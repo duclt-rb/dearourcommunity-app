@@ -1,0 +1,1555 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dear Our Community - Theme Preview</title>
+    <style>
+      /* ================================================
+       DESIGN TOKENS - Mirror of globals.css @theme
+       ================================================ */
+
+      :root {
+        /* Primary Purple */
+        --color-primary: #8f50e2;
+        --color-primary-hover: #7a46c7;
+        --color-primary-dark: #7831da;
+        --color-primary-darker: #6b3fb8;
+
+        /* Text */
+        --color-dark: #1c1c1c;
+
+        /* Background */
+        --color-cream: #f9f2de;
+        --color-cream-alt: #f7f0dc;
+        --color-cream-dark: #f7edd2;
+
+        /* Accent */
+        --color-accent-green: #008600;
+        --color-accent-blue: #00abee;
+        --color-accent-orange: #ff5101;
+
+        /* Border */
+        --color-border: #d2d2d2;
+        --color-border-medium: #d9d9d9;
+        --color-border-light: #efefef;
+
+        /* Radius */
+        --radius-input: 12px;
+        --radius-card: 16px;
+        --radius-card-md: 20px;
+        --radius-card-lg: 24px;
+        --radius-pill: 50px;
+
+        /* Font Size */
+        --text-2xs: 11px;
+        --text-xs: 12px;
+        --text-sm: 14px;
+        --text-base: 16px;
+        --text-lg: 18px;
+        --text-xl: 20px;
+        --text-2xl: 24px;
+        --text-3xl: 30px;
+        --text-4xl: 36px;
+        --text-5xl: 48px;
+        --text-lesson-title: 32px;
+        --text-display: 56px;
+        --text-stat: 70px;
+
+        /* Letter Spacing */
+        --tracking-2xs: 0.3px;
+        --tracking-sm: 0.35px;
+        --tracking-base: 0.4px;
+        --tracking-lg: 0.5px;
+        --tracking-xl: 0.6px;
+        --tracking-2xl: 0.8px;
+        --tracking-3xl: 0.9px;
+        --tracking-4xl: 1.2px;
+        --tracking-5xl: 1.4px;
+        --tracking-label: 1.4px;
+        --tracking-wide: 2px;
+
+        /* Container */
+        --container-max-width: 1268px;
+      }
+
+      /* ================================================
+       BASE STYLES
+       ================================================ */
+
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          'Forma DJR',
+          'Inter',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+        color: var(--color-dark);
+        letter-spacing: var(--tracking-lg);
+        line-height: 1.6;
+        background: #fff;
+      }
+
+      .container {
+        max-width: var(--container-max-width);
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* ================================================
+       LAYOUT
+       ================================================ */
+
+      .header {
+        background: var(--color-primary);
+        color: #fff;
+        padding: 48px 0;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: var(--text-display);
+        font-weight: 700;
+        letter-spacing: var(--tracking-5xl);
+        margin-bottom: 8px;
+      }
+
+      .header p {
+        font-size: var(--text-lg);
+        opacity: 0.9;
+        font-weight: 400;
+      }
+
+      section {
+        padding: 56px 0;
+      }
+
+      section:nth-child(even) {
+        background: var(--color-cream);
+      }
+
+      .section-title {
+        font-size: var(--text-3xl);
+        font-weight: 700;
+        color: var(--color-primary);
+        margin-bottom: 8px;
+        letter-spacing: var(--tracking-3xl);
+      }
+
+      .section-subtitle {
+        font-size: var(--text-base);
+        color: var(--color-dark);
+        opacity: 0.7;
+        margin-bottom: 40px;
+      }
+
+      /* ================================================
+       COLOR SWATCHES
+       ================================================ */
+
+      .color-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+      }
+
+      .color-card {
+        border-radius: var(--radius-card-lg);
+        overflow: hidden;
+        border: 1px solid var(--color-border-light);
+        background: #fff;
+      }
+
+      .color-swatch {
+        height: 100px;
+        display: flex;
+        align-items: flex-end;
+        padding: 12px 16px;
+      }
+
+      .color-swatch span {
+        font-size: var(--text-xs);
+        font-weight: 500;
+        letter-spacing: var(--tracking-2xs);
+        padding: 4px 8px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.85);
+        color: var(--color-dark);
+      }
+
+      .color-info {
+        padding: 16px;
+      }
+
+      .color-info h3 {
+        font-size: var(--text-sm);
+        font-weight: 700;
+        color: var(--color-dark);
+        margin-bottom: 4px;
+      }
+
+      .color-info p {
+        font-size: var(--text-2xs);
+        color: var(--color-dark);
+        opacity: 0.6;
+        letter-spacing: var(--tracking-2xs);
+      }
+
+      .color-info code {
+        display: inline-block;
+        margin-top: 8px;
+        font-size: var(--text-2xs);
+        background: var(--color-cream);
+        padding: 3px 8px;
+        border-radius: 6px;
+        color: var(--color-primary);
+        font-family: 'SF Mono', 'Fira Code', monospace;
+      }
+
+      /* ================================================
+       TYPOGRAPHY SCALE
+       ================================================ */
+
+      .type-row {
+        display: flex;
+        align-items: baseline;
+        gap: 24px;
+        padding: 20px 0;
+        border-bottom: 1px solid var(--color-border-light);
+      }
+
+      .type-row:last-child {
+        border-bottom: none;
+      }
+
+      .type-meta {
+        min-width: 180px;
+        flex-shrink: 0;
+      }
+
+      .type-meta .label {
+        font-size: var(--text-2xs);
+        font-weight: 700;
+        color: var(--color-primary);
+        text-transform: uppercase;
+        letter-spacing: var(--tracking-wide);
+      }
+
+      .type-meta .spec {
+        font-size: var(--text-2xs);
+        color: var(--color-dark);
+        opacity: 0.5;
+        margin-top: 2px;
+        font-family: 'SF Mono', 'Fira Code', monospace;
+      }
+
+      .type-sample {
+        color: var(--color-dark);
+        font-weight: 500;
+        line-height: 1.2;
+      }
+
+      /* ================================================
+       FONT FAMILY
+       ================================================ */
+
+      .font-card {
+        background: #fff;
+        border: 1px solid var(--color-border-light);
+        border-radius: var(--radius-card-lg);
+        padding: 32px;
+        margin-bottom: 20px;
+      }
+
+      .font-card h3 {
+        font-size: var(--text-sm);
+        font-weight: 700;
+        color: var(--color-primary);
+        text-transform: uppercase;
+        letter-spacing: var(--tracking-label);
+        margin-bottom: 4px;
+      }
+
+      .font-card .stack {
+        font-size: var(--text-2xs);
+        color: var(--color-dark);
+        opacity: 0.5;
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        margin-bottom: 20px;
+      }
+
+      .font-weights {
+        display: flex;
+        gap: 40px;
+        flex-wrap: wrap;
+      }
+
+      .font-weight-item .sample {
+        font-size: var(--text-4xl);
+        color: var(--color-dark);
+        line-height: 1.2;
+      }
+
+      .font-weight-item .meta {
+        font-size: var(--text-2xs);
+        color: var(--color-dark);
+        opacity: 0.5;
+        margin-top: 4px;
+      }
+
+      /* ================================================
+       BORDER RADIUS
+       ================================================ */
+
+      .radius-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 20px;
+      }
+
+      .radius-item {
+        text-align: center;
+      }
+
+      .radius-box {
+        width: 100%;
+        height: 100px;
+        background: var(--color-primary);
+        margin-bottom: 12px;
+      }
+
+      .radius-item .label {
+        font-size: var(--text-sm);
+        font-weight: 700;
+        color: var(--color-dark);
+      }
+
+      .radius-item .spec {
+        font-size: var(--text-2xs);
+        color: var(--color-dark);
+        opacity: 0.5;
+        font-family: 'SF Mono', 'Fira Code', monospace;
+      }
+
+      /* ================================================
+       LETTER SPACING
+       ================================================ */
+
+      .spacing-row {
+        display: flex;
+        align-items: baseline;
+        gap: 24px;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--color-border-light);
+      }
+
+      .spacing-row:last-child {
+        border-bottom: none;
+      }
+
+      .spacing-meta {
+        min-width: 140px;
+        flex-shrink: 0;
+      }
+
+      .spacing-meta .label {
+        font-size: var(--text-2xs);
+        font-weight: 700;
+        color: var(--color-primary);
+        font-family: 'SF Mono', 'Fira Code', monospace;
+      }
+
+      .spacing-meta .spec {
+        font-size: var(--text-2xs);
+        color: var(--color-dark);
+        opacity: 0.5;
+        font-family: 'SF Mono', 'Fira Code', monospace;
+      }
+
+      .spacing-sample {
+        font-size: var(--text-xl);
+        font-weight: 500;
+        color: var(--color-dark);
+      }
+
+      /* ================================================
+       BUTTONS
+       ================================================ */
+
+      .button-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+        align-items: center;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 32px;
+        font-size: var(--text-base);
+        font-weight: 500;
+        letter-spacing: var(--tracking-base);
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        font-family: inherit;
+      }
+
+      .btn-primary {
+        background: var(--color-primary);
+        color: #fff;
+        border-radius: var(--radius-pill);
+      }
+
+      .btn-primary:hover {
+        background: var(--color-primary-hover);
+      }
+
+      .btn-secondary {
+        background: var(--color-accent-orange);
+        color: #fff;
+        border-radius: var(--radius-pill);
+      }
+
+      .btn-secondary:hover {
+        opacity: 0.9;
+      }
+
+      .btn-tertiary {
+        background: transparent;
+        color: var(--color-primary);
+        border: 2px solid var(--color-primary);
+        border-radius: var(--radius-pill);
+      }
+
+      .btn-tertiary:hover {
+        background: var(--color-primary);
+        color: #fff;
+      }
+
+      .btn-green {
+        background: var(--color-accent-green);
+        color: #fff;
+        border-radius: var(--radius-pill);
+      }
+
+      .btn-blue {
+        background: var(--color-accent-blue);
+        color: #fff;
+        border-radius: var(--radius-pill);
+      }
+
+      .btn-dark {
+        background: var(--color-dark);
+        color: #fff;
+        border-radius: var(--radius-pill);
+      }
+
+      .btn-label {
+        font-size: var(--text-2xs);
+        color: var(--color-dark);
+        opacity: 0.5;
+        min-width: 80px;
+      }
+
+      /* ================================================
+       CARDS
+       ================================================ */
+
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 24px;
+      }
+
+      .card {
+        border-radius: var(--radius-card-lg);
+        padding: 32px;
+        border: 1px solid var(--color-border);
+      }
+
+      .card-cream {
+        background: var(--color-cream);
+      }
+
+      .card-white {
+        background: #fff;
+      }
+
+      .card h3 {
+        font-size: var(--text-xl);
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+
+      .card p {
+        font-size: var(--text-sm);
+        opacity: 0.7;
+        line-height: 1.7;
+      }
+
+      .card .tag {
+        display: inline-block;
+        font-size: var(--text-2xs);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: var(--tracking-wide);
+        padding: 6px 12px;
+        border-radius: var(--radius-pill);
+        margin-bottom: 16px;
+      }
+
+      .tag-purple {
+        background: var(--color-primary);
+        color: #fff;
+      }
+      .tag-green {
+        background: var(--color-accent-green);
+        color: #fff;
+      }
+      .tag-orange {
+        background: var(--color-accent-orange);
+        color: #fff;
+      }
+      .tag-blue {
+        background: var(--color-accent-blue);
+        color: #fff;
+      }
+
+      /* ================================================
+       FORM ELEMENTS
+       ================================================ */
+
+      .form-group {
+        margin-bottom: 20px;
+        max-width: 400px;
+      }
+
+      .form-group label {
+        display: block;
+        font-size: var(--text-sm);
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: var(--color-dark);
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 14px 16px;
+        font-size: var(--text-base);
+        font-family: inherit;
+        letter-spacing: var(--tracking-base);
+        background: var(--color-cream-alt);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-input);
+        color: var(--color-dark);
+        outline: none;
+        transition: border-color 0.2s;
+      }
+
+      .form-input:focus {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(143, 80, 226, 0.15);
+      }
+
+      .form-input::placeholder {
+        color: var(--color-dark);
+        opacity: 0.35;
+      }
+
+      /* ================================================
+       OPACITY SCALE
+       ================================================ */
+
+      .opacity-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 12px;
+      }
+
+      .opacity-item {
+        text-align: center;
+      }
+
+      .opacity-swatch {
+        height: 64px;
+        border-radius: var(--radius-card);
+        margin-bottom: 8px;
+        border: 1px solid var(--color-border-light);
+      }
+
+      .opacity-item .label {
+        font-size: var(--text-2xs);
+        font-weight: 700;
+        color: var(--color-dark);
+        font-family: 'SF Mono', 'Fira Code', monospace;
+      }
+
+      /* ================================================
+       FOOTER
+       ================================================ */
+
+      .footer {
+        background: var(--color-dark);
+        color: rgba(255, 255, 255, 0.6);
+        padding: 40px 0;
+        text-align: center;
+        font-size: var(--text-sm);
+      }
+
+      .footer strong {
+        color: #fff;
+        font-weight: 500;
+      }
+
+      /* ================================================
+       RESPONSIVE
+       ================================================ */
+
+      @media (max-width: 768px) {
+        .header h1 {
+          font-size: var(--text-3xl);
+        }
+        .section-title {
+          font-size: var(--text-2xl);
+        }
+        .type-row {
+          flex-direction: column;
+          gap: 8px;
+        }
+        .type-meta {
+          min-width: auto;
+        }
+        .spacing-row {
+          flex-direction: column;
+          gap: 4px;
+        }
+        .spacing-meta {
+          min-width: auto;
+        }
+        .font-weights {
+          gap: 24px;
+        }
+        .font-weight-item .sample {
+          font-size: var(--text-2xl);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- HEADER -->
+    <div class="header">
+      <div class="container">
+        <h1>Theme Preview</h1>
+        <p>Dear Our Community - Design System Tokens</p>
+      </div>
+    </div>
+
+    <!-- COLORS - PRIMARY -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Primary Colors</h2>
+        <p class="section-subtitle">Brand identity palette - Purple family</p>
+        <div class="color-grid">
+          <div class="color-card">
+            <div class="color-swatch" style="background: #8f50e2"><span>#8F50E2</span></div>
+            <div class="color-info">
+              <h3>Primary</h3>
+              <p>Brand identity, CTAs, hero sections</p>
+              <code>--color-primary</code>
+            </div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: #7a46c7"><span>#7A46C7</span></div>
+            <div class="color-info">
+              <h3>Primary Hover</h3>
+              <p>Hover state for primary elements</p>
+              <code>--color-primary-hover</code>
+            </div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: #7831da"><span>#7831DA</span></div>
+            <div class="color-info">
+              <h3>Primary Dark</h3>
+              <p>Active/pressed states</p>
+              <code>--color-primary-dark</code>
+            </div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: #6b3fb8"><span>#6B3FB8</span></div>
+            <div class="color-info">
+              <h3>Primary Darker</h3>
+              <p>Deep accent, dark mode variants</p>
+              <code>--color-primary-darker</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COLORS - ACCENT -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Accent Colors</h2>
+        <p class="section-subtitle">Secondary brand colors for specific contexts</p>
+        <div class="color-grid">
+          <div class="color-card">
+            <div class="color-swatch" style="background: #008600">
+              <span style="color: #fff">#008600</span>
+            </div>
+            <div class="color-info">
+              <h3>Green - Impact</h3>
+              <p>Sustainability, success states, eco content</p>
+              <code>--color-accent-green</code>
+            </div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: #ff5101">
+              <span style="color: #fff">#FF5101</span>
+            </div>
+            <div class="color-info">
+              <h3>Orange - Action</h3>
+              <p>CTAs, energy, transformation highlights</p>
+              <code>--color-accent-orange</code>
+            </div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: #00abee">
+              <span style="color: #fff">#00ABEE</span>
+            </div>
+            <div class="color-info">
+              <h3>Blue - Community</h3>
+              <p>Community features, trust indicators</p>
+              <code>--color-accent-blue</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COLORS - NEUTRAL -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Neutral Colors</h2>
+        <p class="section-subtitle">Backgrounds, text, and border colors</p>
+        <div class="color-grid">
+          <div class="color-card">
+            <div class="color-swatch" style="background: #1c1c1c">
+              <span style="color: #fff">#1C1C1C</span>
+            </div>
+            <div class="color-info">
+              <h3>Dark</h3>
+              <p>Primary text color</p>
+              <code>--color-dark</code>
+            </div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: #f9f2de"><span>#F9F2DE</span></div>
+            <div class="color-info">
+              <h3>Cream</h3>
+              <p>Section backgrounds, content cards</p>
+              <code>--color-cream</code>
+            </div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: #f7f0dc"><span>#F7F0DC</span></div>
+            <div class="color-info">
+              <h3>Cream Alt</h3>
+              <p>Form backgrounds, inputs</p>
+              <code>--color-cream-alt</code>
+            </div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: #f7edd2"><span>#F7EDD2</span></div>
+            <div class="color-info">
+              <h3>Cream Dark</h3>
+              <p>Alternative sections, hover states</p>
+              <code>--color-cream-dark</code>
+            </div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: #d2d2d2"><span>#D2D2D2</span></div>
+            <div class="color-info">
+              <h3>Border</h3>
+              <p>Default borders, dividers</p>
+              <code>--color-border</code>
+            </div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: #d9d9d9"><span>#D9D9D9</span></div>
+            <div class="color-info">
+              <h3>Border Medium</h3>
+              <p>Table borders, medium emphasis</p>
+              <code>--color-border-medium</code>
+            </div>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: #efefef"><span>#EFEFEF</span></div>
+            <div class="color-info">
+              <h3>Border Light</h3>
+              <p>Subtle dividers, light borders</p>
+              <code>--color-border-light</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FONT FAMILY -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Font Family</h2>
+        <p class="section-subtitle">Typography foundation - Forma DJR with system fallbacks</p>
+        <div class="font-card">
+          <h3>Forma DJR</h3>
+          <div class="stack">
+            "Forma DJR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif
+          </div>
+          <div class="font-weights">
+            <div class="font-weight-item">
+              <div class="sample" style="font-weight: 400">Aa</div>
+              <div class="meta">Regular 400 - Body text, paragraphs</div>
+            </div>
+            <div class="font-weight-item">
+              <div class="sample" style="font-weight: 500">Aa</div>
+              <div class="meta">Medium 500 - Subheadings, navigation</div>
+            </div>
+            <div class="font-weight-item">
+              <div class="sample" style="font-weight: 700">Aa</div>
+              <div class="meta">Bold 700 - Headlines, hero text</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FONT SIZE SCALE -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Font Size Scale</h2>
+        <p class="section-subtitle">Complete typography scale from 2xs to stat</p>
+        <div class="type-row">
+          <div class="type-meta">
+            <div class="label">text-2xs</div>
+            <div class="spec">11px / 0.6875rem</div>
+          </div>
+          <div class="type-sample" style="font-size: var(--text-2xs)">
+            The quick brown fox jumps
+          </div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">
+            <div class="label">text-xs</div>
+            <div class="spec">12px / 0.75rem</div>
+          </div>
+          <div class="type-sample" style="font-size: var(--text-xs)">The quick brown fox jumps</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">
+            <div class="label">text-sm</div>
+            <div class="spec">14px / 0.875rem</div>
+          </div>
+          <div class="type-sample" style="font-size: var(--text-sm)">The quick brown fox jumps</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">
+            <div class="label">text-base</div>
+            <div class="spec">16px / 1rem</div>
+          </div>
+          <div class="type-sample" style="font-size: var(--text-base)">
+            The quick brown fox jumps over the lazy dog
+          </div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">
+            <div class="label">text-lg</div>
+            <div class="spec">18px / 1.125rem</div>
+          </div>
+          <div class="type-sample" style="font-size: var(--text-lg)">
+            The quick brown fox jumps over the lazy dog
+          </div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">
+            <div class="label">text-xl</div>
+            <div class="spec">20px / 1.25rem</div>
+          </div>
+          <div class="type-sample" style="font-size: var(--text-xl)">
+            The quick brown fox jumps over
+          </div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">
+            <div class="label">text-2xl</div>
+            <div class="spec">24px / 1.5rem</div>
+          </div>
+          <div class="type-sample" style="font-size: var(--text-2xl)">The quick brown fox</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">
+            <div class="label">text-3xl</div>
+            <div class="spec">30px / 1.875rem</div>
+          </div>
+          <div class="type-sample" style="font-size: var(--text-3xl)">The quick brown fox</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">
+            <div class="label">text-4xl</div>
+            <div class="spec">36px / 2.25rem</div>
+          </div>
+          <div class="type-sample" style="font-size: var(--text-4xl)">Brown fox</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">
+            <div class="label">text-5xl</div>
+            <div class="spec">48px / 3rem</div>
+          </div>
+          <div class="type-sample" style="font-size: var(--text-5xl)">Fox jumps</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">
+            <div class="label">text-lesson-title</div>
+            <div class="spec">32px / 2rem</div>
+          </div>
+          <div class="type-sample" style="font-size: var(--text-lesson-title)">Lesson Title</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">
+            <div class="label">text-display</div>
+            <div class="spec">56px / 3.5rem</div>
+          </div>
+          <div class="type-sample" style="font-size: var(--text-display); font-weight: 700">
+            Display
+          </div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">
+            <div class="label">text-stat</div>
+            <div class="spec">70px / 4.375rem</div>
+          </div>
+          <div class="type-sample" style="font-size: var(--text-stat); font-weight: 700">70px</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LETTER SPACING -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Letter Spacing</h2>
+        <p class="section-subtitle">Tracking tokens - pattern: font-size x 0.025px</p>
+        <div class="spacing-row">
+          <div class="spacing-meta">
+            <div class="label">--tracking-2xs</div>
+            <div class="spec">0.3px (12px)</div>
+          </div>
+          <div class="spacing-sample" style="letter-spacing: var(--tracking-2xs)">
+            Dear Our Community
+          </div>
+        </div>
+        <div class="spacing-row">
+          <div class="spacing-meta">
+            <div class="label">--tracking-sm</div>
+            <div class="spec">0.35px (14px)</div>
+          </div>
+          <div class="spacing-sample" style="letter-spacing: var(--tracking-sm)">
+            Dear Our Community
+          </div>
+        </div>
+        <div class="spacing-row">
+          <div class="spacing-meta">
+            <div class="label">--tracking-base</div>
+            <div class="spec">0.4px (16px)</div>
+          </div>
+          <div class="spacing-sample" style="letter-spacing: var(--tracking-base)">
+            Dear Our Community
+          </div>
+        </div>
+        <div class="spacing-row">
+          <div class="spacing-meta">
+            <div class="label">--tracking-lg</div>
+            <div class="spec">0.5px (20px) DEFAULT</div>
+          </div>
+          <div class="spacing-sample" style="letter-spacing: var(--tracking-lg)">
+            Dear Our Community
+          </div>
+        </div>
+        <div class="spacing-row">
+          <div class="spacing-meta">
+            <div class="label">--tracking-xl</div>
+            <div class="spec">0.6px (24px)</div>
+          </div>
+          <div class="spacing-sample" style="letter-spacing: var(--tracking-xl)">
+            Dear Our Community
+          </div>
+        </div>
+        <div class="spacing-row">
+          <div class="spacing-meta">
+            <div class="label">--tracking-2xl</div>
+            <div class="spec">0.8px (32px)</div>
+          </div>
+          <div class="spacing-sample" style="letter-spacing: var(--tracking-2xl)">
+            Dear Our Community
+          </div>
+        </div>
+        <div class="spacing-row">
+          <div class="spacing-meta">
+            <div class="label">--tracking-3xl</div>
+            <div class="spec">0.9px (36px)</div>
+          </div>
+          <div class="spacing-sample" style="letter-spacing: var(--tracking-3xl)">
+            Dear Our Community
+          </div>
+        </div>
+        <div class="spacing-row">
+          <div class="spacing-meta">
+            <div class="label">--tracking-4xl</div>
+            <div class="spec">1.2px (48px)</div>
+          </div>
+          <div class="spacing-sample" style="letter-spacing: var(--tracking-4xl)">
+            Dear Our Community
+          </div>
+        </div>
+        <div class="spacing-row">
+          <div class="spacing-meta">
+            <div class="label">--tracking-5xl</div>
+            <div class="spec">1.4px (56px)</div>
+          </div>
+          <div class="spacing-sample" style="letter-spacing: var(--tracking-5xl)">
+            Dear Our Community
+          </div>
+        </div>
+        <div class="spacing-row">
+          <div class="spacing-meta">
+            <div class="label">--tracking-label</div>
+            <div class="spec">1.4px uppercase labels</div>
+          </div>
+          <div
+            class="spacing-sample"
+            style="
+              letter-spacing: var(--tracking-label);
+              text-transform: uppercase;
+              font-size: var(--text-sm);
+            "
+          >
+            TRUSTED BY
+          </div>
+        </div>
+        <div class="spacing-row">
+          <div class="spacing-meta">
+            <div class="label">--tracking-wide</div>
+            <div class="spec">2px uppercase tags</div>
+          </div>
+          <div
+            class="spacing-sample"
+            style="
+              letter-spacing: var(--tracking-wide);
+              text-transform: uppercase;
+              font-size: var(--text-sm);
+            "
+          >
+            FEATURED COURSES
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BORDER RADIUS -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Border Radius</h2>
+        <p class="section-subtitle">Consistent rounding tokens for all UI elements</p>
+        <div class="radius-grid">
+          <div class="radius-item">
+            <div class="radius-box" style="border-radius: var(--radius-input)"></div>
+            <div class="label">Input</div>
+            <div class="spec">12px</div>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="border-radius: var(--radius-card)"></div>
+            <div class="label">Card</div>
+            <div class="spec">16px</div>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="border-radius: var(--radius-card-md)"></div>
+            <div class="label">Card MD</div>
+            <div class="spec">20px</div>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="border-radius: var(--radius-card-lg)"></div>
+            <div class="label">Card LG</div>
+            <div class="spec">24px</div>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="border-radius: var(--radius-pill)"></div>
+            <div class="label">Pill</div>
+            <div class="spec">50px</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUTTONS -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Buttons</h2>
+        <p class="section-subtitle">Button variants using brand tokens</p>
+        <div class="button-row">
+          <span class="btn-label">Primary</span>
+          <button class="btn btn-primary">Join Now</button>
+        </div>
+        <div class="button-row">
+          <span class="btn-label">Secondary</span>
+          <button class="btn btn-secondary">Learn More</button>
+        </div>
+        <div class="button-row">
+          <span class="btn-label">Tertiary</span>
+          <button class="btn btn-tertiary">Explore</button>
+        </div>
+        <div class="button-row">
+          <span class="btn-label">Green</span>
+          <button class="btn btn-green">Impact</button>
+        </div>
+        <div class="button-row">
+          <span class="btn-label">Blue</span>
+          <button class="btn btn-blue">Community</button>
+        </div>
+        <div class="button-row">
+          <span class="btn-label">Dark</span>
+          <button class="btn btn-dark">Get Started</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CARDS -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Card Components</h2>
+        <p class="section-subtitle">Content cards with cream and white backgrounds</p>
+        <div class="card-grid">
+          <div class="card card-cream">
+            <span class="tag tag-purple">Featured</span>
+            <h3 style="color: var(--color-primary)">Sustainability Skills</h3>
+            <p>
+              Learn essential skills for building a sustainable future in Southeast Asia through
+              hands-on projects.
+            </p>
+          </div>
+          <div class="card card-white">
+            <span class="tag tag-green">Impact</span>
+            <h3 style="color: var(--color-accent-green)">Climate Action</h3>
+            <p>
+              Join community-driven initiatives tackling climate change challenges across the
+              region.
+            </p>
+          </div>
+          <div class="card card-cream">
+            <span class="tag tag-orange">Action</span>
+            <h3 style="color: var(--color-accent-orange)">Youth Leadership</h3>
+            <p>
+              Empowering the next generation of leaders through mentorship and collaborative
+              learning.
+            </p>
+          </div>
+          <div class="card card-white">
+            <span class="tag tag-blue">Community</span>
+            <h3 style="color: var(--color-accent-blue)">Network Building</h3>
+            <p>
+              Connect with like-minded peers and mentors across Southeast Asia's vibrant community.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FORM ELEMENTS -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Form Elements</h2>
+        <p class="section-subtitle">Input fields with cream backgrounds and focus states</p>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input class="form-input" type="email" placeholder="your@email.com" />
+        </div>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input class="form-input" type="text" placeholder="Enter your name" />
+        </div>
+        <div class="form-group">
+          <label>Message</label>
+          <textarea class="form-input" rows="4" placeholder="Tell us about yourself..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- OPACITY VARIANTS -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Color Opacity Variants</h2>
+        <p class="section-subtitle">Using Tailwind opacity syntax: bg-primary/20, text-dark/60</p>
+        <h3
+          style="
+            font-size: var(--text-sm);
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--color-primary);
+          "
+        >
+          PRIMARY PURPLE
+        </h3>
+        <div class="opacity-grid" style="margin-bottom: 32px">
+          <div class="opacity-item">
+            <div class="opacity-swatch" style="background: rgba(143, 80, 226, 0.1)"></div>
+            <div class="label">10%</div>
+          </div>
+          <div class="opacity-item">
+            <div class="opacity-swatch" style="background: rgba(143, 80, 226, 0.2)"></div>
+            <div class="label">20%</div>
+          </div>
+          <div class="opacity-item">
+            <div class="opacity-swatch" style="background: rgba(143, 80, 226, 0.3)"></div>
+            <div class="label">30%</div>
+          </div>
+          <div class="opacity-item">
+            <div class="opacity-swatch" style="background: rgba(143, 80, 226, 0.5)"></div>
+            <div class="label">50%</div>
+          </div>
+          <div class="opacity-item">
+            <div class="opacity-swatch" style="background: rgba(143, 80, 226, 0.7)"></div>
+            <div class="label">70%</div>
+          </div>
+          <div class="opacity-item">
+            <div class="opacity-swatch" style="background: rgba(143, 80, 226, 1)"></div>
+            <div class="label">100%</div>
+          </div>
+        </div>
+        <h3
+          style="
+            font-size: var(--text-sm);
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--color-primary);
+          "
+        >
+          DARK TEXT
+        </h3>
+        <div class="opacity-grid">
+          <div class="opacity-item">
+            <div class="opacity-swatch" style="background: rgba(28, 28, 28, 0.1)"></div>
+            <div class="label">10%</div>
+          </div>
+          <div class="opacity-item">
+            <div class="opacity-swatch" style="background: rgba(28, 28, 28, 0.2)"></div>
+            <div class="label">20%</div>
+          </div>
+          <div class="opacity-item">
+            <div class="opacity-swatch" style="background: rgba(28, 28, 28, 0.3)"></div>
+            <div class="label">30%</div>
+          </div>
+          <div class="opacity-item">
+            <div class="opacity-swatch" style="background: rgba(28, 28, 28, 0.5)"></div>
+            <div class="label">50%</div>
+          </div>
+          <div class="opacity-item">
+            <div class="opacity-swatch" style="background: rgba(28, 28, 28, 0.7)"></div>
+            <div class="label">70%</div>
+          </div>
+          <div class="opacity-item">
+            <div class="opacity-swatch" style="background: rgba(28, 28, 28, 1)"></div>
+            <div class="label">100%</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SPEC TABLE -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Complete Token Reference</h2>
+        <p class="section-subtitle">All design tokens in one view</p>
+        <table style="width: 100%; border-collapse: collapse; font-size: var(--text-sm)">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--color-primary)">
+              <th
+                style="
+                  text-align: left;
+                  padding: 12px 16px;
+                  color: var(--color-primary);
+                  font-size: var(--text-2xs);
+                  text-transform: uppercase;
+                  letter-spacing: var(--tracking-wide);
+                "
+              >
+                Category
+              </th>
+              <th
+                style="
+                  text-align: left;
+                  padding: 12px 16px;
+                  color: var(--color-primary);
+                  font-size: var(--text-2xs);
+                  text-transform: uppercase;
+                  letter-spacing: var(--tracking-wide);
+                "
+              >
+                Token
+              </th>
+              <th
+                style="
+                  text-align: left;
+                  padding: 12px 16px;
+                  color: var(--color-primary);
+                  font-size: var(--text-2xs);
+                  text-transform: uppercase;
+                  letter-spacing: var(--tracking-wide);
+                "
+              >
+                Value
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Color</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --color-primary
+              </td>
+              <td style="padding: 10px 16px">#8F50E2</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Color</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --color-primary-hover
+              </td>
+              <td style="padding: 10px 16px">#7A46C7</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Color</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --color-primary-dark
+              </td>
+              <td style="padding: 10px 16px">#7831DA</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Color</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --color-primary-darker
+              </td>
+              <td style="padding: 10px 16px">#6B3FB8</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Color</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --color-dark
+              </td>
+              <td style="padding: 10px 16px">#1C1C1C</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Color</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --color-cream
+              </td>
+              <td style="padding: 10px 16px">#F9F2DE</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Color</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --color-cream-alt
+              </td>
+              <td style="padding: 10px 16px">#F7F0DC</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Color</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --color-cream-dark
+              </td>
+              <td style="padding: 10px 16px">#F7EDD2</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Color</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --color-accent-green
+              </td>
+              <td style="padding: 10px 16px">#008600</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Color</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --color-accent-blue
+              </td>
+              <td style="padding: 10px 16px">#00ABEE</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Color</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --color-accent-orange
+              </td>
+              <td style="padding: 10px 16px">#FF5101</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Color</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --color-border
+              </td>
+              <td style="padding: 10px 16px">#D2D2D2</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Color</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --color-border-medium
+              </td>
+              <td style="padding: 10px 16px">#D9D9D9</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Color</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --color-border-light
+              </td>
+              <td style="padding: 10px 16px">#EFEFEF</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Radius</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --radius-input
+              </td>
+              <td style="padding: 10px 16px">12px</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Radius</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --radius-card
+              </td>
+              <td style="padding: 10px 16px">16px</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Radius</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --radius-card-md
+              </td>
+              <td style="padding: 10px 16px">20px</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Radius</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --radius-card-lg
+              </td>
+              <td style="padding: 10px 16px">24px</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Radius</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --radius-pill
+              </td>
+              <td style="padding: 10px 16px">50px</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Font</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --font-sans
+              </td>
+              <td style="padding: 10px 16px">Forma DJR, system-ui, sans-serif</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Font Size</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --text-2xs
+              </td>
+              <td style="padding: 10px 16px">11px</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Font Size</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --text-lesson-title
+              </td>
+              <td style="padding: 10px 16px">32px</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Font Size</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --text-display
+              </td>
+              <td style="padding: 10px 16px">56px</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Font Size</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --text-stat
+              </td>
+              <td style="padding: 10px 16px">70px</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Tracking</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --tracking-2xs
+              </td>
+              <td style="padding: 10px 16px">0.3px</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Tracking</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --tracking-lg (default)
+              </td>
+              <td style="padding: 10px 16px">0.5px</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Tracking</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --tracking-label
+              </td>
+              <td style="padding: 10px 16px">1.4px</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Tracking</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --tracking-wide
+              </td>
+              <td style="padding: 10px 16px">2px</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Container</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --container-max-width
+              </td>
+              <td style="padding: 10px 16px">1268px</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-light)">
+              <td style="padding: 10px 16px">Breakpoint</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --breakpoint-3xl
+              </td>
+              <td style="padding: 10px 16px">1920px</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px 16px">Breakpoint</td>
+              <td style="padding: 10px 16px; font-family: monospace; font-size: var(--text-2xs)">
+                --breakpoint-4xl
+              </td>
+              <td style="padding: 10px 16px">2560px</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <p><strong>Dear Our Community</strong> - "Unpack the gap, unlock the path"</p>
+        <p style="margin-top: 8px">Design System v1.0 | Font: Forma DJR (400, 500, 700)</p>
+      </div>
+    </div>
+  </body>
+</html>
