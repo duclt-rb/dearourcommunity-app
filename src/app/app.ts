@@ -1,16 +1,10 @@
-import { Component, inject } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { LucideHeart, LucideStar, LucideZap } from '@lucide/angular';
-import { CounterStore } from './counter.store';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [ButtonModule, CardModule, LucideHeart, LucideStar, LucideZap],
-  providers: [CounterStore],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
-export class App {
-  readonly store = inject(CounterStore);
-}
+export class App {}
