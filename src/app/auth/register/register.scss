@@ -16,15 +16,39 @@
   cursor: pointer;
 
   input[type='checkbox'] {
+    appearance: none !important;
+    -webkit-appearance: none !important;
     margin-top: 2px;
     width: 18px;
     height: 18px;
+    min-width: 18px;
     border: 1.5px solid var(--color-border-input);
     border-radius: 4px;
     background: var(--color-bg);
-    accent-color: var(--color-primary);
     cursor: pointer;
-    appearance: auto;
+    position: relative;
+    transition: all 0.15s;
+
+    &:checked {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 5px;
+        width: 5px;
+        height: 9px;
+        border: solid #fff;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(143, 80, 226, 0.1);
+    }
   }
 
   &__label {
