@@ -1,9 +1,11 @@
-import { Component, ViewEncapsulation, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Component, inject, signal, ViewEncapsulation } from '@angular/core';
 import { email, form, FormField, required } from '@angular/forms/signals';
+import { Router, RouterLink } from '@angular/router';
+import { ApiError } from '@dearourcommunity/client';
 import { LucideEye, LucideEyeOff, LucideLock, LucideMail } from '@lucide/angular';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
+import { ClientService } from '../../core/client.service';
 import AuthLayoutComponent from '../auth-layout/auth-layout';
 
 @Component({
@@ -26,6 +28,7 @@ import AuthLayoutComponent from '../auth-layout/auth-layout';
 })
 export default class LoginPage {
   private router = inject(Router);
+  private api = inject(ClientService);
 
   loginModel = signal({ email: '', password: '' });
 
@@ -89,11 +92,12 @@ export default class LoginPage {
     this.error.set(null);
 
     try {
-      // TODO: Wire up to @dearourcommunity/client AuthClient
-      await new Promise((r) => setTimeout(r, 1200)); // simulate
-      this.router.navigate(['/dashboard']);
-    } catch {
-      this.error.set('Invalid email or password');
+      const { email, password } = this.loginModel();
+      const { accessToken } = await this.api.auth.login({ email, password });
+      this.api.setToken(accessToken);
+      this.router.navigate(['/profile']);
+    } catch (err) {
+      this.error.set(err instanceof ApiError ? err.message : 'Invalid email or password');
     } finally {
       this.loading.set(false);
     }

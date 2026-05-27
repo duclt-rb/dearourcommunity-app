@@ -1,0 +1,45 @@
+/* Register-specific overrides (shared styles in auth-layout) */
+
+.field-row {
+  display: flex;
+  gap: 1rem;
+
+  .field {
+    flex: 1;
+  }
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  cursor: pointer;
+
+  input[type='checkbox'] {
+    margin-top: 2px;
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--color-border-input);
+    border-radius: 4px;
+    background: var(--color-bg);
+    accent-color: var(--color-primary);
+    cursor: pointer;
+    appearance: auto;
+  }
+
+  &__label {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    letter-spacing: var(--tracking-sm);
+  }
+}
+
+.auth-form__error {
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: var(--color-error-500);
+  font-size: 0.8125rem;
+  letter-spacing: var(--tracking-sm);
+}

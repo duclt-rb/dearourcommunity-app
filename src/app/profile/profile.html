@@ -1,0 +1,12 @@
+<div class="profile-page">
+  <div class="profile-card">
+    @if (loading()) {
+      <p class="profile-card__loading">Loading...</p>
+    } @else {
+      <div class="profile-card__avatar">{{ name().charAt(0) }}</div>
+      <h1 class="profile-card__name">{{ name() }}</h1>
+      <p class="profile-card__email">{{ email() }}</p>
+      <button class="profile-card__logout" (click)="logout()">Sign out</button>
+    }
+  </div>
+</div>

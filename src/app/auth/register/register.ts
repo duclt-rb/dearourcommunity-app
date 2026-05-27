@@ -1,18 +1,141 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject, signal, ViewEncapsulation } from '@angular/core';
+import {
+  email,
+  form,
+  FormField,
+  minLength,
+  patternError,
+  required,
+  validate,
+} from '@angular/forms/signals';
+import { Router, RouterLink } from '@angular/router';
+import { ApiError } from '@dearourcommunity/client';
+import {
+  LucideEye,
+  LucideEyeOff,
+  LucideLock,
+  LucideMail,
+  LucidePhone,
+  LucideUser,
+} from '@lucide/angular';
+import { Button } from 'primeng/button';
+import { InputText } from 'primeng/inputtext';
+import { ClientService } from '../../core/client.service';
+import AuthLayoutComponent from '../auth-layout/auth-layout';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [RouterLink],
-  template: `
-    <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;">
-      <div style="text-align:center;">
-        <h1 style="font-size:1.5rem;margin-bottom:0.5rem;">Create Account</h1>
-        <p style="color:#666;margin-bottom:1rem;">Coming soon</p>
-        <a routerLink="/auth/login" style="color:var(--color-primary);">Back to login</a>
-      </div>
-    </div>
-  `,
+  imports: [
+    AuthLayoutComponent,
+    FormField,
+    RouterLink,
+    LucideUser,
+    LucideMail,
+    LucidePhone,
+    LucideLock,
+    LucideEye,
+    LucideEyeOff,
+    InputText,
+    Button,
+  ],
+  templateUrl: './register.html',
+  styleUrl: './register.scss',
+  encapsulation: ViewEncapsulation.None,
 })
-export default class RegisterPage {}
+export default class RegisterPage {
+  private router = inject(Router);
+  private client = inject(ClientService);
+
+  registerModel = signal({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    password: '',
+    repeatPassword: '',
+    agreeToTerms: false,
+  });
+
+  registerForm = form(this.registerModel, (p) => {
+    required(p.firstName, { message: 'Họ là bắt buộc' });
+    required(p.lastName, { message: 'Tên là bắt buộc' });
+    required(p.email, { message: 'Email là bắt buộc' });
+    email(p.email, { message: 'Email không hợp lệ' });
+    required(p.phone, { message: 'Số điện thoại là bắt buộc' });
+    required(p.password, { message: 'Mật khẩu là bắt buộc' });
+    minLength(p.password, 8, { message: 'Mật khẩu tối thiểu 8 ký tự' });
+    required(p.repeatPassword, { message: 'Nhập lại mật khẩu là bắt buộc' });
+    validate(p.repeatPassword, (ctx) => {
+      return ctx.value() === this.registerModel().password
+        ? undefined
+        : patternError(/^$/, { message: 'Mật khẩu không khớp' });
+    });
+    required(p.agreeToTerms, { message: 'Bạn phải đồng ý với điều khoản' });
+  });
+
+  // PrimeNG PassThrough
+  inputPt = {
+    root: {
+      style: `
+        width: 100%;
+        height: 50px;
+        padding: 0 14px 0 44px;
+        border: 1.5px solid var(--color-border-input);
+        border-radius: 14px;
+        background: var(--color-bg-input);
+        font-family: var(--font-sans);
+        font-size: 0.9375rem;
+        color: var(--color-text);
+        letter-spacing: var(--tracking-base);
+        transition: all 0.2s;
+        outline: none;
+        box-shadow: none;
+      `,
+    },
+  };
+
+  submitPt = {
+    root: {
+      style: `
+        width: 100%;
+        height: 50px;
+        border: none;
+        border-radius: 14px;
+        background: var(--color-primary);
+        color: var(--color-bg);
+        font-family: var(--font-sans);
+        font-size: 0.9375rem;
+        font-weight: 600;
+        letter-spacing: var(--tracking-base);
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      `,
+    },
+  };
+
+  showPassword = signal(false);
+  loading = signal(false);
+  error = signal<string | null>(null);
+
+  async onSubmit(e: Event) {
+    e.preventDefault();
+
+    this.registerForm().markAsTouched();
+
+    if (this.registerForm().invalid()) return;
+
+    this.loading.set(true);
+    this.error.set(null);
+
+    try {
+      const dto = this.registerModel();
+      const { accessToken } = await this.client.auth.register(dto);
+      this.client.setToken(accessToken);
+      this.router.navigate(['/dashboard']);
+    } catch (err) {
+      this.error.set(err instanceof ApiError ? err.message : 'Đăng ký thất bại');
+    } finally {
+      this.loading.set(false);
+    }
+  }
+}
