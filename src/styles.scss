@@ -69,6 +69,17 @@
 }
 
 /* ================================================
+   CSS CUSTOM PROPERTIES
+   Defined here (outside Tailwind @layer) so they're
+   accessible from component styles via var()
+   ================================================ */
+
+:root {
+  --font-sans: 'Forma DJR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Forma DJR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ================================================
    BASE STYLES
    ================================================ */
 

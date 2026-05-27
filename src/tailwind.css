@@ -11,38 +11,116 @@
   --font-sans: 'Forma DJR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-display: 'Forma DJR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  /* Primary Purple */
-  --color-primary: #8f50e2;
-  --color-primary-hover: #7a46c7;
-  --color-primary-dark: #7831da;
-  --color-primary-darker: #6b3fb8;
+  /* ── Primary Purple Scale ── */
+  --color-primary-50: #f5eeff;
+  --color-primary-100: #ede0ff;
+  --color-primary-200: #dbc1ff;
+  --color-primary-300: #c499ff;
+  --color-primary-400: #a96eff;
+  --color-primary-500: #8f50e2;
+  --color-primary-600: #7a46c7;
+  --color-primary-700: #6b3fb8;
+  --color-primary-800: #55309a;
+  --color-primary-900: #3d2170;
+  --color-primary: var(--color-primary-500);
+  --color-primary-hover: var(--color-primary-600);
 
-  /* Text */
-  --color-dark: #1c1c1c;
+  /* ── Gray Scale ── */
+  --color-gray-50: #f9f9f9;
+  --color-gray-100: #f5f5f5;
+  --color-gray-200: #efefef;
+  --color-gray-300: #d9d9d9;
+  --color-gray-400: #d2d2d2;
+  --color-gray-500: #b0b0b0;
+  --color-gray-600: #8a8a8a;
+  --color-gray-700: #6b6b6b;
+  --color-gray-800: #4a4a4a;
+  --color-gray-900: #1c1c1c;
+  --color-dark: var(--color-gray-900);
 
-  /* Background / Cream */
-  --color-cream: #f9f2de;
-  --color-cream-alt: #f7f0dc;
-  --color-cream-dark: #f7edd2;
+  /* ── Background ── */
+  --color-bg: #ffffff;
+  --color-bg-subtle: #f9f9f9;
+  --color-bg-muted: #f5f5f5;
 
-  /* Accent Colors */
+  /* ── Semantic Colors ── */
+  /* Success */
+  --color-success-50: #e6f9e6;
+  --color-success-100: #b3ecb3;
+  --color-success-200: #80df80;
+  --color-success-300: #4dd24d;
+  --color-success-400: #26b926;
+  --color-success-500: #008600;
+  --color-success-600: #007400;
+  --color-success-700: #005c00;
+  --color-success-800: #004400;
+  --color-success-900: #002d00;
+  --color-success: var(--color-success-500);
+
+  /* Warning */
+  --color-warning-50: #fff8e6;
+  --color-warning-100: #ffedb3;
+  --color-warning-200: #ffe280;
+  --color-warning-300: #ffd64d;
+  --color-warning-400: #ffcb26;
+  --color-warning-500: #f5a623;
+  --color-warning-600: #d4901e;
+  --color-warning-700: #a06c17;
+  --color-warning-800: #6c4810;
+  --color-warning-900: #3a2609;
+  --color-warning: var(--color-warning-500);
+
+  /* Info */
+  --color-info-50: #e6f7fc;
+  --color-info-100: #b3e8f7;
+  --color-info-200: #80d9f2;
+  --color-info-300: #4dcaed;
+  --color-info-400: #26bee9;
+  --color-info-500: #00abee;
+  --color-info-600: #0096d4;
+  --color-info-700: #0074a5;
+  --color-info-800: #005276;
+  --color-info-900: #003147;
+  --color-info: var(--color-info-500);
+
+  /* Error */
+  --color-error-50: #fef2f2;
+  --color-error-100: #fde8e8;
+  --color-error-200: #fbd5d5;
+  --color-error-300: #f8b4b4;
+  --color-error-400: #f07171;
+  --color-error-500: #dc2626;
+  --color-error-600: #b91c1c;
+  --color-error-700: #991b1b;
+  --color-error-800: #7f1d1d;
+  --color-error-900: #450a0a;
+  --color-error: var(--color-error-500);
+
+  /* ── Accent Colors (brand-specific) ── */
   --color-accent-green: #008600;
+  --color-accent-green-hover: #007400;
   --color-accent-blue: #00abee;
+  --color-accent-blue-hover: #0096d4;
   --color-accent-orange: #ff5101;
+  --color-accent-orange-hover: #e64800;
 
-  /* Border */
-  --color-border: #d2d2d2;
-  --color-border-medium: #d9d9d9;
+  /* ── Border ── */
+  --color-border: #d9d9d9;
   --color-border-light: #efefef;
+  --color-border-lighter: #f5f5f5;
 
-  /* Border Radius */
+  /* ── Border Radius ── */
   --radius-input: 12px;
   --radius-card: 16px;
   --radius-card-md: 20px;
   --radius-card-lg: 24px;
   --radius-pill: 50px;
 
-  /* Font Size Scale */
+  /* ── Opacity ── */
+  --opacity-disabled: 0.5;
+  --opacity-overlay: 0.6;
+
+  /* ── Font Size Scale ── */
   --text-2xs: 0.6875rem; /* 11px */
   --text-xs: 0.75rem; /* 12px */
   --text-sm: 0.875rem; /* 14px */
@@ -57,7 +135,7 @@
   --text-display: 3.5rem; /* 56px */
   --text-stat: 4.375rem; /* 70px */
 
-  /* Letter Spacing */
+  /* ── Letter Spacing ── */
   --tracking-2xs: 0.3px;
   --tracking-sm: 0.35px;
   --tracking-base: 0.4px;
@@ -70,10 +148,53 @@
   --tracking-label: 1.4px;
   --tracking-wide: 2px;
 
-  /* Container */
+  /* ── Container ── */
   --container-max-width: 1268px;
 
-  /* Breakpoints */
+  /* ── Breakpoints ── */
   --breakpoint-3xl: 1920px;
   --breakpoint-4xl: 2560px;
+}
+
+/* ── CSS Custom Properties for component use ── */
+
+:root {
+  /* Primary */
+  --color-primary: #8f50e2;
+  --color-primary-hover: #7a46c7;
+
+  /* Error */
+  --color-error-500: #dc2626;
+
+  /* Background */
+  --color-bg: #ffffff;
+  --color-bg-input: #f8f8fb;
+  --color-bg-input-hover: #f4f4f8;
+  --color-bg-toggle-hover: #f0f0f5;
+  --color-bg-social-hover: #f8f8fb;
+
+  /* Text */
+  --color-text: #1a1a2e;
+  --color-text-muted: #7a7a8e;
+  --color-text-secondary: #3a3a4e;
+  --color-text-label: #2d2d3f;
+  --color-text-divider: #9e9eae;
+  --color-text-placeholder: #b0b0be;
+
+  /* Icon */
+  --color-icon: #a5a5b5;
+  --color-icon-hover: #5a5a6e;
+
+  /* Border */
+  --color-border-input: #e2e2ea;
+  --color-border-input-hover: #c8c8d4;
+  --color-border-divider: #e8e8ee;
+
+  /* Accent */
+  --color-accent-gradient-start: #c499ff;
+  --color-accent-gradient-end: #ff9cee;
+
+  /* Brand Dark */
+  --color-brand-dark-start: #5a2d9e;
+  --color-brand-dark-end: #2a1554;
 }
