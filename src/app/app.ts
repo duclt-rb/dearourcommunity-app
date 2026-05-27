@@ -9,7 +9,7 @@ import { CounterStore } from './counter.store';
   imports: [ButtonModule, CardModule, LucideHeart, LucideStar, LucideZap],
   providers: [CounterStore],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
 })
 export class App {
   readonly store = inject(CounterStore);

@@ -20,15 +20,15 @@ export const appConfig: ApplicationConfig = {
         options: {
           cssLayer: {
             name: 'primeng',
-            order: 'tailwind-base, primeng, tailwind-utilities'
-          }
-        }
-      }
+            order: 'tailwind-base, primeng, tailwind-utilities',
+          },
+        },
+      },
     }),
     provideLucideConfig({
       size: 24,
       color: 'currentColor',
       strokeWidth: 2,
     }),
-  ]
+  ],
 };
