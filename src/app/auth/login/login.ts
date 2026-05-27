@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
-import { LucideHeart, LucideMail, LucideLock, LucideEye, LucideEyeOff } from '@lucide/angular';
+import { LucideMail, LucideLock, LucideEye, LucideEyeOff } from '@lucide/angular';
 
 @Component({
   selector: 'app-login',
@@ -15,7 +15,6 @@ import { LucideHeart, LucideMail, LucideLock, LucideEye, LucideEyeOff } from '@l
     InputTextModule,
     ButtonModule,
     CheckboxModule,
-    LucideHeart,
     LucideMail,
     LucideLock,
     LucideEye,

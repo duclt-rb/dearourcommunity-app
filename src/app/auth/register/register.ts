@@ -5,14 +5,7 @@ import { RouterLink } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
-import {
-  LucideHeart,
-  LucideMail,
-  LucideLock,
-  LucideUser,
-  LucideEye,
-  LucideEyeOff,
-} from '@lucide/angular';
+import { LucideMail, LucideLock, LucideUser, LucideEye, LucideEyeOff } from '@lucide/angular';
 
 @Component({
   selector: 'app-register',
@@ -24,7 +17,6 @@ import {
     InputTextModule,
     ButtonModule,
     CheckboxModule,
-    LucideHeart,
     LucideMail,
     LucideLock,
     LucideUser,
