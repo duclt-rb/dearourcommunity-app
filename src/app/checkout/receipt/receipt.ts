@@ -15,7 +15,9 @@ export default class ReceiptComponent implements OnInit {
   private route = inject(ActivatedRoute);
   readonly store = inject(CheckoutStore);
 
-  courseTitle = 'ESG Căn Bản Cho Người Mới Bắt Đầu';
+  get packageName(): string {
+    return this.store.selectedPackage()?.name ?? 'Gói Premium';
+  }
 
   // Aliases for 100% template compatibility
   resultCode = this.store.resultCode;

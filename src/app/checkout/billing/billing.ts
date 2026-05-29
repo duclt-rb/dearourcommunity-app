@@ -41,8 +41,11 @@ export default class BillingComponent {
   couponError = this.store.couponError;
   loading = this.store.isLoading;
   paymentError = this.store.paymentError;
-  originalPrice = 500000;
   finalPrice = this.store.finalPrice;
+
+  get originalPrice(): number {
+    return this.store.originalPrice();
+  }
 
   goToPayment() {
     this.store.setStep(2);

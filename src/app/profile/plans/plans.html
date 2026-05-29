@@ -85,10 +85,10 @@
                     <svg lucideArrowRight [size]="16" strokeWidth="2"></svg>
                   </button>
                 } @else {
-                  <a class="plan-card__cta" routerLink="/checkout/billing">
+                  <button class="plan-card__cta cursor-pointer" (click)="selectAndUpgrade(pkg)">
                     Nâng cấp
                     <svg lucideArrowRight [size]="16" strokeWidth="2"></svg>
-                  </a>
+                  </button>
                 }
               </div>
             </div>
@@ -146,10 +146,10 @@
                     <svg lucideArrowRight [size]="16" strokeWidth="2"></svg>
                   </button>
                 } @else {
-                  <a class="plan-card__cta" routerLink="/checkout/billing">
+                  <button class="plan-card__cta cursor-pointer" (click)="selectAndUpgrade(pkg)">
                     Nâng cấp
                     <svg lucideArrowRight [size]="16" strokeWidth="2"></svg>
-                  </a>
+                  </button>
                 }
               </div>
             </div>

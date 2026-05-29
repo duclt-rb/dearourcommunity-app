@@ -20,9 +20,9 @@
       <div class="enroll-status">
         @if (activating()) {
           <div class="spinner-sm dark"></div>
-          <span class="enroll-loading">Đang kích hoạt khóa học...</span>
+          <span class="enroll-loading">Đang kích hoạt gói thành viên...</span>
         } @else {
-          <span class="enroll-success">✓ Khóa học đã được kích hoạt!</span>
+          <span class="enroll-success">✓ Tài khoản của bạn đã được nâng cấp!</span>
         }
       </div>
 
@@ -30,8 +30,8 @@
       <div class="order-card">
         <div class="order-details">
           <div class="order-row">
-            <span class="order-label">Đơn hàng</span>
-            <span class="order-value">{{ courseTitle }}</span>
+            <span class="order-label">Gói đăng ký</span>
+            <span class="order-value">{{ packageName }}</span>
           </div>
           <div class="order-row">
             <span class="order-label">Mã đơn hàng</span>
@@ -54,8 +54,8 @@
           <svg lucideHome [size]="18" strokeWidth="2"></svg>
           Trang chủ
         </a>
-        <a routerLink="/profile/courses" class="btn btn-primary">
-          Bắt đầu học
+        <a routerLink="/profile/plans" class="btn btn-primary">
+          Xem Gói của tôi
           <svg lucideArrowRight [size]="20" strokeWidth="2"></svg>
         </a>
       </div>
@@ -83,8 +83,8 @@
       <div class="order-card">
         <div class="order-details">
           <div class="order-row">
-            <span class="order-label">Đơn hàng</span>
-            <span class="order-value">{{ courseTitle }}</span>
+            <span class="order-label">Gói đăng ký</span>
+            <span class="order-value">{{ packageName }}</span>
           </div>
           <div class="order-row">
             <span class="order-label">Mã đơn hàng</span>

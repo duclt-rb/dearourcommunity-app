@@ -1,8 +1,10 @@
 import { computed } from '@angular/core';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { Router } from '@angular/router';
+import type { Package } from '@dearourcommunity/client';
 
 export interface CheckoutState {
+  selectedPackage: Package | null;
   step: number;
   couponApplied: boolean;
   appliedCode: string;
@@ -18,6 +20,7 @@ export interface CheckoutState {
 }
 
 const initialState: CheckoutState = {
+  selectedPackage: null,
   step: 1,
   couponApplied: false,
   appliedCode: '',
@@ -33,7 +36,7 @@ const initialState: CheckoutState = {
 };
 
 export const CheckoutStore = signalStore(
-  { providedIn: 'root' }, // Registered globally so that step 1 and step 2 components share the same instance
+  { providedIn: 'root' }, // Registered globally so that plans component can set package, and checkout flows can read it
   withState(initialState),
   withComputed(({ originalPrice, couponApplied, resultCode, amount }) => ({
     finalPrice: computed(() => (couponApplied() ? originalPrice() * 0.8 : originalPrice())), // 20% discount
@@ -41,6 +44,17 @@ export const CheckoutStore = signalStore(
     amountFormatted: computed(() => amount().toLocaleString('vi-VN')),
   })),
   withMethods((store) => ({
+    selectPackage(pkg: Package) {
+      patchState(store, {
+        selectedPackage: pkg,
+        originalPrice: pkg.price,
+        couponApplied: false,
+        appliedCode: '',
+        couponError: false,
+        step: 1,
+      });
+    },
+
     setStep(step: number) {
       patchState(store, { step, paymentError: false });
     },

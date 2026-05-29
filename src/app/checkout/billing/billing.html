@@ -38,12 +38,12 @@
             <h2 class="order-card-title">Order Details</h2>
           </div>
           <div class="order-card-body">
-            <!-- Courses -->
+            <!-- Selected Plan -->
             <div style="display: flex; flex-direction: column; gap: 8px">
-              <span class="section-label">Courses</span>
+              <span class="section-label">Selected Plan</span>
               <div class="course-row">
                 <span class="course-name">
-                  ESG Căn Bản Cho Người Mới Bắt Đầu
+                  {{ store.selectedPackage()?.name }}
                   <span
                     style="
                       display: block;
@@ -52,7 +52,7 @@
                       color: rgba(28, 28, 28, 0.5);
                     "
                   >
-                    Khóa học trực tuyến · 12 bài học
+                    {{ store.selectedPackage()?.description }}
                   </span>
                 </span>
                 <span class="course-price">₫ {{ originalPrice | number: '1.0-0' }}</span>
@@ -191,7 +191,7 @@
                 style="font-size: 14px; color: rgba(28, 28, 28, 0.6); letter-spacing: 0.14px"
               >
                 <span class="course-name" style="font-size: 14px; font-weight: 400">
-                  ESG Căn Bản Cho Người Mới Bắt Đầu
+                  {{ store.selectedPackage()?.name }}
                 </span>
                 <span style="white-space: nowrap">₫ {{ finalPrice() | number: '1.0-0' }}</span>
               </div>

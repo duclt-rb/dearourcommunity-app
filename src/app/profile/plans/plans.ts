@@ -1,6 +1,6 @@
 import { CurrencyPipe } from '@angular/common';
 import { afterRenderEffect, Component, computed, inject, resource } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import type { Package } from '@dearourcommunity/client';
 import {
   LucideArrowRight,
@@ -13,6 +13,7 @@ import {
 } from '@lucide/angular';
 import { ClientService } from '../../core/client.service';
 import { ProfileStore } from '../profile.store';
+import { CheckoutStore } from '../../checkout/checkout.store';
 
 export interface UIPackage extends Package {
   formattedFeatures: { key: string; label: string }[];
@@ -23,7 +24,6 @@ export interface UIPackage extends Package {
   standalone: true,
   imports: [
     CurrencyPipe,
-    RouterLink,
     LucideCheck,
     LucideRocket,
     LucideStar,
@@ -37,6 +37,8 @@ export interface UIPackage extends Package {
 })
 export default class PlansComponent {
   private api = inject(ClientService);
+  private router = inject(Router);
+  private checkoutStore = inject(CheckoutStore);
   store = inject(ProfileStore);
 
   // 1. Dùng resource API mới để tự động tải packages
@@ -110,6 +112,11 @@ export default class PlansComponent {
     const active = this.activePackage();
     if (!active) return false;
     return this.resolveTier(pkg) < this.resolveTier(active);
+  }
+
+  selectAndUpgrade(pkg: Package) {
+    this.checkoutStore.selectPackage(pkg);
+    this.router.navigate(['/checkout/billing']);
   }
 
   private resolveTier(pkg: Package): number {
