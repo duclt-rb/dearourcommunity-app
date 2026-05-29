@@ -1,5 +1,5 @@
 import { Component, inject, signal, computed } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import {
   LucideCheck,
@@ -10,12 +10,12 @@ import {
   LucideCreditCard,
   LucideArrowLeft,
 } from '@lucide/angular';
+import LogoComponent from '../../shared/logo/logo';
 
 @Component({
   selector: 'app-billing',
   standalone: true,
   imports: [
-    RouterLink,
     DecimalPipe,
     LucideCheck,
     LucideTag,
@@ -24,6 +24,7 @@ import {
     LucideSmartphone,
     LucideCreditCard,
     LucideArrowLeft,
+    LogoComponent,
   ],
   templateUrl: './billing.html',
   styleUrl: './billing.css',

@@ -55,6 +55,7 @@ import {
   LucideList,
   LucideX,
 } from '@lucide/angular';
+import LogoComponent from '../../shared/logo/logo';
 
 @Component({
   selector: 'app-lesson-player',
@@ -78,6 +79,7 @@ import {
     LucideCircle,
     LucideList,
     LucideX,
+    LogoComponent,
   ],
   templateUrl: './lesson-player.html',
   styleUrl: './lesson-player.css',

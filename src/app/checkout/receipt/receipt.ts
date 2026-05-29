@@ -1,11 +1,12 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { LucideCheck, LucideHome, LucideArrowRight, LucideCircleX } from '@lucide/angular';
+import LogoComponent from '../../shared/logo/logo';
 
 @Component({
   selector: 'app-receipt',
   standalone: true,
-  imports: [RouterLink, LucideCheck, LucideHome, LucideArrowRight, LucideCircleX],
+  imports: [RouterLink, LucideCheck, LucideHome, LucideArrowRight, LucideCircleX, LogoComponent],
   templateUrl: './receipt.html',
   styleUrl: './receipt.css',
 })

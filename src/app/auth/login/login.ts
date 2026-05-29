@@ -7,12 +7,14 @@ import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { ClientService } from '../../core/client.service';
 import AuthLayoutComponent from '../auth-layout/auth-layout';
+import LogoComponent from '../../shared/logo/logo';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
     AuthLayoutComponent,
+    LogoComponent,
     FormField,
     RouterLink,
     LucideMail,
