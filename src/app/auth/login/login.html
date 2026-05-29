@@ -62,6 +62,11 @@
         }
       </div>
 
+      <!-- API Error -->
+      @if (error(); as msg) {
+        <div class="auth-form__error">{{ msg }}</div>
+      }
+
       <!-- Submit -->
       <p-button
         type="submit"

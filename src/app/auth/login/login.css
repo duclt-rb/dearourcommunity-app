@@ -1,1 +1,16 @@
 /* Login-specific overrides (shared styles in auth-layout) */
+
+.auth-form__error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1rem;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-error-500);
+  letter-spacing: var(--tracking-sm);
+  animation: auth-fade-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}

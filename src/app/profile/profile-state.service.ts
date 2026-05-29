@@ -31,6 +31,7 @@ export class ProfileStateService {
   lastName = signal('');
   phone = signal('');
   avatarUrl = signal<string | null>(null);
+  packageName = signal<string | null>(null);
 
   // Enrolled Courses & Certificates State
   enrolledCourses = signal<EnrolledCourse[]>([]);
@@ -72,6 +73,7 @@ export class ProfileStateService {
       const user = await this.api.auth.me();
       this.userId.set(user.id);
       this.email.set(user.email);
+      this.packageName.set(user.package?.name ?? null);
 
       // Load additional persisted profile fields from localStorage
       const saved = localStorage.getItem(`${PROFILE_DATA_KEY}:${user.id}`);
