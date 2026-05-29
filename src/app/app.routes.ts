@@ -49,8 +49,13 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'system',
+    loadComponent: () => import('./system/system'),
+    canActivate: [authGuard],
+  },
+  {
     path: 'checkout',
-    canActivate: [authGuard, checkoutGuard],
+    canActivate: [authGuard],
     children: [
       {
         path: '',
@@ -59,6 +64,7 @@ export const routes: Routes = [
       },
       {
         path: 'billing',
+        canActivate: [checkoutGuard],
         loadComponent: () => import('./checkout/billing/billing'),
       },
       {

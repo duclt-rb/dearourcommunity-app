@@ -8,4 +8,8 @@ export class CourseService {
   get course() {
     return this.clientService.course;
   }
+
+  findAll(keyword?: string) {
+    return this.clientService.course.findAll(keyword);
+  }
 }

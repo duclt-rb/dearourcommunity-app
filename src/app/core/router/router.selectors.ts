@@ -1,4 +1,6 @@
 import { getRouterSelectors } from '@ngrx/router-store';
+import { createSelector } from '@ngrx/store';
+import { safeParseExtraData } from './router.helper';
 
 // 1. Trích xuất các selectors mặc định từ @ngrx/router-store
 export const {
@@ -30,3 +32,14 @@ export const selectQueryTransId = selectQueryParam('transId');
 
 // Chọn query param 'amount' (ví dụ: /receipt?amount=500000)
 export const selectQueryAmount = selectQueryParam('amount');
+
+// Chọn query param 'extraData' (ví dụ: /receipt?extraData=...)
+export const selectQueryExtraData = selectQueryParam('extraData');
+
+// Selector giải mã và phân tích cú pháp extraData từ query param
+export const selectDecodedExtraData = createSelector(
+  selectQueryExtraData,
+  (extraDataVal): { packageId?: string; userId?: string } | null => {
+    return typeof extraDataVal === 'string' ? safeParseExtraData(extraDataVal) : null;
+  },
+);

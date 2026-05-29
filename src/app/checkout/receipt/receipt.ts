@@ -1,15 +1,27 @@
-import { Component, inject, OnInit, effect } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { LucideArrowRight, LucideCheck, LucideCircleX, LucideHome } from '@lucide/angular';
 import { Store } from '@ngrx/store';
-import { CheckoutStore } from '../checkout.store';
+import { getMomoResultMessage } from '../../core/router/momo-result-codes';
 import {
-  selectQueryResultCode,
-  selectQueryOrderId,
-  selectQueryTransId,
+  selectDecodedExtraData,
   selectQueryAmount,
-} from '../../core/router.selectors';
-import { LucideCheck, LucideHome, LucideArrowRight, LucideCircleX } from '@lucide/angular';
+  selectQueryOrderId,
+  selectQueryResultCode,
+  selectQueryTransId,
+} from '../../core/router/router.selectors';
 import LogoComponent from '../../shared/logo/logo';
+import { CheckoutStore } from '../checkout.store';
+
+// Định nghĩa hằng số bản đồ tên các gói học tập
+const PACKAGE_NAME_MAP: Record<string, string> = {
+  'youth-basic': 'Gói Youth Basic',
+  'youth-standard': 'Gói Youth Standard',
+  'youth-premium': 'Gói Youth Premium',
+  'organization-basic': 'Gói Organization Basic',
+  'organization-standard': 'Gói Organization Standard',
+  'organization-premium': 'Gói Organization Premium',
+};
 
 @Component({
   selector: 'app-receipt',
@@ -18,7 +30,7 @@ import LogoComponent from '../../shared/logo/logo';
   templateUrl: './receipt.html',
   styleUrl: './receipt.css',
 })
-export default class ReceiptComponent implements OnInit {
+export default class ReceiptComponent {
   private ngrxStore = inject(Store);
   readonly store = inject(CheckoutStore);
 
@@ -27,10 +39,15 @@ export default class ReceiptComponent implements OnInit {
   readonly routeOrderId = this.ngrxStore.selectSignal(selectQueryOrderId);
   readonly routeTransId = this.ngrxStore.selectSignal(selectQueryTransId);
   readonly routeAmount = this.ngrxStore.selectSignal(selectQueryAmount);
+  readonly extraDataObj = this.ngrxStore.selectSignal(selectDecodedExtraData);
 
-  get packageName(): string {
-    return this.store.selectedPackage()?.name ?? 'Gói Premium';
-  }
+  packageName = computed<string>(() => {
+    const extra = this.extraDataObj();
+    if (extra && extra.packageId) {
+      return PACKAGE_NAME_MAP[extra.packageId] ?? 'Gói Premium';
+    }
+    return 'Gói Premium';
+  });
 
   // Aliases for 100% template compatibility
   resultCode = this.store.resultCode;
@@ -41,19 +58,18 @@ export default class ReceiptComponent implements OnInit {
   amountFormatted = this.store.amountFormatted;
   activating = this.store.activating;
 
+  resultMessage = computed<string>(() => getMomoResultMessage(this.resultCode()));
+
   constructor() {
     // Đồng bộ cực kỳ đơn giản vì receiptGuard đã đảm bảo dữ liệu hợp lệ!
     effect(() => {
-      const code = (this.routeResultCode() as string) || '0';
-      const oId = (this.routeOrderId() as string) || 'MOMO20260529ABC123';
-      const tId = (this.routeTransId() as string) || '1283746529';
-      const amt = Number(this.routeAmount()) || 500000;
+      const code = this.routeResultCode() as string;
+      const oId = this.routeOrderId() as string;
+      const tId = this.routeTransId() as string;
+      const amt = Number(this.routeAmount());
 
       this.store.setPaymentParams(code, oId, tId, amt);
+      this.store.verifyEnrollment(oId);
     });
-  }
-
-  ngOnInit() {
-    this.store.startActivationTimer();
   }
 }

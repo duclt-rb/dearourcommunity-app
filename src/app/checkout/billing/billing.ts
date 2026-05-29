@@ -1,5 +1,4 @@
 import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { CheckoutStore } from '../checkout.store';
 import {
@@ -31,7 +30,6 @@ import LogoComponent from '../../shared/logo/logo';
   styleUrl: './billing.css',
 })
 export default class BillingComponent {
-  private router = inject(Router);
   readonly store = inject(CheckoutStore);
 
   // Aliases for 100% template compatibility
@@ -64,6 +62,6 @@ export default class BillingComponent {
   }
 
   confirmPayment() {
-    this.store.confirmPayment(this.router);
+    this.store.confirmPayment();
   }
 }

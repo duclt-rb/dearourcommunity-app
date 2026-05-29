@@ -31,7 +31,7 @@
         <div class="order-details">
           <div class="order-row">
             <span class="order-label">Gói đăng ký</span>
-            <span class="order-value">{{ packageName }}</span>
+            <span class="order-value">{{ packageName() }}</span>
           </div>
           <div class="order-row">
             <span class="order-label">Mã đơn hàng</span>
@@ -77,14 +77,14 @@
       <h1 class="result-title">Thanh toán thất bại</h1>
 
       <!-- Description -->
-      <p class="result-desc">Đã có lỗi xảy ra trong quá trình thanh toán. Vui lòng thử lại.</p>
+      <p class="result-desc">{{ resultMessage() }}</p>
 
       <!-- Order Details -->
       <div class="order-card">
         <div class="order-details">
           <div class="order-row">
             <span class="order-label">Gói đăng ký</span>
-            <span class="order-value">{{ packageName }}</span>
+            <span class="order-value">{{ packageName() }}</span>
           </div>
           <div class="order-row">
             <span class="order-label">Mã đơn hàng</span>
