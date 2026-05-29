@@ -1,0 +1,2937 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Giới Thiệu Về ESG - Dear Our Community</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        font-family:
+          'Inter',
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          sans-serif;
+        letter-spacing: 0.5px;
+        color: #1c1c1c;
+        background: #fff;
+        line-height: 1.5;
+      }
+      button {
+        cursor: pointer;
+        font-family: inherit;
+      }
+      input,
+      select,
+      textarea {
+        font-family: inherit;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      :root {
+        --color-primary: #8f50e2;
+        --color-primary-hover: #7a46c7;
+        --color-dark: #1c1c1c;
+        --color-accent-green: #008600;
+        --color-accent-blue: #00abee;
+        --color-border: #d2d2d2;
+        --color-border-light: #efefef;
+        --radius-input: 12px;
+        --radius-pill: 50px;
+      }
+
+      /* ─── LAYOUT ─── */
+      .lesson-layout {
+        display: flex;
+        min-height: 100vh;
+        background: #fff;
+        position: relative;
+      }
+
+      /* ─── LOADING BAR ─── */
+      .loading-bar {
+        position: fixed;
+        inset: 0 0 auto 0;
+        z-index: 50;
+        height: 4px;
+        overflow: hidden;
+        background: rgba(143, 80, 226, 0.2);
+      }
+      .loading-bar-inner {
+        height: 100%;
+        width: 33.333%;
+        border-radius: 999px;
+        background: var(--color-primary);
+        animation: progressSlide 1.2s ease-in-out infinite;
+      }
+      @keyframes progressSlide {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(400%);
+        }
+      }
+
+      /* ─── SIDEBAR ─── */
+      .sidebar {
+        display: none;
+        flex-direction: column;
+        width: 403px;
+        flex-shrink: 0;
+        background: #fff;
+        height: 100vh;
+        overflow: hidden;
+      }
+      @media (min-width: 1024px) {
+        .sidebar {
+          display: flex;
+        }
+      }
+      .sidebar-logo {
+        padding: 20px 40px;
+      }
+      .sidebar-lessons {
+        flex: 1;
+        overflow-y: auto;
+      }
+
+      .back-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-top: 1px solid rgba(28, 28, 28, 0.1);
+        background: #fff;
+        padding: 12px 24px;
+        cursor: pointer;
+      }
+      .back-link-text {
+        flex: 1;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 24px;
+        letter-spacing: 0.16px;
+        color: var(--color-dark);
+      }
+      .back-link-text:hover {
+        color: var(--color-primary);
+      }
+
+      /* Lesson menu item */
+      .lesson-item {
+        width: 100%;
+        cursor: pointer;
+      }
+      .lesson-header {
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        border-top: 1px solid rgba(28, 28, 28, 0.1);
+        background: #fff;
+        padding: 12px 24px;
+        cursor: pointer;
+      }
+      .lesson-header-inner {
+        display: flex;
+        width: 100%;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .lesson-icon {
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .lesson-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .lesson-name {
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: 0.16px;
+      }
+      .lesson-name.active {
+        font-weight: 700;
+        color: var(--color-primary);
+      }
+      .lesson-name.default {
+        color: var(--color-dark);
+      }
+      .lesson-topics-row {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .topic-count-badge {
+        display: flex;
+        width: 20px;
+        height: 20px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        background: var(--color-primary);
+      }
+      .topic-count-badge svg {
+        width: 12px;
+        height: 12px;
+        color: #fff;
+      }
+      .topic-count {
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 20px;
+        letter-spacing: 0.14px;
+        color: var(--color-dark);
+      }
+
+      /* Expanded topics */
+      .topics-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 24px 16px 60px;
+      }
+      .topics-container.active {
+        background: rgba(143, 80, 226, 0.2);
+        padding-top: 16px;
+      }
+      .topics-container.inactive {
+        background: #fff;
+        padding-top: 0;
+      }
+      .triangle-indicator {
+        position: absolute;
+        top: -4px;
+        left: 60px;
+        transform: rotate(180deg);
+      }
+      .topic-item {
+        display: flex;
+        width: 100%;
+        cursor: pointer;
+        align-items: center;
+        gap: 12px;
+      }
+      .topic-dot {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .topic-dot-circle {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 1px solid rgba(28, 28, 28, 0.2);
+      }
+      .topic-title {
+        flex: 1;
+        font-size: 14px;
+        line-height: 20px;
+        letter-spacing: 0.14px;
+      }
+      .topic-title.active {
+        font-weight: 500;
+        color: var(--color-primary);
+      }
+      .topic-title.default {
+        color: var(--color-dark);
+      }
+
+      /* Report card */
+      .report-card {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        background: var(--color-dark);
+        padding: 24px 40px;
+      }
+      .report-icon-wrap {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: 50%;
+        background: var(--color-dark);
+      }
+      .report-text {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        color: #fff;
+      }
+      .report-title {
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 24px;
+        letter-spacing: 0.5px;
+      }
+      .report-body {
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: 0.16px;
+        opacity: 0.9;
+      }
+      .report-btn {
+        display: flex;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: var(--radius-pill);
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        padding: 16px 20px;
+        transition: background 0.2s;
+        cursor: pointer;
+      }
+      .report-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .report-btn-text {
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 24px;
+        letter-spacing: 0.16px;
+        color: #fff;
+      }
+
+      /* ─── MAIN CONTENT ─── */
+      .main-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border-left: 1px solid rgba(28, 28, 28, 0.1);
+        min-width: 0;
+      }
+
+      /* ─── HEADER ─── */
+      .header {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        width: 100%;
+        border-bottom: 1px solid var(--color-border-light);
+        background: #fff;
+      }
+
+      /* Desktop header */
+      .header-desktop {
+        display: none;
+        height: 68px;
+        align-items: center;
+        gap: 16px;
+        padding: 0 40px;
+      }
+      @media (min-width: 1024px) {
+        .header-desktop {
+          display: flex;
+        }
+      }
+      .toggle-sidebar {
+        display: flex;
+        width: 32px;
+        height: 32px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: var(--color-primary);
+        border: none;
+        color: #fff;
+        transition: background 0.2s;
+      }
+      .toggle-sidebar:hover {
+        background: var(--color-primary-hover);
+      }
+      .header-progress {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .header-progress-text {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        line-height: 20px;
+        letter-spacing: 0.16px;
+      }
+      .header-progress-pct {
+        font-weight: 700;
+        color: var(--color-primary);
+      }
+      .header-progress-steps {
+        color: rgba(28, 28, 28, 0.5);
+      }
+      .header-progress-bar {
+        height: 4px;
+        width: 100%;
+        overflow: hidden;
+        border-radius: var(--radius-pill);
+        background: rgba(28, 28, 28, 0.1);
+      }
+      .header-progress-fill {
+        height: 100%;
+        border-radius: var(--radius-pill);
+        background: var(--color-primary);
+        transition: width 0.3s;
+      }
+      .header-nav {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .btn-nav {
+        display: flex;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: var(--radius-pill);
+        padding: 16px 20px;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 24px;
+        letter-spacing: 0.16px;
+        border: none;
+        transition: background 0.2s;
+      }
+      .btn-nav:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+      .btn-nav-prev {
+        border: 1px solid var(--color-border);
+        background: #fff;
+        color: var(--color-dark);
+      }
+      .btn-nav-prev:hover:not(:disabled) {
+        background: rgba(28, 28, 28, 0.05);
+      }
+      .btn-nav-next {
+        background: var(--color-dark);
+        color: #fff;
+      }
+      .btn-nav-next:hover:not(:disabled) {
+        background: rgba(28, 28, 28, 0.9);
+      }
+      .btn-complete {
+        display: flex;
+        height: 40px;
+        flex: 1;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: var(--radius-pill);
+        background: var(--color-primary);
+        padding: 16px 20px;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 24px;
+        letter-spacing: 0.16px;
+        color: #fff;
+        border: none;
+        transition: background 0.2s;
+      }
+      @media (min-width: 1024px) {
+        .btn-complete {
+          flex: none;
+          padding: 16px 20px;
+        }
+      }
+      .btn-complete:hover {
+        background: var(--color-primary-hover);
+      }
+      .btn-complete:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+      .badge-completed {
+        display: flex;
+        height: 40px;
+        flex: 1;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-pill);
+        background: rgba(0, 171, 238, 0.2);
+        padding: 0 12px;
+      }
+      @media (min-width: 1024px) {
+        .badge-completed {
+          flex: none;
+          padding: 0 20px;
+        }
+      }
+      .badge-completed-text {
+        font-size: 14px;
+        font-weight: 500;
+        text-transform: uppercase;
+        color: #00a8eb;
+        letter-spacing: 0.14px;
+      }
+
+      /* User section */
+      .user-section {
+        border-left: 1px solid rgba(28, 28, 28, 0.1);
+        padding-left: 16px;
+      }
+      .user-avatar-sm {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--color-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .user-avatar-sm span {
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      /* Mobile header */
+      .header-mobile {
+        display: flex;
+        flex-direction: column;
+      }
+      @media (min-width: 1024px) {
+        .header-mobile {
+          display: none;
+        }
+      }
+      .header-mobile-row1 {
+        display: flex;
+        height: 48px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+      }
+      .mobile-menu-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: none;
+        border: none;
+      }
+      .mobile-menu-btn-text {
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 20px;
+        letter-spacing: 0.16px;
+        color: var(--color-primary);
+      }
+      .header-mobile-row2 {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        border-top: 1px solid var(--color-border-light);
+        padding: 10px 20px;
+      }
+      .header-mobile-progress-text {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        line-height: 20px;
+        letter-spacing: 0.14px;
+      }
+
+      /* ─── CONTENT AREA ─── */
+      .content-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        overflow-y: auto;
+        padding: 20px;
+      }
+      @media (min-width: 1024px) {
+        .content-area {
+          gap: 20px;
+          padding: 40px 32px;
+        }
+      }
+      @media (min-width: 1280px) {
+        .content-area {
+          padding: 40px 64px;
+        }
+      }
+      @media (min-width: 1536px) {
+        .content-area {
+          padding: 40px 305px;
+        }
+      }
+
+      .content-max {
+        width: 100%;
+        max-width: 906px;
+      }
+
+      /* Lesson title */
+      .lesson-title-wrap {
+        display: none;
+        width: 100%;
+        max-width: 906px;
+      }
+      @media (min-width: 1024px) {
+        .lesson-title-wrap {
+          display: block;
+        }
+      }
+      .lesson-title {
+        font-size: 32px;
+        font-weight: 500;
+        line-height: 44px;
+        letter-spacing: 0.6px;
+        color: var(--color-dark);
+      }
+
+      /* Breadcrumb */
+      .breadcrumb-wrap {
+        display: none;
+        width: 100%;
+      }
+      @media (min-width: 1024px) {
+        .breadcrumb-wrap {
+          display: block;
+        }
+      }
+      .breadcrumb {
+        display: flex;
+        width: 100%;
+        max-width: 906px;
+        align-items: center;
+        gap: 8px;
+        overflow: hidden;
+        border-radius: 8px;
+        background: rgba(28, 28, 28, 0.05);
+        padding: 12px 16px;
+      }
+      .breadcrumb-item {
+        display: flex;
+        min-width: 0;
+        flex-shrink: 0;
+        align-items: center;
+        gap: 8px;
+      }
+      .breadcrumb-item:last-child {
+        flex-shrink: 1;
+        min-width: 0;
+      }
+      .breadcrumb-link {
+        white-space: nowrap;
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: 0.16px;
+        color: var(--color-dark);
+        transition: color 0.2s;
+      }
+      .breadcrumb-link:hover {
+        color: var(--color-primary);
+      }
+      .breadcrumb-current {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: 0.16px;
+        color: var(--color-dark);
+      }
+
+      /* ─── VIDEO PLAYER ─── */
+      .video-wrapper {
+        width: 100%;
+        max-width: 906px;
+      }
+      .video-container {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        border-radius: 12px 12px 0 0;
+        background: var(--color-dark);
+      }
+      .video-container video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        cursor: pointer;
+      }
+      .video-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .video-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 5;
+      }
+      .video-overlay.loading {
+        background: rgba(28, 28, 28, 0.8);
+      }
+      .video-overlay.play-overlay {
+        background: rgba(0, 0, 0, 0.3);
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .video-overlay.play-overlay:hover {
+        background: rgba(0, 0, 0, 0.4);
+      }
+      .play-btn-circle {
+        display: flex;
+        width: 56px;
+        height: 56px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--color-dark);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s;
+      }
+      @media (min-width: 640px) {
+        .play-btn-circle {
+          width: 80px;
+          height: 80px;
+        }
+      }
+      .play-btn-circle:hover {
+        transform: scale(1.05);
+      }
+      .spinner {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #fff;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .loading-text {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 14px;
+        margin-top: 12px;
+      }
+
+      /* Countdown overlay */
+      .countdown-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        background: rgba(28, 28, 28, 0.9);
+        padding: 0 16px;
+        z-index: 6;
+      }
+      @media (min-width: 640px) {
+        .countdown-overlay {
+          gap: 24px;
+          padding: 0 24px;
+        }
+      }
+      .countdown-ring {
+        position: relative;
+        width: 64px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      @media (min-width: 640px) {
+        .countdown-ring {
+          width: 96px;
+          height: 96px;
+        }
+      }
+      .countdown-ring svg {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+      }
+      .countdown-number {
+        font-size: 20px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        color: #fff;
+        position: relative;
+        z-index: 1;
+      }
+      @media (min-width: 640px) {
+        .countdown-number {
+          font-size: 30px;
+        }
+      }
+      .countdown-text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+        text-align: center;
+      }
+      .countdown-label {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+      }
+      @media (min-width: 640px) {
+        .countdown-label {
+          font-size: 14px;
+        }
+      }
+      .countdown-next-title {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 14px;
+        font-weight: 500;
+        color: #fff;
+      }
+      @media (min-width: 640px) {
+        .countdown-next-title {
+          max-width: 320px;
+          font-size: 16px;
+        }
+      }
+      .countdown-actions {
+        display: flex;
+        gap: 8px;
+      }
+      @media (min-width: 640px) {
+        .countdown-actions {
+          gap: 12px;
+        }
+      }
+      .countdown-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 999px;
+        padding: 8px 14px;
+        font-size: 12px;
+        font-weight: 500;
+        border: none;
+        color: #fff;
+        transition: background 0.2s;
+      }
+      @media (min-width: 640px) {
+        .countdown-btn {
+          gap: 8px;
+          padding: 10px 20px;
+          font-size: 14px;
+        }
+      }
+      .countdown-btn.cancel {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .countdown-btn.cancel:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .countdown-btn.skip {
+        background: var(--color-primary);
+      }
+      .countdown-btn.skip:hover {
+        background: var(--color-primary-hover);
+      }
+
+      /* ─── VIDEO CONTROLS ─── */
+      .video-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 0 0 12px 12px;
+        background: rgba(28, 28, 28, 0.05);
+        padding: 8px 12px;
+      }
+      @media (min-width: 1024px) {
+        .video-controls {
+          gap: 20px;
+          padding: 10px 20px;
+        }
+      }
+      .ctrl-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        background: none;
+        border: none;
+        color: rgba(28, 28, 28, 0.8);
+        transition: color 0.2s;
+        flex-shrink: 0;
+      }
+      @media (min-width: 1024px) {
+        .ctrl-btn {
+          width: 24px;
+          height: 24px;
+        }
+      }
+      .ctrl-btn:hover {
+        color: var(--color-dark);
+      }
+      .ctrl-speed {
+        padding: 4px 8px;
+        font-size: 12px;
+        background: none;
+        border: none;
+        color: rgba(28, 28, 28, 0.8);
+        transition: color 0.2s;
+      }
+      @media (min-width: 1024px) {
+        .ctrl-speed {
+          padding: 10px 20px;
+          font-size: 14px;
+        }
+      }
+      .ctrl-speed:hover {
+        color: var(--color-dark);
+      }
+      .ctrl-time {
+        min-width: 70px;
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+        color: rgba(28, 28, 28, 0.7);
+        flex-shrink: 0;
+      }
+      @media (min-width: 1024px) {
+        .ctrl-time {
+          min-width: 90px;
+          font-size: 14px;
+        }
+      }
+
+      .progress-bar-wrap {
+        flex: 1;
+        position: relative;
+        height: 6px;
+        cursor: pointer;
+        border-radius: 999px;
+        background: rgba(28, 28, 28, 0.2);
+        transition: height 0.15s;
+      }
+      .progress-bar-wrap:hover {
+        height: 10px;
+      }
+      .progress-bar-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: var(--color-primary);
+        pointer-events: none;
+        transition: width 0.075s;
+      }
+      .progress-bar-thumb {
+        position: absolute;
+        top: 50%;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--color-primary);
+        transform: translateY(-50%);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s;
+      }
+      .progress-bar-wrap:hover .progress-bar-thumb {
+        opacity: 1;
+      }
+      .hover-tooltip {
+        position: absolute;
+        bottom: calc(100% + 8px);
+        transform: translateX(-50%);
+        border-radius: 4px;
+        background: rgba(28, 28, 28, 0.9);
+        padding: 2px 8px;
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+        color: #fff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        pointer-events: none;
+        white-space: nowrap;
+      }
+
+      .ctrl-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      @media (min-width: 1024px) {
+        .ctrl-right {
+          gap: 20px;
+        }
+      }
+
+      /* Volume slider popup */
+      .volume-popup {
+        position: absolute;
+        bottom: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 12px;
+        background: #fff;
+        padding: 12px 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        z-index: 10;
+      }
+      .volume-track {
+        position: relative;
+        width: 6px;
+        height: 96px;
+        cursor: pointer;
+        border-radius: 999px;
+        background: rgba(28, 28, 28, 0.15);
+      }
+      .volume-fill {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        border-radius: 999px;
+        background: var(--color-primary);
+      }
+      .volume-thumb {
+        position: absolute;
+        left: 50%;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        border: 2px solid var(--color-primary);
+        background: #fff;
+        transform: translateX(-50%);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        transition: box-shadow 0.15s;
+      }
+      .volume-thumb:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+      }
+
+      /* Quality menu */
+      .quality-menu {
+        position: absolute;
+        bottom: calc(100% + 8px);
+        right: 0;
+        min-width: 110px;
+        overflow: hidden;
+        border-radius: 12px;
+        background: #fff;
+        padding: 6px 0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        z-index: 10;
+      }
+      .quality-label {
+        padding: 4px 12px 4px 12px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        color: rgba(28, 28, 28, 0.4);
+      }
+      .quality-option {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: space-between;
+        padding: 6px 12px;
+        font-size: 14px;
+        background: none;
+        border: none;
+        transition: background 0.15s;
+      }
+      .quality-option:hover {
+        background: rgba(28, 28, 28, 0.05);
+      }
+      .quality-option.active {
+        font-weight: 600;
+        color: var(--color-primary);
+      }
+      .quality-option.default {
+        color: rgba(28, 28, 28, 0.8);
+      }
+      .quality-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--color-primary);
+        margin-left: 8px;
+      }
+
+      /* ─── LESSON CONTENT SECTION ─── */
+      .steps-card {
+        width: 100%;
+        max-width: 906px;
+        overflow: hidden;
+        border-radius: 12px;
+        border: 1px solid rgba(28, 28, 28, 0.1);
+      }
+      .steps-header {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        background: var(--color-primary);
+        padding: 16px;
+      }
+      @media (min-width: 1024px) {
+        .steps-header {
+          flex-direction: row;
+          align-items: center;
+          gap: 12px;
+          padding: 16px 24px;
+          height: 60px;
+        }
+      }
+      .steps-header-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      @media (min-width: 1024px) {
+        .steps-header-left {
+          gap: 12px;
+        }
+      }
+      .steps-title {
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 24px;
+        letter-spacing: 0.16px;
+        color: #fff;
+      }
+      @media (min-width: 1024px) {
+        .steps-title {
+          flex: 1;
+          font-size: 20px;
+          line-height: 28px;
+          letter-spacing: 0.5px;
+        }
+      }
+      .steps-progress-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-left: 32px;
+      }
+      @media (min-width: 1024px) {
+        .steps-progress-info {
+          margin-left: auto;
+          padding-left: 0;
+        }
+      }
+      .steps-progress-pct {
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 20px;
+        letter-spacing: 0.14px;
+        color: #fff;
+      }
+      @media (min-width: 1024px) {
+        .steps-progress-pct {
+          font-size: 16px;
+          letter-spacing: 0.16px;
+        }
+      }
+      .steps-divider {
+        width: 1px;
+        height: 14px;
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .steps-count {
+        font-size: 14px;
+        line-height: 20px;
+        letter-spacing: 0.14px;
+        color: #fff;
+      }
+      @media (min-width: 1024px) {
+        .steps-count {
+          font-size: 16px;
+          letter-spacing: 0.16px;
+        }
+      }
+
+      .steps-list {
+        display: flex;
+        flex-direction: column;
+        padding: 8px 16px;
+      }
+      @media (min-width: 1024px) {
+        .steps-list {
+          padding: 8px 24px;
+        }
+      }
+      .step-row {
+        display: flex;
+        cursor: pointer;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 0;
+      }
+      .step-row:not(:last-child) {
+        border-bottom: 1px solid rgba(28, 28, 28, 0.1);
+      }
+      .step-icon {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      @media (min-width: 1024px) {
+        .step-icon {
+          width: 24px;
+          height: 24px;
+        }
+      }
+      .step-name {
+        flex: 1;
+        font-size: 14px;
+        line-height: 20px;
+        letter-spacing: 0.14px;
+      }
+      @media (min-width: 1024px) {
+        .step-name {
+          font-size: 16px;
+          line-height: 24px;
+          letter-spacing: 0.16px;
+        }
+      }
+      .step-name.active {
+        font-weight: 500;
+        color: var(--color-primary);
+      }
+      .step-name.default {
+        color: var(--color-dark);
+      }
+
+      /* ─── BOTTOM NAVIGATION ─── */
+      .bottom-nav {
+        display: flex;
+        width: 100%;
+        max-width: 906px;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+      .bottom-nav-buttons {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        gap: 8px;
+      }
+      @media (min-width: 1024px) {
+        .bottom-nav-buttons {
+          justify-content: space-between;
+          gap: 0;
+        }
+      }
+      .bottom-btn {
+        display: flex;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        border-radius: var(--radius-pill);
+        padding: 8px 12px;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 20px;
+        letter-spacing: 0.14px;
+        border: none;
+        transition: background 0.2s;
+      }
+      @media (min-width: 1024px) {
+        .bottom-btn {
+          gap: 8px;
+          padding: 16px 20px;
+          font-size: 16px;
+          line-height: 24px;
+          letter-spacing: 0.16px;
+        }
+      }
+      .bottom-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+      .bottom-btn-prev {
+        border: 1px solid var(--color-border);
+        background: #fff;
+        color: var(--color-dark);
+      }
+      .bottom-btn-prev:hover:not(:disabled) {
+        background: rgba(28, 28, 28, 0.05);
+      }
+      .bottom-btn-next {
+        background: var(--color-dark);
+        color: #fff;
+      }
+      .bottom-btn-next:hover:not(:disabled) {
+        background: rgba(28, 28, 28, 0.9);
+      }
+      .bottom-btn-complete {
+        flex: 1;
+        background: var(--color-primary);
+        color: #fff;
+      }
+      @media (min-width: 1024px) {
+        .bottom-btn-complete {
+          flex: none;
+        }
+      }
+      .bottom-btn-complete:hover {
+        background: var(--color-primary-hover);
+      }
+      .bottom-btn-complete:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      .back-to-course-link {
+        font-size: 14px;
+        line-height: 20px;
+        letter-spacing: 0.14px;
+        color: var(--color-primary);
+        background: none;
+        border: none;
+        transition: color 0.2s;
+      }
+      .back-to-course-link:hover {
+        text-decoration: underline;
+      }
+      @media (min-width: 1024px) {
+        .back-to-course-link {
+          font-size: 16px;
+          line-height: 24px;
+          letter-spacing: 0.16px;
+        }
+      }
+
+      /* ─── MOBILE FLOATING CHAT ─── */
+      .floating-chat {
+        position: fixed;
+        bottom: 24px;
+        right: 20px;
+        z-index: 40;
+        display: flex;
+        width: 40px;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: var(--color-dark);
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s;
+      }
+      .floating-chat:hover {
+        transform: scale(1.05);
+      }
+      @media (min-width: 1024px) {
+        .floating-chat {
+          display: none;
+        }
+      }
+
+      /* ─── MOBILE MENU DRAWER ─── */
+      .mobile-drawer {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+      }
+      @media (min-width: 1024px) {
+        .mobile-drawer {
+          display: none;
+        }
+      }
+      .drawer-header {
+        display: flex;
+        height: 48px;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--color-primary);
+        padding: 0 20px;
+      }
+      .drawer-title {
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 20px;
+        letter-spacing: 0.16px;
+        color: #fff;
+      }
+      .drawer-close {
+        display: flex;
+        width: 24px;
+        height: 24px;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        color: #fff;
+      }
+      .drawer-body {
+        flex: 1;
+        overflow-y: auto;
+      }
+      .drawer-back {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 20px;
+        cursor: pointer;
+      }
+      .drawer-back-text {
+        flex: 1;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 24px;
+        letter-spacing: 0.16px;
+        color: var(--color-dark);
+      }
+      .drawer-lesson {
+        width: 100%;
+        cursor: pointer;
+      }
+      .drawer-lesson-header {
+        display: flex;
+        width: 100%;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 20px;
+      }
+      .drawer-lesson-topics {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .drawer-lesson-name {
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: 0.16px;
+      }
+      .drawer-lesson-name.active {
+        font-weight: 700;
+        color: var(--color-primary);
+      }
+      .drawer-lesson-name.default {
+        color: var(--color-dark);
+      }
+
+      /* ─── REPORT DIALOG ─── */
+      .dialog-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 60;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(28, 28, 28, 0.6);
+        padding: 0 16px;
+      }
+      .dialog {
+        position: relative;
+        display: flex;
+        max-height: 90vh;
+        width: 100%;
+        max-width: 512px;
+        flex-direction: column;
+        overflow: hidden;
+        border-radius: 24px;
+        background: #fff;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      }
+      .dialog-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(28, 28, 28, 0.1);
+        padding: 20px 24px;
+      }
+      .dialog-top-text {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .dialog-title {
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 24px;
+        letter-spacing: 0.5px;
+        color: var(--color-dark);
+      }
+      .dialog-subtitle {
+        font-size: 14px;
+        line-height: 20px;
+        letter-spacing: 0.14px;
+        color: rgba(28, 28, 28, 0.6);
+      }
+      .dialog-close-btn {
+        margin-left: 16px;
+        display: flex;
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: none;
+        border: none;
+        color: rgba(28, 28, 28, 0.4);
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+      .dialog-close-btn:hover {
+        background: rgba(28, 28, 28, 0.05);
+        color: var(--color-dark);
+      }
+      .dialog-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px 24px;
+      }
+      .dialog-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .dialog-field-label {
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 20px;
+        color: var(--color-dark);
+      }
+      .dialog-field-label .required {
+        color: #ef4444;
+      }
+      .dialog-select {
+        height: 40px;
+        border-radius: var(--radius-input);
+        border: 1px solid rgba(28, 28, 28, 0.2);
+        padding: 0 16px;
+        font-size: 14px;
+        color: var(--color-dark);
+        background: #fff;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .dialog-select:focus {
+        border-color: var(--color-primary);
+      }
+      .dialog-textarea {
+        resize: none;
+        border-radius: var(--radius-input);
+        border: 1px solid rgba(28, 28, 28, 0.2);
+        padding: 12px 16px;
+        font-size: 14px;
+        color: var(--color-dark);
+        background: #fff;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .dialog-textarea:focus {
+        border-color: var(--color-primary);
+      }
+      .dialog-textarea::placeholder {
+        color: rgba(28, 28, 28, 0.4);
+      }
+      .dialog-submit {
+        margin-top: 4px;
+        display: flex;
+        width: 100%;
+        height: 44px;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-pill);
+        background: var(--color-primary);
+        border: none;
+        font-size: 16px;
+        font-weight: 500;
+        color: #fff;
+        transition: background 0.2s;
+      }
+      .dialog-submit:hover {
+        background: var(--color-primary-hover);
+      }
+      .dialog-submit:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      /* ─── SVG ICONS (inline) ─── */
+      .icon-chevron-down {
+        transition: transform 0.2s;
+      }
+      .icon-chevron-down.rotated {
+        transform: rotate(180deg);
+      }
+
+      /* ─── RESPONSIVE ─── */
+      @media (max-width: 639px) {
+        .lesson-title {
+          font-size: 24px;
+          line-height: 32px;
+        }
+        .video-controls {
+          flex-wrap: wrap;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="lesson-layout">
+      <!-- Loading Bar -->
+      <div class="loading-bar">
+        <div class="loading-bar-inner"></div>
+      </div>
+
+      <!-- ===== DESKTOP SIDEBAR ===== -->
+      <aside class="sidebar" id="desktopSidebar">
+        <!-- Logo -->
+        <div class="sidebar-logo">
+          <svg width="138" height="24" viewBox="0 0 1200 200" fill="none" style="display: block">
+            <text
+              x="0"
+              y="140"
+              font-size="100"
+              font-weight="700"
+              fill="#8F50E2"
+              font-family="Inter,sans-serif"
+            >
+              dear
+            </text>
+            <text
+              x="320"
+              y="140"
+              font-size="100"
+              font-weight="300"
+              fill="#1c1c1c"
+              font-family="Inter,sans-serif"
+            >
+              our community
+            </text>
+          </svg>
+        </div>
+
+        <div class="sidebar-lessons">
+          <!-- Back to Course -->
+          <div class="back-link">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M15 18L9 12L15 6"
+                stroke="#1c1c1c"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <span class="back-link-text">Quay lại chi tiết khoá học</span>
+          </div>
+
+          <!-- Lesson 1: Completed, expanded -->
+          <div class="lesson-item" data-lesson="1">
+            <div class="lesson-header" onclick="toggleLesson('1')">
+              <div class="lesson-header-inner">
+                <div class="lesson-icon">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    style="width: 24px; height: 24px; color: #8f50e2"
+                  >
+                    <path
+                      d="M24 12C24 10.304 23.14 8.809 21.832 7.927C22.133 6.379 21.684 4.714 20.485 3.514C19.286 2.315 17.621 1.866 16.072 2.167C15.19 0.859 13.695 -0.001 11.999 -0.001C10.303 -0.001 8.808 0.859 7.926 2.167C6.378 1.866 4.712 2.315 3.513 3.514C2.314 4.713 1.865 6.378 2.166 7.927C0.858 8.809 -0.002 10.304 -0.002 12C-0.002 13.696 0.858 15.191 2.166 16.073C1.865 17.621 2.314 19.287 3.513 20.486C4.712 21.685 6.377 22.134 7.926 21.833C8.808 23.141 10.303 24.001 11.999 24.001C13.695 24.001 15.19 23.141 16.072 21.833C17.62 22.134 19.286 21.685 20.485 20.486C21.684 19.287 22.133 17.622 21.832 16.073C23.14 15.191 24 13.696 24 12ZM11.909 15.419C11.522 15.806 11.013 15.999 10.502 15.999C9.991 15.999 9.477 15.804 9.086 15.414L6.304 12.718L7.697 11.281L10.49 13.988L16.299 8.287L17.703 9.712L11.909 15.419Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </div>
+                <div class="lesson-info">
+                  <span class="lesson-name default" style="font-weight: 700"
+                    >Chương 1: Tổng Quan Về ESG</span
+                  >
+                  <!-- Completed: no topic count row -->
+                </div>
+              </div>
+            </div>
+            <!-- No expandable topics since completed -->
+          </div>
+
+          <!-- Lesson 2: Active, expanded (current lesson's parent) -->
+          <div class="lesson-item" data-lesson="2">
+            <div class="lesson-header" onclick="toggleLesson('2')">
+              <div class="lesson-header-inner">
+                <div class="lesson-icon">
+                  <svg viewBox="0 0 24 24" fill="none" style="width: 24px; height: 24px">
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-opacity="0.1"
+                      stroke-width="2.8"
+                      style="color: #1c1c1c"
+                    />
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="#8F50E2"
+                      stroke-width="2.8"
+                      stroke-dasharray="62.83"
+                      stroke-dashoffset="31.42"
+                      stroke-linecap="round"
+                      transform="rotate(-90 12 12)"
+                    />
+                  </svg>
+                </div>
+                <div class="lesson-info">
+                  <span class="lesson-name active">Chương 2: Môi Trường (E)</span>
+                  <div class="lesson-topics-row">
+                    <div class="topic-count-badge">
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M6 9L12 15L18 9"
+                          stroke="currentColor"
+                          stroke-width="3"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </div>
+                    <span class="topic-count">3 Chủ đề</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="topics-container active" id="topics-2">
+              <div class="triangle-indicator">
+                <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+                  <path d="M8 0L16 12H0L8 0Z" fill="white" />
+                </svg>
+              </div>
+              <div class="topic-item" onclick="navigateTopic('topic-2-1')">
+                <div class="topic-dot">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    style="width: 16px; height: 16px; color: #8f50e2"
+                  >
+                    <path
+                      d="M24 12C24 10.304 23.14 8.809 21.832 7.927C22.133 6.379 21.684 4.714 20.485 3.514C19.286 2.315 17.621 1.866 16.072 2.167C15.19 0.859 13.695 -0.001 11.999 -0.001C10.303 -0.001 8.808 0.859 7.926 2.167C6.378 1.866 4.712 2.315 3.513 3.514C2.314 4.713 1.865 6.378 2.166 7.927C0.858 8.809 -0.002 10.304 -0.002 12C-0.002 13.696 0.858 15.191 2.166 16.073C1.865 17.621 2.314 19.287 3.513 20.486C4.712 21.685 6.377 22.134 7.926 21.833C8.808 23.141 10.303 24.001 11.999 24.001C13.695 24.001 15.19 23.141 16.072 21.833C17.62 22.134 19.286 21.685 20.485 20.486C21.684 19.287 22.133 17.622 21.832 16.073C23.14 15.191 24 13.696 24 12ZM11.909 15.419C11.522 15.806 11.013 15.999 10.502 15.999C9.991 15.999 9.477 15.804 9.086 15.414L6.304 12.718L7.697 11.281L10.49 13.988L16.299 8.287L17.703 9.712L11.909 15.419Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </div>
+                <span class="topic-title default">Biến Đổi Khí Hậu & Phát Thải Carbon</span>
+              </div>
+              <div class="topic-item" onclick="navigateTopic('topic-2-2')">
+                <div class="topic-dot">
+                  <div class="topic-dot-circle"></div>
+                </div>
+                <span class="topic-title active">Giới Thiệu Về ESG</span>
+              </div>
+              <div class="topic-item" onclick="navigateTopic('topic-2-3')">
+                <div class="topic-dot">
+                  <div class="topic-dot-circle"></div>
+                </div>
+                <span class="topic-title default">Quản Lý Tài Nguyên & Chất Thải</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lesson 3: Not started -->
+          <div class="lesson-item" data-lesson="3">
+            <div class="lesson-header" onclick="toggleLesson('3')">
+              <div class="lesson-header-inner">
+                <div class="lesson-icon">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    style="width: 24px; height: 24px; color: #1c1c1c"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-opacity="0.1"
+                      stroke-width="2.8"
+                    />
+                  </svg>
+                </div>
+                <div class="lesson-info">
+                  <span class="lesson-name default">Chương 3: Xã Hội (S)</span>
+                  <div class="lesson-topics-row">
+                    <div class="topic-count-badge">
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M6 9L12 15L18 9"
+                          stroke="currentColor"
+                          stroke-width="3"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </div>
+                    <span class="topic-count">4 Chủ đề</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="topics-container inactive" id="topics-3" style="display: none">
+              <div class="topic-item">
+                <div class="topic-dot"><div class="topic-dot-circle"></div></div>
+                <span class="topic-title default">Quyền Con Người Trong Chuỗi Cung Ứng</span>
+              </div>
+              <div class="topic-item">
+                <div class="topic-dot"><div class="topic-dot-circle"></div></div>
+                <span class="topic-title default">Đa Dạng & Hòa Nhập</span>
+              </div>
+              <div class="topic-item">
+                <div class="topic-dot"><div class="topic-dot-circle"></div></div>
+                <span class="topic-title default">An Toàn & Sức Khỏe Nghề Nghiệp</span>
+              </div>
+              <div class="topic-item">
+                <div class="topic-dot"><div class="topic-dot-circle"></div></div>
+                <span class="topic-title default">Quan Hệ Cộng Đồng</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lesson 4 -->
+          <div class="lesson-item" data-lesson="4">
+            <div class="lesson-header" onclick="toggleLesson('4')">
+              <div class="lesson-header-inner">
+                <div class="lesson-icon">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    style="width: 24px; height: 24px; color: #1c1c1c"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-opacity="0.1"
+                      stroke-width="2.8"
+                    />
+                  </svg>
+                </div>
+                <div class="lesson-info">
+                  <span class="lesson-name default">Chương 4: Quản Trị (G)</span>
+                  <div class="lesson-topics-row">
+                    <div class="topic-count-badge">
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M6 9L12 15L18 9"
+                          stroke="currentColor"
+                          stroke-width="3"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </div>
+                    <span class="topic-count">3 Chủ đề</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="topics-container inactive" id="topics-4" style="display: none">
+              <div class="topic-item">
+                <div class="topic-dot"><div class="topic-dot-circle"></div></div>
+                <span class="topic-title default">Cấu Trúc Hội Đồng Quản Trị</span>
+              </div>
+              <div class="topic-item">
+                <div class="topic-dot"><div class="topic-dot-circle"></div></div>
+                <span class="topic-title default">Đạo Đức Kinh Doanh</span>
+              </div>
+              <div class="topic-item">
+                <div class="topic-dot"><div class="topic-dot-circle"></div></div>
+                <span class="topic-title default">Minh Bạch & Công Bố Thông Tin</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Report Feedback Card -->
+        <div class="report-card">
+          <div class="report-icon-wrap">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" style="color: #fff">
+              <path
+                d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+          <div class="report-text">
+            <p class="report-title">Bài học không hoạt động đúng?</p>
+            <p class="report-body">
+              (Lỗi kỹ thuật, vấn đề nội dung, v.v.) Nhấn nút báo cáo để thông báo cho chúng tôi.
+            </p>
+          </div>
+          <button class="report-btn" onclick="toggleReportDialog(true)">
+            <span class="report-btn-text">Báo cáo / Phản hồi</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="color: #fff">
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </aside>
+
+      <!-- ===== MAIN CONTENT ===== -->
+      <div class="main-area">
+        <!-- ===== HEADER ===== -->
+        <header class="header">
+          <!-- Desktop -->
+          <div class="header-desktop">
+            <button class="toggle-sidebar" onclick="toggleSidebar()" aria-label="Thu gọn thanh bên">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" id="sidebarChevron">
+                <path
+                  d="M15 18L9 12L15 6"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+
+            <div class="header-progress">
+              <div class="header-progress-text">
+                <span class="header-progress-pct">42% Hoàn thành</span>
+                <span class="header-progress-steps">2/5 Bước</span>
+              </div>
+              <div class="header-progress-bar">
+                <div class="header-progress-fill" style="width: 42%"></div>
+              </div>
+            </div>
+
+            <div class="header-nav">
+              <button class="btn-nav btn-nav-prev" onclick="prevLesson()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M15 18L9 12L15 6"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                Trước
+              </button>
+              <button class="btn-nav btn-nav-next" onclick="nextLesson()">
+                Tiếp
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M9 18L15 12L9 6"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <button class="btn-complete" onclick="markComplete(this)">
+              <span>Đánh dấu hoàn thành</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M20 6L9 17L4 12"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+
+            <div class="user-section">
+              <div class="user-avatar-sm"><span>NV</span></div>
+            </div>
+          </div>
+
+          <!-- Mobile -->
+          <div class="header-mobile">
+            <div class="header-mobile-row1">
+              <button class="mobile-menu-btn" onclick="openMobileDrawer()">
+                <span class="mobile-menu-btn-text">Bài học khoá học</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="color: #8f50e2">
+                  <path
+                    d="M6 9L12 15L18 9"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+              <div class="user-avatar-sm" style="width: 28px; height: 28px"><span>NV</span></div>
+            </div>
+            <div class="header-mobile-row2">
+              <div class="header-mobile-progress-text">
+                <span style="font-weight: 700; color: var(--color-primary)">42% Hoàn thành</span>
+                <span style="color: rgba(28, 28, 28, 0.5)">2/5 Bước</span>
+              </div>
+              <div class="header-progress-bar">
+                <div class="header-progress-fill" style="width: 42%"></div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- ===== CONTENT AREA ===== -->
+        <div class="content-area">
+          <div class="lesson-title-wrap">
+            <h1 class="lesson-title">Giới Thiệu Về ESG</h1>
+          </div>
+
+          <div class="breadcrumb-wrap">
+            <div class="breadcrumb">
+              <div class="breadcrumb-item">
+                <a href="#" class="breadcrumb-link">E-learning</a>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  style="color: rgba(28, 28, 28, 0.4); flex-shrink: 0"
+                >
+                  <path
+                    d="M9 18L15 12L9 6"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+              <div class="breadcrumb-item">
+                <a href="#" class="breadcrumb-link">ESG Căn Bản Cho Người Mới Bắt Đầu</a>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  style="color: rgba(28, 28, 28, 0.4); flex-shrink: 0"
+                >
+                  <path
+                    d="M9 18L15 12L9 6"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+              <div class="breadcrumb-item">
+                <span class="breadcrumb-current">Giới Thiệu Về ESG</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video Player -->
+          <div class="video-wrapper">
+            <div class="video-container" id="videoContainer">
+              <!-- Video thumbnail -->
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='906' height='509' viewBox='0 0 906 509'%3E%3Crect width='906' height='509' fill='%23222'/%3E%3Crect x='353' y='204.5' width='200' height='100' rx='12' fill='%238F50E2'/%3E%3Cpolygon points='413,224 493,254.5 413,285' fill='%23fff'/%3E%3C/svg%3E"
+                alt="Video thumbnail"
+              />
+
+              <!-- Play overlay -->
+              <div class="video-overlay play-overlay" onclick="playVideo(this)">
+                <div class="play-btn-circle">
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    style="margin-left: 2px"
+                  >
+                    <polygon points="5,3 19,12 5,21" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="video-controls">
+              <button class="ctrl-btn" onclick="togglePlay()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" id="playIcon">
+                  <polygon points="5,3 19,12 5,21" />
+                </svg>
+              </button>
+
+              <div style="display: flex; align-items: center; gap: 4px">
+                <button class="ctrl-btn" onclick="rewind()">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M1 4V10H7" />
+                    <path
+                      d="M3.51 15C4.15839 16.8404 5.38734 18.4202 7.01166 19.5014C8.63598 20.5826 10.5677 21.1067 12.5285 20.9947C14.4893 20.8827 16.3491 20.1403 17.8412 18.8798C19.3333 17.6193 20.3744 15.909 20.8017 14.0068C21.2291 12.1046 21.0202 10.1124 20.2063 8.33832C19.3924 6.56427 18.0192 5.10637 16.2833 4.18866C14.5475 3.27094 12.5448 2.94482 10.6057 3.25738C8.66657 3.56994 6.89736 4.50376 5.59 5.92L1 10"
+                    />
+                  </svg>
+                </button>
+
+                <button class="ctrl-speed" onclick="changeSpeed()">1x</button>
+
+                <button class="ctrl-btn" onclick="forward()">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M23 4V10H17" />
+                    <path
+                      d="M20.49 15C19.8416 16.8404 18.6127 18.4202 16.9883 19.5014C15.364 20.5826 13.4323 21.1067 11.4715 20.9947C9.51067 20.8827 7.65086 20.1403 6.15878 18.8798C4.6667 17.6193 3.62562 15.909 3.19827 14.0068C2.77091 12.1046 2.97977 10.1124 3.7937 8.33832C4.60763 6.56427 5.98085 5.10637 7.71669 4.18866C9.45254 3.27094 11.4552 2.94482 13.3943 3.25738C15.3334 3.56994 17.1026 4.50376 18.41 5.92L23 10"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              <span class="ctrl-time">1:23 / 15:30</span>
+
+              <div class="progress-bar-wrap" id="progressBar" onmousedown="seekVideo(event)">
+                <div class="progress-bar-fill" id="progressFill" style="width: 9%"></div>
+                <div
+                  class="progress-bar-thumb"
+                  id="progressThumb"
+                  style="left: calc(9% - 6px)"
+                ></div>
+              </div>
+
+              <div class="ctrl-right">
+                <div style="position: relative; display: flex; align-items: center">
+                  <button
+                    class="ctrl-btn"
+                    onclick="toggleVolumeSlider()"
+                    id="volumeBtn"
+                    onmouseenter="showVolumeSlider()"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path d="M11 5L6 9H2V15H6L11 19V5Z" fill="currentColor" />
+                      <path
+                        d="M19.07 4.93C20.9442 6.80528 21.9999 9.34836 21.9999 12C21.9999 14.6516 20.9442 17.1947 19.07 19.07M15.54 8.46C16.4774 9.39783 17.0039 10.6692 17.0039 11.995C17.0039 13.3208 16.4774 14.5922 15.54 15.53"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </button>
+                  <div id="volumePopup" style="display: none">
+                    <div class="volume-popup" onmouseleave="hideVolumeSliderDelayed()">
+                      <div class="volume-track" id="volumeTrack" onmousedown="changeVolume(event)">
+                        <div class="volume-fill" id="volumeFill" style="height: 100%"></div>
+                        <div
+                          class="volume-thumb"
+                          id="volumeThumb"
+                          style="bottom: calc(100% - 7px)"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="position: relative; display: none" class="lg-flex" id="qualityWrap">
+                  <button class="ctrl-btn" onclick="toggleQualityMenu()">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <circle cx="12" cy="12" r="3" />
+                      <path
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+                      />
+                    </svg>
+                  </button>
+                  <div id="qualityMenu" style="display: none">
+                    <div class="quality-menu">
+                      <p class="quality-label">Chất lượng</p>
+                      <button class="quality-option active" data-quality="auto">
+                        <span>Tự động</span><span class="quality-dot"></span>
+                      </button>
+                      <button class="quality-option default" data-quality="1080">
+                        <span>1080p</span>
+                      </button>
+                      <button class="quality-option default" data-quality="720">
+                        <span>720p</span>
+                      </button>
+                      <button class="quality-option default" data-quality="480">
+                        <span>480p</span>
+                      </button>
+                      <button class="quality-option default" data-quality="360">
+                        <span>360p</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <button class="ctrl-btn" onclick="toggleFullscreen()">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lesson Content Section (Steps) -->
+          <div class="steps-card">
+            <div class="steps-header">
+              <div class="steps-header-left">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="color: #fff">
+                  <path
+                    d="M12 20H21M3 20H4M12 4H21M4 4H5M3 12H12M19 12H21"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                </svg>
+                <span class="steps-title">Nội dung bài học</span>
+              </div>
+              <div class="steps-progress-info">
+                <span class="steps-progress-pct">42% Hoàn thành</span>
+                <div class="steps-divider"></div>
+                <span class="steps-count">2/5 Bước</span>
+              </div>
+            </div>
+
+            <div class="steps-list">
+              <div class="step-row" onclick="navigateStep('step-1')">
+                <div class="step-icon">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    style="width: 16px; height: 16px; color: #8f50e2"
+                  >
+                    <path
+                      d="M24 12C24 10.304 23.14 8.809 21.832 7.927C22.133 6.379 21.684 4.714 20.485 3.514C19.286 2.315 17.621 1.866 16.072 2.167C15.19 0.859 13.695 -0.001 11.999 -0.001C10.303 -0.001 8.808 0.859 7.926 2.167C6.378 1.866 4.712 2.315 3.513 3.514C2.314 4.713 1.865 6.378 2.166 7.927C0.858 8.809 -0.002 10.304 -0.002 12C-0.002 13.696 0.858 15.191 2.166 16.073C1.865 17.621 2.314 19.287 3.513 20.486C4.712 21.685 6.377 22.134 7.926 21.833C8.808 23.141 10.303 24.001 11.999 24.001C13.695 24.001 15.19 23.141 16.072 21.833C17.62 22.134 19.286 21.685 20.485 20.486C21.684 19.287 22.133 17.622 21.832 16.073C23.14 15.191 24 13.696 24 12ZM11.909 15.419C11.522 15.806 11.013 15.999 10.502 15.999C9.991 15.999 9.477 15.804 9.086 15.414L6.304 12.718L7.697 11.281L10.49 13.988L16.299 8.287L17.703 9.712L11.909 15.419Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </div>
+                <span class="step-name default">Tổng Quan Về ESG</span>
+              </div>
+
+              <div class="step-row" onclick="navigateStep('step-2')">
+                <div class="step-icon">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    style="width: 16px; height: 16px; color: #8f50e2"
+                  >
+                    <path
+                      d="M24 12C24 10.304 23.14 8.809 21.832 7.927C22.133 6.379 21.684 4.714 20.485 3.514C19.286 2.315 17.621 1.866 16.072 2.167C15.19 0.859 13.695 -0.001 11.999 -0.001C10.303 -0.001 8.808 0.859 7.926 2.167C6.378 1.866 4.712 2.315 3.513 3.514C2.314 4.713 1.865 6.378 2.166 7.927C0.858 8.809 -0.002 10.304 -0.002 12C-0.002 13.696 0.858 15.191 2.166 16.073C1.865 17.621 2.314 19.287 3.513 20.486C4.712 21.685 6.377 22.134 7.926 21.833C8.808 23.141 10.303 24.001 11.999 24.001C13.695 24.001 15.19 23.141 16.072 21.833C17.62 22.134 19.286 21.685 20.485 20.486C21.684 19.287 22.133 17.622 21.832 16.073C23.14 15.191 24 13.696 24 12ZM11.909 15.419C11.522 15.806 11.013 15.999 10.502 15.999C9.991 15.999 9.477 15.804 9.086 15.414L6.304 12.718L7.697 11.281L10.49 13.988L16.299 8.287L17.703 9.712L11.909 15.419Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </div>
+                <span class="step-name default">Biến Đổi Khí Hậu & Phát Thải Carbon</span>
+              </div>
+
+              <div class="step-row" onclick="navigateStep('step-3')">
+                <div class="step-icon">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    style="width: 16px; height: 16px; color: #1c1c1c"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-opacity="0.2"
+                      stroke-width="1.5"
+                    />
+                  </svg>
+                </div>
+                <span class="step-name active">Giới Thiệu Về ESG</span>
+              </div>
+
+              <div class="step-row" onclick="navigateStep('step-4')">
+                <div class="step-icon">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    style="width: 16px; height: 16px; color: #1c1c1c"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-opacity="0.2"
+                      stroke-width="1.5"
+                    />
+                  </svg>
+                </div>
+                <span class="step-name default">Quản Lý Tài Nguyên & Chất Thải</span>
+              </div>
+
+              <div class="step-row" onclick="navigateStep('step-5')">
+                <div class="step-icon">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    style="width: 16px; height: 16px; color: #1c1c1c"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-opacity="0.2"
+                      stroke-width="1.5"
+                    />
+                  </svg>
+                </div>
+                <span class="step-name default">Bài Tập Cuối Chương</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Navigation -->
+          <div class="bottom-nav">
+            <div class="bottom-nav-buttons">
+              <button class="bottom-btn bottom-btn-prev" onclick="prevLesson()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0">
+                  <path
+                    d="M15 18L9 12L15 6"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <span>Trước</span>
+              </button>
+
+              <button class="bottom-btn bottom-btn-complete" onclick="markComplete(this)">
+                <span>Đánh dấu hoàn thành</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0">
+                  <path
+                    d="M20 6L9 17L4 12"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+
+              <button class="bottom-btn bottom-btn-next" onclick="nextLesson()">
+                <span>Tiếp</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0">
+                  <path
+                    d="M9 18L15 12L9 6"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <button class="back-to-course-link" onclick="backToCourse()">
+              Quay lại chi tiết khoá học
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating Chat Button (mobile) -->
+      <button class="floating-chat" onclick="toggleReportDialog(true)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"
+            stroke="white"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <!-- ===== MOBILE DRAWER ===== -->
+    <div class="mobile-drawer" id="mobileDrawer" style="display: none">
+      <div class="drawer-header">
+        <span class="drawer-title">Bài học khoá học</span>
+        <button class="drawer-close" onclick="closeMobileDrawer()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M18 6L6 18M6 6L18 18"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+      </div>
+      <div class="drawer-body">
+        <div class="drawer-back" onclick="closeMobileDrawer()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M15 18L9 12L15 6"
+              stroke="#1c1c1c"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span class="drawer-back-text">Quay lại chi tiết khoá học</span>
+        </div>
+        <!-- Lesson 1 -->
+        <div class="drawer-lesson">
+          <div class="drawer-lesson-header" onclick="mobileToggleLesson(this)">
+            <div class="lesson-icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                style="width: 24px; height: 24px; color: #8f50e2"
+              >
+                <path
+                  d="M24 12C24 10.304 23.14 8.809 21.832 7.927C22.133 6.379 21.684 4.714 20.485 3.514C19.286 2.315 17.621 1.866 16.072 2.167C15.19 0.859 13.695 -0.001 11.999 -0.001C10.303 -0.001 8.808 0.859 7.926 2.167C6.378 1.866 4.712 2.315 3.513 3.514C2.314 4.713 1.865 6.378 2.166 7.927C0.858 8.809 -0.002 10.304 -0.002 12C-0.002 13.696 0.858 15.191 2.166 16.073C1.865 17.621 2.314 19.287 3.513 20.486C4.712 21.685 6.377 22.134 7.926 21.833C8.808 23.141 10.303 24.001 11.999 24.001C13.695 24.001 15.19 23.141 16.072 21.833C17.62 22.134 19.286 21.685 20.485 20.486C21.684 19.287 22.133 17.622 21.832 16.073C23.14 15.191 24 13.696 24 12Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
+            <div class="lesson-info">
+              <span class="drawer-lesson-name default" style="font-weight: 700"
+                >Chương 1: Tổng Quan Về ESG</span
+              >
+            </div>
+          </div>
+        </div>
+        <!-- Lesson 2 -->
+        <div class="drawer-lesson">
+          <div
+            class="drawer-lesson-header"
+            style="background: rgba(143, 80, 226, 0.2)"
+            onclick="mobileToggleLesson(this)"
+          >
+            <div class="lesson-icon">
+              <svg viewBox="0 0 24 24" fill="none" style="width: 24px; height: 24px">
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-opacity="0.1"
+                  stroke-width="2.8"
+                  style="color: #1c1c1c"
+                />
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="#8F50E2"
+                  stroke-width="2.8"
+                  stroke-dasharray="62.83"
+                  stroke-dashoffset="31.42"
+                  stroke-linecap="round"
+                  transform="rotate(-90 12 12)"
+                />
+              </svg>
+            </div>
+            <div class="lesson-info">
+              <span class="drawer-lesson-name active">Chương 2: Môi Trường (E)</span>
+              <div class="drawer-lesson-topics">
+                <div class="topic-count-badge">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M6 9L12 15L18 9"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </div>
+                <span class="topic-count">3 Chủ đề</span>
+              </div>
+            </div>
+          </div>
+          <div class="topics-container active">
+            <div class="topic-item">
+              <div class="topic-dot">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  style="width: 16px; height: 16px; color: #8f50e2"
+                >
+                  <path
+                    d="M24 12C24 10.304 23.14 8.809 21.832 7.927C22.133 6.379 21.684 4.714 20.485 3.514C19.286 2.315 17.621 1.866 16.072 2.167C15.19 0.859 13.695 -0.001 11.999 -0.001C10.303 -0.001 8.808 0.859 7.926 2.167C6.378 1.866 4.712 2.315 3.513 3.514C2.314 4.713 1.865 6.378 2.166 7.927C0.858 8.809 -0.002 10.304 -0.002 12C-0.002 13.696 0.858 15.191 2.166 16.073C1.865 17.621 2.314 19.287 3.513 20.486C4.712 21.685 6.377 22.134 7.926 21.833C8.808 23.141 10.303 24.001 11.999 24.001C13.695 24.001 15.19 23.141 16.072 21.833C17.62 22.134 19.286 21.685 20.485 20.486C21.684 19.287 22.133 17.622 21.832 16.073C23.14 15.191 24 13.696 24 12Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </div>
+              <span class="topic-title default">Biến Đổi Khí Hậu</span>
+            </div>
+            <div class="topic-item">
+              <div class="topic-dot"><div class="topic-dot-circle"></div></div>
+              <span class="topic-title active">Giới Thiệu Về ESG</span>
+            </div>
+            <div class="topic-item">
+              <div class="topic-dot"><div class="topic-dot-circle"></div></div>
+              <span class="topic-title default">Quản Lý Tài Nguyên</span>
+            </div>
+          </div>
+        </div>
+        <!-- Lesson 3 -->
+        <div class="drawer-lesson">
+          <div class="drawer-lesson-header" onclick="mobileToggleLesson(this)">
+            <div class="lesson-icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                style="width: 24px; height: 24px; color: #1c1c1c"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-opacity="0.1"
+                  stroke-width="2.8"
+                />
+              </svg>
+            </div>
+            <div class="lesson-info">
+              <span class="drawer-lesson-name default">Chương 3: Xã Hội (S)</span>
+              <div class="drawer-lesson-topics">
+                <div class="topic-count-badge">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M6 9L12 15L18 9"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </div>
+                <span class="topic-count">4 Chủ đề</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Lesson 4 -->
+        <div class="drawer-lesson">
+          <div class="drawer-lesson-header" onclick="mobileToggleLesson(this)">
+            <div class="lesson-icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                style="width: 24px; height: 24px; color: #1c1c1c"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-opacity="0.1"
+                  stroke-width="2.8"
+                />
+              </svg>
+            </div>
+            <div class="lesson-info">
+              <span class="drawer-lesson-name default">Chương 4: Quản Trị (G)</span>
+              <div class="drawer-lesson-topics">
+                <div class="topic-count-badge">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M6 9L12 15L18 9"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </div>
+                <span class="topic-count">3 Chủ đề</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== REPORT DIALOG ===== -->
+    <div
+      class="dialog-backdrop"
+      id="reportDialog"
+      style="display: none"
+      onclick="if (event.target === this) toggleReportDialog(false);"
+    >
+      <div class="dialog">
+        <div class="dialog-top">
+          <div class="dialog-top-text">
+            <h2 class="dialog-title">Báo cáo sự cố</h2>
+            <p class="dialog-subtitle">
+              Hãy cho chúng tôi biết vấn đề bạn gặp phải để chúng tôi có thể cải thiện trải nghiệm
+              học tập của bạn.
+            </p>
+          </div>
+          <button class="dialog-close-btn" onclick="toggleReportDialog(false)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M18 6L6 18M6 6L18 18"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="dialog-body">
+          <form
+            onsubmit="
+              event.preventDefault();
+              submitReport();
+            "
+            style="display: flex; flex-direction: column; gap: 16px"
+          >
+            <div class="dialog-field">
+              <label class="dialog-field-label" for="report-type"
+                >Loại vấn đề <span class="required">*</span></label
+              >
+              <select id="report-type" class="dialog-select" required>
+                <option value="" disabled selected>Chọn loại vấn đề</option>
+                <option value="technical">Lỗi kỹ thuật</option>
+                <option value="content">Vấn đề nội dung</option>
+                <option value="video">Vấn đề video</option>
+                <option value="audio">Vấn đề âm thanh</option>
+                <option value="other">Khác</option>
+              </select>
+            </div>
+            <div class="dialog-field">
+              <label class="dialog-field-label" for="report-message"
+                >Mô tả chi tiết <span class="required">*</span></label
+              >
+              <textarea
+                id="report-message"
+                class="dialog-textarea"
+                rows="5"
+                placeholder="Mô tả vấn đề bạn gặp phải..."
+                required
+              ></textarea>
+            </div>
+            <button type="submit" class="dialog-submit">Gửi báo cáo</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================
+  JAVASCRIPT
+  ================================================ -->
+    <script>
+      // ─── Sidebar Toggle ───
+      let sidebarCollapsed = false;
+
+      function toggleSidebar() {
+        sidebarCollapsed = !sidebarCollapsed;
+        const sidebar = document.getElementById('desktopSidebar');
+        const chevron = document.getElementById('sidebarChevron');
+        if (sidebarCollapsed) {
+          sidebar.style.display = 'none';
+          chevron.style.transform = 'rotate(180deg)';
+        } else {
+          sidebar.style.display = 'flex';
+          chevron.style.transform = 'rotate(0deg)';
+        }
+      }
+
+      // ─── Lesson Toggle (expand/collapse topics) ───
+      const expandedLessons = new Set(['2']);
+
+      function toggleLesson(id) {
+        if (expandedLessons.has(id)) {
+          expandedLessons.delete(id);
+        } else {
+          expandedLessons.add(id);
+        }
+        const topics = document.getElementById('topics-' + id);
+        if (topics) {
+          topics.style.display = expandedLessons.has(id) ? 'flex' : 'none';
+          // toggle triangle/padding
+          if (expandedLessons.has(id)) {
+            topics.classList.remove('inactive');
+            topics.classList.add('active');
+          } else {
+            topics.classList.remove('active');
+            topics.classList.add('inactive');
+          }
+        }
+      }
+
+      // ─── Navigation ───
+      function prevLesson() {
+        alert('Chuyển đến bài trước');
+      }
+      function nextLesson() {
+        alert('Chuyển đến bài tiếp theo');
+      }
+      function navigateTopic(id) {
+        alert('Chuyển đến chủ đề: ' + id);
+      }
+      function navigateStep(id) {
+        alert('Chuyển đến bước: ' + id);
+      }
+      function backToCourse() {
+        alert('Quay lại chi tiết khoá học');
+      }
+
+      // ─── Mark Complete ───
+      function markComplete(btn) {
+        btn.innerHTML =
+          '<div style="display:flex;align-items:center;gap:8px;"><span class="badge-completed-text" style="color:#00a8eb;font-size:14px;font-weight:500;text-transform:uppercase;letter-spacing:0.14px;">Đã hoàn thành</span></div>';
+        btn.className = 'badge-completed';
+      }
+
+      // ─── Video Player ───
+      let isPlaying = false;
+
+      function playVideo(el) {
+        isPlaying = true;
+        el.style.display = 'none';
+        document.getElementById('playIcon').innerHTML =
+          '<rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/>';
+        // Replace thumb with dark bg + spinner (simulating buffering)
+        const container = document.getElementById('videoContainer');
+        container.querySelector('img').style.display = 'none';
+        const overlay = document.createElement('div');
+        overlay.className = 'video-overlay loading';
+        overlay.innerHTML =
+          '<div style="display:flex;flex-direction:column;align-items:center;gap:12px;"><div class="spinner"></div><span class="loading-text">Đang tải video...</span></div>';
+        container.appendChild(overlay);
+        setTimeout(() => {
+          overlay.remove();
+          const bg = document.createElement('div');
+          bg.style.cssText =
+            'position:absolute;inset:0;background:#111;display:flex;align-items:center;justify-content:center;';
+          bg.innerHTML =
+            '<span style="color:rgba(255,255,255,0.3);font-size:14px;">Đang phát video...</span>';
+          container.appendChild(bg);
+        }, 2000);
+      }
+
+      function togglePlay() {
+        const icon = document.getElementById('playIcon');
+        if (isPlaying) {
+          isPlaying = false;
+          icon.innerHTML = '<polygon points="5,3 19,12 5,21" fill="currentColor"/>';
+        } else {
+          isPlaying = true;
+          icon.innerHTML =
+            '<rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/>';
+        }
+      }
+
+      let currentSpeed = 1;
+      const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
+
+      function changeSpeed() {
+        const idx = speeds.indexOf(currentSpeed);
+        currentSpeed = speeds[(idx + 1) % speeds.length];
+        document.querySelector('.ctrl-speed').textContent = currentSpeed + 'x';
+      }
+
+      function rewind() {
+        /* simulate rewind 10s */
+      }
+      function forward() {
+        /* simulate forward 10s */
+      }
+
+      // ─── Progress Bar Seek ───
+      function seekVideo(e) {
+        const bar = document.getElementById('progressBar');
+        const rect = bar.getBoundingClientRect();
+        const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        document.getElementById('progressFill').style.width = ratio * 100 + '%';
+        document.getElementById('progressThumb').style.left = 'calc(' + ratio * 100 + '% - 6px)';
+      }
+
+      // ─── Volume ───
+      let volumeVisible = false;
+
+      function showVolumeSlider() {
+        document.getElementById('volumePopup').style.display = 'block';
+        volumeVisible = true;
+      }
+
+      function toggleVolumeSlider() {
+        volumeVisible = !volumeVisible;
+        document.getElementById('volumePopup').style.display = volumeVisible ? 'block' : 'none';
+      }
+
+      let volumeHideTimer;
+
+      function hideVolumeSliderDelayed() {
+        volumeHideTimer = setTimeout(() => {
+          document.getElementById('volumePopup').style.display = 'none';
+          volumeVisible = false;
+        }, 500);
+      }
+
+      function changeVolume(e) {
+        const track = document.getElementById('volumeTrack');
+        const rect = track.getBoundingClientRect();
+        const ratio = 1 - Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+        document.getElementById('volumeFill').style.height = ratio * 100 + '%';
+        document.getElementById('volumeThumb').style.bottom = 'calc(' + ratio * 100 + '% - 7px)';
+      }
+
+      // ─── Quality Menu ───
+      function toggleQualityMenu() {
+        const menu = document.getElementById('qualityMenu');
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+      }
+
+      document.querySelectorAll('.quality-option').forEach((btn) => {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('.quality-option').forEach((b) => {
+            b.className = 'quality-option default';
+          });
+          this.className = 'quality-option active';
+          document.getElementById('qualityMenu').style.display = 'none';
+        });
+      });
+
+      // ─── Fullscreen ───
+      function toggleFullscreen() {
+        const container = document.getElementById('videoContainer');
+        if (!document.fullscreenElement) {
+          container.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen();
+        }
+      }
+
+      // ─── Mobile Drawer ───
+      function openMobileDrawer() {
+        document.getElementById('mobileDrawer').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeMobileDrawer() {
+        document.getElementById('mobileDrawer').style.display = 'none';
+        document.body.style.overflow = '';
+      }
+
+      function mobileToggleLesson(el) {
+        /* expand/collapse in drawer */
+      }
+
+      // ─── Report Dialog ───
+      function toggleReportDialog(show) {
+        document.getElementById('reportDialog').style.display = show ? 'flex' : 'none';
+        document.body.style.overflow = show ? 'hidden' : '';
+      }
+
+      function submitReport() {
+        alert('Báo cáo đã được gửi!');
+        toggleReportDialog(false);
+      }
+
+      // ─── Outside click for volume ───
+      document.addEventListener('click', function (e) {
+        const popup = document.getElementById('volumePopup');
+        const btn = document.getElementById('volumeBtn');
+        if (
+          popup.style.display === 'block' &&
+          !popup.contains(e.target) &&
+          !btn.contains(e.target)
+        ) {
+          popup.style.display = 'none';
+          volumeVisible = false;
+        }
+      });
+
+      // Show quality menu on desktop only
+      if (window.innerWidth >= 1024) {
+        document.getElementById('qualityWrap').style.display = 'block';
+      }
+    </script>
+  </body>
+</html>

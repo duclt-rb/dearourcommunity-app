@@ -1,0 +1,1110 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registration - Dear Our Community</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        font-family:
+          'Inter',
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          sans-serif;
+        letter-spacing: 0.5px;
+        color: #1c1c1c;
+        background: #fff;
+        line-height: 1.5;
+      }
+      button {
+        cursor: pointer;
+        font-family: inherit;
+      }
+      input {
+        font-family: inherit;
+      }
+
+      :root {
+        --color-primary: #8f50e2;
+        --color-primary-hover: #7a46c7;
+        --color-dark: #1c1c1c;
+        --color-accent-green: #008600;
+        --color-border: #d2d2d2;
+        --color-momo: #ae2070;
+        --radius-card: 16px;
+        --radius-input: 12px;
+        --radius-pill: 50px;
+      }
+
+      .page-section {
+        width: 100%;
+        background: #fff;
+        padding: 36px 20px 60px;
+      }
+      @media (min-width: 1024px) {
+        .page-section {
+          padding: 80px 86px 120px;
+        }
+      }
+      .page-inner {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        align-items: center;
+        max-width: 640px;
+        margin: 0 auto;
+      }
+
+      /* ─── Title ─── */
+      .page-title {
+        font-size: 32px;
+        font-weight: 500;
+        text-align: center;
+        letter-spacing: 1.2px;
+        line-height: 1.2;
+        color: var(--color-dark);
+      }
+      @media (min-width: 1024px) {
+        .page-title {
+          font-size: 48px;
+        }
+      }
+      .page-subtitle {
+        font-size: 16px;
+        text-align: center;
+        letter-spacing: 0.4px;
+        line-height: 24px;
+        color: var(--color-dark);
+      }
+      .page-subtitle .highlight {
+        font-weight: 700;
+        color: var(--color-primary);
+      }
+
+      /* ─── Step Indicator ─── */
+      .step-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        max-width: 320px;
+      }
+      .step-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .step-circle {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .step-circle.active {
+        background: var(--color-primary);
+        color: #fff;
+      }
+      .step-circle.dim {
+        background: rgba(28, 28, 28, 0.1);
+        color: rgba(28, 28, 28, 0.4);
+      }
+      .step-circle.done {
+        background: rgba(143, 80, 226, 0.1);
+        color: var(--color-primary);
+      }
+      .step-label {
+        font-size: 13px;
+        letter-spacing: 0.14px;
+      }
+      .step-label.active {
+        font-weight: 500;
+        color: var(--color-dark);
+      }
+      .step-label.dim {
+        color: rgba(28, 28, 28, 0.4);
+      }
+      .step-connector {
+        flex: 1;
+        height: 1px;
+        background: rgba(28, 28, 28, 0.1);
+      }
+
+      /* ─── Order Card ─── */
+      .order-card {
+        width: 100%;
+        border: 1px solid #dbdbdc;
+        border-radius: var(--radius-card);
+        overflow: hidden;
+      }
+      .order-card-header {
+        background: #fff;
+        padding: 24px 24px 0;
+      }
+      .order-card-title {
+        font-size: 24px;
+        font-weight: 500;
+        line-height: 32px;
+        letter-spacing: 0.6px;
+        color: var(--color-dark);
+      }
+      .order-card-body {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 16px 24px 24px;
+      }
+      .order-card-subtitle {
+        font-size: 14px;
+        color: rgba(28, 28, 28, 0.6);
+        letter-spacing: 0.14px;
+        line-height: 20px;
+      }
+
+      /* Section label */
+      .section-label {
+        font-size: 14px;
+        font-weight: 500;
+        text-transform: uppercase;
+        color: rgba(28, 28, 28, 0.6);
+        letter-spacing: 0.14px;
+        line-height: 20px;
+      }
+
+      /* Course row */
+      .course-row {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        justify-content: space-between;
+      }
+      .course-name {
+        flex: 1;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 24px;
+        letter-spacing: 0.4px;
+        color: var(--color-dark);
+      }
+      .course-price {
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: 0.4px;
+        text-align: right;
+        white-space: nowrap;
+        color: var(--color-dark);
+      }
+
+      .dashed-divider {
+        width: 100%;
+        border-top: 1px dashed rgba(28, 28, 28, 0.1);
+      }
+
+      /* ─── Coupon ─── */
+      .coupon-input-row {
+        display: flex;
+        gap: 8px;
+        align-items: flex-end;
+      }
+      .coupon-input {
+        flex: 1;
+        max-width: 232px;
+        height: 48px;
+        background: rgba(28, 28, 28, 0.05);
+        border-radius: 8px;
+        padding: 0 20px;
+        font-size: 14px;
+        color: rgba(28, 28, 28, 0.8);
+        letter-spacing: 0.14px;
+        line-height: 20px;
+        border: none;
+        outline: none;
+      }
+      .coupon-input::placeholder {
+        color: rgba(28, 28, 28, 0.4);
+      }
+      .btn-apply {
+        height: 48px;
+        padding: 0 24px;
+        background: var(--color-dark);
+        color: #fff;
+        font-size: 16px;
+        font-weight: 500;
+        border-radius: 8px;
+        letter-spacing: 0.4px;
+        line-height: 24px;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: opacity 0.2s;
+      }
+      .btn-apply:hover {
+        opacity: 0.9;
+      }
+      .btn-apply:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* Coupon applied */
+      .coupon-applied {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(0, 134, 0, 0.1);
+        border: 1px solid rgba(0, 134, 0, 0.3);
+        border-radius: var(--radius-input);
+        padding: 12px 16px;
+      }
+      .coupon-applied-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .coupon-code {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--color-dark);
+        letter-spacing: 0.14px;
+      }
+      .coupon-discount {
+        font-size: 13px;
+        color: rgba(28, 28, 28, 0.6);
+        letter-spacing: 0.14px;
+      }
+      .btn-remove-coupon {
+        background: none;
+        border: none;
+        color: rgba(28, 28, 28, 0.4);
+        padding: 0;
+        display: flex;
+        transition: color 0.2s;
+      }
+      .btn-remove-coupon:hover {
+        color: var(--color-dark);
+      }
+
+      .coupon-hint {
+        display: flex;
+        gap: 4px;
+        align-items: center;
+      }
+      .coupon-hint-text {
+        font-size: 14px;
+        color: var(--color-primary);
+        letter-spacing: 0.14px;
+        line-height: 20px;
+      }
+      .coupon-error {
+        font-size: 13px;
+        color: #ef4444;
+        letter-spacing: 0.14px;
+        line-height: 20px;
+      }
+
+      /* ─── Total ─── */
+      .total-section {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .total-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .total-row.original {
+        font-size: 14px;
+        color: rgba(28, 28, 28, 0.5);
+        letter-spacing: 0.14px;
+      }
+      .total-row.original .line-through {
+        text-decoration: line-through;
+      }
+      .total-row.final {
+        font-size: 16px;
+        color: #4d4d4f;
+        letter-spacing: 0.4px;
+      }
+      .total-row.final .total-label {
+        font-weight: 500;
+        line-height: 24px;
+      }
+      .total-row.final .total-value {
+        font-weight: 700;
+        line-height: 24px;
+        color: var(--color-primary);
+      }
+      .vat-note {
+        font-size: 14px;
+        font-style: italic;
+        color: rgba(28, 28, 28, 0.6);
+        letter-spacing: 0.14px;
+        line-height: 20px;
+        text-align: right;
+      }
+
+      /* ─── Buttons ─── */
+      .btn-checkout {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+        background: var(--color-primary);
+        color: #fff;
+        font-size: 16px;
+        font-weight: 500;
+        border-radius: var(--radius-pill);
+        padding: 16px 28px;
+        width: 180px;
+        letter-spacing: 0.4px;
+        line-height: 24px;
+        border: none;
+        transition: background 0.2s;
+      }
+      .btn-checkout:hover {
+        background: var(--color-primary-hover);
+      }
+
+      .btn-back {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        justify-content: center;
+        background: #fff;
+        color: var(--color-dark);
+        font-size: 16px;
+        font-weight: 500;
+        border-radius: var(--radius-pill);
+        padding: 16px 24px;
+        border: 1px solid #dbdbdc;
+        letter-spacing: 0.4px;
+        line-height: 24px;
+        transition: background 0.2s;
+      }
+      .btn-back:hover {
+        background: rgba(28, 28, 28, 0.05);
+      }
+
+      .btn-confirm {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+        background: var(--color-primary);
+        color: #fff;
+        font-size: 16px;
+        font-weight: 500;
+        border-radius: var(--radius-pill);
+        padding: 16px 28px;
+        min-width: 180px;
+        letter-spacing: 0.4px;
+        line-height: 24px;
+        border: none;
+        transition: background 0.2s;
+      }
+      .btn-confirm:hover {
+        background: var(--color-primary-hover);
+      }
+      .btn-confirm:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .action-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      /* ─── Payment Option ─── */
+      .payment-option {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px;
+        border-radius: 12px;
+        border: 2px solid #dbdbdc;
+        background: #fff;
+        text-align: left;
+        transition: border-color 0.2s;
+      }
+      .payment-option:hover {
+        border-color: rgba(28, 28, 28, 0.3);
+      }
+      .payment-option.selected {
+        border-color: var(--color-momo);
+        background: rgba(174, 32, 112, 0.05);
+      }
+      .payment-option.disabled {
+        background: rgba(28, 28, 28, 0.05);
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+      .payment-option.disabled:hover {
+        border-color: #dbdbdc;
+      }
+      .payment-icon-box {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .payment-icon-box.selected {
+        background: rgba(174, 32, 112, 0.1);
+      }
+      .payment-icon-box.dim {
+        background: rgba(28, 28, 28, 0.05);
+      }
+      .payment-option-name {
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 24px;
+        letter-spacing: 0.4px;
+        display: block;
+      }
+      .payment-option-name.selected {
+        color: var(--color-dark);
+      }
+      .payment-option-name.dim {
+        color: rgba(28, 28, 28, 0.5);
+      }
+      .payment-option-desc {
+        font-size: 13px;
+        color: rgba(28, 28, 28, 0.5);
+        letter-spacing: 0.14px;
+        line-height: 18px;
+      }
+      .radio-circle {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid rgba(28, 28, 28, 0.2);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .radio-circle.selected {
+        border-color: var(--color-momo);
+      }
+      .radio-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--color-momo);
+      }
+
+      /* ─── Payment Info (bank transfer - disabled) ─── */
+      .payment-extras {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      @media (min-width: 640px) {
+        .payment-extras {
+          flex-direction: row;
+          gap: 40px;
+        }
+      }
+      .payment-extras .bank-details {
+        flex: 1;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        font-size: 14px;
+        line-height: 22px;
+        letter-spacing: 0.5px;
+        color: var(--color-dark);
+      }
+      @media (min-width: 640px) {
+        .payment-extras .bank-details {
+          gap: 16px;
+          font-size: 16px;
+          line-height: 24px;
+        }
+      }
+      .payment-extras .bank-row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        border-radius: 8px;
+      }
+      @media (min-width: 640px) {
+        .payment-extras .bank-row {
+          gap: 16px;
+        }
+      }
+      .payment-extras .bank-label {
+        flex-shrink: 0;
+        width: 90px;
+      }
+      @media (min-width: 640px) {
+        .payment-extras .bank-label {
+          width: 110px;
+        }
+      }
+      .payment-extras .bank-value {
+        flex: 1;
+        font-weight: 700;
+        word-break: break-all;
+      }
+
+      .spinner-sm {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #fff;
+        animation: spin 0.6s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .error-msg {
+        font-size: 14px;
+        color: #ef4444;
+        text-align: center;
+      }
+
+      /* step visibility */
+      .step-content {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+      }
+      .step-content.visible {
+        display: flex;
+      }
+
+      @media (max-width: 639px) {
+        .page-title {
+          font-size: 28px;
+        }
+        .action-row {
+          flex-direction: column;
+          width: 100%;
+        }
+        .action-row .btn-back,
+        .action-row .btn-confirm {
+          width: 100%;
+        }
+        .btn-checkout {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <section class="page-section">
+      <div class="page-inner">
+        <!-- Header -->
+        <div
+          style="display: flex; flex-direction: column; gap: 12px; align-items: center; width: 100%"
+        >
+          <h1 class="page-title">Registration</h1>
+          <p class="page-subtitle">
+            Account Registration: <span class="highlight">Nguyễn Văn A</span>
+          </p>
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+          <div class="step-item">
+            <div class="step-circle active" id="step1Circle">1</div>
+            <span class="step-label active" id="step1Label">Order</span>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step-item">
+            <div class="step-circle dim" id="step2Circle">2</div>
+            <span class="step-label dim" id="step2Label">Payment</span>
+          </div>
+        </div>
+
+        <!-- ===== STEP 1: Order ===== -->
+        <div class="step-content visible" id="stepOrder">
+          <div class="order-card">
+            <div class="order-card-header">
+              <h2 class="order-card-title">Order Details</h2>
+            </div>
+            <div class="order-card-body">
+              <!-- Courses -->
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <span class="section-label">Courses</span>
+                <div class="course-row">
+                  <span class="course-name">
+                    ESG Căn Bản Cho Người Mới Bắt Đầu
+                    <span
+                      style="
+                        display: block;
+                        font-size: 13px;
+                        font-weight: 400;
+                        color: rgba(28, 28, 28, 0.5);
+                      "
+                      >Khóa học trực tuyến · 12 bài học</span
+                    >
+                  </span>
+                  <span class="course-price">₫ 500.000</span>
+                </div>
+              </div>
+
+              <div class="dashed-divider"></div>
+
+              <!-- Promo Code -->
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <span class="section-label">Promo code</span>
+
+                <!-- Coupon input (shown when no coupon applied) -->
+                <div id="couponInputArea">
+                  <div class="coupon-input-row">
+                    <input
+                      class="coupon-input"
+                      type="text"
+                      id="promoInput"
+                      placeholder="Enter your promo code"
+                    />
+                    <button class="btn-apply" id="btnApply" onclick="applyCoupon()">Apply</button>
+                  </div>
+                  <div class="coupon-hint" style="margin-top: 8px">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      style="color: var(--color-primary); flex-shrink: 0"
+                    >
+                      <path
+                        d="M20.59 13.41L12.01 22H4V13.99L12.59 5.4M20.59 13.41L14.42 19.58"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M8 8H8.01"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                    <span class="coupon-hint-text">Use offers to get discounts</span>
+                  </div>
+                </div>
+
+                <!-- Coupon applied state (hidden initially) -->
+                <div id="couponAppliedArea" style="display: none">
+                  <div class="coupon-applied">
+                    <div class="coupon-applied-left">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        style="color: var(--color-accent-green); flex-shrink: 0"
+                      >
+                        <path
+                          d="M20.59 13.41L12.01 22H4V13.99L12.59 5.4M20.59 13.41L14.42 19.58"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M8 8H8.01"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                      <span class="coupon-code" id="appliedCode">WELCOME20</span>
+                      <span class="coupon-discount" id="appliedDiscount">−20%</span>
+                    </div>
+                    <button class="btn-remove-coupon" onclick="removeCoupon()">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M18 6L6 18M6 6L18 18" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Coupon error -->
+                <p class="coupon-error" id="couponError" style="display: none">
+                  Invalid promo code
+                </p>
+              </div>
+
+              <div class="dashed-divider"></div>
+
+              <!-- Total -->
+              <div class="total-section">
+                <!-- Original price (hidden unless discount) -->
+                <div class="total-row original" id="originalPriceRow" style="display: none">
+                  <span>Original price</span>
+                  <span class="line-through" id="originalPriceValue">₫ 500.000</span>
+                </div>
+                <div class="total-row final">
+                  <span class="total-label">Total</span>
+                  <span class="total-value" id="finalPriceValue">₫ 500.000</span>
+                </div>
+                <p class="vat-note">(VAT included)</p>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-checkout" onclick="goToPayment()">
+            Checkout
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- ===== STEP 2: Payment ===== -->
+        <div class="step-content" id="stepPayment">
+          <div class="order-card">
+            <div class="order-card-header">
+              <h2 class="order-card-title">Payment Method</h2>
+              <p class="order-card-subtitle">Select your preferred payment method</p>
+            </div>
+            <div class="order-card-body">
+              <!-- MoMo (selected) -->
+              <button class="payment-option selected" onclick="selectMomo()">
+                <div class="payment-icon-box selected">
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    style="color: #ae2070"
+                  >
+                    <rect
+                      x="5"
+                      y="2"
+                      width="14"
+                      height="20"
+                      rx="3"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    />
+                    <line
+                      x1="12"
+                      y1="18"
+                      x2="12"
+                      y2="18.01"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </div>
+                <div style="flex: 1">
+                  <span class="payment-option-name selected">MoMo</span>
+                  <span class="payment-option-desc">Pay with MoMo e-wallet</span>
+                </div>
+                <div class="radio-circle selected">
+                  <div class="radio-dot"></div>
+                </div>
+              </button>
+
+              <!-- Bank Transfer (disabled) -->
+              <button class="payment-option disabled">
+                <div class="payment-icon-box dim">
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    style="color: rgba(28, 28, 28, 0.3)"
+                  >
+                    <rect
+                      x="2"
+                      y="12"
+                      width="20"
+                      height="8"
+                      rx="2"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    />
+                    <path
+                      d="M4 12V8C4 4.68629 6.68629 2 10 2H14C17.3137 2 20 4.68629 20 8V12"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    />
+                    <line
+                      x1="12"
+                      y1="16"
+                      x2="12"
+                      y2="18"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </div>
+                <div style="flex: 1">
+                  <span class="payment-option-name dim">Bank Transfer</span>
+                  <span class="payment-option-desc">Transfer directly to our bank account</span>
+                </div>
+                <div class="radio-circle"></div>
+              </button>
+
+              <div class="dashed-divider"></div>
+
+              <!-- Order summary -->
+              <div style="display: flex; flex-direction: column; gap: 4px">
+                <div
+                  class="course-row"
+                  style="font-size: 14px; color: rgba(28, 28, 28, 0.6); letter-spacing: 0.14px"
+                >
+                  <span class="course-name" style="font-size: 14px; font-weight: 400"
+                    >ESG Căn Bản Cho Người Mới Bắt Đầu</span
+                  >
+                  <span id="paymentPrice" style="white-space: nowrap">₫ 500.000</span>
+                </div>
+                <div class="total-row final">
+                  <span class="total-label">Total</span>
+                  <span class="total-value" id="paymentTotal">₫ 500.000</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error message placeholder -->
+          <p class="error-msg" id="paymentError" style="display: none">
+            Payment failed. Please try again.
+          </p>
+
+          <div class="action-row">
+            <button class="btn-back" onclick="backToOrder()">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M19 12H5M12 19L5 12L12 5" />
+              </svg>
+              Back
+            </button>
+            <button class="btn-confirm" id="btnPay" onclick="confirmPayment()">
+              Pay with MoMo
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== DEMO TOGGLE ===== -->
+    <div
+      style="
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+      "
+    >
+      <button
+        onclick="resetToOrder()"
+        style="
+          padding: 8px 16px;
+          border-radius: 50px;
+          background: #1c1c1c;
+          color: #fff;
+          border: none;
+          font-size: 13px;
+          font-weight: 500;
+        "
+      >
+        Step 1: Order
+      </button>
+      <button
+        onclick="goToPayment()"
+        style="
+          padding: 8px 16px;
+          border-radius: 50px;
+          background: #8f50e2;
+          color: #fff;
+          border: none;
+          font-size: 13px;
+          font-weight: 500;
+        "
+      >
+        Step 2: Payment
+      </button>
+      <button
+        onclick="applyCouponDemo()"
+        style="
+          padding: 8px 16px;
+          border-radius: 50px;
+          background: #008600;
+          color: #fff;
+          border: none;
+          font-size: 13px;
+          font-weight: 500;
+        "
+      >
+        Apply coupon
+      </button>
+    </div>
+
+    <script>
+      let hasDiscount = false;
+      let couponApplied = false;
+
+      function goToPayment() {
+        document.getElementById('stepOrder').classList.remove('visible');
+        document.getElementById('stepPayment').classList.add('visible');
+
+        document.getElementById('step1Circle').className = 'step-circle done';
+        document.getElementById('step1Circle').innerHTML =
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17L4 12"/></svg>';
+        document.getElementById('step1Label').className = 'step-label dim';
+
+        document.getElementById('step2Circle').className = 'step-circle active';
+        document.getElementById('step2Circle').textContent = '2';
+        document.getElementById('step2Label').className = 'step-label active';
+
+        // Sync price to payment step
+        const finalPrice = document.getElementById('finalPriceValue').textContent;
+        document.getElementById('paymentPrice').textContent = finalPrice;
+        document.getElementById('paymentTotal').textContent = finalPrice;
+      }
+
+      function backToOrder() {
+        document.getElementById('stepPayment').classList.remove('visible');
+        document.getElementById('stepOrder').classList.add('visible');
+
+        document.getElementById('step1Circle').className = 'step-circle active';
+        document.getElementById('step1Circle').textContent = '1';
+        document.getElementById('step1Label').className = 'step-label active';
+
+        document.getElementById('step2Circle').className = 'step-circle dim';
+        document.getElementById('step2Circle').textContent = '2';
+        document.getElementById('step2Label').className = 'step-label dim';
+
+        document.getElementById('paymentError').style.display = 'none';
+      }
+
+      function applyCoupon() {
+        const input = document.getElementById('promoInput');
+        const code = input.value.trim().toUpperCase();
+        if (!code) return;
+
+        // Simulate valid coupon
+        if (code === 'WELCOME20' || code === 'SALE20') {
+          couponApplied = true;
+          hasDiscount = true;
+          document.getElementById('couponInputArea').style.display = 'none';
+          document.getElementById('couponAppliedArea').style.display = 'block';
+          document.getElementById('couponError').style.display = 'none';
+          document.getElementById('appliedCode').textContent = code;
+          document.getElementById('appliedDiscount').textContent = '−20%';
+
+          // Update prices
+          document.getElementById('originalPriceRow').style.display = 'flex';
+          document.getElementById('originalPriceValue').textContent = '₫ 500.000';
+          document.getElementById('finalPriceValue').textContent = '₫ 400.000';
+        } else {
+          document.getElementById('couponError').style.display = 'block';
+          document.getElementById('couponError').textContent = 'Invalid promo code';
+        }
+      }
+
+      function applyCouponDemo() {
+        document.getElementById('promoInput').value = 'WELCOME20';
+        applyCoupon();
+      }
+
+      function removeCoupon() {
+        couponApplied = false;
+        hasDiscount = false;
+        document.getElementById('couponInputArea').style.display = 'block';
+        document.getElementById('couponAppliedArea').style.display = 'none';
+        document.getElementById('couponError').style.display = 'none';
+        document.getElementById('promoInput').value = '';
+
+        document.getElementById('originalPriceRow').style.display = 'none';
+        document.getElementById('finalPriceValue').textContent = '₫ 500.000';
+      }
+
+      function selectMomo() {
+        // MoMo is the only selectable option
+      }
+
+      function confirmPayment() {
+        const btn = document.getElementById('btnPay');
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner-sm"></div> Processing...';
+        document.getElementById('paymentError').style.display = 'none';
+
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML =
+            'Pay with MoMo <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z"/></svg>';
+          // Simulate redirect to payment result
+          alert('Redirect to payment result page...');
+        }, 2000);
+      }
+
+      function resetToOrder() {
+        backToOrder();
+      }
+    </script>
+  </body>
+</html>

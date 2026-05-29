@@ -1,0 +1,1000 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thanh toán - Dear Our Community</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        font-family:
+          'Inter',
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          sans-serif;
+        letter-spacing: 0.5px;
+        color: #1c1c1c;
+        background: #fff;
+        line-height: 1.5;
+      }
+      button {
+        cursor: pointer;
+        font-family: inherit;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      :root {
+        --color-primary: #8f50e2;
+        --color-primary-hover: #7a46c7;
+        --color-dark: #1c1c1c;
+        --color-cream-alt: #f7f0dc;
+        --color-accent-green: #008600;
+        --color-border: #d2d2d2;
+        --radius-card-lg: 24px;
+        --radius-pill: 50px;
+      }
+
+      .page-section {
+        position: relative;
+        width: 100%;
+        background: #fff;
+        padding: 36px 20px 60px;
+      }
+      @media (min-width: 1024px) {
+        .page-section {
+          padding: 120px 86px 202px;
+        }
+      }
+
+      .page-inner {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        align-items: center;
+        max-width: 1268px;
+        margin: 0 auto;
+      }
+      @media (min-width: 1024px) {
+        .page-inner {
+          gap: 60px;
+        }
+      }
+
+      /* ─── Title (mobile) ─── */
+      .title-mobile {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+      }
+      @media (min-width: 1024px) {
+        .title-mobile {
+          display: none;
+        }
+      }
+      .title-mobile h2 {
+        font-size: 32px;
+        font-weight: 500;
+        line-height: 44px;
+        letter-spacing: 0.5px;
+        color: var(--color-dark);
+      }
+      .title-mobile p {
+        font-size: 14px;
+        line-height: 20px;
+        letter-spacing: 0.5px;
+        color: var(--color-dark);
+      }
+
+      /* ─── Main row ─── */
+      .main-row {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        gap: 24px;
+      }
+      @media (min-width: 1024px) {
+        .main-row {
+          flex-direction: row;
+          align-items: flex-end;
+          gap: 0;
+        }
+      }
+
+      /* ─── Left payment info (desktop) ─── */
+      .left-panel {
+        display: none;
+      }
+      @media (min-width: 1024px) {
+        .left-panel {
+          display: flex;
+          flex: 1;
+          flex-direction: column;
+          gap: 40px;
+          padding: 20px 60px 20px 0;
+        }
+      }
+      .left-title {
+        font-size: 56px;
+        font-weight: 500;
+        line-height: 1.2;
+        color: var(--color-dark);
+        max-width: 530px;
+      }
+      .left-subtitle {
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: 0.5px;
+        color: var(--color-dark);
+        max-width: 450px;
+        margin-top: 16px;
+      }
+
+      /* ─── Payment Info Card ─── */
+      .payment-info {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        width: 100%;
+      }
+      @media (min-width: 640px) {
+        .payment-info {
+          flex-direction: row;
+          gap: 40px;
+        }
+      }
+      .qr-box {
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-card-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+        width: 180px;
+        height: 180px;
+        align-self: center;
+      }
+      @media (min-width: 640px) {
+        .qr-box {
+          width: 240px;
+          height: 240px;
+          align-self: flex-start;
+        }
+      }
+      .qr-inner {
+        width: 140px;
+        height: 142px;
+        position: relative;
+      }
+      @media (min-width: 640px) {
+        .qr-inner {
+          width: 190px;
+          height: 192px;
+        }
+      }
+      .qr-inner svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .bank-details {
+        flex: 1;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        font-size: 14px;
+        line-height: 22px;
+        letter-spacing: 0.5px;
+        color: var(--color-dark);
+      }
+      @media (min-width: 640px) {
+        .bank-details {
+          gap: 16px;
+          font-size: 16px;
+          line-height: 24px;
+        }
+      }
+      .bank-row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        border-radius: 8px;
+      }
+      @media (min-width: 640px) {
+        .bank-row {
+          gap: 16px;
+        }
+      }
+      .bank-label {
+        flex-shrink: 0;
+        width: 90px;
+      }
+      @media (min-width: 640px) {
+        .bank-label {
+          width: 110px;
+        }
+      }
+      .bank-value {
+        flex: 1;
+        font-weight: 700;
+        word-break: break-all;
+      }
+
+      /* ─── Booking Summary Card ─── */
+      .summary-card {
+        background: var(--color-cream-alt);
+        border-radius: var(--radius-card-lg);
+        padding: 20px;
+        width: 100%;
+      }
+      @media (min-width: 1024px) {
+        .summary-card {
+          width: 600px;
+          padding: 40px;
+        }
+      }
+      .summary-inner {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+      }
+      @media (min-width: 640px) {
+        .summary-inner {
+          gap: 20px;
+        }
+      }
+      .mentor-img {
+        position: relative;
+        height: 140px;
+        width: 100px;
+        flex-shrink: 0;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      @media (min-width: 640px) {
+        .mentor-img {
+          height: 200px;
+          width: 141px;
+        }
+      }
+      .mentor-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .mentor-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      @media (min-width: 640px) {
+        .mentor-info {
+          gap: 16px;
+        }
+      }
+      .mentor-name {
+        font-size: 20px;
+        font-weight: 500;
+        line-height: 1.2;
+        letter-spacing: 0.5px;
+        color: var(--color-dark);
+      }
+      @media (min-width: 640px) {
+        .mentor-name {
+          font-size: 32px;
+          line-height: 40px;
+        }
+      }
+      .mentor-position {
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 1.2;
+        letter-spacing: 0.5px;
+        color: var(--color-primary);
+      }
+      @media (min-width: 640px) {
+        .mentor-position {
+          font-size: 20px;
+          line-height: 24px;
+        }
+      }
+
+      .social-links {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      @media (min-width: 640px) {
+        .social-links {
+          gap: 16px;
+        }
+      }
+      .social-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-pill);
+        background: rgba(28, 28, 28, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+      }
+      .social-btn:hover {
+        background: rgba(28, 28, 28, 0.1);
+      }
+      @media (min-width: 640px) {
+        .social-btn {
+          width: 48px;
+          height: 48px;
+        }
+      }
+
+      .summary-divider {
+        height: 1px;
+        width: 100%;
+        background: var(--color-dark);
+      }
+
+      .schedule-row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        border-radius: 8px;
+        font-size: 14px;
+        line-height: 22px;
+        letter-spacing: 0.5px;
+      }
+      @media (min-width: 640px) {
+        .schedule-row {
+          gap: 16px;
+          font-size: 20px;
+          line-height: 28px;
+        }
+      }
+      .schedule-label {
+        color: var(--color-dark);
+        flex-shrink: 0;
+      }
+      .schedule-value {
+        flex: 1;
+        font-weight: 500;
+        color: var(--color-primary);
+      }
+
+      /* ─── Payment info mobile (below summary) ─── */
+      .payment-mobile {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+      }
+      @media (min-width: 1024px) {
+        .payment-mobile {
+          display: none;
+        }
+      }
+
+      /* ─── Wave ─── */
+      .wave-container {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        height: 42px;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .wave-container svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+        min-width: 1200px;
+      }
+
+      @media (max-width: 639px) {
+        .mentor-name {
+          font-size: 18px;
+        }
+        .mentor-position {
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <section class="page-section">
+      <div class="page-inner">
+        <!-- Mobile Title -->
+        <div class="title-mobile">
+          <h2>Thanh toán</h2>
+          <p>Vui lòng chuyển khoản theo thông tin bên dưới để hoàn tất đặt lịch.</p>
+        </div>
+
+        <!-- Main Row -->
+        <div class="main-row">
+          <!-- Left Panel: Payment Info (Desktop only) -->
+          <div class="left-panel">
+            <div>
+              <h2 class="left-title">Thanh toán</h2>
+              <p class="left-subtitle">
+                Vui lòng chuyển khoản theo thông tin bên dưới để hoàn tất đặt lịch.
+              </p>
+            </div>
+
+            <!-- Payment Info Card -->
+            <div class="payment-info">
+              <!-- QR Code -->
+              <div class="qr-box">
+                <div class="qr-inner">
+                  <svg viewBox="0 0 190 192" fill="none">
+                    <rect x="0" y="0" width="190" height="192" fill="white" />
+                    <rect x="4" y="4" width="32" height="32" rx="3" fill="#1c1c1c" />
+                    <rect x="40" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="44" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="48" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="56" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="60" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="66" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="72" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="76" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="80" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="86" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="92" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="98" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="102" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="110" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="114" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="118" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="126" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="134" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="140" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="146" y="4" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="154" y="4" width="32" height="32" rx="3" fill="#1c1c1c" />
+                    <rect x="4" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="10" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="16" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="24" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="30" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="56" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="62" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="70" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="76" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="82" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="92" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="98" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="106" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="112" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="126" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="132" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="138" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="144" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="154" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="160" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="166" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="174" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="184" y="40" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="4" y="46" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="16" y="46" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="24" y="46" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="34" y="46" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="46" y="46" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="56" y="46" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="70" y="46" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="76" y="46" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="86" y="46" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="92" y="46" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="106" y="46" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="112" y="46" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="118" y="46" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="126" y="46" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="138" y="46" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="148" y="46" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="160" y="46" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="166" y="46" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="174" y="46" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="4" y="52" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="12" y="52" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="20" y="52" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="28" y="52" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="40" y="52" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="56" y="52" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="64" y="52" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="70" y="52" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="82" y="52" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="92" y="52" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="98" y="52" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="106" y="52" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="132" y="52" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="140" y="52" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="148" y="52" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="154" y="52" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="160" y="52" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="170" y="52" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="4" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="10" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="16" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="24" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="30" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="36" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="50" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="62" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="68" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="76" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="82" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="92" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="98" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="110" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="118" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="126" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="136" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="144" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="150" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="158" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="164" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="170" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="178" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="184" y="58" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="4" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="14" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="20" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="40" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="48" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="56" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="66" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="82" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="88" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="98" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="104" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="112" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="120" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="126" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="134" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="144" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="152" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="158" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="166" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="172" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="180" y="64" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="4" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="10" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="16" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="26" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="36" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="44" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="50" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="56" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="62" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="70" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="76" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="110" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="120" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="126" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="136" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="142" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="150" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="158" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="166" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="172" y="70" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="4" y="76" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="12" y="76" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="18" y="76" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="24" y="76" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="30" y="76" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="36" y="76" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="44" y="76" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="50" y="76" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="62" y="76" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="70" y="76" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="76" y="76" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="82" y="76" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="154" y="76" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="164" y="76" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="174" y="76" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="184" y="76" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="4" y="82" width="32" height="32" rx="3" fill="#1c1c1c" />
+                    <rect x="40" y="82" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="44" y="82" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="50" y="82" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="56" y="82" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="64" y="82" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="70" y="82" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="78" y="82" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="88" y="82" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="94" y="82" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="100" y="82" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="112" y="82" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="120" y="82" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="126" y="82" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="132" y="82" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="140" y="82" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="148" y="82" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="154" y="82" width="32" height="32" rx="3" fill="#1c1c1c" />
+                    <rect x="4" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="10" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="16" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="24" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="32" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="38" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="50" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="58" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="66" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="76" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="86" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="94" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="100" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="110" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="116" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="126" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="132" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="138" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="146" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="154" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="160" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="168" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="176" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="182" y="118" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="4" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="10" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="20" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="28" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="36" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="44" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="58" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="66" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="72" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="80" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="88" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="94" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="100" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="108" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="116" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="126" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="134" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="140" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="148" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="158" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="164" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="170" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="178" y="124" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="4" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="12" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="18" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="28" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="34" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="44" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="60" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="66" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="72" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="80" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="88" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="96" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="106" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="116" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="122" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="130" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="136" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="144" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="150" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="158" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="168" y="130" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="4" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="10" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="16" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="24" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="30" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="36" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="42" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="48" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="58" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="64" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="72" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="80" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="88" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="94" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="100" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="112" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="118" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="124" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="130" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="138" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="144" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="150" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="160" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="168" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="174" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="184" y="136" width="2" height="2" fill="#1c1c1c" />
+                    <rect x="154" y="136" width="32" height="32" rx="3" fill="#1c1c1c" />
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Bank Details -->
+              <div class="bank-details">
+                <div class="bank-row">
+                  <span class="bank-label">Ngân hàng</span>
+                  <span class="bank-value">NGÂN HÀNG TMCP QUÂN ĐỘI</span>
+                </div>
+                <div class="bank-row">
+                  <span class="bank-label">Số tài khoản</span>
+                  <span class="bank-value">1343256742</span>
+                </div>
+                <div class="bank-row">
+                  <span class="bank-label">Tên tài khoản</span>
+                  <span class="bank-value">LE THAI NGUYEN</span>
+                </div>
+                <div class="bank-row">
+                  <span class="bank-label">Nội dung</span>
+                  <span class="bank-value">Q1538562</span>
+                </div>
+                <div class="bank-row">
+                  <span class="bank-label">Số tiền</span>
+                  <span class="bank-value">1.500.000 vnđ</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Booking Summary Card -->
+          <div class="summary-card">
+            <div class="summary-inner">
+              <!-- Mentor Image -->
+              <div class="mentor-img">
+                <svg
+                  width="141"
+                  height="200"
+                  viewBox="0 0 141 200"
+                  fill="none"
+                  style="background: #e5e7eb; border-radius: 8px"
+                >
+                  <circle cx="70" cy="60" r="30" fill="#d1d5db" />
+                  <ellipse cx="70" cy="140" rx="50" ry="70" fill="#d1d5db" />
+                </svg>
+              </div>
+
+              <!-- Mentor Info -->
+              <div class="mentor-info">
+                <div>
+                  <h3 class="mentor-name">Ms Trịnh Thu Hoài</h3>
+                  <p class="mentor-position">Chuyên gia ESG &amp; Phát triển bền vững</p>
+
+                  <div class="social-links">
+                    <a href="#" class="social-btn" aria-label="LinkedIn">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <rect x="3" y="3" width="18" height="18" rx="2" fill="#1c1c1c" />
+                        <path
+                          d="M8.25 10.5V17.25M8.25 7.875C8.25 8.49632 7.74632 9 7.125 9C6.50368 9 6 8.49632 6 7.875C6 7.25368 6.50368 6.75 7.125 6.75C7.74632 6.75 8.25 7.25368 8.25 7.875ZM12 17.25V13.5C12 12.9696 12.2107 12.4609 12.5858 12.0858C12.9609 11.7107 13.4696 11.5 14 11.5C14.5304 11.5 15.0391 11.7107 15.4142 12.0858C15.7893 12.4609 16 12.9696 16 13.5V17.25M12 10.5V17.25"
+                          stroke="white"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </a>
+                    <a href="#" class="social-btn" aria-label="Email">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <rect x="3" y="4.5" width="18" height="15" rx="2" fill="#1c1c1c" />
+                        <path
+                          d="M3 6L12 12.75L21 6"
+                          stroke="white"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+
+                <div class="summary-divider"></div>
+
+                <div class="schedule-row">
+                  <span class="schedule-label">Lịch hẹn :</span>
+                  <span class="schedule-value">08:00 - 10:00 | 17/12/2025</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Payment Info Card (below summary) -->
+        <div class="payment-mobile">
+          <div class="payment-info">
+            <div class="qr-box">
+              <div class="qr-inner">
+                <svg viewBox="0 0 190 192" fill="none">
+                  <rect x="0" y="0" width="190" height="192" fill="white" />
+                  <rect x="4" y="4" width="32" height="32" rx="3" fill="#1c1c1c" />
+                  <rect x="40" y="4" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="44" y="4" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="48" y="4" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="56" y="4" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="60" y="4" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="66" y="4" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="72" y="4" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="76" y="4" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="80" y="4" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="86" y="4" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="92" y="4" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="98" y="4" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="102" y="4" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="110" y="4" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="154" y="4" width="32" height="32" rx="3" fill="#1c1c1c" />
+                  <rect x="4" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="10" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="16" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="24" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="30" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="56" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="62" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="70" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="76" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="82" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="92" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="98" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="106" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="112" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="126" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="132" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="138" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="144" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="154" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="160" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="166" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="174" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="184" y="40" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="4" y="46" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="16" y="46" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="24" y="46" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="34" y="46" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="46" y="46" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="56" y="46" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="70" y="46" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="76" y="46" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="86" y="46" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="92" y="46" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="106" y="46" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="112" y="46" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="118" y="46" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="126" y="46" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="138" y="46" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="148" y="46" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="160" y="46" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="166" y="46" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="174" y="46" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="4" y="52" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="12" y="52" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="20" y="52" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="28" y="52" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="40" y="52" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="56" y="52" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="64" y="52" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="70" y="52" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="82" y="52" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="92" y="52" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="98" y="52" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="106" y="52" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="132" y="52" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="140" y="52" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="148" y="52" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="154" y="52" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="160" y="52" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="170" y="52" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="4" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="10" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="16" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="24" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="30" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="36" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="50" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="62" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="68" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="76" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="82" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="92" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="98" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="110" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="118" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="126" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="136" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="144" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="150" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="158" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="164" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="170" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="178" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="184" y="58" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="4" y="64" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="14" y="64" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="20" y="64" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="40" y="64" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="48" y="64" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="56" y="64" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="66" y="64" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="82" y="64" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="88" y="64" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="98" y="64" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="104" y="64" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="112" y="64" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="120" y="64" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="126" y="64" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="134" y="64" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="144" y="64" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="152" y="64" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="158" y="64" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="166" y="64" width="2" height="2" fill="#1c1c1c" />
+                  <rect x="154" y="64" width="32" height="32" rx="3" fill="#1c1c1c" />
+                  <rect x="4" y="82" width="32" height="32" rx="3" fill="#1c1c1c" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="bank-details">
+              <div class="bank-row">
+                <span class="bank-label">Ngân hàng</span>
+                <span class="bank-value">NGÂN HÀNG TMCP QUÂN ĐỘI</span>
+              </div>
+              <div class="bank-row">
+                <span class="bank-label">Số tài khoản</span>
+                <span class="bank-value">1343256742</span>
+              </div>
+              <div class="bank-row">
+                <span class="bank-label">Tên tài khoản</span>
+                <span class="bank-value">LE THAI NGUYEN</span>
+              </div>
+              <div class="bank-row">
+                <span class="bank-label">Nội dung</span>
+                <span class="bank-value">Q1538562</span>
+              </div>
+              <div class="bank-row">
+                <span class="bank-label">Số tiền</span>
+                <span class="bank-value">1.500.000 vnđ</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wave Decoration -->
+      <div class="wave-container">
+        <svg
+          preserveAspectRatio="none"
+          width="100%"
+          height="100%"
+          viewBox="0 0 1714 42"
+          fill="none"
+          style="display: block"
+        >
+          <path
+            d="M833.471 0C846.82 5.96413e-05 846.929 6.10852 860.111 6.18555C873.295 6.10895 873.404 1.86281e-05 886.754 0C886.923 1.50225e-06 887.088 4.70811e-07 887.257 0C898.253 3.78311e-05 900.265 4.1444 908 5.64941V5.74219C909.6 6.02058 911.443 6.18847 913.646 6.18848C927.081 6.18848 927.106 2.34319e-05 940.54 0C953.974 0.000111625 953.999 6.18841 967.433 6.18848C980.867 6.18848 980.892 1.87456e-05 994.326 0C1007.76 0.000103623 1007.78 6.1884 1021.22 6.18848C1034.65 6.18848 1034.68 1.87456e-05 1048.11 0C1061.55 8.98232e-05 1061.57 6.18838 1075 6.18848C1088.44 6.18848 1088.46 1.87456e-05 1101.9 0C1115.33 7.60239e-05 1115.36 6.18837 1128.79 6.18848C1142.23 6.18848 1142.25 2.81183e-05 1155.68 0C1169.12 6.22246e-05 1169.14 6.18836 1182.58 6.18848C1196.01 6.18848 1196.04 2.81183e-05 1209.47 0C1222.86 5.98029e-05 1222.93 6.14216 1236.22 6.18652C1249.51 6.1423 1249.58 1.63434e-05 1262.97 0C1263.02 4.59371e-07 1263.06 0.00081635 1263.11 0.000976562C1263.16 0.000816677 1263.21 1.34936e-07 1263.26 0C1274.25 3.78311e-05 1276.27 4.1444 1284 5.64941V5.70508C1285.65 6.0063 1287.56 6.18847 1289.86 6.18848C1303.29 6.18848 1303.32 1.87456e-05 1316.75 0C1330.19 0.000119628 1330.21 6.18842 1343.65 6.18848C1357.08 6.18848 1357.11 2.34319e-05 1370.54 0C1383.97 0.000111625 1384 6.18841 1397.43 6.18848C1410.87 6.18848 1410.89 1.87456e-05 1424.33 0C1437.76 0.000103623 1437.78 6.1884 1451.22 6.18848C1464.65 6.18848 1464.68 1.87456e-05 1478.11 0C1491.55 8.98232e-05 1491.57 6.18838 1505 6.18848C1518.44 6.18848 1518.46 1.87456e-05 1531.9 0C1545.33 7.60239e-05 1545.36 6.18837 1558.79 6.18848C1572.23 6.18848 1572.25 2.81183e-05 1585.68 0C1599.12 6.22246e-05 1599.14 6.18836 1612.58 6.18848C1626.01 6.18848 1626.04 2.81183e-05 1639.47 0C1652.9 6.00189e-05 1652.93 6.18834 1666.36 6.18848C1679.8 6.18848 1679.82 3.74909e-05 1693.26 0C1704.25 3.78311e-05 1706.27 4.1444 1714 5.64941V42H0V6.1875C0.0246945 6.18754 0.049433 6.18848 0.0742188 6.18848C13.5084 6.18848 13.5337 1.64024e-05 26.9678 0C40.4019 0.000111625 40.4272 6.18841 53.8613 6.18848C67.2954 6.18848 67.3207 1.64024e-05 80.7549 0C94.189 0.000103623 94.2142 6.18841 107.648 6.18848C121.082 6.18848 121.108 1.64024e-05 134.542 0C147.976 8.98232e-05 148.001 6.18838 161.435 6.18848C174.869 6.18848 174.895 2.10966e-05 188.329 0C201.763 7.60239e-05 201.788 6.18837 215.222 6.18848C228.656 6.18848 228.682 2.10966e-05 242.116 0C255.55 6.22246e-05 255.575 6.18836 269.009 6.18848C282.443 6.18848 282.469 2.10966e-05 295.903 0C309.337 5.98029e-05 309.398 6.14216 322.693 6.18652C335.989 6.1423 336.05 1.63434e-05 349.484 0C349.534 4.59371e-07 349.583 0.00081635 349.633 0.000976562C349.682 0.000816677 349.731 1.34936e-07 349.781 0C360.776 3.78311e-05 362.788 4.1444 370.523 5.64941V5.74219C372.123 6.02058 373.966 6.18847 376.169 6.18848C389.603 6.18848 389.629 2.34319e-05 403.063 0C416.497 0.000111625 416.522 6.18841 429.956 6.18848C443.39 6.18848 443.415 1.87456e-05 456.849 0C470.283 0.000103623 470.309 6.1884 483.743 6.18848C497.177 6.18848 497.202 1.87456e-05 510.636 0C524.07 8.98232e-05 524.095 6.18838 537.529 6.18848C550.964 6.18848 550.989 1.87456e-05 564.423 0C577.857 7.60239e-05 577.882 6.18837 591.316 6.18848C604.75 6.18848 604.775 2.10966e-05 618.209 0C631.643 6.22246e-05 631.668 6.18836 645.102 6.18848C658.536 6.18848 658.562 2.10966e-05 671.996 0C685.392 5.97888e-05 685.463 6.13759 698.714 6.18653C711.965 6.13744 712.036 1.44883e-05 725.432 0C725.48 3.94199e-07 725.529 0.00081635 725.578 0.000976562C725.627 0.000816677 725.675 1.15744e-07 725.724 0C736.774 3.78311e-05 738.807 4.1444 746.523 5.64941V5.74219C748.123 6.02058 749.966 6.18847 752.169 6.18848C765.603 6.18848 765.629 2.34319e-05 779.063 0C792.497 0.000111625 792.522 6.18841 805.956 6.18848C819.39 6.18848 819.415 1.87456e-05 832.849 0C832.963 1.49062e-05 833.004 3.51379e-05 833.471 0Z"
+            fill="#8F50E2"
+          />
+        </svg>
+      </div>
+    </section>
+  </body>
+</html>

@@ -8,13 +8,15 @@
 
 .sidebar-brand {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  padding: 10px 0 0;
+  padding: 0;
+  margin-bottom: 20px;
+  margin-top: 20px;
 }
 
 .sidebar-logo {
-  height: 52px;
+  height: 72px;
   width: auto;
   object-fit: contain;
 }
@@ -31,16 +33,20 @@
 
 .user-info {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
+  width: 100%;
 }
 .avatar {
   position: relative;
-  width: 100px;
-  height: 100px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  border: 6px solid rgba(28, 28, 28, 0.1);
+  border: 2px solid #fff;
+  box-shadow:
+    0 4px 12px rgba(28, 28, 28, 0.08),
+    0 0 0 1px rgba(28, 28, 28, 0.05);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -54,7 +60,7 @@
 }
 .avatar-placeholder span {
   color: #fff;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
 }
 .avatar-img {
@@ -63,20 +69,32 @@
   object-fit: cover;
   display: block;
 }
+.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
 .user-name {
-  font-size: 32px;
+  font-size: 20px;
   font-weight: 500;
-  line-height: 44px;
-  letter-spacing: 0.32px;
+  line-height: 28px;
+  letter-spacing: 0.2px;
   color: var(--color-dark);
-  text-align: center;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .user-email {
-  font-size: 16px;
-  line-height: 24px;
-  letter-spacing: 0.16px;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.14px;
   color: rgba(28, 28, 28, 0.6);
-  text-align: center;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .sidebar-divider {
   height: 1px;
