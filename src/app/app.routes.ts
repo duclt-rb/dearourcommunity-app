@@ -33,6 +33,10 @@ export const routes: Routes = [
         loadComponent: () => import('./profile/certificates/certificates'),
       },
       {
+        path: 'plans',
+        loadComponent: () => import('./profile/plans/plans'),
+      },
+      {
         path: 'edit-profile',
         loadComponent: () => import('./profile/edit-profile/edit-profile'),
       },

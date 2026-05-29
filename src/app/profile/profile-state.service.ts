@@ -32,15 +32,16 @@ export class ProfileStateService {
   phone = signal('');
   avatarUrl = signal<string | null>(null);
   packageName = signal<string | null>(null);
+  packageId = signal<string | null>(null);
 
   // Enrolled Courses & Certificates State
   enrolledCourses = signal<EnrolledCourse[]>([]);
   certificates = signal<Certificate[]>([]);
 
   // Active Tab
-  activeTab = signal<'dashboard' | 'courses' | 'certificates' | 'edit-profile' | 'password'>(
-    'dashboard',
-  );
+  activeTab = signal<
+    'dashboard' | 'courses' | 'certificates' | 'plans' | 'edit-profile' | 'password'
+  >('dashboard');
 
   // Computed Stats
   stats = computed(() => {
@@ -74,6 +75,7 @@ export class ProfileStateService {
       this.userId.set(user.id);
       this.email.set(user.email);
       this.packageName.set(user.package?.name ?? null);
+      this.packageId.set(user.packageId ?? null);
 
       // Load additional persisted profile fields from localStorage
       const saved = localStorage.getItem(`${PROFILE_DATA_KEY}:${user.id}`);
