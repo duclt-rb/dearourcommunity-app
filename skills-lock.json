@@ -18,6 +18,12 @@
       "sourceType": "github",
       "skillPath": "skills/taste-skill/SKILL.md",
       "computedHash": "6d838b246d0e35d0b53f4f23f98ba7a1dd561937e64f7d0c7553b0928e376c3e"
+    },
+    "ngrx": {
+      "source": "oguzhan18/angular-ecosystem-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ngrx/SKILL.md",
+      "computedHash": "798812ef44d47cc6370d6c9466df7983e754860a24519c4e7b5f3c700648af99"
     }
   }
 }
