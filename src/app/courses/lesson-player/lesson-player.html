@@ -1,0 +1,649 @@
+<div class="lesson-layout">
+  <!-- Loading Bar -->
+  @if (videoLoading()) {
+    <div class="loading-bar">
+      <div class="loading-bar-inner"></div>
+    </div>
+  }
+
+  <!-- ===== DESKTOP SIDEBAR ===== -->
+  <aside class="sidebar" [style.display]="sidebarCollapsed() ? 'none' : 'flex'">
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <img src="/logo.png" alt="Dear Our Community" style="height: 72px; display: block" />
+    </div>
+
+    <div class="sidebar-lessons">
+      <!-- Back to Course -->
+      <div class="back-link" (click)="backToCourse()">
+        <svg lucideChevronLeft [size]="24" strokeWidth="2" style="color: #1c1c1c"></svg>
+        <span class="back-link-text">Quay lại chi tiết khoá học</span>
+      </div>
+
+      <!-- Render Chapters & Topics dynamically -->
+      @for (chapter of chapters(); track chapter.id) {
+        <div class="lesson-item">
+          <div class="lesson-header" (click)="toggleChapter(chapter.id)">
+            <div class="lesson-header-inner">
+              <!-- Completed Icon vs Progress Ring Icon -->
+              <div class="lesson-icon">
+                @if (chapter.completed) {
+                  <svg lucideBadgeCheck [size]="24" style="color: #8f50e2"></svg>
+                } @else {
+                  <svg viewBox="0 0 24 24" fill="none" style="width: 24px; height: 24px">
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-opacity="0.1"
+                      stroke-width="2.8"
+                      style="color: #1c1c1c"
+                    />
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="#8F50E2"
+                      stroke-width="2.8"
+                      [attr.stroke-dasharray]="62.83"
+                      [attr.stroke-dashoffset]="chapter.progressOffset"
+                      stroke-linecap="round"
+                      transform="rotate(-90 12 12)"
+                    />
+                  </svg>
+                }
+              </div>
+              <div class="lesson-info">
+                <span
+                  class="lesson-name"
+                  [class.active]="chapter.isActive"
+                  [class.default]="!chapter.isActive"
+                  [style.fontWeight]="chapter.isActive || chapter.completed ? '700' : '400'"
+                >
+                  {{ chapter.title }}
+                </span>
+                @if (chapter.topicCount > 0) {
+                  <div class="lesson-topics-row">
+                    <div class="topic-count-badge">
+                      <svg lucideChevronDown [size]="16" strokeWidth="3"></svg>
+                    </div>
+                    <span class="topic-count">{{ chapter.topicCount }} Chủ đề</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Expanded Topics -->
+          @if (isChapterExpanded(chapter.id) && chapter.topics.length > 0) {
+            <div class="topics-container active">
+              <div class="triangle-indicator">
+                <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+                  <path d="M8 0L16 12H0L8 0Z" fill="white" />
+                </svg>
+              </div>
+              @for (topic of chapter.topics; track topic.id) {
+                <div class="topic-item" (click)="selectTopic(topic.id)">
+                  <div class="topic-dot">
+                    @if (topic.completed) {
+                      <svg lucideBadgeCheck [size]="16" style="color: #8f50e2"></svg>
+                    } @else {
+                      <div class="topic-dot-circle"></div>
+                    }
+                  </div>
+                  <span
+                    class="topic-title"
+                    [class.active]="topic.isActive"
+                    [class.default]="!topic.isActive"
+                  >
+                    {{ topic.title }}
+                  </span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Report Feedback Card -->
+    <div class="report-card">
+      <div class="report-icon-wrap">
+        <svg lucideMessageSquare [size]="44" strokeWidth="1.5" style="color: #fff"></svg>
+      </div>
+      <div class="report-text">
+        <p class="report-title">Bài học không hoạt động đúng?</p>
+        <p class="report-body">
+          (Lỗi kỹ thuật, vấn đề nội dung, v.v.) Nhấn nút báo cáo để thông báo cho chúng tôi.
+        </p>
+      </div>
+      <button class="report-btn" (click)="toggleReportDialog(true)">
+        <span class="report-btn-text">Báo cáo / Phản hồi</span>
+        <svg lucideChevronRight [size]="20" strokeWidth="2" style="color: #fff"></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="main-area">
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+      <!-- Desktop -->
+      <div class="header-desktop">
+        <button class="toggle-sidebar" (click)="toggleSidebar()" aria-label="Thu gọn thanh bên">
+          <svg
+            lucideChevronLeft
+            [size]="20"
+            strokeWidth="2"
+            [style.transform]="sidebarCollapsed() ? 'rotate(180deg)' : 'rotate(0deg)'"
+            style="transition: transform 0.2s"
+          ></svg>
+        </button>
+
+        <div class="header-progress">
+          <div class="header-progress-text">
+            <span class="header-progress-pct">{{ progressPct() }}% Hoàn thành</span>
+            <span class="header-progress-steps"
+              >{{ completedSteps() }}/{{ totalSteps() }} Bước</span
+            >
+          </div>
+          <div class="header-progress-bar">
+            <div class="header-progress-fill" [style.width.%]="progressPct()"></div>
+          </div>
+        </div>
+
+        <div class="header-nav">
+          <button class="btn-nav btn-nav-prev" (click)="prevLesson()">
+            <svg lucideChevronLeft [size]="20" strokeWidth="2"></svg>
+            Trước
+          </button>
+          <button class="btn-nav btn-nav-next" (click)="nextLesson()">
+            Tiếp
+            <svg lucideChevronRight [size]="20" strokeWidth="2"></svg>
+          </button>
+        </div>
+
+        @if (!lessonCompleted()) {
+          <button class="btn-complete" (click)="markComplete()">
+            <span>Đánh dấu hoàn thành</span>
+            <svg lucideCheck [size]="20" strokeWidth="2"></svg>
+          </button>
+        } @else {
+          <div class="badge-completed">
+            <span class="badge-completed-text">Đã hoàn thành</span>
+          </div>
+        }
+
+        <div class="user-section">
+          <div class="user-avatar-sm"><span>NV</span></div>
+        </div>
+      </div>
+
+      <!-- Mobile -->
+      <div class="header-mobile">
+        <div class="header-mobile-row1">
+          <button class="mobile-menu-btn" (click)="openMobileDrawer()">
+            <span class="mobile-menu-btn-text">Bài học khoá học</span>
+            <svg lucideChevronDown [size]="16" strokeWidth="2.5" style="color: #8f50e2"></svg>
+          </button>
+          <div class="user-avatar-sm" style="width: 28px; height: 28px"><span>NV</span></div>
+        </div>
+        <div class="header-mobile-row2">
+          <div class="header-mobile-progress-text">
+            <span style="font-weight: 700; color: var(--color-primary)"
+              >{{ progressPct() }}% Hoàn thành</span
+            >
+            <span style="color: rgba(28, 28, 28, 0.5)"
+              >{{ completedSteps() }}/{{ totalSteps() }} Bước</span
+            >
+          </div>
+          <div class="header-progress-bar">
+            <div class="header-progress-fill" [style.width.%]="progressPct()"></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== CONTENT AREA ===== -->
+    <div class="content-area">
+      <div class="lesson-title-wrap">
+        <h1 class="lesson-title">{{ activeTopicTitle() }}</h1>
+      </div>
+
+      <div class="breadcrumb-wrap">
+        <div class="breadcrumb">
+          <div class="breadcrumb-item">
+            <a href="#" class="breadcrumb-link" (click)="$event.preventDefault()">E-learning</a>
+            <svg
+              lucideChevronRight
+              [size]="16"
+              strokeWidth="2"
+              style="color: rgba(28, 28, 28, 0.4); flex-shrink: 0"
+            ></svg>
+          </div>
+          <div class="breadcrumb-item">
+            <a href="#" class="breadcrumb-link" (click)="$event.preventDefault()"
+              >ESG Căn Bản Cho Người Mới Bắt Đầu</a
+            >
+            <svg
+              lucideChevronRight
+              [size]="16"
+              strokeWidth="2"
+              style="color: rgba(28, 28, 28, 0.4); flex-shrink: 0"
+            ></svg>
+          </div>
+          <div class="breadcrumb-item">
+            <span class="breadcrumb-current">{{ activeTopicTitle() }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- HTML5 Video Player -->
+      <div class="video-wrapper">
+        <div class="video-container" id="videoContainer">
+          <!-- Actual HTML5 Video Element -->
+          <video
+            #videoPlayer
+            [src]="videoUrl"
+            (play)="isPlaying.set(true)"
+            (pause)="isPlaying.set(false)"
+            (waiting)="videoLoading.set(true)"
+            (playing)="videoLoading.set(false)"
+            (timeupdate)="onTimeUpdate()"
+            (loadedmetadata)="onLoadedMetadata()"
+            (click)="togglePlay()"
+          ></video>
+
+          <!-- Play overlay (shown when paused and not buffering) -->
+          @if (!isPlaying() && !videoLoading()) {
+            <div class="video-overlay play-overlay" (click)="togglePlay()">
+              <div class="play-btn-circle">
+                <svg lucidePlay [size]="28" fill="currentColor" style="margin-left: 2px"></svg>
+              </div>
+            </div>
+          }
+
+          <!-- Buffering / Loading Overlay -->
+          @if (videoLoading()) {
+            <div class="video-overlay loading">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 12px">
+                <div class="spinner"></div>
+                <span class="loading-text">Đang tải video...</span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Custom Video Controls -->
+        <div class="video-controls">
+          <!-- Play / Pause Button -->
+          <button class="ctrl-btn" (click)="togglePlay()">
+            @if (isPlaying()) {
+              <svg lucidePause [size]="16" fill="currentColor"></svg>
+            } @else {
+              <svg lucidePlay [size]="16" fill="currentColor"></svg>
+            }
+          </button>
+
+          <!-- Navigation Shortcuts -->
+          <div style="display: flex; align-items: center; gap: 4px">
+            <button class="ctrl-btn" (click)="rewind()" aria-label="Lùi 10s">
+              <svg lucideRotateCcw [size]="16" strokeWidth="2"></svg>
+            </button>
+
+            <!-- Speed control -->
+            <button class="ctrl-speed" (click)="changeSpeed()">{{ playbackSpeed() }}x</button>
+
+            <button class="ctrl-btn" (click)="forward()" aria-label="Tới 10s">
+              <svg lucideRotateCw [size]="16" strokeWidth="2"></svg>
+            </button>
+          </div>
+
+          <!-- Video playback time -->
+          <span class="ctrl-time">{{ currentTimeFormatted() }} / {{ durationFormatted() }}</span>
+
+          <!-- Interactive Progress Seek Slider -->
+          <div class="progress-bar-wrap" id="progressBar" (mousedown)="seekVideo($event)">
+            <div class="progress-bar-fill" [style.width.%]="videoProgressPct()"></div>
+            <div
+              class="progress-bar-thumb"
+              [style.left.%]="videoProgressPct()"
+              style="transform: translate(-50%, -50%)"
+            ></div>
+          </div>
+
+          <div class="ctrl-right">
+            <!-- Dynamic Volume Control -->
+            <div class="volume-popup-wrapper">
+              <button class="ctrl-btn" (click)="toggleVolumeSlider()" id="volumeBtn">
+                @if (volume() === 0) {
+                  <svg lucideVolumeX [size]="16" strokeWidth="2"></svg>
+                } @else if (volume() < 0.5) {
+                  <svg lucideVolume1 [size]="16" strokeWidth="2"></svg>
+                } @else {
+                  <svg lucideVolume2 [size]="16" strokeWidth="2"></svg>
+                }
+              </button>
+
+              @if (showVolume()) {
+                <div class="volume-popup">
+                  <div class="volume-track" (mousedown)="changeVolume($event)">
+                    <div class="volume-fill" [style.height.%]="volume() * 100"></div>
+                    <div
+                      class="volume-thumb"
+                      [style.bottom.%]="volume() * 100"
+                      style="transform: translate(-50%, 50%)"
+                    ></div>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- Dynamic Quality Control -->
+            <div class="quality-menu-wrapper" style="display: flex">
+              <button class="ctrl-btn" (click)="toggleQualityMenu()">
+                <svg lucideSettings [size]="16" strokeWidth="2"></svg>
+              </button>
+
+              @if (showQuality()) {
+                <div class="quality-menu">
+                  <p class="quality-label">Chất lượng</p>
+                  <button
+                    class="quality-option"
+                    [class.active]="selectedQuality() === 'auto'"
+                    [class.default]="selectedQuality() !== 'auto'"
+                    (click)="selectQuality('auto')"
+                  >
+                    <span>Tự động</span>
+                    @if (selectedQuality() === 'auto') {
+                      <span class="quality-dot"></span>
+                    }
+                  </button>
+                  <button
+                    class="quality-option"
+                    [class.active]="selectedQuality() === '1080'"
+                    [class.default]="selectedQuality() !== '1080'"
+                    (click)="selectQuality('1080')"
+                  >
+                    <span>1080p</span>
+                    @if (selectedQuality() === '1080') {
+                      <span class="quality-dot"></span>
+                    }
+                  </button>
+                  <button
+                    class="quality-option"
+                    [class.active]="selectedQuality() === '720'"
+                    [class.default]="selectedQuality() !== '720'"
+                    (click)="selectQuality('720')"
+                  >
+                    <span>720p</span>
+                    @if (selectedQuality() === '720') {
+                      <span class="quality-dot"></span>
+                    }
+                  </button>
+                  <button
+                    class="quality-option"
+                    [class.active]="selectedQuality() === '480'"
+                    [class.default]="selectedQuality() !== '480'"
+                    (click)="selectQuality('480')"
+                  >
+                    <span>480p</span>
+                    @if (selectedQuality() === '480') {
+                      <span class="quality-dot"></span>
+                    }
+                  </button>
+                </div>
+              }
+            </div>
+
+            <!-- Fullscreen Button -->
+            <button class="ctrl-btn" (click)="toggleFullscreen()">
+              <svg lucideMaximize [size]="16" strokeWidth="2"></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lesson Content Section (Steps checklist) -->
+      <div class="steps-card">
+        <div class="steps-header">
+          <div class="steps-header-left">
+            <svg lucideList [size]="24" strokeWidth="2" style="color: #fff"></svg>
+            <span class="steps-title">Nội dung bài học</span>
+          </div>
+          <div class="steps-progress-info">
+            <span class="steps-progress-pct">{{ progressPct() }}% Hoàn thành</span>
+            <div class="steps-divider"></div>
+            <span class="steps-count">{{ completedSteps() }}/{{ totalSteps() }} Bước</span>
+          </div>
+        </div>
+
+        <div class="steps-list">
+          @for (step of steps(); track step.id; let idx = $index) {
+            <div class="step-row" (click)="selectStep(step.id)">
+              <div class="step-icon">
+                @if (step.completed) {
+                  <svg lucideBadgeCheck [size]="16" style="color: #8f50e2"></svg>
+                } @else {
+                  <svg
+                    lucideCircle
+                    [size]="16"
+                    strokeWidth="1.5"
+                    style="color: #1c1c1c; opacity: 0.2"
+                  ></svg>
+                }
+              </div>
+              <span
+                class="step-name"
+                [class.active]="step.isActive"
+                [class.default]="!step.isActive"
+              >
+                {{ step.title }}
+              </span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Bottom Navigation -->
+      <div class="bottom-nav">
+        <div class="bottom-nav-buttons">
+          <button class="bottom-btn bottom-btn-prev" (click)="prevLesson()">
+            <svg lucideChevronLeft [size]="16" strokeWidth="2" style="flex-shrink: 0"></svg>
+            <span>Trước</span>
+          </button>
+
+          @if (!lessonCompleted()) {
+            <button class="bottom-btn bottom-btn-complete" (click)="markComplete()">
+              <span>Đánh dấu hoàn thành</span>
+              <svg lucideCheck [size]="16" strokeWidth="2" style="flex-shrink: 0"></svg>
+            </button>
+          } @else {
+            <div class="badge-completed" style="flex: 1; max-width: 200px">
+              <span class="badge-completed-text">Đã hoàn thành</span>
+            </div>
+          }
+
+          <button class="bottom-btn bottom-btn-next" (click)="nextLesson()">
+            <span>Tiếp</span>
+            <svg lucideChevronRight [size]="16" strokeWidth="2" style="flex-shrink: 0"></svg>
+          </button>
+        </div>
+
+        <button class="back-to-course-link" (click)="backToCourse()">
+          Quay lại chi tiết khoá học
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Chat Button (mobile feedback) -->
+  <button class="floating-chat" (click)="toggleReportDialog(true)">
+    <svg lucideMessageSquare [size]="20" strokeWidth="2" style="color: #fff"></svg>
+  </button>
+</div>
+
+<!-- ===== MOBILE DRAWER ===== -->
+@if (mobileDrawerOpen()) {
+  <div class="mobile-drawer">
+    <div class="drawer-header">
+      <span class="drawer-title">Bài học khoá học</span>
+      <button class="drawer-close" (click)="closeMobileDrawer()">
+        <svg lucideX [size]="24" strokeWidth="2"></svg>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <div class="drawer-back" (click)="backToCourse(); closeMobileDrawer()">
+        <svg lucideChevronLeft [size]="24" strokeWidth="2" style="color: #1c1c1c"></svg>
+        <span class="drawer-back-text">Quay lại chi tiết khoá học</span>
+      </div>
+
+      <!-- Mobile chapter list -->
+      @for (chapter of chapters(); track chapter.id) {
+        <div class="drawer-lesson">
+          <div class="drawer-lesson-header" (click)="toggleChapter(chapter.id)">
+            <div class="lesson-icon">
+              @if (chapter.completed) {
+                <svg lucideBadgeCheck [size]="24" style="color: #8f50e2"></svg>
+              } @else {
+                <svg viewBox="0 0 24 24" fill="none" style="width: 24px; height: 24px">
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-opacity="0.1"
+                    stroke-width="2.8"
+                    style="color: #1c1c1c"
+                  />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="#8F50E2"
+                    stroke-width="2.8"
+                    [attr.stroke-dasharray]="62.83"
+                    [attr.stroke-dashoffset]="chapter.progressOffset"
+                    stroke-linecap="round"
+                    transform="rotate(-90 12 12)"
+                  />
+                </svg>
+              }
+            </div>
+            <div class="lesson-info">
+              <span
+                class="drawer-lesson-name"
+                [class.active]="chapter.isActive"
+                [class.default]="!chapter.isActive"
+                [style.fontWeight]="chapter.isActive || chapter.completed ? '700' : '400'"
+              >
+                {{ chapter.title }}
+              </span>
+              @if (chapter.topicCount > 0) {
+                <div class="drawer-lesson-topics">
+                  <div class="topic-count-badge">
+                    <svg lucideChevronDown [size]="16" strokeWidth="3"></svg>
+                  </div>
+                  <span class="topic-count">{{ chapter.topicCount }} Chủ đề</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Drawer Chapter Topics -->
+          @if (isChapterExpanded(chapter.id) && chapter.topics.length > 0) {
+            <div
+              class="topics-container active"
+              style="background: none; border: none; padding-left: 52px"
+            >
+              @for (topic of chapter.topics; track topic.id) {
+                <div class="topic-item" (click)="selectTopic(topic.id); closeMobileDrawer()">
+                  <div class="topic-dot">
+                    @if (topic.completed) {
+                      <svg lucideBadgeCheck [size]="16" style="color: #8f50e2"></svg>
+                    } @else {
+                      <div class="topic-dot-circle"></div>
+                    }
+                  </div>
+                  <span
+                    class="topic-title"
+                    [class.active]="topic.isActive"
+                    [class.default]="!topic.isActive"
+                  >
+                    {{ topic.title }}
+                  </span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}
+
+<!-- ===== REPORT DIALOG ===== -->
+@if (reportDialogOpen()) {
+  <div class="dialog-backdrop" (click)="closeReportDialogOnBackdrop($event)">
+    <div class="dialog">
+      <div class="dialog-top">
+        <div class="dialog-top-text">
+          <h2 class="dialog-title">Báo cáo sự cố</h2>
+          <p class="dialog-subtitle">
+            Hãy cho chúng tôi biết vấn đề bạn gặp phải để chúng tôi có thể cải thiện trải nghiệm học
+            tập của bạn.
+          </p>
+        </div>
+        <button class="dialog-close-btn" (click)="toggleReportDialog(false)">
+          <svg lucideX [size]="20" strokeWidth="2"></svg>
+        </button>
+      </div>
+      <div class="dialog-body">
+        <form
+          (submit)="$event.preventDefault(); submitReport()"
+          style="display: flex; flex-direction: column; gap: 16px"
+        >
+          <div class="dialog-field">
+            <label class="dialog-field-label" for="report-type"
+              >Loại vấn đề <span class="required">*</span></label
+            >
+            <select
+              id="report-type"
+              class="dialog-select"
+              required
+              (change)="onReportTypeChange($event)"
+            >
+              <option value="" disabled selected>Chọn loại vấn đề</option>
+              <option value="technical">Lỗi kỹ thuật</option>
+              <option value="content">Vấn đề nội dung</option>
+              <option value="video">Vấn đề video</option>
+              <option value="audio">Vấn đề âm thanh</option>
+              <option value="other">Khác</option>
+            </select>
+          </div>
+          <div class="dialog-field">
+            <label class="dialog-field-label" for="report-message"
+              >Mô tả chi tiết <span class="required">*</span></label
+            >
+            <textarea
+              id="report-message"
+              class="dialog-textarea"
+              rows="5"
+              placeholder="Mô tả vấn đề bạn gặp phải..."
+              required
+              (input)="onReportMessageChange($event)"
+            ></textarea>
+          </div>
+          <button
+            type="submit"
+            class="dialog-submit"
+            [disabled]="!reportType() || !reportMessage()"
+          >
+            Gửi báo cáo
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+}

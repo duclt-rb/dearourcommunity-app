@@ -1,11 +1,30 @@
 import { Component, inject, signal, computed } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
+import {
+  LucideCheck,
+  LucideTag,
+  LucideX,
+  LucideSend,
+  LucideSmartphone,
+  LucideCreditCard,
+  LucideArrowLeft,
+} from '@lucide/angular';
 
 @Component({
   selector: 'app-billing',
   standalone: true,
-  imports: [DecimalPipe],
+  imports: [
+    RouterLink,
+    DecimalPipe,
+    LucideCheck,
+    LucideTag,
+    LucideX,
+    LucideSend,
+    LucideSmartphone,
+    LucideCreditCard,
+    LucideArrowLeft,
+  ],
   templateUrl: './billing.html',
   styleUrl: './billing.css',
 })
