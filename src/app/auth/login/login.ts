@@ -1,10 +1,11 @@
 import { Component, inject, signal, ViewEncapsulation } from '@angular/core';
 import { email, form, FormField, required } from '@angular/forms/signals';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ApiError } from '@dearourcommunity/client';
 import { LucideEye, LucideEyeOff, LucideLock, LucideMail } from '@lucide/angular';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
+import { environment } from '../../../environments/environment';
 import { ClientService } from '../../core/client.service';
 import AuthLayoutComponent from '../auth-layout/auth-layout';
 
@@ -28,6 +29,7 @@ import AuthLayoutComponent from '../auth-layout/auth-layout';
 })
 export default class LoginPage {
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private api = inject(ClientService);
 
   loginModel = signal({ email: '', password: '' });
@@ -95,7 +97,13 @@ export default class LoginPage {
       const { email, password } = this.loginModel();
       const { accessToken } = await this.api.auth.login({ email, password });
       this.api.setToken(accessToken);
-      this.router.navigate(['/profile']);
+
+      const redirect = this.route.snapshot.queryParamMap.get('redirect');
+      if (redirect) {
+        window.location.href = environment.appUrl + redirect;
+      } else {
+        this.router.navigate(['/profile']);
+      }
     } catch (err) {
       this.error.set(err instanceof ApiError ? err.message : 'Invalid email or password');
     } finally {
