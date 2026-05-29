@@ -1,6 +1,13 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Component, inject, OnInit, effect } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { CheckoutStore } from '../checkout.store';
+import {
+  selectQueryResultCode,
+  selectQueryOrderId,
+  selectQueryTransId,
+  selectQueryAmount,
+} from '../../core/router.selectors';
 import { LucideCheck, LucideHome, LucideArrowRight, LucideCircleX } from '@lucide/angular';
 import LogoComponent from '../../shared/logo/logo';
 
@@ -12,8 +19,14 @@ import LogoComponent from '../../shared/logo/logo';
   styleUrl: './receipt.css',
 })
 export default class ReceiptComponent implements OnInit {
-  private route = inject(ActivatedRoute);
+  private ngrxStore = inject(Store);
   readonly store = inject(CheckoutStore);
+
+  // Chọn trực tiếp từ Router Store bằng Signal!
+  readonly routeResultCode = this.ngrxStore.selectSignal(selectQueryResultCode);
+  readonly routeOrderId = this.ngrxStore.selectSignal(selectQueryOrderId);
+  readonly routeTransId = this.ngrxStore.selectSignal(selectQueryTransId);
+  readonly routeAmount = this.ngrxStore.selectSignal(selectQueryAmount);
 
   get packageName(): string {
     return this.store.selectedPackage()?.name ?? 'Gói Premium';
@@ -28,17 +41,19 @@ export default class ReceiptComponent implements OnInit {
   amountFormatted = this.store.amountFormatted;
   activating = this.store.activating;
 
-  ngOnInit() {
-    this.route.queryParams.subscribe((params) => {
-      const code = params['resultCode'] !== undefined ? params['resultCode'] : '0';
-      const oId = params['orderId'] || 'MOMO20260529ABC123';
-      const tId = params['transId'] || '1283746529';
+  constructor() {
+    // Đồng bộ cực kỳ đơn giản vì receiptGuard đã đảm bảo dữ liệu hợp lệ!
+    effect(() => {
+      const code = (this.routeResultCode() as string) || '0';
+      const oId = (this.routeOrderId() as string) || 'MOMO20260529ABC123';
+      const tId = (this.routeTransId() as string) || '1283746529';
+      const amt = Number(this.routeAmount()) || 500000;
 
-      const amt = Number(params['amount']);
-      const amountVal = !isNaN(amt) && amt > 0 ? amt : 500000;
-
-      this.store.setPaymentParams(code, oId, tId, amountVal);
-      this.store.startActivationTimer();
+      this.store.setPaymentParams(code, oId, tId, amt);
     });
+  }
+
+  ngOnInit() {
+    this.store.startActivationTimer();
   }
 }
