@@ -40,7 +40,7 @@ import AuthLayoutComponent from '../auth-layout/auth-layout';
     Button,
   ],
   templateUrl: './register.html',
-  styleUrl: './register.scss',
+  styleUrl: './register.css',
   encapsulation: ViewEncapsulation.None,
 })
 export default class RegisterPage {

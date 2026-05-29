@@ -1,3 +1,5 @@
+@layer theme, tailwind-base, primeng, tailwind-utilities;
+
 @import 'tailwindcss';
 @plugin 'tailwindcss-primeui';
 
@@ -154,26 +156,13 @@
   /* ── Breakpoints ── */
   --breakpoint-3xl: 1920px;
   --breakpoint-4xl: 2560px;
-}
 
-/* ── CSS Custom Properties for component use ── */
-
-:root {
-  /* Primary */
-  --color-primary: #8f50e2;
-  --color-primary-hover: #7a46c7;
-
-  /* Error */
-  --color-error-500: #dc2626;
-
-  /* Background */
-  --color-bg: #ffffff;
+  /* ── Combined Brand Variables (Moved from :root to generate utilities) ── */
   --color-bg-input: #f8f8fb;
   --color-bg-input-hover: #f4f4f8;
   --color-bg-toggle-hover: #f0f0f5;
   --color-bg-social-hover: #f8f8fb;
 
-  /* Text */
   --color-text: #1a1a2e;
   --color-text-muted: #7a7a8e;
   --color-text-secondary: #3a3a4e;
@@ -181,20 +170,16 @@
   --color-text-divider: #9e9eae;
   --color-text-placeholder: #b0b0be;
 
-  /* Icon */
   --color-icon: #a5a5b5;
   --color-icon-hover: #5a5a6e;
 
-  /* Border */
   --color-border-input: #e2e2ea;
   --color-border-input-hover: #c8c8d4;
   --color-border-divider: #e8e8ee;
 
-  /* Accent */
   --color-accent-gradient-start: #c499ff;
   --color-accent-gradient-end: #ff9cee;
 
-  /* Brand Dark */
   --color-brand-dark-start: #5a2d9e;
   --color-brand-dark-end: #2a1554;
 }

@@ -23,7 +23,7 @@ import AuthLayoutComponent from '../auth-layout/auth-layout';
     Button,
   ],
   templateUrl: './login.html',
-  styleUrl: './login.scss',
+  styleUrl: './login.css',
   encapsulation: ViewEncapsulation.None,
 })
 export default class LoginPage {

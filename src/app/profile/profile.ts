@@ -6,7 +6,7 @@ import { ClientService } from '../core/client.service';
   selector: 'app-profile',
   standalone: true,
   templateUrl: './profile.html',
-  styleUrl: './profile.scss',
+  styleUrl: './profile.css',
 })
 export default class ProfilePage implements OnInit {
   private api = inject(ClientService);
