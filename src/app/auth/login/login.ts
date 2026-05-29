@@ -4,7 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LucideEye, LucideEyeOff, LucideLock, LucideMail } from '@lucide/angular';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
-import { AuthStore } from '../../core/auth.store';
+import { AuthStore } from '../../core/stores/auth.store';
 import AuthLayoutComponent from '../auth-layout/auth-layout';
 import LogoComponent from '../../shared/logo/logo';
 

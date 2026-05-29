@@ -1,6 +1,6 @@
 import { inject, computed } from '@angular/core';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
-import { AuthService } from './services/auth.service';
+import { AuthService } from '../services/auth.service';
 import { ApiError, RegisterDto } from '@dearourcommunity/client';
 
 export interface AuthUser {
