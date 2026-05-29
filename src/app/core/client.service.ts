@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { DocClient } from '@dearourcommunity/client';
+import { Client } from '@dearourcommunity/client';
 import { environment } from '../../environments/environment';
 
 const TOKEN_KEY = 'doc:access_token';
 
 @Injectable({ providedIn: 'root' })
 export class ClientService {
-  private client = new DocClient({ baseUrl: environment.apiBaseUrl });
+  private client = new Client({ baseUrl: environment.apiBaseUrl });
 
   constructor() {
     const saved = localStorage.getItem(TOKEN_KEY);
