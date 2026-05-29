@@ -12,7 +12,7 @@ import {
   LucideUsers,
 } from '@lucide/angular';
 import { ClientService } from '../../core/client.service';
-import { ProfileStateService } from '../profile.store';
+import { ProfileStore } from '../profile.store';
 
 export interface UIPackage extends Package {
   formattedFeatures: { key: string; label: string }[];
@@ -37,7 +37,7 @@ export interface UIPackage extends Package {
 })
 export default class PlansComponent {
   private api = inject(ClientService);
-  state = inject(ProfileStateService);
+  store = inject(ProfileStore);
 
   // 1. Dùng resource API mới để tự động tải packages
   packagesResource = resource({
@@ -79,20 +79,19 @@ export default class PlansComponent {
 
   activePackage = computed<UIPackage | null>(() => {
     const list = this.packages();
-    const id = this.state.packageId();
-    const name = this.state.packageName();
+    const id = this.store.packageId();
+    const name = this.store.packageName();
     if (!list.length) return null;
     const byId = id ? list.find((p) => p.id === id) : null;
-    if (byId) return byId;
     const byName = name ? list.find((p) => p.name === name) : null;
-    return byName ?? null;
+    return byId ?? byName ?? null;
   });
 
   constructor() {
     // 3. Dùng afterRenderEffect để scroll vào view sau khi DOM đã được render xong (Không cần setTimeout)
     afterRenderEffect(() => {
       const isLoaded = !this.packagesResource.isLoading();
-      const activeId = this.state.packageId();
+      const activeId = this.store.packageId();
       if (isLoaded && this.packages().length > 0 && activeId) {
         const el = document.querySelector('.plan-card--active');
         if (el) {

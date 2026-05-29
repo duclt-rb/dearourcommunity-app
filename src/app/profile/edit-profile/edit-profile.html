@@ -14,7 +14,7 @@
           <img [src]="tempAvatarUrl()" class="avatar-img" alt="Avatar" />
         } @else {
           <div class="avatar-placeholder">
-            <span>{{ state.displayName().charAt(0) }}</span>
+            <span>{{ store.displayName().charAt(0) }}</span>
           </div>
         }
       </div>
@@ -81,7 +81,7 @@
             id="email"
             type="email"
             class="form-input readonly"
-            [value]="state.email()"
+            [value]="store.email()"
             readonly
           />
           <span class="field-help">Địa chỉ email đăng nhập không thể thay đổi.</span>

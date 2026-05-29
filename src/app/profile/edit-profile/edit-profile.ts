@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { ProfileStateService } from '../profile.store';
+import { ProfileStore } from '../profile.store';
 
 @Component({
   selector: 'app-profile-edit',
@@ -9,7 +9,7 @@ import { ProfileStateService } from '../profile.store';
   styleUrl: './edit-profile.css',
 })
 export default class EditProfileComponent implements OnInit {
-  state = inject(ProfileStateService);
+  store = inject(ProfileStore);
 
   // Temporary local form states
   tempFirstName = signal('');
@@ -22,10 +22,10 @@ export default class EditProfileComponent implements OnInit {
   errorMessage = signal<string | null>(null);
 
   ngOnInit() {
-    this.tempFirstName.set(this.state.firstName());
-    this.tempLastName.set(this.state.lastName());
-    this.tempPhone.set(this.state.phone());
-    this.tempAvatarUrl.set(this.state.avatarUrl());
+    this.tempFirstName.set(this.store.firstName());
+    this.tempLastName.set(this.store.lastName());
+    this.tempPhone.set(this.store.phone());
+    this.tempAvatarUrl.set(this.store.avatarUrl());
   }
 
   getInputValue(event: Event): string {
@@ -55,7 +55,7 @@ export default class EditProfileComponent implements OnInit {
     await new Promise((resolve) => setTimeout(resolve, 800));
 
     try {
-      this.state.updateProfile(
+      this.store.updateProfile(
         this.tempFirstName(),
         this.tempLastName(),
         this.tempPhone(),

@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ClientService } from '../../core/client.service';
 import LogoComponent from '../../shared/logo/logo';
-import { ProfileStateService } from '../profile.store';
+import { ProfileStore } from '../profile.store';
 
 @Component({
   selector: 'app-profile-sidebar',
@@ -12,7 +12,7 @@ import { ProfileStateService } from '../profile.store';
   styleUrl: './sidebar.css',
 })
 export class SidebarComponent {
-  state = inject(ProfileStateService);
+  store = inject(ProfileStore);
   private api = inject(ClientService);
   private router = inject(Router);
 

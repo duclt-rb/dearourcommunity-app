@@ -1,6 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { EnrolledCourse, ProfileStateService } from '../profile.store';
+import { EnrolledCourse, ProfileStore } from '../profile.store';
 
 @Component({
   selector: 'app-profile-dashboard',
@@ -10,10 +10,10 @@ import { EnrolledCourse, ProfileStateService } from '../profile.store';
   styleUrl: './dashboard.css',
 })
 export default class DashboardComponent {
-  state = inject(ProfileStateService);
+  store = inject(ProfileStore);
 
   inProgressCourses = computed(() =>
-    this.state.enrolledCourses().filter((c) => c.progress > 0 && c.progress < 100),
+    this.store.enrolledCourses().filter((c) => c.progress > 0 && c.progress < 100),
   );
 
   continueCourse(course: EnrolledCourse) {

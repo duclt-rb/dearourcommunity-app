@@ -8,7 +8,7 @@
     <div class="plans-header">
       <h1 class="plans-title">Gói của tôi</h1>
       <p class="plans-subtitle">
-        @if (state.packageName(); as name) {
+        @if (store.packageName(); as name) {
           Bạn đang sử dụng <strong>{{ name }}</strong
           >. Xem thêm các gói khác bên dưới.
         } @else {

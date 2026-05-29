@@ -1,5 +1,12 @@
-import { Injectable, inject, computed } from '@angular/core';
-import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
+import { inject, computed } from '@angular/core';
+import {
+  signalStore,
+  withState,
+  withComputed,
+  withMethods,
+  patchState,
+  withHooks,
+} from '@ngrx/signals';
 import { ClientService } from '../core/client.service';
 
 export interface EnrolledCourse {
@@ -43,6 +50,7 @@ const initialState = {
 
 // 1. Define the ProfileStore using @ngrx/signals
 export const ProfileStore = signalStore(
+  { providedIn: 'root' },
   withState(initialState),
   withComputed(({ enrolledCourses, certificates, firstName, lastName }) => ({
     stats: computed(() => {
@@ -189,13 +197,9 @@ export const ProfileStore = signalStore(
       });
     },
   })),
+  withHooks({
+    onInit(store) {
+      store.initializeMockData();
+    },
+  }),
 );
-
-// 2. Extend the ProfileStore to maintain 100% backward compatibility
-@Injectable({ providedIn: 'root' })
-export class ProfileStateService extends ProfileStore {
-  constructor() {
-    super();
-    this.initializeMockData();
-  }
-}

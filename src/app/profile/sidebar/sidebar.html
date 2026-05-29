@@ -5,18 +5,18 @@
 
   <div class="user-info">
     <div class="avatar">
-      @if (state.avatarUrl()) {
-        <img [src]="state.avatarUrl()" class="avatar-img" alt="Avatar" />
+      @if (store.avatarUrl()) {
+        <img [src]="store.avatarUrl()" class="avatar-img" alt="Avatar" />
       } @else {
         <div class="avatar-placeholder">
-          <span>{{ state.displayName().charAt(0) }}</span>
+          <span>{{ store.displayName().charAt(0) }}</span>
         </div>
       }
     </div>
     <div class="user-details">
-      <h2 class="user-name">{{ state.displayName() }}</h2>
-      <p class="user-email">{{ state.email() }}</p>
-      <span class="user-package">{{ state.packageName() ?? 'Free' }}</span>
+      <h2 class="user-name">{{ store.displayName() }}</h2>
+      <p class="user-email">{{ store.email() }}</p>
+      <span class="user-package">{{ store.packageName() ?? 'Free' }}</span>
     </div>
   </div>
 

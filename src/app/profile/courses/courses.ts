@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EnrolledCourse, ProfileStateService } from '../profile.store';
+import { EnrolledCourse, ProfileStore } from '../profile.store';
 
 @Component({
   selector: 'app-profile-courses',
@@ -10,7 +10,7 @@ import { EnrolledCourse, ProfileStateService } from '../profile.store';
   styleUrl: './courses.css',
 })
 export default class CoursesComponent {
-  state = inject(ProfileStateService);
+  store = inject(ProfileStore);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -18,7 +18,7 @@ export default class CoursesComponent {
   filter = signal<'all' | 'in_progress' | 'completed'>('all');
 
   filteredCourses = computed(() => {
-    const list = this.state.enrolledCourses();
+    const list = this.store.enrolledCourses();
     const filterVal = this.filter();
 
     if (filterVal === 'in_progress') {

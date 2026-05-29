@@ -6,7 +6,7 @@
     </p>
   </div>
 
-  @if (state.certificates().length === 0) {
+  @if (store.certificates().length === 0) {
     <div class="empty-state">
       <div class="icon">🏆</div>
       <p>Bạn chưa hoàn thành khóa học nào để nhận chứng chỉ. Hãy tiếp tục cố gắng nhé!</p>
@@ -14,7 +14,7 @@
     </div>
   } @else {
     <div class="cert-grid">
-      @for (cert of state.certificates(); track cert.id) {
+      @for (cert of store.certificates(); track cert.id) {
         <div class="cert-card">
           <div class="cert-visual-preview">
             <div class="cert-badge-icon">🎓</div>
