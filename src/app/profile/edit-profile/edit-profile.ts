@@ -1,5 +1,5 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
-import { ProfileStateService } from '../profile-state.service';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { ProfileStateService } from '../profile.store';
 
 @Component({
   selector: 'app-profile-edit',

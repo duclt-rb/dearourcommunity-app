@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { ClientService } from '../core/client.service';
-import { ProfileStateService } from './profile-state.service';
+import { ProfileStateService } from './profile.store';
 import { SidebarComponent } from './sidebar/sidebar';
 
 @Component({

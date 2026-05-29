@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
-import { ProfileStateService } from '../profile-state.service';
-import { ClientService } from '../../core/client.service';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { ClientService } from '../../core/client.service';
 import LogoComponent from '../../shared/logo/logo';
+import { ProfileStateService } from '../profile.store';
 
 @Component({
   selector: 'app-profile-sidebar',

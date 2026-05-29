@@ -1,5 +1,5 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, computed, inject, resource, afterRenderEffect } from '@angular/core';
+import { afterRenderEffect, Component, computed, inject, resource } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import type { Package } from '@dearourcommunity/client';
 import {
@@ -12,7 +12,7 @@ import {
   LucideUsers,
 } from '@lucide/angular';
 import { ClientService } from '../../core/client.service';
-import { ProfileStateService } from '../profile-state.service';
+import { ProfileStateService } from '../profile.store';
 
 export interface UIPackage extends Package {
   formattedFeatures: { key: string; label: string }[];

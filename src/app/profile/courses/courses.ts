@@ -1,6 +1,6 @@
-import { Component, inject, signal, computed } from '@angular/core';
-import { ProfileStateService, EnrolledCourse } from '../profile-state.service';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { EnrolledCourse, ProfileStateService } from '../profile.store';
 
 @Component({
   selector: 'app-profile-courses',

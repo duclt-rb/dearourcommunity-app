@@ -88,3 +88,30 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* ================================================
+   SHARED PROFILE PAGE HEADER STYLES
+   ================================================ */
+
+.profile-page-header {
+  margin-bottom: 32px;
+}
+.profile-page-title {
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 44px;
+  letter-spacing: 0.32px;
+  color: var(--color-dark);
+  margin: 0 0 8px;
+}
+.profile-page-subtitle {
+  font-size: 15px;
+  line-height: 22px;
+  color: rgba(28, 28, 28, 0.55);
+  letter-spacing: 0.15px;
+  margin: 0;
+}
+.profile-page-subtitle strong {
+  color: var(--color-dark);
+  font-weight: 600;
+}

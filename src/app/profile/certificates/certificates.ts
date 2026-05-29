@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
-import { ProfileStateService, Certificate } from '../profile-state.service';
 import { RouterLink } from '@angular/router';
+import { Certificate, ProfileStateService } from '../profile.store';
 
 @Component({
   selector: 'app-profile-certificates',
