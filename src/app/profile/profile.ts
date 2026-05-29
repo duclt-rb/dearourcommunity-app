@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
-import { ClientService } from '../core/client.service';
+import { AuthService } from '../core/services/auth.service';
 import { ProfileStore } from './profile.store';
 import { SidebarComponent } from './sidebar/sidebar';
 
@@ -12,7 +12,7 @@ import { SidebarComponent } from './sidebar/sidebar';
   styleUrl: './profile.css',
 })
 export default class ProfilePage implements OnInit {
-  private api = inject(ClientService);
+  private authService = inject(AuthService);
   private router = inject(Router);
   store = inject(ProfileStore);
 
@@ -22,7 +22,7 @@ export default class ProfilePage implements OnInit {
     try {
       await this.store.loadProfile();
     } catch {
-      this.api.clearToken();
+      this.authService.clearToken();
       this.router.navigate(['/auth/login']);
     } finally {
       this.loading.set(false);

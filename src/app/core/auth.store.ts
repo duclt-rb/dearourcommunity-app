@@ -1,6 +1,6 @@
 import { inject, computed } from '@angular/core';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
-import { ClientService } from './client.service';
+import { AuthService } from './services/auth.service';
 import { ApiError, RegisterDto } from '@dearourcommunity/client';
 
 export interface AuthUser {
@@ -33,20 +33,20 @@ export const AuthStore = signalStore(
   withComputed(({ token }) => ({
     isAuthenticated: computed(() => !!token()),
   })),
-  withMethods((store, api = inject(ClientService)) => ({
+  withMethods((store, authService = inject(AuthService)) => ({
     async loadCurrentUser() {
-      if (!api.token) return;
+      if (!authService.token) return;
       patchState(store, { isLoading: true, error: null });
       try {
-        const user = await api.auth.me();
+        const user = await authService.me();
         patchState(store, {
           user: user as AuthUser,
-          token: api.token,
+          token: authService.token,
           isLoading: false,
         });
       } catch (err) {
         console.error('Failed to load current user', err);
-        api.clearToken();
+        authService.clearToken();
         patchState(store, {
           user: null,
           token: null,
@@ -59,10 +59,10 @@ export const AuthStore = signalStore(
     async login(credentials: { email: string; password: string }) {
       patchState(store, { isLoading: true, error: null });
       try {
-        const { accessToken } = await api.auth.login(credentials);
-        api.setToken(accessToken);
+        const { accessToken } = await authService.login(credentials);
+        authService.setToken(accessToken);
 
-        const user = await api.auth.me();
+        const user = await authService.me();
 
         patchState(store, {
           user: user as AuthUser,
@@ -83,10 +83,10 @@ export const AuthStore = signalStore(
     async register(dto: RegisterDto) {
       patchState(store, { isLoading: true, error: null });
       try {
-        const { accessToken } = await api.auth.register(dto);
-        api.setToken(accessToken);
+        const { accessToken } = await authService.register(dto);
+        authService.setToken(accessToken);
 
-        const user = await api.auth.me();
+        const user = await authService.me();
 
         patchState(store, {
           user: user as AuthUser,
@@ -105,7 +105,7 @@ export const AuthStore = signalStore(
     },
 
     logout() {
-      api.clearToken();
+      authService.clearToken();
       patchState(store, initialState);
     },
 

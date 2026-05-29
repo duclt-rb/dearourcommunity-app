@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Client } from '@dearourcommunity/client';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 const TOKEN_KEY = 'doc:access_token';
 

@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { ClientService } from '../../core/client.service';
+import { AuthService } from '../../core/services/auth.service';
 import LogoComponent from '../../shared/logo/logo';
 import { ProfileStore } from '../profile.store';
 
@@ -13,11 +13,11 @@ import { ProfileStore } from '../profile.store';
 })
 export class SidebarComponent {
   store = inject(ProfileStore);
-  private api = inject(ClientService);
+  private authService = inject(AuthService);
   private router = inject(Router);
 
   onLogout() {
-    this.api.clearToken();
+    this.authService.clearToken();
     this.router.navigate(['/auth/login']);
   }
 }

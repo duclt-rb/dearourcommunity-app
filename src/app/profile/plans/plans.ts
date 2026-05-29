@@ -11,7 +11,7 @@ import {
   LucideStar,
   LucideUsers,
 } from '@lucide/angular';
-import { ClientService } from '../../core/client.service';
+import { PackagesService } from '../../core/services/packages.service';
 import { ProfileStore } from '../profile.store';
 import { CheckoutStore } from '../../checkout/checkout.store';
 
@@ -36,14 +36,14 @@ export interface UIPackage extends Package {
   styleUrl: './plans.css',
 })
 export default class PlansComponent {
-  private api = inject(ClientService);
+  private packagesService = inject(PackagesService);
   private router = inject(Router);
   private checkoutStore = inject(CheckoutStore);
   store = inject(ProfileStore);
 
   // 1. Dùng resource API mới để tự động tải packages
   packagesResource = resource({
-    loader: () => this.api.packages.findAll(),
+    loader: () => this.packagesService.findAll(),
   });
 
   // Helper để xử lý dữ liệu và format sẵn các feature key

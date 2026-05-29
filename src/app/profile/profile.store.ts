@@ -7,7 +7,7 @@ import {
   patchState,
   withHooks,
 } from '@ngrx/signals';
-import { ClientService } from '../core/client.service';
+import { AuthService } from '../core/services/auth.service';
 
 export interface EnrolledCourse {
   id: number;
@@ -72,10 +72,10 @@ export const ProfileStore = signalStore(
       return `${first} ${last}`.trim();
     }),
   })),
-  withMethods((store, api = inject(ClientService)) => ({
+  withMethods((store, authService = inject(AuthService)) => ({
     async loadProfile() {
       try {
-        const user = await api.auth.me();
+        const user = await authService.me();
 
         let fName = '';
         let lName = '';
