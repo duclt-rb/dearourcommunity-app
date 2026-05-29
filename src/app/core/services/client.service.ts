@@ -35,6 +35,10 @@ export class ClientService {
     return this.client.purchases;
   }
 
+  get payment() {
+    return this.client.payment;
+  }
+
   get health() {
     return this.client.health;
   }
