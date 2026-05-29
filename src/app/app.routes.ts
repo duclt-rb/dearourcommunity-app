@@ -43,6 +43,24 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'checkout',
+    children: [
+      {
+        path: '',
+        redirectTo: 'billing',
+        pathMatch: 'full',
+      },
+      {
+        path: 'billing',
+        loadComponent: () => import('./checkout/billing/billing'),
+      },
+      {
+        path: 'receipt',
+        loadComponent: () => import('./checkout/receipt/receipt'),
+      },
+    ],
+  },
+  {
     path: '**',
     redirectTo: 'profile',
   },

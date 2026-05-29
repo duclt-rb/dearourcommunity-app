@@ -1,0 +1,167 @@
+<!-- ===== SUCCESS STATE (resultCode === '0') ===== -->
+@if (paymentSuccess()) {
+  <section class="page-section">
+    <div class="page-inner">
+      <!-- Icon -->
+      <div class="result-icon success">
+        <svg
+          width="40"
+          height="40"
+          viewBox="0 0 24 24"
+          fill="none"
+          style="color: var(--color-accent-green)"
+        >
+          <path
+            d="M20 6L9 17L4 12"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+
+      <!-- Title -->
+      <h1 class="result-title">Thanh toán thành công!</h1>
+
+      <!-- Description -->
+      <p class="result-desc">Cảm ơn bạn! Đơn hàng đã được thanh toán thành công.</p>
+
+      <!-- Enrollment status -->
+      <div class="enroll-status">
+        @if (activating()) {
+          <div class="spinner-sm dark"></div>
+          <span class="enroll-loading">Đang kích hoạt khóa học...</span>
+        } @else {
+          <span class="enroll-success">✓ Khóa học đã được kích hoạt!</span>
+        }
+      </div>
+
+      <!-- Order Details -->
+      <div class="order-card">
+        <div class="order-details">
+          <div class="order-row">
+            <span class="order-label">Đơn hàng</span>
+            <span class="order-value">{{ courseTitle }}</span>
+          </div>
+          <div class="order-row">
+            <span class="order-label">Mã đơn hàng</span>
+            <span class="order-value">{{ orderId() }}</span>
+          </div>
+          <div class="order-row">
+            <span class="order-label">Mã giao dịch MoMo</span>
+            <span class="order-value">{{ transId() }}</span>
+          </div>
+          <div class="order-row amount">
+            <span class="order-label">Số tiền</span>
+            <span class="order-value">₫ {{ amountFormatted() }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="action-row">
+        <a routerLink="/profile/dashboard" class="btn btn-home">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M3 12L12 3l9 9" />
+            <path d="M5 10v9a1 1 0 0 0 1 1h3v-5h6v5h3a1 1 0 0 0 1-1v-9" />
+          </svg>
+          Trang chủ
+        </a>
+        <a routerLink="/profile/courses" class="btn btn-primary">
+          Bắt đầu học
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M5 12H19M12 5L19 12L12 19" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+} @else {
+  <!-- ===== FAILURE STATE (resultCode !== '0') ===== -->
+  <section class="page-section">
+    <div class="page-inner">
+      <!-- Icon -->
+      <div class="result-icon fail">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" style="color: #ef4444">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+          <path
+            d="M15 9L9 15M9 9L15 15"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </div>
+
+      <!-- Title -->
+      <h1 class="result-title">Thanh toán thất bại</h1>
+
+      <!-- Description -->
+      <p class="result-desc">Đã có lỗi xảy ra trong quá trình thanh toán. Vui lòng thử lại.</p>
+
+      <!-- Order Details -->
+      <div class="order-card">
+        <div class="order-details">
+          <div class="order-row">
+            <span class="order-label">Đơn hàng</span>
+            <span class="order-value">{{ courseTitle }}</span>
+          </div>
+          <div class="order-row">
+            <span class="order-label">Mã đơn hàng</span>
+            <span class="order-value">{{ orderId() || 'N/A' }}</span>
+          </div>
+          <div class="order-row amount">
+            <span class="order-label">Số tiền</span>
+            <span class="order-value">₫ {{ amountFormatted() }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="action-row">
+        <a routerLink="/profile/dashboard" class="btn btn-home">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M3 12L12 3l9 9" />
+            <path d="M5 10v9a1 1 0 0 0 1 1h3v-5h6v5h3a1 1 0 0 0 1-1v-9" />
+          </svg>
+          Trang chủ
+        </a>
+        <a routerLink="/checkout/billing" class="btn btn-primary">
+          Thử lại
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M5 12H19M12 5L19 12L12 19" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+}
