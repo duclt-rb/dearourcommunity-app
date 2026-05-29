@@ -46,6 +46,7 @@
   letter-spacing: 0.32px;
   color: var(--color-dark);
   margin-bottom: 24px;
+  margin-top: 24px;
 }
 .courses-section {
   display: flex;
