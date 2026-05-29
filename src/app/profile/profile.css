@@ -9,7 +9,7 @@
   flex-direction: column;
   gap: 40px;
   padding: 80px 16px 128px;
-  max-width: 1268px;
+  max-width: 1440px;
   margin: 0 auto;
 }
 @media (min-width: 640px) {
@@ -22,8 +22,8 @@
   .page-inner {
     flex-direction: row;
     gap: 80px;
-    padding-left: 80px;
-    padding-right: 80px;
+    padding-left: 32px;
+    padding-right: 32px;
   }
 }
 
