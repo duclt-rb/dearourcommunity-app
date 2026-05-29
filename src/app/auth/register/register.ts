@@ -9,7 +9,6 @@ import {
   validate,
 } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
-import { ApiError } from '@dearourcommunity/client';
 import {
   LucideEye,
   LucideEyeOff,
@@ -20,7 +19,7 @@ import {
 } from '@lucide/angular';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
-import { ClientService } from '../../core/client.service';
+import { AuthStore } from '../../core/auth.store';
 import AuthLayoutComponent from '../auth-layout/auth-layout';
 import LogoComponent from '../../shared/logo/logo';
 
@@ -47,7 +46,7 @@ import LogoComponent from '../../shared/logo/logo';
 })
 export default class RegisterPage {
   private router = inject(Router);
-  private client = inject(ClientService);
+  store = inject(AuthStore);
 
   registerModel = signal({
     firstName: '',
@@ -116,8 +115,8 @@ export default class RegisterPage {
   };
 
   showPassword = signal(false);
-  loading = signal(false);
-  error = signal<string | null>(null);
+  loading = this.store.isLoading;
+  error = this.store.error;
 
   async onSubmit(e: Event) {
     e.preventDefault();
@@ -126,18 +125,14 @@ export default class RegisterPage {
 
     if (this.registerForm().invalid()) return;
 
-    this.loading.set(true);
-    this.error.set(null);
-
     try {
       const dto = this.registerModel();
-      const { accessToken } = await this.client.auth.register(dto);
-      this.client.setToken(accessToken);
-      this.router.navigate(['/dashboard']);
-    } catch (err) {
-      this.error.set(err instanceof ApiError ? err.message : 'Đăng ký thất bại');
-    } finally {
-      this.loading.set(false);
+      const result = await this.store.register(dto);
+      if (result.success) {
+        this.router.navigate(['/dashboard']);
+      }
+    } catch {
+      // Handled by AuthStore
     }
   }
 }

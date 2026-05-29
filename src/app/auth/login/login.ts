@@ -1,11 +1,10 @@
 import { Component, inject, signal, ViewEncapsulation } from '@angular/core';
 import { email, form, FormField, required } from '@angular/forms/signals';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ApiError } from '@dearourcommunity/client';
 import { LucideEye, LucideEyeOff, LucideLock, LucideMail } from '@lucide/angular';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
-import { ClientService } from '../../core/client.service';
+import { AuthStore } from '../../core/auth.store';
 import AuthLayoutComponent from '../auth-layout/auth-layout';
 import LogoComponent from '../../shared/logo/logo';
 
@@ -31,7 +30,7 @@ import LogoComponent from '../../shared/logo/logo';
 export default class LoginPage {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private api = inject(ClientService);
+  store = inject(AuthStore);
 
   loginModel = signal({ email: '', password: '' });
 
@@ -81,8 +80,8 @@ export default class LoginPage {
   };
 
   showPassword = signal(false);
-  loading = signal(false);
-  error = signal<string | null>(null);
+  loading = this.store.isLoading;
+  error = this.store.error;
 
   async onSubmit(e: Event) {
     e.preventDefault();
@@ -91,24 +90,20 @@ export default class LoginPage {
 
     if (this.loginForm().invalid()) return;
 
-    this.loading.set(true);
-    this.error.set(null);
-
     try {
       const { email, password } = this.loginModel();
-      const { accessToken } = await this.api.auth.login({ email, password });
-      this.api.setToken(accessToken);
+      const result = await this.store.login({ email, password });
 
-      const redirect = this.route.snapshot.queryParamMap.get('redirect');
-      if (redirect) {
-        window.location.href = redirect;
-      } else {
-        this.router.navigate(['/profile']);
+      if (result.success) {
+        const redirect = this.route.snapshot.queryParamMap.get('redirect');
+        if (redirect) {
+          window.location.href = redirect;
+        } else {
+          this.router.navigate(['/profile']);
+        }
       }
-    } catch (err) {
-      this.error.set(err instanceof ApiError ? err.message : 'Invalid email or password');
-    } finally {
-      this.loading.set(false);
+    } catch {
+      // Handled by AuthStore
     }
   }
 
