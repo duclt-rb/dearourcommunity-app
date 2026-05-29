@@ -1,0 +1,74 @@
+<div class="tab-content active">
+  <div class="courses-header">
+    <h3 class="section-title">Khóa học của tôi</h3>
+
+    <div class="filter-tabs">
+      <button class="filter-tab" [class.active]="filter() === 'all'" (click)="filter.set('all')">
+        Tất cả
+      </button>
+      <button
+        class="filter-tab"
+        [class.active]="filter() === 'in_progress'"
+        (click)="filter.set('in_progress')"
+      >
+        Đang học
+      </button>
+      <button
+        class="filter-tab"
+        [class.active]="filter() === 'completed'"
+        (click)="filter.set('completed')"
+      >
+        Hoàn thành
+      </button>
+    </div>
+  </div>
+
+  @if (filteredCourses().length === 0) {
+    <div class="empty-state">
+      <div class="icon">📚</div>
+      <p>Không tìm thấy khóa học nào phù hợp với bộ lọc này.</p>
+    </div>
+  } @else {
+    <div class="course-grid">
+      @for (course of filteredCourses(); track course.id) {
+        <div class="course-card">
+          <div class="course-thumb" (click)="onAction(course)">
+            <img [src]="course.thumbnail" alt="{{ course.title }}" />
+          </div>
+
+          <div class="course-card-content">
+            <span class="course-category">{{ course.category }}</span>
+            <h4 class="course-card-title">{{ course.title }}</h4>
+
+            <div class="progress-section">
+              <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" [style.width.%]="course.progress"></div>
+              </div>
+              <div class="progress-info">
+                @if (course.progress === 100) {
+                  <span class="progress-text completed">Đã hoàn thành</span>
+                } @else if (course.progress > 0) {
+                  <span class="progress-text in-progress">Đang học {{ course.progress }}%</span>
+                } @else {
+                  <span class="progress-text">Chưa bắt đầu</span>
+                }
+                <span class="progress-date">{{ course.lastActive }}</span>
+              </div>
+            </div>
+
+            @if (course.progress === 100) {
+              <div class="cta-row">
+                <button class="cta-link outline" (click)="viewCertificate()">Xem chứng chỉ</button>
+                <button class="cta-link primary" (click)="onAction(course)">Học lại</button>
+              </div>
+            } @else {
+              <button class="cta-link primary w-full" (click)="onAction(course)">
+                {{ course.progress > 0 ? 'Học tiếp' : 'Bắt đầu học' }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

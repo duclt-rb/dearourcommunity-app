@@ -1,0 +1,44 @@
+<div class="tab-content active">
+  <div class="stats-card">
+    <div class="stat-block">
+      <span class="stat-value">{{ state.stats().completed }}</span>
+      <span class="stat-label">Hoàn thành</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-block">
+      <span class="stat-value">{{ state.stats().inProgress }}</span>
+      <span class="stat-label">Đang học</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-block">
+      <span class="stat-value">{{ state.stats().certificates }}</span>
+      <span class="stat-label">Chứng chỉ</span>
+    </div>
+  </div>
+
+  <div class="courses-section">
+    <h3 class="section-title">Tiếp tục học</h3>
+
+    @if (inProgressCourses().length === 0) {
+      <div class="empty-state">
+        <div class="icon">🎓</div>
+        <p>Bạn không có khóa học nào đang học dở. Hãy bắt đầu khóa học mới!</p>
+        <button class="btn-primary mt-4" routerLink="../courses">Xem tất cả khóa học</button>
+      </div>
+    } @else {
+      <div class="course-list">
+        @for (course of inProgressCourses(); track course.id) {
+          <a class="course-row" (click)="continueCourse(course)">
+            <span class="course-title">{{ course.title }}</span>
+            <span class="status-badge in_progress">Đang học ({{ course.progress }}%)</span>
+            <div class="continue-btn">
+              <svg viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+          </a>
+        }
+      </div>
+    }
+  </div>
+</div>

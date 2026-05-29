@@ -14,6 +14,33 @@ export const routes: Routes = [
     path: 'profile',
     loadComponent: () => import('./profile/profile'),
     canActivate: [authGuard],
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./profile/dashboard/dashboard'),
+      },
+      {
+        path: 'courses',
+        loadComponent: () => import('./profile/courses/courses'),
+      },
+      {
+        path: 'certificates',
+        loadComponent: () => import('./profile/certificates/certificates'),
+      },
+      {
+        path: 'edit-profile',
+        loadComponent: () => import('./profile/edit-profile/edit-profile'),
+      },
+      {
+        path: 'password',
+        loadComponent: () => import('./profile/password/password'),
+      },
+    ],
   },
   {
     path: '**',

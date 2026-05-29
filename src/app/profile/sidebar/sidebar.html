@@ -1,0 +1,30 @@
+<div class="sidebar">
+  <div class="user-info">
+    <div class="avatar">
+      @if (state.avatarUrl()) {
+        <img [src]="state.avatarUrl()" class="avatar-img" alt="Avatar" />
+      } @else {
+        <div class="avatar-placeholder">
+          <span>{{ state.displayName().charAt(0) }}</span>
+        </div>
+      }
+    </div>
+    <div class="user-details">
+      <h2 class="user-name">{{ state.displayName() }}</h2>
+      <p class="user-email">{{ state.email() }}</p>
+    </div>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <nav class="nav-tabs scrollbar-hide">
+    <button class="nav-tab" routerLink="dashboard" routerLinkActive="active">Hồ sơ</button>
+    <button class="nav-tab" routerLink="courses" routerLinkActive="active">Khóa học</button>
+    <button class="nav-tab" routerLink="certificates" routerLinkActive="active">Chứng chỉ</button>
+    <button class="nav-tab" routerLink="edit-profile" routerLinkActive="active">
+      Đổi thông tin
+    </button>
+    <button class="nav-tab" routerLink="password" routerLinkActive="active">Đổi mật khẩu</button>
+    <button class="nav-tab logout" (click)="onLogout()">Đăng xuất</button>
+  </nav>
+</div>

@@ -1,0 +1,42 @@
+<div class="tab-content active">
+  <h3 class="section-title">Chứng chỉ của tôi</h3>
+
+  @if (state.certificates().length === 0) {
+    <div class="empty-state">
+      <div class="icon">🏆</div>
+      <p>Bạn chưa hoàn thành khóa học nào để nhận chứng chỉ. Hãy tiếp tục cố gắng nhé!</p>
+      <button class="btn-primary mt-4" routerLink="../courses">Học tiếp ngay</button>
+    </div>
+  } @else {
+    <div class="cert-grid">
+      @for (cert of state.certificates(); track cert.id) {
+        <div class="cert-card">
+          <div class="cert-visual-preview">
+            <div class="cert-badge-icon">🎓</div>
+            <span class="cert-brand">DEAR OUR COMMUNITY</span>
+            <span class="cert-subtitle">CERTIFICATE OF COMPLETION</span>
+          </div>
+
+          <div class="cert-card-content">
+            <h4 class="cert-course-title">{{ cert.courseTitle }}</h4>
+
+            <div class="cert-metadata">
+              <div class="meta-item">
+                <span class="meta-label">Ngày cấp:</span>
+                <span class="meta-value">{{ cert.issueDate }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Mã số:</span>
+                <span class="meta-value code">{{ cert.code }}</span>
+              </div>
+            </div>
+
+            <button class="btn-outline w-full justify-center" (click)="downloadCertificate(cert)">
+              Tải xuống chứng chỉ (PDF)
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

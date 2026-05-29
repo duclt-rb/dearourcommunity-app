@@ -1,0 +1,147 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  flex-shrink: 0;
+}
+@media (min-width: 1024px) {
+  .sidebar {
+    width: 280px;
+  }
+}
+@media (min-width: 1280px) {
+  .sidebar {
+    width: 320px;
+  }
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.avatar {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 6px solid rgba(28, 28, 28, 0.1);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatar-placeholder span {
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+}
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.user-name {
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 44px;
+  letter-spacing: 0.32px;
+  color: var(--color-dark);
+  text-align: center;
+}
+.user-email {
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.16px;
+  color: rgba(28, 28, 28, 0.6);
+  text-align: center;
+}
+.sidebar-divider {
+  height: 1px;
+  width: 100%;
+  background: rgba(28, 28, 28, 0.1);
+}
+
+/* Navigation */
+.nav-tabs {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+@media (min-width: 1024px) {
+  .nav-tabs {
+    flex-direction: column;
+    gap: 20px;
+    overflow: visible;
+    padding-bottom: 0;
+  }
+}
+.nav-tab {
+  white-space: nowrap;
+  border-radius: 50px;
+  border: 1px solid rgba(28, 28, 28, 0.2);
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  background: transparent;
+  transition:
+    color 0.2s,
+    background 0.2s,
+    border-color 0.2s;
+  outline: none;
+}
+@media (min-width: 1024px) {
+  .nav-tab {
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    text-align: left;
+    font-size: 20px;
+    line-height: 28px;
+  }
+}
+.nav-tab:hover {
+  color: var(--color-primary);
+}
+.nav-tab.active {
+  border-color: var(--color-primary);
+  background: rgba(143, 80, 226, 0.1);
+  color: var(--color-primary);
+}
+@media (min-width: 1024px) {
+  .nav-tab.active {
+    background: transparent;
+    border: none;
+  }
+}
+.nav-tab.logout {
+  color: var(--color-dark);
+}
+.nav-tab.logout:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+@media (min-width: 1024px) {
+  .nav-tab.logout {
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    text-align: left;
+    font-size: 20px;
+    line-height: 28px;
+  }
+  .nav-tab.logout:hover {
+    border: none;
+  }
+}

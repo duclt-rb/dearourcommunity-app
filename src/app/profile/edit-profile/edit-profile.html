@@ -1,0 +1,93 @@
+<div class="tab-content active">
+  <div class="edit-profile-section">
+    <h3 class="section-title">Chỉnh sửa thông tin</h3>
+
+    <!-- Photo Section -->
+    <div class="photo-section">
+      <div class="avatar">
+        @if (tempAvatarUrl()) {
+          <img [src]="tempAvatarUrl()" class="avatar-img" alt="Avatar" />
+        } @else {
+          <div class="avatar-placeholder">
+            <span>{{ state.displayName().charAt(0) }}</span>
+          </div>
+        }
+      </div>
+      <div class="photo-actions">
+        <button class="btn-outline" (click)="changePhoto()">Đổi ảnh</button>
+        @if (tempAvatarUrl()) {
+          <button class="btn-outline danger" (click)="removePhoto()">Xóa ảnh</button>
+        }
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <form class="form-card" (submit)="onSubmit($event)">
+      @if (successMessage()) {
+        <div class="msg-success">{{ successMessage() }}</div>
+      }
+      @if (errorMessage()) {
+        <div class="msg-error">{{ errorMessage() }}</div>
+      }
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="lastName">Họ & Tên đệm</label>
+          <input
+            id="lastName"
+            type="text"
+            class="form-input"
+            placeholder="Ví dụ: Nguyễn Văn"
+            [value]="tempLastName()"
+            (input)="tempLastName.set(getInputValue($event))"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="firstName">Tên</label>
+          <input
+            id="firstName"
+            type="text"
+            class="form-input"
+            placeholder="Ví dụ: Anh"
+            [value]="tempFirstName()"
+            (input)="tempFirstName.set(getInputValue($event))"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="phone">Số điện thoại</label>
+          <input
+            id="phone"
+            type="tel"
+            class="form-input"
+            placeholder="Ví dụ: 0987654321"
+            [value]="tempPhone()"
+            (input)="tempPhone.set(getInputValue($event))"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="email">Địa chỉ email</label>
+          <input
+            id="email"
+            type="email"
+            class="form-input readonly"
+            [value]="state.email()"
+            readonly
+          />
+          <span class="field-help">Địa chỉ email đăng nhập không thể thay đổi.</span>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="loading()">
+          {{ loading() ? 'Đang lưu...' : 'Lưu thay đổi' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
