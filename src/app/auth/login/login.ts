@@ -5,7 +5,6 @@ import { ApiError } from '@dearourcommunity/client';
 import { LucideEye, LucideEyeOff, LucideLock, LucideMail } from '@lucide/angular';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
-import { environment } from '../../../environments/environment';
 import { ClientService } from '../../core/client.service';
 import AuthLayoutComponent from '../auth-layout/auth-layout';
 
@@ -100,7 +99,7 @@ export default class LoginPage {
 
       const redirect = this.route.snapshot.queryParamMap.get('redirect');
       if (redirect) {
-        window.location.href = environment.appUrl + redirect;
+        window.location.href = redirect;
       } else {
         this.router.navigate(['/profile']);
       }
