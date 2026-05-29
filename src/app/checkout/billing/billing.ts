@@ -1,6 +1,7 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
+import { CheckoutStore } from '../checkout.store';
 import {
   LucideCheck,
   LucideTag,
@@ -31,61 +32,35 @@ import LogoComponent from '../../shared/logo/logo';
 })
 export default class BillingComponent {
   private router = inject(Router);
+  readonly store = inject(CheckoutStore);
 
-  step = signal(1);
-  couponApplied = signal(false);
-  appliedCode = signal('');
-  couponError = signal(false);
-  loading = signal(false);
-  paymentError = signal(false);
-
+  // Aliases for 100% template compatibility
+  step = this.store.step;
+  couponApplied = this.store.couponApplied;
+  appliedCode = this.store.appliedCode;
+  couponError = this.store.couponError;
+  loading = this.store.isLoading;
+  paymentError = this.store.paymentError;
   originalPrice = 500000;
-  finalPrice = computed(() => (this.couponApplied() ? 400000 : 500000));
+  finalPrice = this.store.finalPrice;
 
   goToPayment() {
-    this.step.set(2);
-    this.paymentError.set(false);
+    this.store.setStep(2);
   }
 
   backToOrder() {
-    this.step.set(1);
-    this.paymentError.set(false);
+    this.store.setStep(1);
   }
 
   applyCoupon(code: string) {
-    const cleanCode = code.trim().toUpperCase();
-    if (!cleanCode) return;
-
-    if (cleanCode === 'WELCOME20' || cleanCode === 'SALE20') {
-      this.couponApplied.set(true);
-      this.appliedCode.set(cleanCode);
-      this.couponError.set(false);
-    } else {
-      this.couponError.set(true);
-    }
+    this.store.applyCoupon(code);
   }
 
   removeCoupon() {
-    this.couponApplied.set(false);
-    this.appliedCode.set('');
-    this.couponError.set(false);
+    this.store.removeCoupon();
   }
 
   confirmPayment() {
-    this.loading.set(true);
-    this.paymentError.set(false);
-
-    // Giả lập redirect tới trang kết quả thanh toán (receipt) sau 2 giây
-    setTimeout(() => {
-      this.loading.set(false);
-      this.router.navigate(['/checkout/receipt'], {
-        queryParams: {
-          resultCode: '0',
-          orderId: 'MOMO' + Date.now(),
-          transId: Math.floor(Math.random() * 1000000000).toString(),
-          amount: this.finalPrice().toString(),
-        },
-      });
-    }, 2000);
+    this.store.confirmPayment(this.router);
   }
 }

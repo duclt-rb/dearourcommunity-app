@@ -1,5 +1,6 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { CheckoutStore } from '../checkout.store';
 import { LucideCheck, LucideHome, LucideArrowRight, LucideCircleX } from '@lucide/angular';
 import LogoComponent from '../../shared/logo/logo';
 
@@ -12,55 +13,30 @@ import LogoComponent from '../../shared/logo/logo';
 })
 export default class ReceiptComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  readonly store = inject(CheckoutStore);
 
   courseTitle = 'ESG Căn Bản Cho Người Mới Bắt Đầu';
 
-  // Signals để quản lý tham số từ URL
-  resultCode = signal<string | null>(null);
-  orderId = signal<string | null>(null);
-  transId = signal<string | null>(null);
-  amount = signal<number>(500000);
-
-  // Trạng thái thanh toán (Thành công nếu resultCode là '0')
-  paymentSuccess = computed(() => this.resultCode() === '0');
-
-  // Định dạng số tiền sử dụng locale tiếng Việt (ngăn cách hàng nghìn bằng dấu chấm)
-  amountFormatted = computed(() => {
-    return this.amount().toLocaleString('vi-VN');
-  });
-
-  // Trạng thái giả lập đang kích hoạt khóa học
-  activating = signal(true);
+  // Aliases for 100% template compatibility
+  resultCode = this.store.resultCode;
+  orderId = this.store.orderId;
+  transId = this.store.transId;
+  amount = this.store.amount;
+  paymentSuccess = this.store.paymentSuccess;
+  amountFormatted = this.store.amountFormatted;
+  activating = this.store.activating;
 
   ngOnInit() {
-    // Đăng ký lắng nghe sự thay đổi query parameters của URL
     this.route.queryParams.subscribe((params) => {
-      if (params['resultCode'] !== undefined) {
-        this.resultCode.set(params['resultCode']);
-      } else {
-        // Mặc định hiển thị thành công nếu truy cập trực tiếp để demo đẹp mắt
-        this.resultCode.set('0');
-      }
-
-      this.orderId.set(params['orderId'] || 'MOMO20260529ABC123');
-      this.transId.set(params['transId'] || '1283746529');
+      const code = params['resultCode'] !== undefined ? params['resultCode'] : '0';
+      const oId = params['orderId'] || 'MOMO20260529ABC123';
+      const tId = params['transId'] || '1283746529';
 
       const amt = Number(params['amount']);
-      if (!isNaN(amt) && amt > 0) {
-        this.amount.set(amt);
-      } else {
-        this.amount.set(500000);
-      }
+      const amountVal = !isNaN(amt) && amt > 0 ? amt : 500000;
 
-      // Kích hoạt hiệu ứng quay vòng giả lập tiến trình kích hoạt khóa học
-      this.startActivationTimer();
+      this.store.setPaymentParams(code, oId, tId, amountVal);
+      this.store.startActivationTimer();
     });
-  }
-
-  private startActivationTimer() {
-    this.activating.set(true);
-    setTimeout(() => {
-      this.activating.set(false);
-    }, 3000); // 3 giây kích hoạt xong
   }
 }
