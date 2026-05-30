@@ -4,7 +4,9 @@
     <div style="display: flex; flex-direction: column; gap: 12px; align-items: center; width: 100%">
       <app-logo style="margin-bottom: 4px"></app-logo>
       <h1 class="page-title">Registration</h1>
-      <p class="page-subtitle">Account Registration: <span class="highlight">Nguyễn Văn A</span></p>
+      <p class="page-subtitle">
+        Account Registration: <span class="highlight">{{ profileStore.displayName() }}</span>
+      </p>
     </div>
 
     <!-- Step Indicator -->

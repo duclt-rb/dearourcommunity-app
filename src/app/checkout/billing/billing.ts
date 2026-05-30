@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { CheckoutStore } from '../checkout.store';
+import { ProfileStore } from '../../profile/profile.store';
 import {
   LucideCheck,
   LucideTag,
@@ -29,8 +30,13 @@ import LogoComponent from '../../shared/logo/logo';
   templateUrl: './billing.html',
   styleUrl: './billing.css',
 })
-export default class BillingComponent {
+export default class BillingComponent implements OnInit {
   readonly store = inject(CheckoutStore);
+  readonly profileStore = inject(ProfileStore);
+
+  ngOnInit() {
+    this.profileStore.loadProfile();
+  }
 
   // Aliases for 100% template compatibility
   step = this.store.step;

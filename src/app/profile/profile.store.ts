@@ -1,15 +1,15 @@
-import { inject, computed } from '@angular/core';
+import { computed, inject } from '@angular/core';
+import { OrgMembership, PackageType } from '@dearourcommunity/client';
 import {
-  signalStore,
-  withState,
-  withComputed,
-  withMethods,
   patchState,
+  signalStore,
+  withComputed,
   withHooks,
+  withMethods,
+  withState,
 } from '@ngrx/signals';
 import { AuthService } from '../core/services/auth.service';
 import { CourseService } from '../core/services/course.service';
-import { PackageType, OrgMembership } from '@dearourcommunity/client';
 
 function decodeHtml(str: string): string {
   if (!str) return '';
@@ -123,7 +123,10 @@ export const ProfileStore = signalStore(
             }
           }
 
-          const activePackage = user.packages && user.packages.length > 0 ? user.packages[0] : null;
+          const activePackage =
+            user.packages && user.packages.length > 0
+              ? [...user.packages].sort((a, b) => b.tier - a.tier)[0]
+              : null;
           const isMember = user.organizations?.some((org) => org.role === 'member') ?? false;
 
           const enrolled = await courseService.findMyEnrolled();
