@@ -8,6 +8,7 @@ import {
   withHooks,
 } from '@ngrx/signals';
 import { AuthService } from '../core/services/auth.service';
+import { PackageType } from '@dearourcommunity/client';
 
 export interface EnrolledCourse {
   id: number;
@@ -37,6 +38,7 @@ const initialState = {
   avatarUrl: null as string | null,
   packageName: null as string | null,
   packageId: null as string | null,
+  packageType: null as PackageType | null,
   enrolledCourses: [] as EnrolledCourse[],
   certificates: [] as Certificate[],
   activeTab: 'dashboard' as
@@ -45,14 +47,15 @@ const initialState = {
     | 'certificates'
     | 'plans'
     | 'edit-profile'
-    | 'password',
+    | 'password'
+    | 'organization',
 };
 
 // 1. Define the ProfileStore using @ngrx/signals
 export const ProfileStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withComputed(({ enrolledCourses, certificates, firstName, lastName }) => ({
+  withComputed(({ enrolledCourses, certificates, firstName, lastName, packageType }) => ({
     stats: computed(() => {
       const courses = enrolledCourses();
       const completed = courses.filter((c) => c.progress === 100).length;
@@ -71,6 +74,7 @@ export const ProfileStore = signalStore(
       if (!first && !last) return 'Học viên';
       return `${first} ${last}`.trim();
     }),
+    isOrganization: computed(() => packageType() === 'organization'),
   })),
   withMethods((store, authService = inject(AuthService)) => ({
     async loadProfile() {
@@ -106,6 +110,7 @@ export const ProfileStore = signalStore(
           email: user.email,
           packageName: user.package?.name ?? null,
           packageId: user.packageId ?? null,
+          packageType: user.package?.type ?? null,
           firstName: fName,
           lastName: lName,
           phone: ph,

@@ -1,7 +1,7 @@
 import { inject, computed } from '@angular/core';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { AuthService } from '../services/auth.service';
-import { ApiError, RegisterDto } from '@dearourcommunity/client';
+import { ApiError, RegisterDto, PackageType } from '@dearourcommunity/client';
 
 export interface AuthUser {
   id: string;
@@ -9,7 +9,9 @@ export interface AuthUser {
   displayName: string;
   packageId?: string | null;
   package?: {
+    id: string;
     name: string;
+    type: PackageType;
   } | null;
 }
 

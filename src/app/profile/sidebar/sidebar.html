@@ -24,6 +24,9 @@
 
   <nav class="nav-tabs scrollbar-hide">
     <button class="nav-tab" routerLink="dashboard" routerLinkActive="active">Hồ sơ</button>
+    @if (store.isOrganization()) {
+      <button class="nav-tab" routerLink="organization" routerLinkActive="active">Tổ chức</button>
+    }
     <button class="nav-tab" routerLink="courses" routerLinkActive="active">Khóa học</button>
     <button class="nav-tab" routerLink="certificates" routerLinkActive="active">Chứng chỉ</button>
     <button class="nav-tab" routerLink="plans" routerLinkActive="active">Nâng gói</button>

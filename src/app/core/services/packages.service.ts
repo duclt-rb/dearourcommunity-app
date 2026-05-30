@@ -10,6 +10,10 @@ export class PackagesService {
     return this.clientService.packages.findAll();
   }
 
+  findById(id: string) {
+    return this.clientService.packages.findById(id);
+  }
+
   update(id: string, dto: UpdatePackageDto) {
     return this.clientService.packages.update(id, dto);
   }

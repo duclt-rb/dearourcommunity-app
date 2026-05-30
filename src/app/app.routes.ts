@@ -46,6 +46,10 @@ export const routes: Routes = [
         path: 'password',
         loadComponent: () => import('./profile/password/password'),
       },
+      {
+        path: 'organization',
+        loadComponent: () => import('./profile/organization/organization'),
+      },
     ],
   },
   {

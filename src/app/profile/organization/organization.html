@@ -1,0 +1,216 @@
+<div class="tab-content active animate-fade-in">
+  <div class="organization-section">
+    <!-- Header Section -->
+    <div class="profile-page-header">
+      <h1 class="profile-page-title">Quản lý Tổ chức</h1>
+      <p class="profile-page-subtitle">
+        Quản lý thành viên và theo dõi việc đăng ký học trong gói tổ chức của bạn.
+      </p>
+    </div>
+
+    <!-- Alert Messages (matching system form message styles) -->
+    @if (successMessage()) {
+      <div class="msg-success animate-slide-in">{{ successMessage() }}</div>
+    }
+    @if (errorMessage()) {
+      <div class="msg-error animate-slide-in">{{ errorMessage() }}</div>
+    }
+
+    <!-- Loading State -->
+    @if (loading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Đang tải thông tin tổ chức...</p>
+      </div>
+    } @else {
+      <!-- Main Dashboard Content -->
+      @if (!activeOrg()) {
+        <div class="empty-state">
+          <div class="icon">🏢</div>
+          <p>Không tìm thấy tổ chức nào liên kết với tài khoản này.</p>
+          <p class="field-help mt-2">
+            Tài khoản của bạn đã được đăng ký gói tổ chức nhưng chưa được thiết lập tổ chức trên hệ
+            thống. Vui lòng liên hệ bộ phận hỗ trợ của Dear Our Community để kích hoạt.
+          </p>
+        </div>
+      } @else {
+        <!-- Stats Card (exactly matching System Dashboard stats layout) -->
+        <div class="stats-card">
+          <div class="stat-block">
+            <span class="stat-value-text">{{ activeOrg()?.name }}</span>
+            <span class="stat-label">Tổ chức</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-block">
+            <span class="stat-value-text">
+              <span class="status-badge" [ngClass]="isOwner() ? 'completed' : 'in_progress'">
+                {{ isOwner() ? 'Chủ sở hữu' : 'Thành viên' }}
+              </span>
+            </span>
+            <span class="stat-label">Vai trò của bạn</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-block">
+            <span class="stat-value-text">{{ slotsUsed() }} / {{ maxSlots() }}</span>
+            <span class="stat-label">Học viên</span>
+          </div>
+        </div>
+
+        <!-- Invitation Panel (Owner Only, styled like System Form Cards) -->
+        @if (isOwner()) {
+          <form class="form-card" (submit)="onInviteSubmit($event)">
+            <div class="form-card-header">
+              <h3 class="form-card-title">Mời Thành viên Mới</h3>
+              <p class="field-help">
+                Nhập email của người bạn muốn cấp quyền học để gửi lời mời tham gia tổ chức.
+              </p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inviteEmail">Địa chỉ email học viên</label>
+              <div class="input-with-button">
+                <input
+                  id="inviteEmail"
+                  type="email"
+                  class="form-input"
+                  placeholder="Ví dụ: email.nhanvien@congty.com"
+                  [ngModel]="inviteEmail()"
+                  (ngModelChange)="inviteEmail.set($event)"
+                  name="inviteEmail"
+                  required
+                  [disabled]="actionLoading() || slotsUsed() >= maxSlots()"
+                />
+                <button
+                  type="submit"
+                  class="btn-primary"
+                  [disabled]="actionLoading() || slotsUsed() >= maxSlots() || !inviteEmail().trim()"
+                >
+                  {{ actionLoading() ? 'Đang gửi...' : 'Gửi lời mời' }}
+                </button>
+              </div>
+              @if (slotsUsed() >= maxSlots()) {
+                <span class="field-help danger-text">
+                  * Đã hết chỗ trống trong gói hiện tại. Vui lòng nâng cấp gói hoặc gỡ bỏ thành viên
+                  để mời thêm.
+                </span>
+              }
+            </div>
+          </form>
+        }
+
+        <!-- Members List Section -->
+        <div class="members-list-container">
+          <div class="list-section-header">
+            <div class="list-section-title-wrapper">
+              <h3 class="section-title-small">
+                Danh sách thành viên ({{ members()?.length || 0 }})
+              </h3>
+              <p class="field-help">Tất cả thành viên trực thuộc tài khoản tổ chức của bạn.</p>
+            </div>
+
+            <button
+              class="btn-refresh"
+              (click)="loadData()"
+              [disabled]="actionLoading() || loading()"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="refresh-icon"
+                [ngClass]="{ 'spin-animation': loading() }"
+              >
+                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <path d="M3 3v5h5" />
+                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+                <path d="M16 16h5v5" />
+              </svg>
+              Làm mới
+            </button>
+          </div>
+
+          @if ((members()?.length ?? 0) === 0) {
+            <div class="empty-state" style="padding: 40px; border-radius: var(--radius-card)">
+              <p>Chưa có thành viên nào trực thuộc tổ chức này.</p>
+            </div>
+          } @else {
+            <div class="table-container">
+              <table class="system-style-table">
+                <thead>
+                  <tr>
+                    <th>Thành viên</th>
+                    <th>Email</th>
+                    <th>Vai trò</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày tham gia</th>
+                    @if (isOwner()) {
+                      <th class="text-right">Thao tác</th>
+                    }
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (member of members() ?? []; track member.id) {
+                    <tr class="table-row">
+                      <td>
+                        <div class="member-info">
+                          <div class="avatar-sm">
+                            <div class="avatar-placeholder-sm">
+                              <span>{{
+                                getMemberDisplayName(member).charAt(0).toUpperCase()
+                              }}</span>
+                            </div>
+                          </div>
+                          <span class="member-name">{{ getMemberDisplayName(member) }}</span>
+                        </div>
+                      </td>
+                      <td class="member-email">{{ getMemberEmail(member) }}</td>
+                      <td>
+                        <span
+                          class="status-badge"
+                          [ngClass]="member.role === 'owner' ? 'completed' : 'role-member-badge'"
+                        >
+                          {{ member.role === 'owner' ? 'Chủ sở hữu' : 'Học viên' }}
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          class="status-indicator"
+                          [ngClass]="
+                            member.status === 'active' ? 'status-active' : 'status-pending'
+                          "
+                        >
+                          <span class="status-dot"></span>
+                          {{ member.status === 'active' ? 'Hoạt động' : 'Chờ xác nhận' }}
+                        </span>
+                      </td>
+                      <td class="join-date">{{ member.joinedAt | date: 'dd/MM/yyyy' }}</td>
+                      @if (isOwner()) {
+                        <td class="text-right">
+                          @if (member.role !== 'owner') {
+                            <button
+                              class="btn-outline danger compact-btn"
+                              (click)="onRemoveMember(member.id, getMemberEmail(member))"
+                              [disabled]="actionLoading()"
+                            >
+                              Xóa
+                            </button>
+                          } @else {
+                            <span class="action-placeholder">-</span>
+                          }
+                        </td>
+                      }
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+</div>
