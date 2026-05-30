@@ -29,7 +29,9 @@
     }
     <button class="nav-tab" routerLink="courses" routerLinkActive="active">Khóa học</button>
     <button class="nav-tab" routerLink="certificates" routerLinkActive="active">Chứng chỉ</button>
-    <button class="nav-tab" routerLink="plans" routerLinkActive="active">Nâng gói</button>
+    @if (store.showPlansTab()) {
+      <button class="nav-tab" routerLink="plans" routerLinkActive="active">Nâng gói</button>
+    }
     <button class="nav-tab" routerLink="edit-profile" routerLinkActive="active">
       Đổi thông tin
     </button>

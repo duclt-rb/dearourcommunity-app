@@ -9,7 +9,14 @@ const prettierPlugin = require('eslint-plugin-prettier');
 
 module.exports = tseslint.config(
   {
-    ignores: ['dist/', 'node_modules/', '.angular/', 'eslint.config.js'],
+    ignores: [
+      'dist/',
+      'node_modules/',
+      '.angular/',
+      'eslint.config.js',
+      'playwright.config.ts',
+      'e2e/',
+    ],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
