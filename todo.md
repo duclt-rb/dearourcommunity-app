@@ -61,7 +61,7 @@ src/app/core/
 - [x] Menu Sidebar điều hướng mượt mà giữa các tab con (`dashboard`, `courses`, `certificates`, `plans`, `edit-profile`, `password`).
 - [x] Sử dụng **Mock Data** khởi tạo tại `ProfileStore` để hiển thị các số liệu thống kê học tập (Khóa học đã hoàn thành, số chứng chỉ,...).
 - [x] Giao diện Đổi mật khẩu (`password`) và Chỉnh sửa thông tin cá nhân (`edit-profile`).
-- [ ] Thay thế hoàn toàn Mock Data bằng dữ liệu thật gọi từ `authService.me()` và API profile.
+- [/] Thay thế hoàn toàn Mock Data bằng dữ liệu thật gọi từ `authService.me()` và API profile (Đã kết nối dữ liệu thật cho Khóa học qua API `findMyEnrolled`).
 - [ ] Chức năng Upload / Cập nhật ảnh đại diện (Avatar) sử dụng API.
 - [ ] Cập nhật giao diện chỉnh sửa hồ sơ (`edit-profile.html`, `edit-profile.ts`) để bổ sung các trường thông tin: **Giới tính (Gender)** và **Biệt danh (Nickname)**.
 - [ ] Cập nhật state và phương thức `updateProfile` trong `ProfileStore` để quản lý các trường thông tin mới (**Avatar**, **Gender**, **Nickname**).

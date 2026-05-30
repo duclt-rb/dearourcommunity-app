@@ -12,4 +12,8 @@ export class CourseService {
   findAll(keyword?: string) {
     return this.clientService.course.findAll(keyword);
   }
+
+  findMyEnrolled() {
+    return this.clientService.course.findMyEnrolled();
+  }
 }

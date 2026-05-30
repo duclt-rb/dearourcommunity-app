@@ -62,10 +62,7 @@
             </div>
 
             @if (course.progress === 100) {
-              <div class="cta-row">
-                <button class="cta-link outline" (click)="viewCertificate()">Xem chứng chỉ</button>
-                <button class="cta-link primary" (click)="onAction(course)">Học lại</button>
-              </div>
+              <button class="cta-link primary w-full" (click)="onAction(course)">Học lại</button>
             } @else {
               <button class="cta-link primary w-full" (click)="onAction(course)">
                 {{ course.progress > 0 ? 'Học tiếp' : 'Bắt đầu học' }}
