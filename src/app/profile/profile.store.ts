@@ -114,9 +114,8 @@ export const ProfileStore = signalStore(
           let isMember = false;
           if (user.package?.type === 'organization') {
             try {
-              const orgs = await orgService.getMyOrgs();
-              if (orgs && orgs.length > 0) {
-                const org = orgs[0];
+              const org = await orgService.getActiveOrg();
+              if (org) {
                 const members = await orgService.getMembers(org.id);
                 const currentUserId = user.id;
                 const currentUserMember = members.find((m) => m.userId === currentUserId);

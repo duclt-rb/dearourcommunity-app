@@ -68,9 +68,8 @@ export default class OrganizationComponent implements OnInit {
 
     try {
       // 1. Fetch organization
-      const orgs = await this.orgService.getMyOrgs();
-      if (orgs && orgs.length > 0) {
-        const org = orgs[0];
+      const org = await this.orgService.getActiveOrg();
+      if (org) {
         this.activeOrg.set(org);
 
         // 2. Fetch members

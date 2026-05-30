@@ -14,6 +14,10 @@ export class OrganizationService {
     return this.clientService.org.getMyOrgs();
   }
 
+  getActiveOrg() {
+    return this.clientService.org.getActiveOrg();
+  }
+
   getDetail(id: string) {
     return this.clientService.org.getDetail(id);
   }

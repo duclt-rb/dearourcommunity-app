@@ -21,8 +21,13 @@
         @if (activating()) {
           <div class="spinner-sm dark"></div>
           <span class="enroll-loading">Đang kích hoạt gói thành viên...</span>
-        } @else {
+        } @else if (enrolled()) {
           <span class="enroll-success">✓ Tài khoản của bạn đã được nâng cấp!</span>
+        } @else {
+          <span class="enroll-timeout"
+            >✗ Kích hoạt tài khoản thất bại hoặc quá thời gian phản hồi. Vui lòng liên hệ hỗ
+            trợ.</span
+          >
         }
       </div>
 
