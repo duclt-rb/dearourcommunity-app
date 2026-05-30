@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth.guard';
+import { systemGuard } from './core/system.guard';
 import { checkoutGuard } from './checkout/checkout.guard';
 import { receiptGuard } from './checkout/receipt.guard';
 
@@ -59,7 +60,7 @@ export const routes: Routes = [
   {
     path: 'system',
     loadComponent: () => import('./system/system'),
-    canActivate: [authGuard],
+    canActivate: [systemGuard],
     children: [
       {
         path: '',

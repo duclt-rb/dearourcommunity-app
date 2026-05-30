@@ -1,12 +1,13 @@
-import { inject, computed } from '@angular/core';
-import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
+import { computed, inject } from '@angular/core';
+import { ApiError, PackageType, RegisterDto } from '@dearourcommunity/client';
+import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { AuthService } from '../services/auth.service';
-import { ApiError, RegisterDto, PackageType } from '@dearourcommunity/client';
 
 export interface AuthUser {
   id: string;
   email: string;
   displayName: string;
+  isAdmin?: boolean;
   packageId?: string | null;
   package?: {
     id: string;
