@@ -53,9 +53,28 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'invitations/check',
+    loadComponent: () => import('./invitations/check/check'),
+  },
+  {
     path: 'system',
     loadComponent: () => import('./system/system'),
     canActivate: [authGuard],
+    children: [
+      {
+        path: '',
+        redirectTo: 'packages',
+        pathMatch: 'full',
+      },
+      {
+        path: 'packages',
+        loadComponent: () => import('./system/packages/packages'),
+      },
+      {
+        path: 'transactions',
+        loadComponent: () => import('./system/transactions/transactions'),
+      },
+    ],
   },
   {
     path: 'checkout',

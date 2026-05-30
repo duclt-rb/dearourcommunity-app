@@ -8,7 +8,7 @@ import {
   required,
   validate,
 } from '@angular/forms/signals';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   LucideEye,
   LucideEyeOff,
@@ -46,6 +46,7 @@ import LogoComponent from '../../shared/logo/logo';
 })
 export default class RegisterPage {
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   store = inject(AuthStore);
 
   registerModel = signal({
@@ -129,7 +130,16 @@ export default class RegisterPage {
       const dto = this.registerModel();
       const result = await this.store.register(dto);
       if (result.success) {
-        this.router.navigate(['/dashboard']);
+        const redirectInternal = this.route.snapshot.queryParamMap.get('redirectInternal');
+        const redirect = this.route.snapshot.queryParamMap.get('redirect');
+
+        if (redirectInternal) {
+          this.router.navigateByUrl(redirectInternal);
+        } else if (redirect) {
+          window.location.href = redirect;
+        } else {
+          this.router.navigate(['/profile']);
+        }
       }
     } catch {
       // Handled by AuthStore

@@ -1,0 +1,181 @@
+<app-auth-layout>
+  <div class="auth-form invitation-card">
+    <div class="auth-form__header text-center">
+      <app-logo class="auth-form__logo mx-auto block" />
+    </div>
+
+    <!-- 1. LOADING STATE -->
+    @if (loading()) {
+      <div class="invitation-state invitation-state--loading text-center">
+        <div class="skeleton-wrapper">
+          <div class="skeleton skeleton--circle mx-auto"></div>
+          <div class="skeleton skeleton--title mx-auto mt-6"></div>
+          <div class="skeleton skeleton--text mx-auto mt-4"></div>
+          <div class="skeleton skeleton--text skeleton--short mx-auto mt-2"></div>
+          <div class="skeleton skeleton--button mx-auto mt-8"></div>
+        </div>
+      </div>
+    }
+
+    <!-- 2. ERROR / EXPIRED STATE -->
+    @if (!loading() && errorMessage()) {
+      <div class="invitation-state invitation-state--error text-center">
+        <div class="icon-minimal icon-minimal--error mx-auto mb-6">
+          <svg lucideAlertTriangle [size]="24" strokeWidth="1.8"></svg>
+        </div>
+        <h2 class="auth-form__title text-balance">Lời mời không khả dụng</h2>
+        <p class="auth-form__subtitle mt-4 text-balance">{{ errorMessage() }}</p>
+
+        <div class="auth-form__body--horizontal">
+          <a routerLink="/auth/login" class="invitation-btn-primary"> Đăng nhập </a>
+          <a routerLink="/" class="invitation-btn-secondary"> Trang chủ </a>
+        </div>
+      </div>
+    }
+
+    <!-- 3. SUCCESS / CELEBRATION STATE -->
+    @if (!loading() && !errorMessage() && success()) {
+      <div class="invitation-state invitation-state--success text-center">
+        <div class="icon-minimal icon-minimal--success mx-auto mb-6">
+          <svg lucideCheckCircle2 [size]="24" strokeWidth="2"></svg>
+        </div>
+        <h2 class="auth-form__title">Chúc mừng bạn!</h2>
+        <div class="invitation-box mt-6">
+          <p class="invitation-description text-balance text-left">
+            Bạn đã chấp nhận lời mời và trở thành thành viên chính thức của tổ chức
+            <strong class="text-dark font-semibold">{{ orgName() }}</strong
+            >.
+          </p>
+        </div>
+
+        <div class="auth-form__body mt-10">
+          <a routerLink="/auth/login" class="invitation-btn-primary gap-2">
+            <span>Đăng nhập</span>
+            <svg lucideArrowRight [size]="16" strokeWidth="2"></svg>
+          </a>
+        </div>
+      </div>
+    }
+
+    <!-- 4. VALID INVITATION STATES -->
+    @if (!loading() && !errorMessage() && !success() && invitation()) {
+      <!-- 4.A USER NOT LOGGED IN -->
+      @if (!isAuthenticated()) {
+        <div class="invitation-state text-center">
+          <div class="icon-minimal icon-minimal--primary mx-auto mb-6">
+            <svg lucideMail [size]="24" strokeWidth="1.8"></svg>
+          </div>
+
+          <span class="invitation-badge">LỜI MỜI THÀNH VIÊN</span>
+          <h2 class="auth-form__title mt-3">Tham gia {{ orgName() }}</h2>
+
+          <div class="invitation-box mt-6">
+            <p class="invitation-description text-balance text-left">
+              Bạn (<strong class="text-dark font-medium">{{ invitation()?.email }}</strong
+              >) đã được <strong class="text-dark font-medium">{{ inviterName() }}</strong> mời tham
+              gia tổ chức <strong class="text-primary font-semibold">{{ orgName() }}</strong> trên
+              hệ thống học tập của Dear Our Community.
+            </p>
+          </div>
+
+          <p class="auth-form__subtitle my-6 text-sm text-balance">
+            Vui lòng đăng nhập hoặc tạo tài khoản mới bằng email trên để chấp nhận lời mời.
+          </p>
+
+          <div class="auth-form__body--horizontal">
+            <a [href]="getLoginUrl()" class="invitation-btn-primary gap-2">
+              <svg lucideLogIn [size]="16" strokeWidth="2"></svg>
+              <span>Đăng nhập</span>
+            </a>
+
+            <a [href]="getRegisterUrl()" class="invitation-btn-secondary gap-2">
+              <svg lucideUserPlus [size]="16" strokeWidth="2"></svg>
+              <span>Đăng ký</span>
+            </a>
+          </div>
+        </div>
+      }
+
+      <!-- 4.B USER LOGGED IN & EMAIL MATCHES -->
+      @if (isAuthenticated() && isEmailMatching()) {
+        <div class="invitation-state text-center">
+          <div class="icon-minimal icon-minimal--primary mx-auto mb-6">
+            <svg lucideUsers [size]="24" strokeWidth="1.8"></svg>
+          </div>
+
+          <span class="invitation-badge invitation-badge--success">XÁC THỰC THÀNH CÔNG</span>
+          <h2 class="auth-form__title mt-3">Chào mừng quay trở lại</h2>
+
+          <div class="invitation-box mt-6">
+            <p class="invitation-description text-balance text-left">
+              Xin chào
+              <strong class="text-dark font-semibold">{{ currentUser()?.displayName }}</strong
+              >, hệ thống đã xác nhận tài khoản
+              <strong class="text-dark font-medium">{{ currentUserEmail() }}</strong> trùng khớp với
+              email được mời tham gia tổ chức
+              <strong class="text-primary font-semibold">{{ orgName() }}</strong
+              >.
+            </p>
+          </div>
+
+          <p class="auth-form__subtitle my-6 text-sm">
+            Sẵn sàng để đồng hành cùng đội ngũ và bắt đầu học tập?
+          </p>
+
+          <div class="auth-form__body mt-8">
+            <p-button
+              (click)="acceptInvite()"
+              [loading]="accepting()"
+              [disabled]="accepting()"
+              styleClass="invitation-btn-primary"
+            >
+              <div class="flex items-center justify-center gap-2">
+                <span>Tham gia</span>
+                <svg lucideArrowRight [size]="16" strokeWidth="2"></svg>
+              </div>
+            </p-button>
+          </div>
+        </div>
+      }
+
+      <!-- 4.C USER LOGGED IN & EMAIL MISMATCH -->
+      @if (isAuthenticated() && !isEmailMatching()) {
+        <div class="invitation-state text-center">
+          <div class="icon-minimal icon-minimal--warning mx-auto mb-6">
+            <svg lucideAlertTriangle [size]="24" strokeWidth="1.8"></svg>
+          </div>
+
+          <span class="invitation-badge invitation-badge--warning">KHÔNG TRÙNG KHỚP EMAIL</span>
+          <h2 class="auth-form__title mt-3">Email không khớp</h2>
+
+          <div class="invitation-box invitation-box--warning mt-6 text-left">
+            <p class="text-sm leading-relaxed text-text-secondary">
+              Tài khoản hiện tại của bạn là
+              <strong class="text-dark font-semibold">{{ currentUserEmail() }}</strong
+              >, không khớp với địa chỉ email nhận lời mời là
+              <strong class="text-dark font-semibold">{{ invitation()?.email }}</strong
+              >.
+            </p>
+            <p class="text-sm mt-3 leading-relaxed text-text-secondary">
+              Vui lòng đăng xuất và đăng nhập lại bằng tài khoản email khớp với lời mời để tham gia
+              tổ chức này.
+            </p>
+          </div>
+
+          <div class="auth-form__body--horizontal">
+            <p-button (click)="logoutAndLogin()" styleClass="invitation-btn-primary">
+              <div class="flex items-center justify-center gap-2">
+                <svg lucideLogOut [size]="16" strokeWidth="2"></svg>
+                <span>Đăng xuất</span>
+              </div>
+            </p-button>
+
+            <a routerLink="/profile" class="invitation-btn-secondary gap-2">
+              <span>Trang cá nhân</span>
+            </a>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</app-auth-layout>

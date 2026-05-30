@@ -1,0 +1,301 @@
+<div class="system-layout transactions-module">
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <!-- Stat 1: Total Revenue -->
+    <div class="stat-card revenue">
+      <div class="stat-icon-wrapper">
+        <svg lucideTrendingUp [size]="20" strokeWidth="2"></svg>
+      </div>
+      <div class="stat-details">
+        <span class="stat-label">Tổng doanh thu</span>
+        <h3 class="stat-value">{{ stats().totalRevenue | number }}đ</h3>
+      </div>
+      <div class="stat-glow"></div>
+    </div>
+
+    <!-- Stat 2: Success -->
+    <div class="stat-card success">
+      <div class="stat-icon-wrapper">
+        <svg lucideCheckCircle [size]="20" strokeWidth="2"></svg>
+      </div>
+      <div class="stat-details">
+        <span class="stat-label">Thành công</span>
+        <h3 class="stat-value">{{ stats().successCount }}</h3>
+      </div>
+      <div class="stat-glow"></div>
+    </div>
+
+    <!-- Stat 3: Pending -->
+    <div class="stat-card pending">
+      <div class="stat-icon-wrapper">
+        <svg lucideRefreshCw [size]="20" strokeWidth="2"></svg>
+      </div>
+      <div class="stat-details">
+        <span class="stat-label">Đang chờ xử lý</span>
+        <h3 class="stat-value">{{ stats().pendingCount }}</h3>
+      </div>
+      <div class="stat-glow"></div>
+    </div>
+
+    <!-- Stat 4: Failed/Refunded -->
+    <div class="stat-card failed">
+      <div class="stat-icon-wrapper">
+        <svg lucideXCircle [size]="20" strokeWidth="2"></svg>
+      </div>
+      <div class="stat-details">
+        <span class="stat-label">Thất bại / Hoàn tiền</span>
+        <h3 class="stat-value">{{ stats().failedCount + stats().refundedCount }}</h3>
+      </div>
+      <div class="stat-glow"></div>
+    </div>
+  </div>
+
+  <!-- Filter & Actions Bar -->
+  <div class="filters-panel">
+    <div class="search-input-container">
+      <svg lucideSearch class="search-icon" [size]="16" strokeWidth="2"></svg>
+      <input
+        type="text"
+        placeholder="Tìm kiếm theo email, mã đơn hàng, tên gói..."
+        [value]="searchQuery()"
+        (input)="searchQuery.set($any($event.target).value)"
+        class="form-input-search"
+      />
+      @if (searchQuery()) {
+        <button type="button" class="btn-clear-search" (click)="searchQuery.set('')">✕</button>
+      }
+    </div>
+
+    <div class="filters-right">
+      <!-- Status Filter -->
+      <div class="filter-select-wrapper">
+        <svg lucideFilter class="select-icon" [size]="14" strokeWidth="2"></svg>
+        <select
+          [value]="statusFilter()"
+          (change)="statusFilter.set($any($event.target).value)"
+          class="form-select"
+        >
+          <option value="all">Tất cả trạng thái</option>
+          <option value="success">Thành công</option>
+          <option value="pending">Chờ xử lý</option>
+          <option value="failed">Thất bại</option>
+          <option value="refunded">Đã hoàn tiền</option>
+        </select>
+      </div>
+
+      <!-- Refresh Button -->
+      <button
+        type="button"
+        class="btn-refresh"
+        [disabled]="transactionsResource.isLoading()"
+        (click)="refresh()"
+        title="Làm mới dữ liệu"
+      >
+        <svg
+          lucideRefreshCw
+          [class.spinning]="transactionsResource.isLoading()"
+          [size]="16"
+          strokeWidth="2"
+        ></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Table Section -->
+  <div class="table-container">
+    @if (transactionsResource.isLoading() && !transactions().length) {
+      <!-- Shimmer loading state -->
+      <div class="shimmer-table">
+        <div class="shimmer-row header"></div>
+        <div class="shimmer-row"></div>
+        <div class="shimmer-row"></div>
+        <div class="shimmer-row"></div>
+        <div class="shimmer-row"></div>
+      </div>
+    } @else {
+      @if (!filteredTransactions().length) {
+        <div class="empty-state-card">
+          <div class="empty-icon-wrap">
+            <svg lucideCreditCard [size]="48" strokeWidth="1"></svg>
+          </div>
+          <h3 class="empty-title">Không tìm thấy giao dịch nào</h3>
+          <p class="empty-message">
+            Không có giao dịch nào phù hợp với bộ lọc tìm kiếm hiện tại của bạn.
+          </p>
+        </div>
+      } @else {
+        <table class="system-style-table">
+          <thead>
+            <tr>
+              <th class="col-order-id">Mã đơn hàng</th>
+              <th class="col-user">Học viên</th>
+              <th class="col-pkg">Gói học</th>
+              <th class="col-amount text-right">Số tiền</th>
+              <th class="col-date">Ngày tạo</th>
+              <th class="col-status text-center">Trạng thái</th>
+              <th class="col-actions text-center">Chi tiết</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (t of filteredTransactions(); track t.id) {
+              <tr class="table-row" (click)="viewDetails(t)">
+                <td class="col-order-id">
+                  <span class="order-id-badge">{{ t.orderId || 'Không có ID' }}</span>
+                </td>
+                <td class="col-user">
+                  <div class="user-cell">
+                    <span class="user-display-name">{{
+                      t.user?.wpUser?.displayName || 'Khách vãng lai'
+                    }}</span>
+                    <span class="user-email-text">{{
+                      t.user?.wpUser?.userEmail || 'Không có email'
+                    }}</span>
+                  </div>
+                </td>
+                <td class="col-pkg">
+                  @if (t.package) {
+                    <div class="pkg-cell">
+                      <span class="pkg-name-text">{{ t.package.name }}</span>
+                      <span class="pkg-type-tag" [class]="t.package.packageType">
+                        {{ t.package.packageType === 'youth' ? 'Cá nhân' : 'Doanh nghiệp' }}
+                      </span>
+                    </div>
+                  } @else {
+                    <span class="text-muted">Không xác định</span>
+                  }
+                </td>
+                <td class="col-amount text-right font-mono font-bold">{{ t.amount | number }}đ</td>
+                <td class="col-date">{{ t.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+                <td class="col-status text-center">
+                  <span class="status-badge" [class]="t.status">
+                    {{ getStatusLabel(t.status) }}
+                  </span>
+                </td>
+                <td class="col-actions text-center" (click)="$event.stopPropagation()">
+                  <button type="button" class="btn-action-view" (click)="viewDetails(t)">
+                    <svg lucideEye [size]="16" strokeWidth="2"></svg>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    }
+  </div>
+
+  <!-- Bottom Helper Bar -->
+  <div class="table-footer">
+    <span class="footer-count"
+      >Hiển thị {{ filteredTransactions().length }} trên tổng số {{ stats().totalCount }} giao
+      dịch</span
+    >
+  </div>
+
+  <!-- Transaction Detail Modal -->
+  @if (selectedTransaction(); as t) {
+    <div class="modal-backdrop active" (click)="closeDetails()">
+      <div class="modal-card animate-slide-in" (click)="$event.stopPropagation()">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <svg lucideCreditCard class="modal-icon" [size]="20" strokeWidth="2"></svg>
+            <div>
+              <h3 class="modal-title">Chi tiết giao dịch</h3>
+              <p class="modal-subtitle">Giao dịch #{{ t.id }}</p>
+            </div>
+          </div>
+          <button type="button" class="btn-close-modal" (click)="closeDetails()">✕</button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body">
+          <!-- Main details side by side -->
+          <div class="detail-summary-box" [class]="t.status">
+            <div class="summary-item">
+              <span class="summary-label">Số tiền giao dịch</span>
+              <span class="summary-value">{{ t.amount | number }}đ</span>
+            </div>
+            <div class="summary-status">
+              <span class="status-badge large" [class]="t.status">
+                {{ getStatusLabel(t.status) }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Metadata grid -->
+          <div class="detail-grid">
+            <!-- Order ID -->
+            <div class="detail-field">
+              <span class="field-label">Mã đơn hàng (Order ID)</span>
+              <span class="field-value font-mono highlight">{{ t.orderId }}</span>
+            </div>
+
+            <!-- Transaction Date -->
+            <div class="detail-field">
+              <span class="field-label">Thời gian tạo</span>
+              <span class="field-value">{{ t.createdAt | date: 'dd/MM/yyyy, HH:mm:ss' }}</span>
+            </div>
+
+            <!-- User Name -->
+            <div class="detail-field">
+              <span class="field-label">Họ và tên người mua</span>
+              <span class="field-value">{{ t.user?.wpUser?.displayName || 'Khách vãng lai' }}</span>
+            </div>
+
+            <!-- User Email -->
+            <div class="detail-field">
+              <span class="field-label">Email tài khoản</span>
+              <span class="field-value">{{ t.user?.wpUser?.userEmail || 'Không có email' }}</span>
+            </div>
+
+            <!-- Package Name -->
+            <div class="detail-field">
+              <span class="field-label">Gói học đăng ký</span>
+              <span class="field-value">{{ t.package?.name || 'Không xác định' }}</span>
+            </div>
+
+            <!-- Package Type -->
+            <div class="detail-field">
+              <span class="field-label">Loại gói học</span>
+              <span class="field-value capitalize">{{
+                t.package
+                  ? t.package.packageType === 'youth'
+                    ? 'Cá nhân'
+                    : 'Doanh nghiệp'
+                  : 'Không xác định'
+              }}</span>
+            </div>
+
+            <!-- Payment Method (Assumed MoMo) -->
+            <div class="detail-field">
+              <span class="field-label">Cổng thanh toán</span>
+              <span class="field-value">MoMo E-Wallet</span>
+            </div>
+
+            <!-- Empty Grid Element for layout alignment -->
+            <div></div>
+          </div>
+
+          <!-- System Log Message -->
+          <div class="detail-message-box">
+            <span class="message-label">Thông báo hệ thống</span>
+            <div class="message-content">
+              <svg lucideInfo [size]="16" strokeWidth="2" class="info-icon"></svg>
+              <p class="message-text">
+                {{ t.message || 'Giao dịch được xử lý thành công qua hệ thống MoMo IPN.' }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn secondary" (click)="closeDetails()">
+            Đóng bảng chi tiết
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

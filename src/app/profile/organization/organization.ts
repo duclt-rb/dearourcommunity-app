@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { OrganizationService } from '../../core/services/organization.service';
 import { PackagesService } from '../../core/services/packages.service';
 import { ProfileStore } from '../profile.store';
-import { Organization, OrganizationMember, Package } from '@dearourcommunity/client';
+import { OrganizationMember, Package, OrgMembership } from '@dearourcommunity/client';
 
 @Component({
   selector: 'app-profile-organization',
@@ -19,7 +19,6 @@ export default class OrganizationComponent implements OnInit {
   store = inject(ProfileStore);
 
   // States
-  activeOrg = signal<Organization | null>(null);
   packageDetails = signal<Package | null>(null);
   members = signal<OrganizationMember[] | null>(null);
 
@@ -32,15 +31,13 @@ export default class OrganizationComponent implements OnInit {
   inviteEmail = signal('');
 
   // Computed properties
-  currentUserMember = computed(() => {
-    const list = this.members() || [];
-    const currentUserId = this.store.userId();
-    return list.find((m) => m.userId === currentUserId) || null;
+  activeOrg = computed<OrgMembership | null>(() => {
+    const orgs = this.store.organizations();
+    return orgs && orgs.length > 0 ? orgs[0] : null;
   });
 
   isOwner = computed(() => {
-    const member = this.currentUserMember();
-    return member?.role === 'owner';
+    return this.activeOrg()?.role === 'owner';
   });
 
   slotsUsed = computed(() => {
@@ -67,17 +64,14 @@ export default class OrganizationComponent implements OnInit {
     this.errorMessage.set(null);
 
     try {
-      // 1. Fetch organization
-      const org = await this.orgService.getActiveOrg();
+      const org = this.activeOrg();
       if (org) {
-        this.activeOrg.set(org);
-
-        // 2. Fetch members
+        // Fetch members
         const membersList = await this.orgService.getMembers(org.id);
         this.members.set(membersList);
       }
 
-      // 3. Fetch package details if packageId exists
+      // Fetch package details if packageId exists
       const packageId = this.store.packageId();
       if (packageId) {
         const pkg = await this.packageService.findById(packageId);

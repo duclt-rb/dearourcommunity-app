@@ -33,4 +33,12 @@ export class OrganizationService {
   removeMember(orgId: string, memberId: string) {
     return this.clientService.org.removeMember(orgId, memberId);
   }
+
+  checkInvitation(token: string) {
+    return this.clientService.org.checkInvitation(token);
+  }
+
+  acceptInvitation(token: string) {
+    return this.clientService.org.acceptInvitation({ token });
+  }
 }

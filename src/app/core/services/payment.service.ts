@@ -31,4 +31,12 @@ export class PaymentService {
   validateCoupon(dto: ValidateCouponDto) {
     return this.clientService.payment.validateCoupon(dto);
   }
+
+  /**
+   * Lấy danh sách tất cả các giao dịch hệ thống (chỉ admin mới có quyền)
+   * GET /api/v1/payment/transactions
+   */
+  getTransactions() {
+    return this.clientService.payment.getTransactions();
+  }
 }

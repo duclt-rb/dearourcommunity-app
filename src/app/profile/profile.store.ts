@@ -8,8 +8,7 @@ import {
   withHooks,
 } from '@ngrx/signals';
 import { AuthService } from '../core/services/auth.service';
-import { PackageType } from '@dearourcommunity/client';
-import { OrganizationService } from '../core/services/organization.service';
+import { PackageType, OrgMembership } from '@dearourcommunity/client';
 
 export interface EnrolledCourse {
   id: number;
@@ -41,6 +40,7 @@ const initialState = {
   packageId: null as string | null,
   packageType: null as PackageType | null,
   isOrgMember: false,
+  organizations: [] as OrgMembership[],
   enrolledCourses: [] as EnrolledCourse[],
   certificates: [] as Certificate[],
   activeTab: 'dashboard' as
@@ -81,152 +81,137 @@ export const ProfileStore = signalStore(
       showPlansTab: computed(() => !isOrgMember()),
     }),
   ),
-  withMethods(
-    (store, authService = inject(AuthService), orgService = inject(OrganizationService)) => ({
-      async loadProfile() {
-        try {
-          const user = await authService.me();
+  withMethods((store, authService = inject(AuthService)) => ({
+    async loadProfile() {
+      try {
+        const user = await authService.me();
 
-          let fName = '';
-          let lName = '';
-          let ph = '';
-          let avatar = null as string | null;
+        let fName = '';
+        let lName = '';
+        let ph = '';
+        let avatar = null as string | null;
 
-          // Load additional persisted profile fields from localStorage
-          const saved = localStorage.getItem(`${PROFILE_DATA_KEY}:${user.id}`);
-          if (saved) {
-            const parsed = JSON.parse(saved);
-            fName = parsed.firstName || '';
-            lName = parsed.lastName || '';
-            ph = parsed.phone || '';
-            avatar = parsed.avatarUrl || null;
+        // Load additional persisted profile fields from localStorage
+        const saved = localStorage.getItem(`${PROFILE_DATA_KEY}:${user.id}`);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          fName = parsed.firstName || '';
+          lName = parsed.lastName || '';
+          ph = parsed.phone || '';
+          avatar = parsed.avatarUrl || null;
+        } else {
+          // Fallback to splitting displayName from backend
+          const parts = user.displayName.split(' ');
+          if (parts.length > 1) {
+            lName = parts[0];
+            fName = parts.slice(1).join(' ');
           } else {
-            // Fallback to splitting displayName from backend
-            const parts = user.displayName.split(' ');
-            if (parts.length > 1) {
-              lName = parts[0];
-              fName = parts.slice(1).join(' ');
-            } else {
-              fName = user.displayName;
-            }
+            fName = user.displayName;
           }
-
-          let isMember = false;
-          if (user.package?.type === 'organization') {
-            try {
-              const org = await orgService.getActiveOrg();
-              if (org) {
-                const members = await orgService.getMembers(org.id);
-                const currentUserId = user.id;
-                const currentUserMember = members.find((m) => m.userId === currentUserId);
-                if (currentUserMember && currentUserMember.role === 'member') {
-                  isMember = true;
-                }
-              }
-            } catch (orgErr) {
-              console.error('Failed to load organization members in ProfileStore:', orgErr);
-            }
-          }
-
-          patchState(store, {
-            userId: user.id,
-            email: user.email,
-            packageName: user.package?.name ?? null,
-            packageId: user.packageId ?? null,
-            packageType: user.package?.type ?? null,
-            isOrgMember: isMember,
-            firstName: fName,
-            lastName: lName,
-            phone: ph,
-            avatarUrl: avatar,
-          });
-        } catch (err) {
-          console.error('Failed to load profile in state service', err);
-          throw err;
         }
-      },
 
-      updateProfile(firstName: string, lastName: string, phone: string, avatarUrl: string | null) {
-        patchState(store, { firstName, lastName, phone, avatarUrl });
+        const activePackage = user.packages && user.packages.length > 0 ? user.packages[0] : null;
+        const isMember = user.organizations?.some((org) => org.role === 'member') ?? false;
 
-        const id = store.userId();
-        if (id) {
-          localStorage.setItem(
-            `${PROFILE_DATA_KEY}:${id}`,
-            JSON.stringify({ firstName, lastName, phone, avatarUrl }),
-          );
-        }
-      },
-
-      initializeMockData() {
         patchState(store, {
-          enrolledCourses: [
-            {
-              id: 101,
-              title: 'Kỹ Năng Phản Biện & Giải Quyết Vấn Đề',
-              progress: 65,
-              thumbnail:
-                'https://images.unsplash.com/photo-1513258496099-48168024aec0?w=600&auto=format&fit=crop&q=80',
-              lastActive: '2 giờ trước',
-              category: 'Kỹ năng xã hội',
-            },
-            {
-              id: 102,
-              title: 'Tư Duy Thiết Kế (Design Thinking) Cho Người Bắt Đầu',
-              progress: 100,
-              thumbnail:
-                'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=600&auto=format&fit=crop&q=80',
-              lastActive: '3 ngày trước',
-              category: 'Sáng tạo & Đổi mới',
-            },
-            {
-              id: 103,
-              title: 'Xây Dựng Thương Hiệu Cá Nhân Trên Mạng Xã Hội',
-              progress: 0,
-              thumbnail:
-                'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=600&auto=format&fit=crop&q=80',
-              lastActive: 'Chưa học',
-              category: 'Phát triển sự nghiệp',
-            },
-            {
-              id: 104,
-              title: 'Kỹ Năng Giao Tiếp Thuyết Phục Trong Công Việc',
-              progress: 30,
-              thumbnail:
-                'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&auto=format&fit=crop&q=80',
-              lastActive: '5 ngày trước',
-              category: 'Kỹ năng làm việc',
-            },
-            {
-              id: 105,
-              title: 'Quản Lý Thời Gian & Năng Suất Cá Nhân Hiệu Quả',
-              progress: 100,
-              thumbnail:
-                'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&auto=format&fit=crop&q=80',
-              lastActive: '1 tuần trước',
-              category: 'Phát triển cá nhân',
-            },
-          ],
-          certificates: [
-            {
-              id: 'cert-102',
-              courseTitle: 'Tư Duy Thiết Kế (Design Thinking) Cho Người Bắt Đầu',
-              issueDate: '26/05/2026',
-              code: 'DOC-DT-2026-9874',
-              downloadUrl: '#',
-            },
-            {
-              id: 'cert-105',
-              courseTitle: 'Quản Lý Thời Gian & Năng Suất Cá Nhân Hiệu Quả',
-              issueDate: '15/04/2026',
-              code: 'DOC-TM-2026-3482',
-              downloadUrl: '#',
-            },
-          ],
+          userId: user.id,
+          email: user.email,
+          packageName: activePackage?.name ?? null,
+          packageId: activePackage?.id ?? null,
+          packageType: activePackage?.type ?? null,
+          isOrgMember: isMember,
+          organizations: user.organizations || [],
+          firstName: fName,
+          lastName: lName,
+          phone: ph,
+          avatarUrl: avatar,
         });
-      },
-    }),
-  ),
+      } catch (err) {
+        console.error('Failed to load profile in state service', err);
+        throw err;
+      }
+    },
+
+    updateProfile(firstName: string, lastName: string, phone: string, avatarUrl: string | null) {
+      patchState(store, { firstName, lastName, phone, avatarUrl });
+
+      const id = store.userId();
+      if (id) {
+        localStorage.setItem(
+          `${PROFILE_DATA_KEY}:${id}`,
+          JSON.stringify({ firstName, lastName, phone, avatarUrl }),
+        );
+      }
+    },
+
+    initializeMockData() {
+      patchState(store, {
+        enrolledCourses: [
+          {
+            id: 101,
+            title: 'Kỹ Năng Phản Biện & Giải Quyết Vấn Đề',
+            progress: 65,
+            thumbnail:
+              'https://images.unsplash.com/photo-1513258496099-48168024aec0?w=600&auto=format&fit=crop&q=80',
+            lastActive: '2 giờ trước',
+            category: 'Kỹ năng xã hội',
+          },
+          {
+            id: 102,
+            title: 'Tư Duy Thiết Kế (Design Thinking) Cho Người Bắt Đầu',
+            progress: 100,
+            thumbnail:
+              'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=600&auto=format&fit=crop&q=80',
+            lastActive: '3 ngày trước',
+            category: 'Sáng tạo & Đổi mới',
+          },
+          {
+            id: 103,
+            title: 'Xây Dựng Thương Hiệu Cá Nhân Trên Mạng Xã Hội',
+            progress: 0,
+            thumbnail:
+              'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=600&auto=format&fit=crop&q=80',
+            lastActive: 'Chưa học',
+            category: 'Phát triển sự nghiệp',
+          },
+          {
+            id: 104,
+            title: 'Kỹ Năng Giao Tiếp Thuyết Phục Trong Công Việc',
+            progress: 30,
+            thumbnail:
+              'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&auto=format&fit=crop&q=80',
+            lastActive: '5 ngày trước',
+            category: 'Kỹ năng làm việc',
+          },
+          {
+            id: 105,
+            title: 'Quản Lý Thời Gian & Năng Suất Cá Nhân Hiệu Quả',
+            progress: 100,
+            thumbnail:
+              'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&auto=format&fit=crop&q=80',
+            lastActive: '1 tuần trước',
+            category: 'Phát triển cá nhân',
+          },
+        ],
+        certificates: [
+          {
+            id: 'cert-102',
+            courseTitle: 'Tư Duy Thiết Kế (Design Thinking) Cho Người Bắt Đầu',
+            issueDate: '26/05/2026',
+            code: 'DOC-DT-2026-9874',
+            downloadUrl: '#',
+          },
+          {
+            id: 'cert-105',
+            courseTitle: 'Quản Lý Thời Gian & Năng Suất Cá Nhân Hiệu Quả',
+            issueDate: '15/04/2026',
+            code: 'DOC-TM-2026-3482',
+            downloadUrl: '#',
+          },
+        ],
+      });
+    },
+  })),
   withHooks({
     onInit(store) {
       store.initializeMockData();

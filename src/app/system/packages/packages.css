@@ -1152,36 +1152,3 @@
 .pulse {
   animation: pulse 2s infinite;
 }
-
-/* ────────────────────────────────────────────────────────
-   System Shell Navigation Subtabs
-   ──────────────────────────────────────────────────────── */
-
-.system-main-tabs {
-  display: flex;
-  gap: 12px;
-  border-bottom: 1.5px solid var(--color-border-divider);
-  margin-top: 32px;
-}
-
-.system-main-tab {
-  padding: 14px 24px;
-  font-family: var(--font-sans);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  color: var(--color-text-muted);
-  text-decoration: none;
-  border-bottom: 3px solid transparent;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  margin-bottom: -1.5px;
-  cursor: pointer;
-}
-
-.system-main-tab:hover {
-  color: var(--color-text);
-}
-
-.system-main-tab.active {
-  color: var(--color-primary);
-  border-bottom-color: var(--color-primary);
-}

@@ -95,8 +95,12 @@ export default class LoginPage {
       const result = await this.store.login({ email, password });
 
       if (result.success) {
+        const redirectInternal = this.route.snapshot.queryParamMap.get('redirectInternal');
         const redirect = this.route.snapshot.queryParamMap.get('redirect');
-        if (redirect) {
+
+        if (redirectInternal) {
+          this.router.navigateByUrl(redirectInternal);
+        } else if (redirect) {
           window.location.href = redirect;
         } else {
           this.router.navigate(['/profile']);

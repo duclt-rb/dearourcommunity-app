@@ -5,7 +5,7 @@ import { expect, test } from '@playwright/test';
 // =======================================================
 const WP_USERNAME = 'tuyen@dearourcommunity.com';
 const WP_PASSWORD = 'k6b+yJQ/I';
-const SEARCH_EMAIL = 'duclt.rb1@gmail.com';
+const SEARCH_EMAIL = 'agenticxxx.dev@gmail.com';
 
 test.describe('WordPress Login Flow', () => {
   test('should fill username and password, then submit login form', async ({ page }) => {
