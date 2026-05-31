@@ -51,14 +51,16 @@
           </div>
           <div class="stat-divider"></div>
           <div class="stat-block">
-            <span class="stat-value-text">{{ slotsUsed() }} / {{ maxSlots() }}</span>
+            <span class="stat-value-text"
+              >{{ slotsUsed() }} / {{ packageDetails() ? maxSlots() : '--' }}</span
+            >
             <span class="stat-label">Học viên</span>
           </div>
         </div>
 
         <!-- Invitation Panel (Owner Only, styled like System Form Cards) -->
         @if (isOwner()) {
-          <form class="form-card" (submit)="onInviteSubmit($event)">
+          <form class="form-card" (submit)="onInviteSubmit($event)" novalidate>
             <div class="form-card-header">
               <h3 class="form-card-title">Mời Thành viên Mới</h3>
               <p class="field-help">
@@ -75,20 +77,32 @@
                   class="form-input"
                   placeholder="Ví dụ: email.nhanvien@congty.com"
                   [ngModel]="inviteEmail()"
-                  (ngModelChange)="inviteEmail.set($event)"
+                  (ngModelChange)="inviteEmail.set($event ? $event.trim() : '')"
                   name="inviteEmail"
                   required
-                  [disabled]="actionLoading() || slotsUsed() >= maxSlots()"
+                  [disabled]="
+                    actionLoading() || (packageDetails() !== null && slotsUsed() >= maxSlots())
+                  "
                 />
                 <button
                   type="submit"
                   class="btn-primary"
-                  [disabled]="actionLoading() || slotsUsed() >= maxSlots() || !inviteEmail().trim()"
+                  [disabled]="
+                    actionLoading() ||
+                    (packageDetails() !== null && slotsUsed() >= maxSlots()) ||
+                    !isEmailValid()
+                  "
                 >
                   {{ actionLoading() ? 'Đang gửi...' : 'Gửi lời mời' }}
                 </button>
               </div>
-              @if (slotsUsed() >= maxSlots()) {
+              @if (inviteEmail().trim() && !isEmailValid()) {
+                <span class="field-help danger-text" style="display: block; margin-top: 6px">
+                  * Địa chỉ email không hợp lệ. Vui lòng nhập đúng định dạng (ví dụ:
+                  email@congty.com).
+                </span>
+              }
+              @if (packageDetails() !== null && slotsUsed() >= maxSlots()) {
                 <span class="field-help danger-text">
                   * Đã hết chỗ trống trong gói hiện tại. Vui lòng nâng cấp gói hoặc gỡ bỏ thành viên
                   để mời thêm.

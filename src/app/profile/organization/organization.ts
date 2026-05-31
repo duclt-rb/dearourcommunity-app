@@ -55,6 +55,13 @@ export default class OrganizationComponent implements OnInit {
     return Math.min(100, Math.round((this.slotsUsed() / max) * 100));
   });
 
+  isEmailValid = computed(() => {
+    const email = this.inviteEmail().trim();
+    if (!email) return false;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  });
+
   async ngOnInit() {
     await this.loadData();
   }
