@@ -36,6 +36,9 @@ export const selectQueryAmount = selectQueryParam('amount');
 // Chọn query param 'extraData' (ví dụ: /receipt?extraData=...)
 export const selectQueryExtraData = selectQueryParam('extraData');
 
+// Chọn query param 'redirect' (ví dụ: ?redirect=http://...)
+export const selectQueryRedirect = selectQueryParam('redirect');
+
 // Selector giải mã và phân tích cú pháp extraData từ query param
 export const selectDecodedExtraData = createSelector(
   selectQueryExtraData,

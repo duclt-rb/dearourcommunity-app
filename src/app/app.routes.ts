@@ -6,6 +6,11 @@ import { receiptGuard } from './checkout/receipt.guard';
 
 export const routes: Routes = [
   {
+    path: 'auth',
+    redirectTo: 'auth/login',
+    pathMatch: 'full',
+  },
+  {
     path: 'auth/login',
     loadComponent: () => import('./auth/login/login'),
   },
