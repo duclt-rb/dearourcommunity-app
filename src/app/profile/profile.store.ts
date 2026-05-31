@@ -25,6 +25,7 @@ function decodeHtml(str: string): string {
 export interface EnrolledCourse {
   id: number;
   title: string;
+  slug: string;
   progress: number; // 0 to 100
   thumbnail: string;
   lastActive: string;
@@ -133,6 +134,7 @@ export const ProfileStore = signalStore(
           const enrolledCourses = enrolled.map((c) => ({
             id: c.id,
             title: decodeHtml(c.title),
+            slug: (c as unknown as { slug?: string }).slug || '',
             progress: c.progress,
             thumbnail:
               c.thumbnail ||

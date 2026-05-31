@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EnrolledCourse, ProfileStore } from '../profile.store';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-profile-courses',
@@ -30,7 +31,11 @@ export default class CoursesComponent {
   });
 
   onAction(course: EnrolledCourse) {
-    alert(`Bắt đầu học/học tiếp khóa: ${course.title}`);
+    if (course.id) {
+      window.location.href = `${environment.appUrl}/vi/courses/${course.id}/lessons`;
+    } else {
+      alert(`Bắt đầu học/học tiếp khóa: ${course.title}`);
+    }
   }
 
   viewCertificate() {
