@@ -80,6 +80,10 @@ export const routes: Routes = [
         path: 'transactions',
         loadComponent: () => import('./system/transactions/transactions'),
       },
+      {
+        path: 'mentors',
+        loadComponent: () => import('./system/mentors/mentors'),
+      },
     ],
   },
   {

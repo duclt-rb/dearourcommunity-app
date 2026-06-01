@@ -1,0 +1,422 @@
+<div class="system-layout">
+  <!-- Left Column: Mentor List -->
+  <div class="system-sidebar">
+    <div class="sidebar-header">
+      <h3 class="sidebar-title">Danh sách mentor</h3>
+      <span class="sidebar-count">{{ mentors().length }} mentor</span>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+      <button
+        class="filter-tab"
+        [class.active]="activeTypeFilter() === 'all'"
+        (click)="activeTypeFilter.set('all')"
+      >
+        Tất cả
+      </button>
+      <button
+        class="filter-tab"
+        [class.active]="activeTypeFilter() === 'youth'"
+        (click)="activeTypeFilter.set('youth')"
+      >
+        Cá nhân
+      </button>
+      <button
+        class="filter-tab"
+        [class.active]="activeTypeFilter() === 'organization'"
+        (click)="activeTypeFilter.set('organization')"
+      >
+        Doanh nghiệp
+      </button>
+    </div>
+
+    <!-- Search -->
+    <div class="search-wrapper">
+      <svg lucideSearch class="search-icon" [size]="15" strokeWidth="2"></svg>
+      <input
+        id="mentor-search"
+        type="text"
+        placeholder="Tìm kiếm mentor..."
+        [value]="searchQuery()"
+        (input)="searchQuery.set($any($event.target).value)"
+        class="search-input"
+      />
+      @if (searchQuery()) {
+        <button type="button" class="btn-clear" (click)="searchQuery.set('')">✕</button>
+      }
+    </div>
+
+    <!-- Add Button -->
+    <button type="button" class="btn-add-mentor" (click)="openCreate()">
+      <svg lucidePlus [size]="16" strokeWidth="2.5"></svg>
+      Thêm mentor mới
+    </button>
+
+    <!-- Loading -->
+    @if (mentorsResource.isLoading() && !mentors().length) {
+      <div class="loading-placeholder">
+        <div class="shimmer-card"></div>
+        <div class="shimmer-card"></div>
+        <div class="shimmer-card"></div>
+      </div>
+    } @else if (!filteredMentors().length) {
+      <div class="sidebar-empty">
+        <svg lucideUsers [size]="28" strokeWidth="1.2"></svg>
+        <p>Không có mentor nào phù hợp.</p>
+      </div>
+    } @else {
+      <div class="mentor-list">
+        @for (mentor of filteredMentors(); track mentor.id) {
+          <div
+            class="mentor-item"
+            [class.active]="selectedMentorId() === mentor.id"
+            (click)="openEdit(mentor)"
+          >
+            <!-- Avatar -->
+            <div class="mentor-avatar-wrap">
+              @if (mentor.avatarUrl) {
+                <img [src]="mentor.avatarUrl" [alt]="mentor.name" class="mentor-avatar-img" />
+              } @else {
+                <div class="mentor-avatar-initials">{{ getInitials(mentor.name) }}</div>
+              }
+              <span class="status-dot" [class.active]="mentor.isActive"></span>
+            </div>
+            <!-- Info -->
+            <div class="mentor-item-info">
+              <h4 class="mentor-item-name">{{ mentor.name }}</h4>
+              <p class="mentor-item-position">{{ mentor.position }}</p>
+              <div class="mentor-item-badges">
+                @if (mentor.types && mentor.types.length) {
+                  @for (t of mentor.types; track t) {
+                    <span class="type-badge" [class]="t">
+                      {{ t === 'youth' ? 'Cá nhân' : 'Doanh nghiệp' }}
+                    </span>
+                  }
+                } @else {
+                  <span class="type-badge unset">Chưa phân loại</span>
+                }
+              </div>
+            </div>
+            <!-- Sort order indicator -->
+            <span class="sort-order-badge">#{{ mentor.sortOrder }}</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Right Column: Editor Panel -->
+  <div class="system-content">
+    @if (mode() === 'list') {
+      <!-- Empty state -->
+      <div class="empty-state-card">
+        <div class="empty-icon-wrap">
+          <svg lucideUsers [size]="48" strokeWidth="1"></svg>
+        </div>
+        <h3 class="empty-title">Chưa chọn mentor</h3>
+        <p class="empty-message">
+          Chọn một mentor từ danh sách bên trái để chỉnh sửa, hoặc nhấn
+          <strong>Thêm mentor mới</strong> để tạo mới.
+        </p>
+        <button type="button" class="btn primary" (click)="openCreate()">
+          <svg lucidePlus [size]="16" strokeWidth="2.5"></svg>
+          Thêm mentor mới
+        </button>
+      </div>
+    } @else {
+      <!-- Form Editor Card -->
+      <div class="editor-card">
+        <!-- Header -->
+        <div class="editor-header">
+          <div class="editor-title-row">
+            <svg lucideUsers class="editor-icon" [size]="24" strokeWidth="1.5"></svg>
+            <div>
+              <h2 class="editor-title">
+                {{ mode() === 'create' ? 'Thêm mentor mới' : 'Chỉnh sửa mentor' }}
+              </h2>
+              @if (mode() === 'edit' && selectedMentor(); as m) {
+                <p class="editor-subtitle">
+                  ID: <code>{{ m.id }}</code>
+                </p>
+              }
+            </div>
+          </div>
+          <button type="button" class="btn-close-panel" (click)="closePanel()" title="Đóng">
+            <svg lucideX [size]="18" strokeWidth="2"></svg>
+          </button>
+        </div>
+
+        <!-- Form -->
+        <form class="editor-form" (submit)="save($event)">
+          <!-- Alerts -->
+          @if (saveSuccess()) {
+            <div class="alert success">
+              <svg lucideCheck [size]="18" strokeWidth="2"></svg>
+              <span>{{
+                mode() === 'create' ? 'Tạo mentor thành công!' : 'Cập nhật thành công!'
+              }}</span>
+            </div>
+          }
+          @if (saveError(); as err) {
+            <div class="alert error">
+              <svg lucideAlertCircle [size]="18" strokeWidth="2"></svg>
+              <span>{{ err }}</span>
+            </div>
+          }
+
+          <!-- Name & Slug Row -->
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="mentor-name" class="field__label"
+                >Tên mentor <span class="required-star">*</span></label
+              >
+              <input
+                id="mentor-name"
+                type="text"
+                [value]="mentorModel().name"
+                (input)="onNameInput($any($event.target).value)"
+                placeholder="Nguyễn Văn A"
+                class="form-input"
+              />
+              @if (mentorForm.name().touched() && mentorForm.name().invalid()) {
+                <span class="field__error">{{ mentorForm.name().errors()[0].message }}</span>
+              }
+            </div>
+            <div class="field">
+              <label for="mentor-slug" class="field__label"
+                >Slug <span class="required-star">*</span></label
+              >
+              <input
+                id="mentor-slug"
+                type="text"
+                [formField]="mentorForm.slug"
+                placeholder="nguyen-van-a"
+                class="form-input"
+              />
+              @if (mentorForm.slug().touched() && mentorForm.slug().invalid()) {
+                <span class="field__error">{{ mentorForm.slug().errors()[0].message }}</span>
+              }
+            </div>
+          </div>
+
+          <!-- Position -->
+          <div class="field">
+            <label for="mentor-position" class="field__label"
+              >Chức vụ / Vị trí <span class="required-star">*</span></label
+            >
+            <input
+              id="mentor-position"
+              type="text"
+              [formField]="mentorForm.position"
+              placeholder="CEO tại ABC Corp"
+              class="form-input"
+            />
+            @if (mentorForm.position().touched() && mentorForm.position().invalid()) {
+              <span class="field__error">{{ mentorForm.position().errors()[0].message }}</span>
+            }
+          </div>
+
+          <!-- Avatar & LinkedIn -->
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="mentor-avatar" class="field__label">URL Ảnh đại diện</label>
+              <input
+                id="mentor-avatar"
+                type="url"
+                [formField]="mentorForm.avatarUrl"
+                placeholder="https://..."
+                class="form-input"
+              />
+            </div>
+            <div class="field">
+              <label for="mentor-linkedin" class="field__label">LinkedIn URL</label>
+              <div class="input-prefix-wrap">
+                <svg
+                  lucideExternalLink
+                  class="input-prefix-icon"
+                  [size]="16"
+                  strokeWidth="1.5"
+                ></svg>
+                <input
+                  id="mentor-linkedin"
+                  type="url"
+                  [formField]="mentorForm.linkedinUrl"
+                  placeholder="https://linkedin.com/in/..."
+                  class="form-input with-prefix"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Bio -->
+          <div class="field">
+            <label for="mentor-bio" class="field__label">Giới thiệu (Bio)</label>
+            <textarea
+              id="mentor-bio"
+              [formField]="mentorForm.bio"
+              placeholder="Mô tả ngắn về mentor..."
+              rows="3"
+              class="form-textarea"
+            ></textarea>
+          </div>
+
+          <!-- Tags -->
+          <div class="field">
+            <label for="mentor-tags" class="field__label">Tags</label>
+            <input
+              id="mentor-tags"
+              type="text"
+              [formField]="mentorForm.tagsInput"
+              placeholder="Nhập tags, phân cách bằng dấu phẩy (vd: Startup, Leadership, Tech)"
+              class="form-input"
+            />
+            <span class="field__hint">Phân cách các tag bằng dấu phẩy.</span>
+          </div>
+
+          <!-- Type Checkboxes & SortOrder & isActive -->
+          <div class="form-row-mixed">
+            <!-- Types -->
+            <div class="field">
+              <span class="field__label">Phân loại mentor</span>
+              <div class="checkbox-group">
+                <label class="checkbox-label">
+                  <input
+                    type="checkbox"
+                    id="type-youth"
+                    [checked]="mentorModel().typeYouth"
+                    (change)="
+                      mentorModel.update((m) => ({ ...m, typeYouth: $any($event.target).checked }))
+                    "
+                    class="checkbox-input"
+                  />
+                  <span class="checkbox-custom"></span>
+                  <span class="type-badge youth">Cá nhân (Youth)</span>
+                </label>
+                <label class="checkbox-label">
+                  <input
+                    type="checkbox"
+                    id="type-org"
+                    [checked]="mentorModel().typeOrganization"
+                    (change)="
+                      mentorModel.update((m) => ({
+                        ...m,
+                        typeOrganization: $any($event.target).checked,
+                      }))
+                    "
+                    class="checkbox-input"
+                  />
+                  <span class="checkbox-custom"></span>
+                  <span class="type-badge organization">Doanh nghiệp (Org)</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Sort Order -->
+            <div class="field field--narrow">
+              <label for="mentor-sort" class="field__label">Thứ tự hiển thị</label>
+              <input
+                id="mentor-sort"
+                type="number"
+                [formField]="mentorForm.sortOrder"
+                class="form-input"
+              />
+            </div>
+
+            <!-- Is Active Toggle -->
+            <div class="field field--narrow">
+              <span class="field__label">Trạng thái</span>
+              <button
+                type="button"
+                class="toggle-btn"
+                [class.is-active]="mentorModel().isActive"
+                (click)="mentorModel.update((m) => ({ ...m, isActive: !m.isActive }))"
+              >
+                @if (mentorModel().isActive) {
+                  <svg lucideUserCheck [size]="16" strokeWidth="2"></svg>
+                  <span>Đang hoạt động</span>
+                } @else {
+                  <svg lucideUserX [size]="16" strokeWidth="2"></svg>
+                  <span>Đã ẩn</span>
+                }
+              </button>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <!-- Delete (only in edit mode) -->
+            @if (mode() === 'edit' && selectedMentor(); as m) {
+              <button
+                type="button"
+                class="btn danger"
+                [disabled]="isSaving() || isDeleting() !== null"
+                (click)="requestDelete(m.id)"
+              >
+                <svg lucideTrash2 [size]="16" strokeWidth="2"></svg>
+                Xóa mentor
+              </button>
+            }
+
+            <div class="actions-right">
+              <button type="button" class="btn ghost" (click)="closePanel()">Hủy</button>
+              <button type="submit" class="btn primary" [disabled]="isSaving()">
+                @if (isSaving()) {
+                  <span class="spinner-small"></span> Đang lưu...
+                } @else {
+                  <svg lucideSave [size]="16" strokeWidth="2"></svg>
+                  {{ mode() === 'create' ? 'Tạo mới' : 'Lưu thay đổi' }}
+                }
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+@if (confirmDeleteId(); as deleteId) {
+  <div class="modal-overlay" (click)="cancelDelete()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-icon-wrap danger">
+        <svg lucideTrash2 [size]="24" strokeWidth="1.5"></svg>
+      </div>
+      <h3 class="modal-title">Xác nhận xóa mentor</h3>
+      <p class="modal-desc">
+        Bạn có chắc chắn muốn xóa mentor này không? Hành động này không thể hoàn tác.
+      </p>
+
+      @if (deleteError(); as err) {
+        <div class="alert error">
+          <svg lucideAlertCircle [size]="16" strokeWidth="2"></svg>
+          <span>{{ err }}</span>
+        </div>
+      }
+
+      <div class="modal-actions">
+        <button
+          type="button"
+          class="btn ghost"
+          (click)="cancelDelete()"
+          [disabled]="isDeleting() !== null"
+        >
+          Hủy bỏ
+        </button>
+        <button
+          type="button"
+          class="btn danger"
+          (click)="confirmDelete()"
+          [disabled]="isDeleting() !== null"
+        >
+          @if (isDeleting() !== null) {
+            <span class="spinner-small"></span> Đang xóa...
+          } @else {
+            Xác nhận xóa
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

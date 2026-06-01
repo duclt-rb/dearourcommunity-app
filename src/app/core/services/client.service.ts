@@ -19,6 +19,10 @@ export class ClientService {
     return this.client.auth;
   }
 
+  get mentors() {
+    return this.client.mentors;
+  }
+
   get org() {
     return this.client.org;
   }
