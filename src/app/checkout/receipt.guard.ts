@@ -1,8 +1,6 @@
-import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateFn } from '@angular/router';
 
 export const receiptGuard: CanActivateFn = (route) => {
-  const router = inject(Router);
   const queryParams = route.queryParams;
 
   const resultCode = queryParams['resultCode'];
@@ -16,5 +14,6 @@ export const receiptGuard: CanActivateFn = (route) => {
   }
 
   // Nếu không đủ tham số, chuyển hướng về trang chọn gói đăng ký
-  return router.createUrlTree(['/profile/plans']);
+  window.location.href = '/profile/plans';
+  return false;
 };

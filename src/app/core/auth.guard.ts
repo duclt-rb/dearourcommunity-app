@@ -1,14 +1,16 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateFn } from '@angular/router';
 import { AuthService } from './services/auth.service';
 
-export const authGuard: CanActivateFn = (route) => {
+export const authGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
-  const router = inject(Router);
 
   if (authService.token) {
     return true;
   }
 
-  return router.createUrlTree(['/auth/login'], { queryParams: route.queryParams });
+  // Chuyển hướng cứng dùng window.location.href và truyền full URL qua query param redirect
+  const fullUrl = state.url;
+  window.location.href = `/auth/login?redirect=${encodeURIComponent(fullUrl)}`;
+  return false;
 };

@@ -1,6 +1,6 @@
 import { Component, inject, signal, ViewEncapsulation } from '@angular/core';
 import { email, form, FormField, required } from '@angular/forms/signals';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { LucideEye, LucideEyeOff, LucideLock, LucideMail } from '@lucide/angular';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
@@ -28,7 +28,6 @@ import LogoComponent from '../../shared/logo/logo';
   encapsulation: ViewEncapsulation.None,
 })
 export default class LoginPage {
-  private router = inject(Router);
   private route = inject(ActivatedRoute);
   store = inject(AuthStore);
 
@@ -95,15 +94,12 @@ export default class LoginPage {
       const result = await this.store.login({ email, password });
 
       if (result.success) {
-        const redirectInternal = this.route.snapshot.queryParamMap.get('redirectInternal');
         const redirect = this.route.snapshot.queryParamMap.get('redirect');
 
-        if (redirectInternal) {
-          this.router.navigateByUrl(redirectInternal);
-        } else if (redirect) {
+        if (redirect) {
           window.location.href = redirect;
         } else {
-          this.router.navigate(['/profile']);
+          window.location.href = '/profile';
         }
       }
     } catch {

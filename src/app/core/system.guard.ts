@@ -1,14 +1,14 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateFn } from '@angular/router';
 import { UserProfile } from '@dearourcommunity/client';
 import { AuthService } from './services/auth.service';
 
-export const systemGuard: CanActivateFn = async () => {
+export const systemGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
-  const router = inject(Router);
 
   if (!authService.token) {
-    return router.createUrlTree(['/auth/login']);
+    window.location.href = `/auth/login?redirect=${encodeURIComponent(state.url)}`;
+    return false;
   }
 
   try {
@@ -22,5 +22,6 @@ export const systemGuard: CanActivateFn = async () => {
   }
 
   // Redirect back to profile dashboard if not admin
-  return router.createUrlTree(['/profile/dashboard']);
+  window.location.href = '/profile/dashboard';
+  return false;
 };

@@ -155,16 +155,16 @@ export default class CheckInvitationComponent implements OnInit {
   async logoutAndLogin() {
     this.authStore.logout();
     const currentUrl = window.location.pathname + window.location.search;
-    this.router.navigate(['/auth/login'], { queryParams: { redirectInternal: currentUrl } });
+    window.location.href = `/auth/login?redirect=${encodeURIComponent(currentUrl)}`;
   }
 
   getLoginUrl(): string {
     const currentUrl = window.location.pathname + window.location.search;
-    return `/auth/login?redirectInternal=${encodeURIComponent(currentUrl)}`;
+    return `/auth/login?redirect=${encodeURIComponent(currentUrl)}`;
   }
 
   getRegisterUrl(): string {
     const currentUrl = window.location.pathname + window.location.search;
-    return `/auth/register?redirectInternal=${encodeURIComponent(currentUrl)}`;
+    return `/auth/register?redirect=${encodeURIComponent(currentUrl)}`;
   }
 }
