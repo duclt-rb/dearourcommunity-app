@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://dearourcommunity-be-production.up.railway.app',
+  apiBaseUrl: 'https://api.dearourcommunity.asia',
   appUrl: 'https://dearourcommunity.asia',
 };
