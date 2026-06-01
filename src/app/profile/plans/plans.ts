@@ -116,7 +116,7 @@ export default class PlansComponent {
 
   selectAndUpgrade(pkg: Package) {
     this.checkoutStore.selectPackage(pkg);
-    this.router.navigate(['/checkout/billing']);
+    this.router.navigate(['/checkout/billing'], { queryParams: { packageId: pkg.id } });
   }
 
   private resolveTier(pkg: Package): number {

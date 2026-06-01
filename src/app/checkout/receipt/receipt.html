@@ -108,7 +108,11 @@
           <svg lucideHome [size]="18" strokeWidth="2"></svg>
           Trang chủ
         </a>
-        <a routerLink="/checkout/billing" class="btn btn-primary">
+        <a
+          routerLink="/checkout/billing"
+          [queryParams]="{ packageId: extraDataObj()?.packageId }"
+          class="btn btn-primary"
+        >
           Thử lại
           <svg lucideArrowRight [size]="20" strokeWidth="2"></svg>
         </a>

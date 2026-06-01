@@ -48,10 +48,27 @@
                   {{ store.selectedPackage()?.name }}
                   <span
                     style="
+                      display: inline-block;
+                      font-size: 11px;
+                      font-weight: 500;
+                      color: var(--color-primary, #8f50e2);
+                      background: rgba(143, 80, 226, 0.08);
+                      padding: 2px 6px;
+                      border-radius: 4px;
+                      margin-left: 8px;
+                      font-family: monospace;
+                      vertical-align: middle;
+                    "
+                  >
+                    ID: {{ store.selectedPackage()?.id }}
+                  </span>
+                  <span
+                    style="
                       display: block;
                       font-size: 13px;
                       font-weight: 400;
                       color: rgba(28, 28, 28, 0.5);
+                      margin-top: 4px;
                     "
                   >
                     {{ store.selectedPackage()?.description }}
@@ -192,8 +209,31 @@
                 class="course-row"
                 style="font-size: 14px; color: rgba(28, 28, 28, 0.6); letter-spacing: 0.14px"
               >
-                <span class="course-name" style="font-size: 14px; font-weight: 400">
+                <span
+                  class="course-name"
+                  style="
+                    font-size: 14px;
+                    font-weight: 400;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                  "
+                >
                   {{ store.selectedPackage()?.name }}
+                  <span
+                    style="
+                      display: inline-block;
+                      font-size: 10px;
+                      font-weight: 500;
+                      color: var(--color-primary, #8f50e2);
+                      background: rgba(143, 80, 226, 0.08);
+                      padding: 1px 5px;
+                      border-radius: 4px;
+                      font-family: monospace;
+                    "
+                  >
+                    ID: {{ store.selectedPackage()?.id }}
+                  </span>
                 </span>
                 <span style="white-space: nowrap">₫ {{ finalPrice() | number: '1.0-0' }}</span>
               </div>
