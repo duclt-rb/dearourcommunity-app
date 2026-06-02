@@ -1,4 +1,4 @@
-# App (v0.0.5)
+# App (v0.0.6)
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.12.
 
