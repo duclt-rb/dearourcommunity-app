@@ -7,7 +7,6 @@ import {
   LucideTag,
   LucideX,
   LucideSend,
-  LucideSmartphone,
   LucideCreditCard,
   LucideArrowLeft,
 } from '@lucide/angular';
@@ -22,7 +21,6 @@ import LogoComponent from '../../shared/logo/logo';
     LucideTag,
     LucideX,
     LucideSend,
-    LucideSmartphone,
     LucideCreditCard,
     LucideArrowLeft,
     LogoComponent,
