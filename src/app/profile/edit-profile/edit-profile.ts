@@ -1,20 +1,30 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
+import { form, FormField, required } from '@angular/forms/signals';
 import { ProfileStore } from '../profile.store';
 
 @Component({
   selector: 'app-profile-edit',
   standalone: true,
-  imports: [],
+  imports: [FormField],
   templateUrl: './edit-profile.html',
   styleUrl: './edit-profile.css',
 })
 export default class EditProfileComponent implements OnInit {
   store = inject(ProfileStore);
 
-  // Temporary local form states
-  tempFirstName = signal('');
-  tempLastName = signal('');
-  tempPhone = signal('');
+  profileModel = signal({
+    lastName: '',
+    firstName: '',
+    phone: '',
+  });
+
+  profileForm = form(this.profileModel, (p) => {
+    required(p.lastName, { message: 'Họ là bắt buộc' });
+    required(p.firstName, { message: 'Tên là bắt buộc' });
+    required(p.phone, { message: 'Số điện thoại là bắt buộc' });
+  });
+
+  // Avatar được điều khiển bằng nút bấm nên giữ riêng ngoài form.
   tempAvatarUrl = signal<string | null>(null);
 
   loading = signal(false);
@@ -22,14 +32,12 @@ export default class EditProfileComponent implements OnInit {
   errorMessage = signal<string | null>(null);
 
   ngOnInit() {
-    this.tempFirstName.set(this.store.firstName());
-    this.tempLastName.set(this.store.lastName());
-    this.tempPhone.set(this.store.phone());
+    this.profileModel.set({
+      lastName: this.store.lastName(),
+      firstName: this.store.firstName(),
+      phone: this.store.phone(),
+    });
     this.tempAvatarUrl.set(this.store.avatarUrl());
-  }
-
-  getInputValue(event: Event): string {
-    return (event.target as HTMLInputElement).value;
   }
 
   changePhoto() {
@@ -48,19 +56,17 @@ export default class EditProfileComponent implements OnInit {
 
   async onSubmit(e: Event) {
     e.preventDefault();
-    this.loading.set(true);
     this.successMessage.set(null);
     this.errorMessage.set(null);
 
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    this.profileForm().markAsTouched();
+    if (this.profileForm().invalid()) return;
+
+    this.loading.set(true);
 
     try {
-      this.store.updateProfile(
-        this.tempFirstName(),
-        this.tempLastName(),
-        this.tempPhone(),
-        this.tempAvatarUrl(),
-      );
+      const { firstName, lastName, phone } = this.profileModel();
+      await this.store.updateProfile(firstName, lastName, phone, this.tempAvatarUrl());
       this.successMessage.set('Đã cập nhật thông tin hồ sơ thành công!');
     } catch {
       this.errorMessage.set('Có lỗi xảy ra khi lưu thông tin. Vui lòng thử lại!');

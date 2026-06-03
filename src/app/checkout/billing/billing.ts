@@ -58,6 +58,10 @@ export default class BillingComponent implements OnInit {
   couponApplied = this.store.couponApplied;
   appliedCode = this.store.appliedCode;
   couponError = this.store.couponError;
+  couponErrorMsg = this.store.couponErrorMsg;
+  couponValidating = this.store.couponValidating;
+  couponDiscount = this.store.couponDiscount;
+  couponFinalPrice = this.store.couponFinalPrice;
   loading = this.store.isLoading;
   paymentError = this.store.paymentError;
   paymentMethod = this.store.paymentMethod;

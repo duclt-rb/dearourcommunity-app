@@ -163,7 +163,7 @@
               <th class="col-user">Học viên</th>
               <th class="col-pkg">Gói học</th>
               <th class="col-method text-center">Phương thức</th>
-              <th class="col-amount text-right">Số tiền</th>
+              <th class="col-amount text-right">Số tiền / Giảm giá</th>
               <th class="col-date">Ngày tạo</th>
               <th class="col-status text-center">Trạng thái</th>
               <th class="col-actions text-center">Chi tiết</th>
@@ -202,7 +202,22 @@
                     {{ getPaymentMethodLabel(t.paymentMethod) }}
                   </span>
                 </td>
-                <td class="col-amount text-right font-mono font-bold">{{ t.amount | number }}đ</td>
+                <td class="col-amount text-right">
+                  <div class="amount-cell">
+                    <span class="amount-final font-mono font-bold">{{ t.amount | number }}đ</span>
+                    @if (t.discountAmount && t.discountAmount > 0) {
+                      <span class="amount-original font-mono"
+                        >{{ t.originalAmount | number }}đ</span
+                      >
+                      <span class="amount-discount font-mono">
+                        -{{ t.discountAmount | number }}đ
+                        @if (t.couponCode) {
+                          <span class="amount-coupon">{{ t.couponCode }}</span>
+                        }
+                      </span>
+                    }
+                  </div>
+                </td>
                 <td class="col-date">{{ t.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
                 <td class="col-status text-center">
                   <span class="status-badge" [class]="t.status">

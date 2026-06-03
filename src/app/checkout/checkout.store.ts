@@ -1,6 +1,12 @@
 import { inject, computed } from '@angular/core';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
-import type { CreateBankTransferResponse, Package, PackageId } from '@dearourcommunity/client';
+import { ApiError } from '@dearourcommunity/client';
+import type {
+  CreateBankTransferResponse,
+  Package,
+  PackageId,
+  ValidateCouponResponse,
+} from '@dearourcommunity/client';
 import { PaymentService } from '../core/services/payment.service';
 
 export type PaymentMethod = 'momo' | 'bank';
@@ -11,6 +17,10 @@ export interface CheckoutState {
   couponApplied: boolean;
   appliedCode: string;
   couponError: boolean;
+  couponErrorMsg: string;
+  couponValidating: boolean;
+  // Kết quả validate coupon từ server (POST /coupons/validate) — dùng để hiển thị mức giảm sớm.
+  couponInfo: ValidateCouponResponse | null;
   isLoading: boolean;
   paymentError: boolean;
   originalPrice: number;
@@ -32,6 +42,9 @@ const initialState: CheckoutState = {
   couponApplied: false,
   appliedCode: '',
   couponError: false,
+  couponErrorMsg: '',
+  couponValidating: false,
+  couponInfo: null,
   isLoading: false,
   paymentError: false,
   originalPrice: 500000,
@@ -49,11 +62,19 @@ const initialState: CheckoutState = {
 export const CheckoutStore = signalStore(
   { providedIn: 'root' }, // Registered globally so the checkout flow can read the package selected via ?packageId= (from the main app's /packages page)
   withState(initialState),
-  withComputed(({ resultCode, amount }) => ({
+  withComputed(({ resultCode, amount, originalPrice, couponInfo }) => ({
     // Coupon do server tính (changelog SDK 0.6.8): FE gửi giá gốc + couponCode, số tiền
     // sau giảm lấy từ response createBankTransfer (bankTransfer.amount) — không tự trừ ở client.
     paymentSuccess: computed(() => resultCode() === '0'),
     amountFormatted: computed(() => amount().toLocaleString('vi-VN')),
+    // Mức giảm hiển thị sớm từ kết quả validate coupon (chỉ để xem trước; số thực thu vẫn
+    // do server chốt lại khi tạo thanh toán/chuyển khoản).
+    couponFinalPrice: computed(() => couponInfo()?.final_price ?? originalPrice()),
+    couponDiscount: computed(() => {
+      const info = couponInfo();
+      if (!info) return 0;
+      return Math.max(0, originalPrice() - info.final_price);
+    }),
   })),
   withMethods((store, paymentService = inject(PaymentService)) => ({
     selectPackage(pkg: Package) {
@@ -63,6 +84,9 @@ export const CheckoutStore = signalStore(
         couponApplied: false,
         appliedCode: '',
         couponError: false,
+        couponErrorMsg: '',
+        couponValidating: false,
+        couponInfo: null,
         step: 1,
       });
     },
@@ -82,17 +106,52 @@ export const CheckoutStore = signalStore(
       patchState(store, { paymentMethod: method, paymentError: false });
     },
 
-    applyCoupon(code: string) {
+    async applyCoupon(code: string) {
       const cleanCode = code.trim().toUpperCase();
-      if (!cleanCode) return;
+      if (!cleanCode || store.couponValidating()) return;
 
-      // Coupon được server xác thực khi tạo thanh toán (SDK 0.6.8). Ở client chỉ ghi nhận
-      // mã (optimistic); mức giảm thực tế lấy từ response createBankTransfer / do MoMo xử lý.
-      patchState(store, {
-        couponApplied: true,
-        appliedCode: cleanCode,
-        couponError: false,
-      });
+      const pkg = store.selectedPackage();
+      if (!pkg) {
+        patchState(store, {
+          couponApplied: false,
+          couponInfo: null,
+          couponError: true,
+          couponErrorMsg: '',
+        });
+        return;
+      }
+
+      patchState(store, { couponValidating: true, couponError: false, couponErrorMsg: '' });
+
+      try {
+        // SDK 0.10.0: validate coupon theo packageId (trước đây là course-based). Mọi gói đều
+        // validate trước được, kể cả org/mentor không gắn course. Gọi ngay khi bấm "Áp dụng"
+        // để báo lỗi / hiển thị mức giảm sớm. Số tiền thực thu vẫn do server chốt lại khi tạo
+        // thanh toán/chuyển khoản (FE luôn gửi giá gốc + couponCode); đây chỉ là bản xem trước.
+        const info = await paymentService.validateCoupon({
+          packageId: pkg.id as PackageId,
+          couponCode: cleanCode,
+        });
+        patchState(store, {
+          couponApplied: true,
+          appliedCode: cleanCode,
+          couponInfo: info,
+          couponValidating: false,
+          couponError: false,
+          couponErrorMsg: '',
+        });
+      } catch (err) {
+        console.error('Failed to validate coupon', err);
+        patchState(store, {
+          couponApplied: false,
+          appliedCode: '',
+          couponInfo: null,
+          couponValidating: false,
+          couponError: true,
+          // Hiển thị đúng thông báo từ server (vd "Mã giảm giá không tồn tại.")
+          couponErrorMsg: err instanceof ApiError ? err.message : '',
+        });
+      }
     },
 
     removeCoupon() {
@@ -100,6 +159,9 @@ export const CheckoutStore = signalStore(
         couponApplied: false,
         appliedCode: '',
         couponError: false,
+        couponErrorMsg: '',
+        couponValidating: false,
+        couponInfo: null,
       });
     },
 

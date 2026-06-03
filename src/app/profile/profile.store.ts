@@ -166,9 +166,24 @@ export const ProfileStore = signalStore(
         }
       },
 
-      updateProfile(firstName: string, lastName: string, phone: string, avatarUrl: string | null) {
+      async updateProfile(
+        firstName: string,
+        lastName: string,
+        phone: string,
+        avatarUrl: string | null,
+      ) {
+        // PATCH /api/v1/auth/me — server cập nhật & trả về UserProfile mới nhất.
+        await authService.updateProfile({
+          firstName,
+          lastName,
+          phone,
+          avatar: avatarUrl ?? undefined,
+        });
+
         patchState(store, { firstName, lastName, phone, avatarUrl });
 
+        // `/me` chỉ trả về `displayName`, không tách first/last/phone/avatar,
+        // nên vẫn lưu các field mở rộng vào localStorage để khôi phục khi reload.
         const id = store.userId();
         if (id) {
           localStorage.setItem(
@@ -176,6 +191,12 @@ export const ProfileStore = signalStore(
             JSON.stringify({ firstName, lastName, phone, avatarUrl }),
           );
         }
+      },
+
+      async changePassword(currentPassword: string, password: string, confirmPassword: string) {
+        // Đổi mật khẩu: server xác minh `currentPassword` với WordPress và
+        // kiểm tra `password === confirmPassword`.
+        await authService.updateProfile({ currentPassword, password, confirmPassword });
       },
 
       initializeMockData() {

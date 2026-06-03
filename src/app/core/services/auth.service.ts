@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { ClientService } from './client.service';
-import { RegisterDto, LoginDto } from '@dearourcommunity/client';
+import { RegisterDto, LoginDto, UpdateProfileDto } from '@dearourcommunity/client';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -28,5 +28,9 @@ export class AuthService {
 
   register(dto: RegisterDto) {
     return this.clientService.auth.register(dto);
+  }
+
+  updateProfile(dto: UpdateProfileDto) {
+    return this.clientService.auth.updateProfile(dto);
   }
 }

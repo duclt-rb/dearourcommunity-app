@@ -37,16 +37,17 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label" for="lastName">Họ & Tên đệm</label>
+          <label class="form-label" for="lastName">Họ</label>
           <input
             id="lastName"
             type="text"
             class="form-input"
             placeholder="Ví dụ: Nguyễn Văn"
-            [value]="tempLastName()"
-            (input)="tempLastName.set(getInputValue($event))"
-            required
+            [formField]="profileForm.lastName"
           />
+          @if (profileForm.lastName().touched() && profileForm.lastName().invalid()) {
+            <span class="field-error">{{ profileForm.lastName().errors()[0].message }}</span>
+          }
         </div>
         <div class="form-group">
           <label class="form-label" for="firstName">Tên</label>
@@ -55,10 +56,11 @@
             type="text"
             class="form-input"
             placeholder="Ví dụ: Anh"
-            [value]="tempFirstName()"
-            (input)="tempFirstName.set(getInputValue($event))"
-            required
+            [formField]="profileForm.firstName"
           />
+          @if (profileForm.firstName().touched() && profileForm.firstName().invalid()) {
+            <span class="field-error">{{ profileForm.firstName().errors()[0].message }}</span>
+          }
         </div>
       </div>
 
@@ -70,10 +72,11 @@
             type="tel"
             class="form-input"
             placeholder="Ví dụ: 0987654321"
-            [value]="tempPhone()"
-            (input)="tempPhone.set(getInputValue($event))"
-            required
+            [formField]="profileForm.phone"
           />
+          @if (profileForm.phone().touched() && profileForm.phone().invalid()) {
+            <span class="field-error">{{ profileForm.phone().errors()[0].message }}</span>
+          }
         </div>
         <div class="form-group">
           <label class="form-label" for="email">Địa chỉ email</label>

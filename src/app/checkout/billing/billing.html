@@ -95,8 +95,12 @@
                       placeholder="Nhập mã giảm giá"
                       (keyup.enter)="applyCoupon(promoInput.value)"
                     />
-                    <button class="btn-apply" (click)="applyCoupon(promoInput.value)">
-                      Áp dụng
+                    <button
+                      class="btn-apply"
+                      [disabled]="couponValidating()"
+                      (click)="applyCoupon(promoInput.value)"
+                    >
+                      {{ couponValidating() ? 'Đang kiểm tra...' : 'Áp dụng' }}
                     </button>
                   </div>
                   <div class="coupon-hint" style="margin-top: 8px">
@@ -126,13 +130,17 @@
                       <svg lucideX [size]="16" strokeWidth="2"></svg>
                     </button>
                   </div>
-                  <p class="coupon-note">Mức giảm sẽ được áp dụng khi thanh toán.</p>
+                  @if (couponDiscount() > 0) {
+                    <p class="coupon-note">Đã giảm ₫ {{ couponDiscount() | number: '1.0-0' }}.</p>
+                  } @else {
+                    <p class="coupon-note">Mã hợp lệ. Mức giảm sẽ được áp dụng khi thanh toán.</p>
+                  }
                 </div>
               }
 
               <!-- Coupon error -->
               @if (couponError()) {
-                <p class="coupon-error">Mã giảm giá không hợp lệ</p>
+                <p class="coupon-error">{{ couponErrorMsg() || 'Mã giảm giá không hợp lệ' }}</p>
               }
             </div>
 
@@ -140,9 +148,21 @@
 
             <!-- Total -->
             <div class="total-section">
+              @if (couponDiscount() > 0) {
+                <div class="total-row">
+                  <span class="total-label">Tạm tính</span>
+                  <span class="total-value">₫ {{ originalPrice | number: '1.0-0' }}</span>
+                </div>
+                <div class="total-row">
+                  <span class="total-label">Giảm giá ({{ appliedCode() }})</span>
+                  <span class="total-value bank-field-discount"
+                    >− ₫ {{ couponDiscount() | number: '1.0-0' }}</span
+                  >
+                </div>
+              }
               <div class="total-row final">
                 <span class="total-label">Tổng cộng</span>
-                <span class="total-value">₫ {{ originalPrice | number: '1.0-0' }}</span>
+                <span class="total-value">₫ {{ couponFinalPrice() | number: '1.0-0' }}</span>
               </div>
               <p class="vat-note">(Đã bao gồm VAT)</p>
             </div>

@@ -142,6 +142,12 @@
   letter-spacing: 0.14px;
   color: rgba(28, 28, 28, 0.6);
 }
+.field-error {
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.14px;
+  color: #ef4444;
+}
 .msg-success {
   border-radius: var(--radius-input);
   background: rgba(0, 134, 0, 0.1);
