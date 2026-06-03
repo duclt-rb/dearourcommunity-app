@@ -1,5 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { CheckoutStore, type PaymentMethod } from '../checkout.store';
 import { ProfileStore } from '../../profile/profile.store';
 import {
@@ -8,6 +9,7 @@ import {
   LucideX,
   LucideSend,
   LucideArrowLeft,
+  LucideArrowRight,
   LucideLandmark,
   LucideCopy,
   LucideCircleCheck,
@@ -20,11 +22,13 @@ import { environment } from '../../../environments/environment';
   standalone: true,
   imports: [
     DecimalPipe,
+    RouterLink,
     LucideCheck,
     LucideTag,
     LucideX,
     LucideSend,
     LucideArrowLeft,
+    LucideArrowRight,
     LucideLandmark,
     LucideCopy,
     LucideCircleCheck,

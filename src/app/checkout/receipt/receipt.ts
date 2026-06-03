@@ -14,7 +14,6 @@ import LogoComponent from '../../shared/logo/logo';
 import { CheckoutStore } from '../checkout.store';
 import { PaymentService } from '../../core/services/payment.service';
 import { ProfileStore } from '../../profile/profile.store';
-import { environment } from '../../../environments/environment';
 
 // Bản đồ tên gói (chỉ dùng làm tên dự phòng hiển thị trên biên nhận khi
 // không có tên thật từ API). Đồng bộ ID theo master data mới (client ≥0.6.10).
@@ -42,9 +41,6 @@ export default class ReceiptComponent {
   private paymentService = inject(PaymentService);
   private profileStore = inject(ProfileStore);
   readonly store = inject(CheckoutStore);
-
-  // Trang chọn/quản lý gói nay nằm ở app chính
-  readonly packagesUrl = `${environment.appUrl}/packages`;
 
   // Chọn trực tiếp từ Router Store bằng Signal!
   readonly routeResultCode = this.ngrxStore.selectSignal(selectQueryResultCode);

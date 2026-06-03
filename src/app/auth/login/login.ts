@@ -98,6 +98,9 @@ export default class LoginPage {
 
         if (redirect) {
           window.location.href = redirect;
+        } else if (this.store.user()?.isAdmin) {
+          // Admin đăng nhập → vào thẳng trang quản trị
+          window.location.href = '/system';
         } else {
           window.location.href = '/profile';
         }

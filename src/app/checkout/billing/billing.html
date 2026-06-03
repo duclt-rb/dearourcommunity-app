@@ -386,11 +386,16 @@
         }
 
         <div class="action-row">
-          <button class="btn-back" [disabled]="loading()" (click)="backToOrder()">
-            <svg lucideArrowLeft [size]="18" strokeWidth="2"></svg>
-            Quay lại
-          </button>
-          @if (!bankTransferSubmitted()) {
+          @if (bankTransferSubmitted()) {
+            <a routerLink="/profile/dashboard" class="btn-confirm">
+              Về trang cá nhân
+              <svg lucideArrowRight [size]="20" strokeWidth="2"></svg>
+            </a>
+          } @else {
+            <button class="btn-back" [disabled]="loading()" (click)="backToOrder()">
+              <svg lucideArrowLeft [size]="18" strokeWidth="2"></svg>
+              Quay lại
+            </button>
             <button
               class="btn-confirm"
               [disabled]="loading() || (paymentMethod() === 'bank' && !bankTransfer())"
