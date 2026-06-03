@@ -34,9 +34,9 @@ export default class LoginPage {
   loginModel = signal({ email: '', password: '' });
 
   loginForm = form(this.loginModel, (p) => {
-    required(p.email, { message: 'Email is required' });
-    email(p.email, { message: 'Please enter a valid email' });
-    required(p.password, { message: 'Password is required' });
+    required(p.email, { message: 'Vui lòng nhập email' });
+    email(p.email, { message: 'Email không hợp lệ' });
+    required(p.password, { message: 'Vui lòng nhập mật khẩu' });
   });
 
   // PrimeNG PassThrough — design token values applied directly to DOM

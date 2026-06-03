@@ -1,0 +1,402 @@
+<div class="system-layout bookings-module">
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card total">
+      <div class="stat-icon-wrapper">
+        <svg lucideCalendarClock [size]="20" strokeWidth="2"></svg>
+      </div>
+      <div class="stat-details">
+        <span class="stat-label">Tổng yêu cầu</span>
+        <h3 class="stat-value">{{ stats().totalCount }}</h3>
+      </div>
+      <div class="stat-glow"></div>
+    </div>
+
+    <div class="stat-card pending">
+      <div class="stat-icon-wrapper">
+        <svg lucideClock [size]="20" strokeWidth="2"></svg>
+      </div>
+      <div class="stat-details">
+        <span class="stat-label">Chờ duyệt</span>
+        <h3 class="stat-value">{{ stats().pendingCount }}</h3>
+      </div>
+      <div class="stat-glow"></div>
+    </div>
+
+    <div class="stat-card approved">
+      <div class="stat-icon-wrapper">
+        <svg lucideUserCheck [size]="20" strokeWidth="2"></svg>
+      </div>
+      <div class="stat-details">
+        <span class="stat-label">Đã duyệt</span>
+        <h3 class="stat-value">{{ stats().approvedCount }}</h3>
+      </div>
+      <div class="stat-glow"></div>
+    </div>
+
+    <div class="stat-card rejected">
+      <div class="stat-icon-wrapper">
+        <svg lucideUserX [size]="20" strokeWidth="2"></svg>
+      </div>
+      <div class="stat-details">
+        <span class="stat-label">Đã từ chối</span>
+        <h3 class="stat-value">{{ stats().rejectedCount }}</h3>
+      </div>
+      <div class="stat-glow"></div>
+    </div>
+  </div>
+
+  <!-- Filter & Actions Bar -->
+  <div class="filters-panel">
+    <div class="search-input-container">
+      <svg lucideSearch class="search-icon" [size]="16" strokeWidth="2"></svg>
+      <input
+        type="text"
+        placeholder="Tìm theo tên, email, SĐT, mentor..."
+        [value]="searchQuery()"
+        (input)="setSearch($any($event.target).value)"
+        class="form-input-search"
+      />
+      @if (searchQuery()) {
+        <button type="button" class="btn-clear-search" (click)="setSearch('')">✕</button>
+      }
+    </div>
+
+    <div class="filters-right">
+      <div class="filter-select-wrapper">
+        <svg lucideFilter class="select-icon" [size]="14" strokeWidth="2"></svg>
+        <select
+          [value]="statusFilter()"
+          (change)="setStatusFilter($any($event.target).value)"
+          class="form-select"
+        >
+          <option value="all">Tất cả trạng thái</option>
+          <option value="pending">Chờ duyệt</option>
+          <option value="approved">Đã duyệt</option>
+          <option value="rejected">Đã từ chối</option>
+        </select>
+      </div>
+
+      <button
+        type="button"
+        class="btn-refresh"
+        [disabled]="isLoading()"
+        (click)="refresh()"
+        title="Làm mới dữ liệu"
+      >
+        <svg lucideRefreshCw [class.spinning]="isLoading()" [size]="16" strokeWidth="2"></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Table Section -->
+  <div class="table-container">
+    @if (isLoading() && !bookings().length) {
+      <div class="shimmer-table">
+        <div class="shimmer-row header"></div>
+        <div class="shimmer-row"></div>
+        <div class="shimmer-row"></div>
+        <div class="shimmer-row"></div>
+        <div class="shimmer-row"></div>
+      </div>
+    } @else {
+      @if (!filteredBookings().length) {
+        <div class="empty-state-card">
+          @if (hasActiveFilters()) {
+            <div class="empty-icon-wrap">
+              <svg lucideSearch [size]="32" strokeWidth="1.75"></svg>
+            </div>
+            <h3 class="empty-title">Không tìm thấy yêu cầu phù hợp</h3>
+            <p class="empty-message">
+              Không có yêu cầu nào khớp với từ khoá hoặc bộ lọc hiện tại. Thử điều chỉnh lại điều
+              kiện tìm kiếm.
+            </p>
+            <button type="button" class="empty-action" (click)="clearFilters()">
+              <svg lucideX [size]="16" strokeWidth="2"></svg>
+              Xoá bộ lọc
+            </button>
+          } @else {
+            <div class="empty-icon-wrap">
+              <svg lucideCalendarClock [size]="32" strokeWidth="1.75"></svg>
+            </div>
+            <h3 class="empty-title">Chưa có yêu cầu đặt mentor nào</h3>
+            <p class="empty-message">
+              Khi học viên gửi yêu cầu đặt lịch tư vấn 1-1 với mentor, yêu cầu sẽ xuất hiện ở đây để
+              bạn duyệt.
+            </p>
+            <button type="button" class="empty-action" [disabled]="isLoading()" (click)="refresh()">
+              <svg lucideRefreshCw [class.spinning]="isLoading()" [size]="16" strokeWidth="2"></svg>
+              Làm mới
+            </button>
+          }
+        </div>
+      } @else {
+        <table class="system-style-table">
+          <thead>
+            <tr>
+              <th class="col-user">Người đăng ký</th>
+              <th class="col-contact">Liên hệ</th>
+              <th class="col-mentor">Mentor mong muốn</th>
+              <th class="col-occupation">Nghề nghiệp</th>
+              <th class="col-date">Ngày gửi</th>
+              <th class="col-status text-center">Trạng thái</th>
+              <th class="col-actions text-center">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (b of filteredBookings(); track b.id) {
+              <tr class="table-row" (click)="viewDetails(b)">
+                <td class="col-user">
+                  <div class="user-cell">
+                    <span class="user-display-name">{{ b.name }}</span>
+                    <span class="user-email-text">Sinh năm {{ b.yearBirth }}</span>
+                  </div>
+                </td>
+                <td class="col-contact">
+                  <div class="user-cell">
+                    <span class="user-email-text">{{ b.email }}</span>
+                    <span class="user-email-text">{{ b.phone }}</span>
+                  </div>
+                </td>
+                <td class="col-mentor">
+                  @if (b.mentor) {
+                    <span class="mentor-tag">{{ b.mentor.name }}</span>
+                  } @else {
+                    <span class="text-muted">Admin điều phối</span>
+                  }
+                </td>
+                <td class="col-occupation">{{ b.occupation }}</td>
+                <td class="col-date">{{ b.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+                <td class="col-status text-center">
+                  <span class="status-badge" [class]="b.status">
+                    {{ getStatusLabel(b.status) }}
+                  </span>
+                </td>
+                <td class="col-actions text-center" (click)="$event.stopPropagation()">
+                  @if (canReview(b)) {
+                    <button
+                      type="button"
+                      class="btn-action-approve"
+                      title="Duyệt yêu cầu"
+                      [disabled]="actionLoadingId() === b.id"
+                      (click)="approve(b)"
+                    >
+                      <svg lucideCheck [size]="16" strokeWidth="2"></svg>
+                    </button>
+                  }
+                  <button type="button" class="btn-action-view" (click)="viewDetails(b)">
+                    <svg lucideEye [size]="16" strokeWidth="2"></svg>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    }
+  </div>
+
+  <!-- Footer count -->
+  <div class="table-footer">
+    <span class="footer-count">
+      @if (filteredBookings().length) {
+        Hiển thị {{ filteredBookings().length }} / {{ stats().totalCount }} yêu cầu
+      } @else {
+        Không có yêu cầu
+      }
+    </span>
+  </div>
+
+  <!-- Booking Detail Modal -->
+  @if (selectedBooking(); as b) {
+    <div class="modal-backdrop active" (click)="closeDetails()">
+      <div class="modal-card animate-slide-in" (click)="$event.stopPropagation()">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <svg lucideCalendarClock class="modal-icon" [size]="20" strokeWidth="2"></svg>
+            <div>
+              <h3 class="modal-title">Chi tiết yêu cầu đặt mentor</h3>
+              <p class="modal-subtitle">{{ b.name }} · {{ b.createdAt | date: 'dd/MM/yyyy' }}</p>
+            </div>
+          </div>
+          <button type="button" class="btn-close-modal" (click)="closeDetails()">✕</button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body">
+          <!-- Summary -->
+          <div class="detail-summary-box" [class]="b.status">
+            <div class="summary-item">
+              <span class="summary-label">Người đăng ký</span>
+              <span class="summary-value-text">{{ b.name }}</span>
+              <span class="summary-sub">
+                {{ b.occupation }} · Sinh năm {{ b.yearBirth }} · {{ b.levelOfExperience }}
+              </span>
+            </div>
+            <div class="summary-status">
+              <span class="status-badge large" [class]="b.status">
+                {{ getStatusLabel(b.status) }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Contact links -->
+          <div class="contact-row">
+            <a class="contact-chip" [href]="'mailto:' + b.email">
+              <svg lucideMail [size]="14" strokeWidth="2"></svg>
+              {{ b.email }}
+            </a>
+            <a class="contact-chip" [href]="'tel:' + b.phone">
+              <svg lucidePhone [size]="14" strokeWidth="2"></svg>
+              {{ b.phone }}
+            </a>
+            @if (b.facebookLink) {
+              <a class="contact-chip" [href]="b.facebookLink" target="_blank" rel="noopener">
+                <svg lucideExternalLink [size]="14" strokeWidth="2"></svg>
+                Facebook
+              </a>
+            }
+            @if (b.linkedinLink) {
+              <a class="contact-chip" [href]="b.linkedinLink" target="_blank" rel="noopener">
+                <svg lucideExternalLink [size]="14" strokeWidth="2"></svg>
+                LinkedIn
+              </a>
+            }
+          </div>
+
+          <!-- Metadata grid -->
+          <div class="detail-grid">
+            <div class="detail-field">
+              <span class="field-label">Mentor mong muốn</span>
+              <span class="field-value">{{ b.mentor?.name || 'Để admin tự điều phối' }}</span>
+            </div>
+
+            <div class="detail-field">
+              <span class="field-label">Lĩnh vực quan tâm</span>
+              <span class="field-value">{{ b.fieldOfInterest || 'Chưa cung cấp' }}</span>
+            </div>
+
+            <div class="detail-field">
+              <span class="field-label">Tần suất mong muốn</span>
+              <span class="field-value">
+                @if (b.availability.length) {
+                  {{ b.availability.length }} lựa chọn:
+                  @for (a of b.availability; track a; let last = $last) {
+                    {{ getAvailabilityLabel(a) }}{{ last ? '' : ', ' }}
+                  }
+                } @else {
+                  Chưa chọn
+                }
+              </span>
+            </div>
+
+            <div class="detail-field">
+              <span class="field-label">Hình thức trao đổi</span>
+              <span class="field-value">
+                @if (b.communicationPreferences.length) {
+                  @for (c of b.communicationPreferences; track c; let last = $last) {
+                    {{ getCommunicationLabel(c) }}{{ last ? '' : ', ' }}
+                  }
+                } @else {
+                  Chưa chọn
+                }
+              </span>
+            </div>
+          </div>
+
+          <!-- Long-form fields -->
+          @if (b.specificGoals) {
+            <div class="detail-message-box">
+              <span class="message-label">Mục tiêu cụ thể</span>
+              <p class="message-text">{{ b.specificGoals }}</p>
+            </div>
+          }
+          @if (b.challenges) {
+            <div class="detail-message-box">
+              <span class="message-label">Khó khăn đang gặp</span>
+              <p class="message-text">{{ b.challenges }}</p>
+            </div>
+          }
+          @if (b.preferredTopics) {
+            <div class="detail-message-box">
+              <span class="message-label">Chủ đề mong muốn</span>
+              <p class="message-text">{{ b.preferredTopics }}</p>
+            </div>
+          }
+
+          <!-- Reject confirmation -->
+          @if (confirmRejectId() === b.id) {
+            <div class="detail-message-box warn">
+              <div class="message-content">
+                <svg lucideInfo [size]="16" strokeWidth="2" class="info-icon"></svg>
+                <p class="message-text">
+                  Bạn chắc chắn muốn từ chối yêu cầu này? Học viên sẽ không nhận được mail thanh
+                  toán.
+                </p>
+              </div>
+              <span class="message-label">Lý do từ chối (tuỳ chọn)</span>
+              <textarea
+                class="reject-reason-input"
+                rows="2"
+                placeholder="VD: Hiện chưa có mentor phù hợp với lĩnh vực bạn quan tâm..."
+                [value]="rejectReason()"
+                (input)="setRejectReason($any($event.target).value)"
+              ></textarea>
+            </div>
+          }
+          @if (actionError()) {
+            <p class="action-error-text">{{ actionError() }}</p>
+          }
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="modal-footer">
+          @if (canReview(b)) {
+            @if (confirmRejectId() === b.id) {
+              <button
+                type="button"
+                class="btn secondary"
+                [disabled]="actionLoadingId() === b.id"
+                (click)="cancelReject()"
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                class="btn danger"
+                [disabled]="actionLoadingId() === b.id"
+                (click)="confirmReject(b)"
+              >
+                <svg lucideX [size]="16" strokeWidth="2"></svg>
+                Xác nhận từ chối
+              </button>
+            } @else {
+              <button
+                type="button"
+                class="btn danger-outline"
+                [disabled]="actionLoadingId() === b.id"
+                (click)="startReject(b.id)"
+              >
+                Từ chối
+              </button>
+              <button
+                type="button"
+                class="btn primary"
+                [disabled]="actionLoadingId() === b.id"
+                (click)="approve(b)"
+              >
+                <svg lucideCheck [size]="16" strokeWidth="2"></svg>
+                Duyệt &amp; gửi mail
+              </button>
+            }
+          } @else {
+            <button type="button" class="btn secondary" (click)="closeDetails()">
+              Đóng bảng chi tiết
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

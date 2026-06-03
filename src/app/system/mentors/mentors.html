@@ -11,21 +11,21 @@
       <button
         class="filter-tab"
         [class.active]="activeTypeFilter() === 'all'"
-        (click)="activeTypeFilter.set('all')"
+        (click)="setTypeFilter('all')"
       >
         Tất cả
       </button>
       <button
         class="filter-tab"
         [class.active]="activeTypeFilter() === 'youth'"
-        (click)="activeTypeFilter.set('youth')"
+        (click)="setTypeFilter('youth')"
       >
         Cá nhân
       </button>
       <button
         class="filter-tab"
         [class.active]="activeTypeFilter() === 'organization'"
-        (click)="activeTypeFilter.set('organization')"
+        (click)="setTypeFilter('organization')"
       >
         Doanh nghiệp
       </button>
@@ -39,11 +39,11 @@
         type="text"
         placeholder="Tìm kiếm mentor..."
         [value]="searchQuery()"
-        (input)="searchQuery.set($any($event.target).value)"
+        (input)="setSearch($any($event.target).value)"
         class="search-input"
       />
       @if (searchQuery()) {
-        <button type="button" class="btn-clear" (click)="searchQuery.set('')">✕</button>
+        <button type="button" class="btn-clear" (click)="setSearch('')">✕</button>
       }
     </div>
 
@@ -54,7 +54,7 @@
     </button>
 
     <!-- Loading -->
-    @if (mentorsResource.isLoading() && !mentors().length) {
+    @if (isLoading() && !mentors().length) {
       <div class="loading-placeholder">
         <div class="shimmer-card"></div>
         <div class="shimmer-card"></div>
@@ -230,7 +230,7 @@
               />
             </div>
             <div class="field">
-              <label for="mentor-linkedin" class="field__label">LinkedIn URL</label>
+              <label for="mentor-linkedin" class="field__label">URL LinkedIn</label>
               <div class="input-prefix-wrap">
                 <svg
                   lucideExternalLink
@@ -263,7 +263,7 @@
 
           <!-- Tags -->
           <div class="field">
-            <label for="mentor-tags" class="field__label">Tags</label>
+            <label for="mentor-tags" class="field__label">Thẻ</label>
             <input
               id="mentor-tags"
               type="text"

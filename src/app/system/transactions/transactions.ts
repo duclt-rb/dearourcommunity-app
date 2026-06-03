@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, resource } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { DecimalPipe, DatePipe } from '@angular/common';
 import {
   LucideCreditCard,
@@ -10,9 +10,14 @@ import {
   LucideFilter,
   LucideEye,
   LucideTrendingUp,
+  LucideClock,
+  LucideCheck,
+  LucideX,
+  LucideChevronLeft,
+  LucideChevronRight,
 } from '@lucide/angular';
-import { PaymentService } from '../../core/services/payment.service';
-import type { Transaction, PaymentStatus } from '@dearourcommunity/client';
+import { type PaymentMethod, type PaymentStatus, type Transaction } from '@dearourcommunity/client';
+import { TransactionsStore } from './transactions.store';
 
 @Component({
   selector: 'app-transactions',
@@ -29,102 +34,66 @@ import type { Transaction, PaymentStatus } from '@dearourcommunity/client';
     LucideFilter,
     LucideEye,
     LucideTrendingUp,
+    LucideClock,
+    LucideCheck,
+    LucideX,
+    LucideChevronLeft,
+    LucideChevronRight,
   ],
+  providers: [TransactionsStore],
   templateUrl: './transactions.html',
   styleUrl: './transactions.css',
 })
 export default class TransactionsComponent {
-  private paymentService = inject(PaymentService);
+  private store = inject(TransactionsStore);
 
-  // Search and Filter States
-  searchQuery = signal('');
-  statusFilter = signal<PaymentStatus | 'all'>('all');
+  // State (alias các signal của store để template dùng trực tiếp)
+  readonly isLoading = this.store.isLoading;
+  readonly searchQuery = this.store.searchQuery;
+  readonly statusFilter = this.store.statusFilter;
+  readonly methodFilter = this.store.methodFilter;
+  readonly selectedTransaction = this.store.selectedTransaction;
+  readonly actionLoadingId = this.store.actionLoadingId;
+  readonly actionError = this.store.actionError;
+  readonly showRejectInput = this.store.showRejectInput;
+  readonly rejectReason = this.store.rejectReason;
 
-  // Selected Transaction for Modal Detail View
-  selectedTransaction = signal<Transaction | null>(null);
+  // Computed
+  readonly transactions = this.store.transactions;
+  readonly filteredTransactions = this.store.filteredTransactions;
+  readonly pagedTransactions = this.store.pagedTransactions;
+  readonly totalPages = this.store.totalPages;
+  readonly clampedPage = this.store.clampedPage;
+  readonly pageRange = this.store.pageRange;
+  readonly stats = this.store.stats;
+  readonly hasActiveFilters = this.store.hasActiveFilters;
 
-  // Async Resource loading
-  transactionsResource = resource({
-    loader: () => this.paymentService.getTransactions(),
-  });
+  // Methods (signal-store methods giữ nguyên binding)
+  readonly refresh = this.store.refresh;
+  readonly setSearch = this.store.setSearch;
+  readonly setStatusFilter = this.store.setStatusFilter;
+  readonly setMethodFilter = this.store.setMethodFilter;
+  readonly clearFilters = this.store.clearFilters;
+  readonly goToPage = this.store.goToPage;
+  readonly prevPage = this.store.prevPage;
+  readonly nextPage = this.store.nextPage;
+  readonly viewDetails = this.store.viewDetails;
+  readonly closeDetails = this.store.closeDetails;
+  readonly startReject = this.store.startReject;
+  readonly cancelReject = this.store.cancelReject;
+  readonly setRejectReason = this.store.setRejectReason;
+  readonly approve = this.store.approve;
+  readonly confirmReject = this.store.confirmReject;
 
-  // Master transaction list
-  transactions = computed<Transaction[]>(() => this.transactionsResource.value() ?? []);
-
-  // Filtered and Searched transaction list
-  filteredTransactions = computed(() => {
-    const list = this.transactions();
-    const query = this.searchQuery().toLowerCase().trim();
-    const status = this.statusFilter();
-
-    return list
-      .filter((t) => {
-        // 1. Filter by status
-        if (status !== 'all' && t.status !== status) {
-          return false;
-        }
-
-        // 2. Filter by search query
-        if (query) {
-          const orderIdMatch = t.orderId?.toLowerCase().includes(query) ?? false;
-          const emailMatch = t.user?.wpUser?.userEmail?.toLowerCase().includes(query) ?? false;
-          const nameMatch = t.user?.wpUser?.displayName?.toLowerCase().includes(query) ?? false;
-          const packageNameMatch = t.package?.name?.toLowerCase().includes(query) ?? false;
-
-          return orderIdMatch || emailMatch || nameMatch || packageNameMatch;
-        }
-
-        return true;
-      })
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  });
-
-  // Stats computed from the master transactions list
-  stats = computed(() => {
-    const list = this.transactions();
-    let totalRevenue = 0;
-    let successCount = 0;
-    let failedCount = 0;
-    let pendingCount = 0;
-    let refundedCount = 0;
-
-    for (const t of list) {
-      if (t.status === 'success') {
-        totalRevenue += t.amount;
-        successCount++;
-      } else if (t.status === 'failed') {
-        failedCount++;
-      } else if (t.status === 'pending') {
-        pendingCount++;
-      } else if (t.status === 'refunded') {
-        refundedCount++;
-      }
-    }
-
-    return {
-      totalRevenue,
-      successCount,
-      failedCount,
-      pendingCount,
-      refundedCount,
-      totalCount: list.length,
-    };
-  });
-
-  // Action methods
-  refresh() {
-    this.transactionsResource.reload();
+  /** Giao dịch chuyển khoản đang chờ admin đối soát/duyệt. */
+  canReview(t: Transaction): boolean {
+    return (
+      t.paymentMethod === 'bank_transfer' &&
+      (t.status === 'awaiting_confirmation' || t.status === 'pending')
+    );
   }
 
-  viewDetails(t: Transaction) {
-    this.selectedTransaction.set(t);
-  }
-
-  closeDetails() {
-    this.selectedTransaction.set(null);
-  }
-
-  // Format Helper
+  // Format helpers
   getStatusLabel(status: PaymentStatus): string {
     switch (status) {
       case 'success':
@@ -133,10 +102,16 @@ export default class TransactionsComponent {
         return 'Thất bại';
       case 'pending':
         return 'Chờ xử lý';
+      case 'awaiting_confirmation':
+        return 'Chờ duyệt';
       case 'refunded':
         return 'Đã hoàn tiền';
       default:
         return status;
     }
+  }
+
+  getPaymentMethodLabel(method: PaymentMethod): string {
+    return method === 'bank_transfer' ? 'Chuyển khoản' : 'MoMo';
   }
 }

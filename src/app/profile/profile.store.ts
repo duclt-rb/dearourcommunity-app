@@ -128,6 +128,8 @@ export const ProfileStore = signalStore(
             user.packages && user.packages.length > 0
               ? [...user.packages].sort((a, b) => b.tier - a.tier)[0]
               : null;
+          // `/me` trả về `label` (tên gói hiển thị); fallback về `name` nếu null.
+          const packageLabel = activePackage ? (activePackage.label ?? activePackage.name) : null;
           const isMember = user.organizations?.some((org) => org.role === 'member') ?? false;
 
           const enrolled = await courseService.findMyEnrolled();
@@ -147,7 +149,7 @@ export const ProfileStore = signalStore(
           patchState(store, {
             userId: user.id,
             email: user.email,
-            packageName: activePackage?.name ?? null,
+            packageName: packageLabel,
             packageId: activePackage?.id ?? null,
             packageType: activePackage?.type ?? null,
             isOrgMember: isMember,

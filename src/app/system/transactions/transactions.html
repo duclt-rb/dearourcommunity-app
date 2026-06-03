@@ -25,14 +25,17 @@
       <div class="stat-glow"></div>
     </div>
 
-    <!-- Stat 3: Pending -->
+    <!-- Stat 3: Pending / Awaiting review -->
     <div class="stat-card pending">
       <div class="stat-icon-wrapper">
-        <svg lucideRefreshCw [size]="20" strokeWidth="2"></svg>
+        <svg lucideClock [size]="20" strokeWidth="2"></svg>
       </div>
       <div class="stat-details">
-        <span class="stat-label">Đang chờ xử lý</span>
-        <h3 class="stat-value">{{ stats().pendingCount }}</h3>
+        <span class="stat-label">Chờ xử lý / duyệt</span>
+        <h3 class="stat-value">{{ stats().pendingCount + stats().awaitingCount }}</h3>
+        @if (stats().awaitingCount) {
+          <span class="stat-sub">{{ stats().awaitingCount }} chờ duyệt CK</span>
+        }
       </div>
       <div class="stat-glow"></div>
     </div>
@@ -58,11 +61,11 @@
         type="text"
         placeholder="Tìm kiếm theo email, mã đơn hàng, tên gói..."
         [value]="searchQuery()"
-        (input)="searchQuery.set($any($event.target).value)"
+        (input)="setSearch($any($event.target).value)"
         class="form-input-search"
       />
       @if (searchQuery()) {
-        <button type="button" class="btn-clear-search" (click)="searchQuery.set('')">✕</button>
+        <button type="button" class="btn-clear-search" (click)="setSearch('')">✕</button>
       }
     </div>
 
@@ -72,14 +75,29 @@
         <svg lucideFilter class="select-icon" [size]="14" strokeWidth="2"></svg>
         <select
           [value]="statusFilter()"
-          (change)="statusFilter.set($any($event.target).value)"
+          (change)="setStatusFilter($any($event.target).value)"
           class="form-select"
         >
           <option value="all">Tất cả trạng thái</option>
           <option value="success">Thành công</option>
+          <option value="awaiting_confirmation">Chờ duyệt</option>
           <option value="pending">Chờ xử lý</option>
           <option value="failed">Thất bại</option>
           <option value="refunded">Đã hoàn tiền</option>
+        </select>
+      </div>
+
+      <!-- Payment Method Filter -->
+      <div class="filter-select-wrapper">
+        <svg lucideFilter class="select-icon" [size]="14" strokeWidth="2"></svg>
+        <select
+          [value]="methodFilter()"
+          (change)="setMethodFilter($any($event.target).value)"
+          class="form-select"
+        >
+          <option value="all">Tất cả phương thức</option>
+          <option value="momo">MoMo</option>
+          <option value="bank_transfer">Chuyển khoản</option>
         </select>
       </div>
 
@@ -87,23 +105,18 @@
       <button
         type="button"
         class="btn-refresh"
-        [disabled]="transactionsResource.isLoading()"
+        [disabled]="isLoading()"
         (click)="refresh()"
         title="Làm mới dữ liệu"
       >
-        <svg
-          lucideRefreshCw
-          [class.spinning]="transactionsResource.isLoading()"
-          [size]="16"
-          strokeWidth="2"
-        ></svg>
+        <svg lucideRefreshCw [class.spinning]="isLoading()" [size]="16" strokeWidth="2"></svg>
       </button>
     </div>
   </div>
 
   <!-- Main Table Section -->
   <div class="table-container">
-    @if (transactionsResource.isLoading() && !transactions().length) {
+    @if (isLoading() && !transactions().length) {
       <!-- Shimmer loading state -->
       <div class="shimmer-table">
         <div class="shimmer-row header"></div>
@@ -115,13 +128,32 @@
     } @else {
       @if (!filteredTransactions().length) {
         <div class="empty-state-card">
-          <div class="empty-icon-wrap">
-            <svg lucideCreditCard [size]="48" strokeWidth="1"></svg>
-          </div>
-          <h3 class="empty-title">Không tìm thấy giao dịch nào</h3>
-          <p class="empty-message">
-            Không có giao dịch nào phù hợp với bộ lọc tìm kiếm hiện tại của bạn.
-          </p>
+          @if (hasActiveFilters()) {
+            <div class="empty-icon-wrap">
+              <svg lucideSearch [size]="32" strokeWidth="1.75"></svg>
+            </div>
+            <h3 class="empty-title">Không tìm thấy giao dịch phù hợp</h3>
+            <p class="empty-message">
+              Không có giao dịch nào khớp với từ khoá hoặc bộ lọc hiện tại. Thử điều chỉnh lại điều
+              kiện tìm kiếm.
+            </p>
+            <button type="button" class="empty-action" (click)="clearFilters()">
+              <svg lucideX [size]="16" strokeWidth="2"></svg>
+              Xoá bộ lọc
+            </button>
+          } @else {
+            <div class="empty-icon-wrap">
+              <svg lucideCreditCard [size]="32" strokeWidth="1.75"></svg>
+            </div>
+            <h3 class="empty-title">Chưa có giao dịch nào</h3>
+            <p class="empty-message">
+              Khi học viên thanh toán hoặc gửi yêu cầu chuyển khoản, giao dịch sẽ xuất hiện ở đây.
+            </p>
+            <button type="button" class="empty-action" [disabled]="isLoading()" (click)="refresh()">
+              <svg lucideRefreshCw [class.spinning]="isLoading()" [size]="16" strokeWidth="2"></svg>
+              Làm mới
+            </button>
+          }
         </div>
       } @else {
         <table class="system-style-table">
@@ -130,6 +162,7 @@
               <th class="col-order-id">Mã đơn hàng</th>
               <th class="col-user">Học viên</th>
               <th class="col-pkg">Gói học</th>
+              <th class="col-method text-center">Phương thức</th>
               <th class="col-amount text-right">Số tiền</th>
               <th class="col-date">Ngày tạo</th>
               <th class="col-status text-center">Trạng thái</th>
@@ -137,7 +170,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (t of filteredTransactions(); track t.id) {
+            @for (t of pagedTransactions(); track t.id) {
               <tr class="table-row" (click)="viewDetails(t)">
                 <td class="col-order-id">
                   <span class="order-id-badge">{{ t.orderId || 'Không có ID' }}</span>
@@ -164,6 +197,11 @@
                     <span class="text-muted">Không xác định</span>
                   }
                 </td>
+                <td class="col-method text-center">
+                  <span class="method-badge" [class]="t.paymentMethod">
+                    {{ getPaymentMethodLabel(t.paymentMethod) }}
+                  </span>
+                </td>
                 <td class="col-amount text-right font-mono font-bold">{{ t.amount | number }}đ</td>
                 <td class="col-date">{{ t.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
                 <td class="col-status text-center">
@@ -172,6 +210,17 @@
                   </span>
                 </td>
                 <td class="col-actions text-center" (click)="$event.stopPropagation()">
+                  @if (canReview(t)) {
+                    <button
+                      type="button"
+                      class="btn-action-approve"
+                      title="Duyệt giao dịch"
+                      [disabled]="actionLoadingId() === t.id"
+                      (click)="approve(t)"
+                    >
+                      <svg lucideCheck [size]="16" strokeWidth="2"></svg>
+                    </button>
+                  }
                   <button type="button" class="btn-action-view" (click)="viewDetails(t)">
                     <svg lucideEye [size]="16" strokeWidth="2"></svg>
                   </button>
@@ -186,10 +235,38 @@
 
   <!-- Bottom Helper Bar -->
   <div class="table-footer">
-    <span class="footer-count"
-      >Hiển thị {{ filteredTransactions().length }} trên tổng số {{ stats().totalCount }} giao
-      dịch</span
-    >
+    <span class="footer-count">
+      @if (pageRange().total) {
+        Hiển thị {{ pageRange().from }}–{{ pageRange().to }} trên tổng số
+        {{ pageRange().total }} giao dịch
+      } @else {
+        Không có giao dịch
+      }
+    </span>
+
+    @if (totalPages() > 1) {
+      <div class="pagination">
+        <button
+          type="button"
+          class="page-btn"
+          [disabled]="clampedPage() <= 1"
+          (click)="prevPage()"
+          title="Trang trước"
+        >
+          <svg lucideChevronLeft [size]="16" strokeWidth="2"></svg>
+        </button>
+        <span class="page-indicator">Trang {{ clampedPage() }} / {{ totalPages() }}</span>
+        <button
+          type="button"
+          class="page-btn"
+          [disabled]="clampedPage() >= totalPages()"
+          (click)="nextPage()"
+          title="Trang sau"
+        >
+          <svg lucideChevronRight [size]="16" strokeWidth="2"></svg>
+        </button>
+      </div>
+    }
   </div>
 
   <!-- Transaction Detail Modal -->
@@ -215,6 +292,15 @@
             <div class="summary-item">
               <span class="summary-label">Số tiền giao dịch</span>
               <span class="summary-value">{{ t.amount | number }}đ</span>
+              @if (t.discountAmount && t.discountAmount > 0) {
+                <span class="summary-sub">
+                  Giá gốc {{ t.originalAmount | number }}đ · giảm {{ t.discountAmount | number }}đ
+                  @if (t.couponCode) {
+                    (<span class="font-mono">{{ t.couponCode }}</span
+                    >)
+                  }
+                </span>
+              }
             </div>
             <div class="summary-status">
               <span class="status-badge large" [class]="t.status">
@@ -267,33 +353,109 @@
               }}</span>
             </div>
 
-            <!-- Payment Method (Assumed MoMo) -->
+            <!-- Payment Method -->
             <div class="detail-field">
-              <span class="field-label">Cổng thanh toán</span>
-              <span class="field-value">MoMo E-Wallet</span>
+              <span class="field-label">Phương thức thanh toán</span>
+              <span class="field-value">
+                {{ getPaymentMethodLabel(t.paymentMethod) }}
+                @if (t.paymentMethod === 'momo') {
+                  E-Wallet
+                }
+              </span>
             </div>
 
-            <!-- Empty Grid Element for layout alignment -->
-            <div></div>
+            <!-- Reviewer (bank transfer approved/rejected by admin) -->
+            @if (t.confirmedByUser || t.confirmedAt) {
+              <div class="detail-field">
+                <span class="field-label">Người duyệt</span>
+                <span class="field-value">
+                  {{ t.confirmedByUser?.wpUser?.displayName || 'Admin' }}
+                  @if (t.confirmedAt) {
+                    <span class="text-muted">({{ t.confirmedAt | date: 'dd/MM/yyyy HH:mm' }})</span>
+                  }
+                </span>
+              </div>
+            } @else {
+              <div></div>
+            }
           </div>
 
           <!-- System Log Message -->
-          <div class="detail-message-box">
-            <span class="message-label">Thông báo hệ thống</span>
-            <div class="message-content">
-              <svg lucideInfo [size]="16" strokeWidth="2" class="info-icon"></svg>
-              <p class="message-text">
-                {{ t.message || 'Giao dịch được xử lý thành công qua hệ thống MoMo IPN.' }}
-              </p>
+          @if (t.message) {
+            <div class="detail-message-box">
+              <span class="message-label">Thông báo hệ thống</span>
+              <div class="message-content">
+                <svg lucideInfo [size]="16" strokeWidth="2" class="info-icon"></svg>
+                <p class="message-text">{{ t.message }}</p>
+              </div>
             </div>
-          </div>
+          }
+
+          <!-- Reject reason input -->
+          @if (showRejectInput()) {
+            <div class="detail-message-box">
+              <span class="message-label">Lý do từ chối</span>
+              <textarea
+                class="reject-reason-input"
+                rows="2"
+                placeholder="VD: Không nhận được tiền trong sao kê..."
+                [value]="rejectReason()"
+                (input)="setRejectReason($any($event.target).value)"
+              ></textarea>
+            </div>
+          }
+
+          <!-- Action error -->
+          @if (actionError()) {
+            <p class="action-error-text">{{ actionError() }}</p>
+          }
         </div>
 
         <!-- Modal Footer -->
         <div class="modal-footer">
-          <button type="button" class="btn secondary" (click)="closeDetails()">
-            Đóng bảng chi tiết
-          </button>
+          @if (canReview(t)) {
+            @if (showRejectInput()) {
+              <button
+                type="button"
+                class="btn secondary"
+                [disabled]="actionLoadingId() === t.id"
+                (click)="cancelReject()"
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                class="btn danger"
+                [disabled]="actionLoadingId() === t.id"
+                (click)="confirmReject(t)"
+              >
+                <svg lucideX [size]="16" strokeWidth="2"></svg>
+                Xác nhận từ chối
+              </button>
+            } @else {
+              <button
+                type="button"
+                class="btn danger-outline"
+                [disabled]="actionLoadingId() === t.id"
+                (click)="startReject()"
+              >
+                Từ chối
+              </button>
+              <button
+                type="button"
+                class="btn primary"
+                [disabled]="actionLoadingId() === t.id"
+                (click)="approve(t)"
+              >
+                <svg lucideCheck [size]="16" strokeWidth="2"></svg>
+                Duyệt &amp; kích hoạt
+              </button>
+            }
+          } @else {
+            <button type="button" class="btn secondary" (click)="closeDetails()">
+              Đóng bảng chi tiết
+            </button>
+          }
         </div>
       </div>
     </div>

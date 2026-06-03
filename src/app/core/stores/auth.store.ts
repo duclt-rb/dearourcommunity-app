@@ -53,7 +53,7 @@ export const AuthStore = signalStore(
         patchState(store, {
           user: null,
           token: null,
-          error: err instanceof ApiError ? err.message : 'Failed to retrieve profile',
+          error: err instanceof ApiError ? err.message : 'Không thể tải thông tin tài khoản',
           isLoading: false,
         });
       }
@@ -74,7 +74,7 @@ export const AuthStore = signalStore(
         });
         return { success: true };
       } catch (err) {
-        const errMsg = err instanceof ApiError ? err.message : 'Invalid email or password';
+        const errMsg = err instanceof ApiError ? err.message : 'Email hoặc mật khẩu không đúng';
         patchState(store, {
           error: errMsg,
           isLoading: false,
@@ -98,7 +98,7 @@ export const AuthStore = signalStore(
         });
         return { success: true };
       } catch (err) {
-        const errMsg = err instanceof ApiError ? err.message : 'Registration failed';
+        const errMsg = err instanceof ApiError ? err.message : 'Đăng ký không thành công';
         patchState(store, {
           error: errMsg,
           isLoading: false,

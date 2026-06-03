@@ -1,11 +1,11 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateFn } from '@angular/router';
 import { CheckoutStore } from './checkout.store';
 import { PackagesService } from '../core/services/packages.service';
+import { environment } from '../../environments/environment';
 
 export const checkoutGuard: CanActivateFn = async (route) => {
   const store = inject(CheckoutStore);
-  const router = inject(Router);
   const packagesService = inject(PackagesService);
 
   // Focus solely on selected package validation.
@@ -28,7 +28,7 @@ export const checkoutGuard: CanActivateFn = async (route) => {
     }
   }
 
-  // Redirect back to plans selection if no package has been selected
-  router.navigate(['/profile/plans']);
+  // Redirect back to package selection (app chính) if no package has been selected
+  window.location.href = `${environment.appUrl}/packages`;
   return false;
 };

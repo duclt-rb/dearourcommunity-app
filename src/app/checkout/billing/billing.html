@@ -3,9 +3,9 @@
     <!-- Header -->
     <div style="display: flex; flex-direction: column; gap: 12px; align-items: center; width: 100%">
       <app-logo style="margin-bottom: 4px"></app-logo>
-      <h1 class="page-title">Registration</h1>
+      <h1 class="page-title">Đăng ký</h1>
       <p class="page-subtitle">
-        Account Registration: <span class="highlight">{{ profileStore.displayName() }}</span>
+        Đăng ký tài khoản: <span class="highlight">{{ profileStore.displayName() }}</span>
       </p>
     </div>
 
@@ -20,14 +20,14 @@
           }
         </div>
         <span class="step-label" [class.active]="step() === 1" [class.dim]="step() !== 1"
-          >Order</span
+          >Đơn hàng</span
         >
       </div>
       <div class="step-connector"></div>
       <div class="step-item">
         <div class="step-circle" [class.active]="step() === 2" [class.dim]="step() < 2">2</div>
         <span class="step-label" [class.active]="step() === 2" [class.dim]="step() !== 2"
-          >Payment</span
+          >Thanh toán</span
         >
       </div>
     </div>
@@ -37,12 +37,12 @@
       <div class="step-content visible">
         <div class="order-card">
           <div class="order-card-header">
-            <h2 class="order-card-title">Order Details</h2>
+            <h2 class="order-card-title">Chi tiết đơn hàng</h2>
           </div>
           <div class="order-card-body">
             <!-- Selected Plan -->
             <div style="display: flex; flex-direction: column; gap: 8px">
-              <span class="section-label">Selected Plan</span>
+              <span class="section-label">Gói đã chọn</span>
               <div class="course-row">
                 <span class="course-name">
                   {{ store.selectedPackage()?.name }}
@@ -82,7 +82,7 @@
 
             <!-- Promo Code -->
             <div style="display: flex; flex-direction: column; gap: 8px">
-              <span class="section-label">Promo code</span>
+              <span class="section-label">Mã giảm giá</span>
 
               <!-- Coupon input (shown when no coupon applied) -->
               @if (!couponApplied()) {
@@ -92,10 +92,12 @@
                       class="coupon-input"
                       type="text"
                       #promoInput
-                      placeholder="Enter your promo code"
+                      placeholder="Nhập mã giảm giá"
                       (keyup.enter)="applyCoupon(promoInput.value)"
                     />
-                    <button class="btn-apply" (click)="applyCoupon(promoInput.value)">Apply</button>
+                    <button class="btn-apply" (click)="applyCoupon(promoInput.value)">
+                      Áp dụng
+                    </button>
                   </div>
                   <div class="coupon-hint" style="margin-top: 8px">
                     <svg
@@ -104,7 +106,7 @@
                       strokeWidth="2"
                       style="color: var(--color-primary); flex-shrink: 0"
                     ></svg>
-                    <span class="coupon-hint-text">Use offers to get discounts</span>
+                    <span class="coupon-hint-text">Dùng ưu đãi để được giảm giá</span>
                   </div>
                 </div>
               } @else {
@@ -119,18 +121,18 @@
                         style="color: var(--color-accent-green); flex-shrink: 0"
                       ></svg>
                       <span class="coupon-code">{{ appliedCode() }}</span>
-                      <span class="coupon-discount">−20%</span>
                     </div>
                     <button class="btn-remove-coupon" (click)="removeCoupon()">
                       <svg lucideX [size]="16" strokeWidth="2"></svg>
                     </button>
                   </div>
+                  <p class="coupon-note">Mức giảm sẽ được áp dụng khi thanh toán.</p>
                 </div>
               }
 
               <!-- Coupon error -->
               @if (couponError()) {
-                <p class="coupon-error">Invalid promo code</p>
+                <p class="coupon-error">Mã giảm giá không hợp lệ</p>
               }
             </div>
 
@@ -138,24 +140,17 @@
 
             <!-- Total -->
             <div class="total-section">
-              <!-- Original price (shown when discounted) -->
-              @if (couponApplied()) {
-                <div class="total-row original">
-                  <span>Original price</span>
-                  <span class="line-through">₫ {{ originalPrice | number: '1.0-0' }}</span>
-                </div>
-              }
               <div class="total-row final">
-                <span class="total-label">Total</span>
-                <span class="total-value">₫ {{ finalPrice() | number: '1.0-0' }}</span>
+                <span class="total-label">Tổng cộng</span>
+                <span class="total-value">₫ {{ originalPrice | number: '1.0-0' }}</span>
               </div>
-              <p class="vat-note">(VAT included)</p>
+              <p class="vat-note">(Đã bao gồm VAT)</p>
             </div>
           </div>
         </div>
 
         <button class="btn-checkout" (click)="goToPayment()">
-          Checkout
+          Tiến hành thanh toán
           <svg lucideSend [size]="20" strokeWidth="2"></svg>
         </button>
       </div>
@@ -166,44 +161,180 @@
       <div class="step-content visible">
         <div class="order-card">
           <div class="order-card-header">
-            <h2 class="order-card-title">Payment Method</h2>
-            <p class="order-card-subtitle">Select your preferred payment method</p>
+            <h2 class="order-card-title">Phương thức thanh toán</h2>
+            <p class="order-card-subtitle">Chọn phương thức thanh toán bạn muốn</p>
           </div>
           <div class="order-card-body">
-            <!-- MoMo (selected) -->
-            <button class="payment-option selected">
-              <div class="payment-icon-box selected">
+            <!-- MoMo -->
+            <button
+              type="button"
+              class="payment-option"
+              [class.selected]="paymentMethod() === 'momo'"
+              [class.disabled]="momoDisabled"
+              [attr.aria-pressed]="paymentMethod() === 'momo'"
+              [disabled]="momoDisabled"
+              (click)="selectPaymentMethod('momo')"
+            >
+              <div class="payment-icon-box">
                 <img
                   src="/logo/MOMO-Logo-App.png"
                   alt="MoMo"
                   style="width: 28px; height: 28px; object-fit: contain"
                 />
               </div>
-              <div style="flex: 1">
-                <span class="payment-option-name selected">MoMo</span>
-                <span class="payment-option-desc">Pay with MoMo e-wallet</span>
+              <div class="payment-texts">
+                <span class="payment-option-name">
+                  MoMo
+                  @if (momoDisabled) {
+                    <span class="payment-option-badge">Sắp ra mắt</span>
+                  }
+                </span>
+                <span class="payment-option-desc">
+                  @if (momoDisabled) {
+                    Đang phát triển, vui lòng dùng chuyển khoản ngân hàng
+                  } @else {
+                    Thanh toán qua ví MoMo
+                  }
+                </span>
               </div>
-              <div class="radio-circle selected">
-                <div class="radio-dot"></div>
+              @if (!momoDisabled) {
+                <div class="radio-circle" [class.selected]="paymentMethod() === 'momo'">
+                  @if (paymentMethod() === 'momo') {
+                    <div class="radio-dot"></div>
+                  }
+                </div>
+              }
+            </button>
+
+            <!-- Bank Transfer -->
+            <button
+              type="button"
+              class="payment-option"
+              [class.selected]="paymentMethod() === 'bank'"
+              [attr.aria-pressed]="paymentMethod() === 'bank'"
+              (click)="selectPaymentMethod('bank')"
+            >
+              <div class="payment-icon-box">
+                <svg lucideLandmark [size]="22" strokeWidth="2"></svg>
+              </div>
+              <div class="payment-texts">
+                <span class="payment-option-name">Chuyển khoản ngân hàng</span>
+                <span class="payment-option-desc"
+                  >Chuyển khoản trực tiếp vào tài khoản ngân hàng</span
+                >
+              </div>
+              <div class="radio-circle" [class.selected]="paymentMethod() === 'bank'">
+                @if (paymentMethod() === 'bank') {
+                  <div class="radio-dot"></div>
+                }
               </div>
             </button>
 
-            <!-- Bank Transfer (disabled) -->
-            <button class="payment-option disabled">
-              <div class="payment-icon-box dim">
-                <svg
-                  lucideCreditCard
-                  [size]="22"
-                  strokeWidth="2"
-                  style="color: rgba(28, 28, 28, 0.3)"
-                ></svg>
+            <!-- Bank transfer details + QR -->
+            @if (paymentMethod() === 'bank') {
+              <div class="bank-panel">
+                @if (bankTransferSubmitted()) {
+                  <div class="bank-submitted">
+                    <div class="bank-submitted-icon">
+                      <svg lucideCircleCheck [size]="40" strokeWidth="1.5"></svg>
+                    </div>
+                    <h3 class="bank-submitted-title">Đã ghi nhận yêu cầu của bạn</h3>
+                    <p class="bank-submitted-desc">
+                      Cảm ơn bạn! Chúng tôi sẽ kiểm tra giao dịch chuyển khoản và kích hoạt tài
+                      khoản trong thời gian sớm nhất.
+                    </p>
+                  </div>
+                } @else if (bankCreating()) {
+                  <div class="bank-loading">
+                    <div class="spinner-sm"></div>
+                    <span>Đang tạo thông tin chuyển khoản...</span>
+                  </div>
+                } @else if (bankCreateError()) {
+                  <div class="bank-error">
+                    <p class="bank-error-text">
+                      Không tạo được thông tin chuyển khoản. Vui lòng thử lại.
+                    </p>
+                    <button type="button" class="btn-apply" (click)="retryBankTransfer()">
+                      Thử lại
+                    </button>
+                  </div>
+                } @else if (bankTransfer(); as bank) {
+                  @if (bank.qrUrl) {
+                    <div class="bank-qr">
+                      <img [src]="bank.qrUrl" alt="QR chuyển khoản" class="bank-qr-img" />
+                      <span class="bank-qr-caption"
+                        >Quét mã QR bằng app ngân hàng để chuyển khoản</span
+                      >
+                    </div>
+                  }
+
+                  <div class="bank-fields">
+                    <div class="bank-field">
+                      <span class="bank-field-label">Ngân hàng</span>
+                      <span class="bank-field-value">{{ bank.bankName }}</span>
+                    </div>
+                    <div class="bank-field">
+                      <span class="bank-field-label">Số tài khoản</span>
+                      <button
+                        type="button"
+                        class="bank-field-copy"
+                        (click)="copyToClipboard(bank.accountNo, 'accountNo')"
+                      >
+                        <span class="bank-field-value">{{ bank.accountNo }}</span>
+                        @if (copiedField() === 'accountNo') {
+                          <svg lucideCheck [size]="15" strokeWidth="2.5"></svg>
+                        } @else {
+                          <svg lucideCopy [size]="15" strokeWidth="2"></svg>
+                        }
+                      </button>
+                    </div>
+                    <div class="bank-field">
+                      <span class="bank-field-label">Chủ tài khoản</span>
+                      <span class="bank-field-value">{{ bank.accountName }}</span>
+                    </div>
+                    @if (bank.discountAmount > 0) {
+                      <div class="bank-field">
+                        <span class="bank-field-label">Giảm giá ({{ bank.couponCode }})</span>
+                        <span class="bank-field-value bank-field-discount"
+                          >− ₫ {{ bank.discountAmount | number: '1.0-0' }}</span
+                        >
+                      </div>
+                    }
+                    <div class="bank-field">
+                      <span class="bank-field-label">Số tiền</span>
+                      <span class="bank-field-value">
+                        @if (bank.discountAmount > 0) {
+                          <span class="bank-field-original"
+                            >₫ {{ bank.originalAmount | number: '1.0-0' }}</span
+                          >
+                        }
+                        ₫ {{ bank.amount | number: '1.0-0' }}
+                      </span>
+                    </div>
+                    <div class="bank-field">
+                      <span class="bank-field-label">Nội dung CK</span>
+                      <button
+                        type="button"
+                        class="bank-field-copy"
+                        (click)="copyToClipboard(bank.transferContent, 'content')"
+                      >
+                        <span class="bank-field-value">{{ bank.transferContent }}</span>
+                        @if (copiedField() === 'content') {
+                          <svg lucideCheck [size]="15" strokeWidth="2.5"></svg>
+                        } @else {
+                          <svg lucideCopy [size]="15" strokeWidth="2"></svg>
+                        }
+                      </button>
+                    </div>
+                  </div>
+
+                  <p class="bank-note">
+                    Vui lòng chuyển khoản đúng số tiền và nội dung. Sau khi chuyển khoản, bấm nút
+                    bên dưới để chúng tôi kích hoạt tài khoản cho bạn.
+                  </p>
+                }
               </div>
-              <div style="flex: 1">
-                <span class="payment-option-name dim">Bank Transfer</span>
-                <span class="payment-option-desc">Transfer directly to our bank account</span>
-              </div>
-              <div class="radio-circle"></div>
-            </button>
+            }
 
             <div class="dashed-divider"></div>
 
@@ -239,11 +370,11 @@
                     ID: {{ store.selectedPackage()?.id }}
                   </span>
                 </span>
-                <span style="white-space: nowrap">₫ {{ finalPrice() | number: '1.0-0' }}</span>
+                <span style="white-space: nowrap">₫ {{ originalPrice | number: '1.0-0' }}</span>
               </div>
               <div class="total-row final">
-                <span class="total-label">Total</span>
-                <span class="total-value">₫ {{ finalPrice() | number: '1.0-0' }}</span>
+                <span class="total-label">Tổng cộng</span>
+                <span class="total-value">₫ {{ displayTotal() | number: '1.0-0' }}</span>
               </div>
             </div>
           </div>
@@ -251,23 +382,32 @@
 
         <!-- Error message placeholder -->
         @if (paymentError()) {
-          <p class="error-msg">Payment failed. Please try again.</p>
+          <p class="error-msg">Thanh toán thất bại. Vui lòng thử lại.</p>
         }
 
         <div class="action-row">
           <button class="btn-back" [disabled]="loading()" (click)="backToOrder()">
             <svg lucideArrowLeft [size]="18" strokeWidth="2"></svg>
-            Back
+            Quay lại
           </button>
-          <button class="btn-confirm" [disabled]="loading()" (click)="confirmPayment()">
-            @if (loading()) {
-              <div class="spinner-sm"></div>
-              Processing...
-            } @else {
-              Pay with MoMo
-              <svg lucideSend [size]="20" strokeWidth="2"></svg>
-            }
-          </button>
+          @if (!bankTransferSubmitted()) {
+            <button
+              class="btn-confirm"
+              [disabled]="loading() || (paymentMethod() === 'bank' && !bankTransfer())"
+              (click)="confirmPayment()"
+            >
+              @if (loading()) {
+                <div class="spinner-sm"></div>
+                Đang xử lý...
+              } @else if (paymentMethod() === 'bank') {
+                Tôi đã chuyển khoản
+                <svg lucideCheck [size]="20" strokeWidth="2"></svg>
+              } @else {
+                Thanh toán qua MoMo
+                <svg lucideSend [size]="20" strokeWidth="2"></svg>
+              }
+            </button>
+          }
         </div>
       </div>
     }

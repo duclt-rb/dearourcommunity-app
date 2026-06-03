@@ -89,7 +89,7 @@ export default class OrganizationComponent implements OnInit {
       const msg =
         err instanceof Error
           ? err.message
-          : 'Không thể tải thông tin tổ chức. Vui lòng thử lại sau.';
+          : 'Không thể tải thông tin doanh nghiệp. Vui lòng thử lại sau.';
       this.errorMessage.set(msg);
     } finally {
       this.loading.set(false);
@@ -103,7 +103,7 @@ export default class OrganizationComponent implements OnInit {
 
     const org = this.activeOrg();
     if (!org) {
-      this.errorMessage.set('Không tìm thấy thông tin tổ chức.');
+      this.errorMessage.set('Không tìm thấy thông tin doanh nghiệp.');
       return;
     }
 
@@ -120,7 +120,9 @@ export default class OrganizationComponent implements OnInit {
 
     try {
       await this.orgService.inviteMember(org.id, { email });
-      this.successMessage.set(`Đã gửi lời mời tham gia tổ chức tới email ${email} thành công!`);
+      this.successMessage.set(
+        `Đã gửi lời mời tham gia doanh nghiệp tới email ${email} thành công!`,
+      );
       this.inviteEmail.set('');
 
       // Reload members list
@@ -140,7 +142,9 @@ export default class OrganizationComponent implements OnInit {
     const org = this.activeOrg();
     if (!org) return;
 
-    if (!confirm(`Bạn có chắc chắn muốn xóa thành viên ${memberEmail} ra khỏi tổ chức không?`)) {
+    if (
+      !confirm(`Bạn có chắc chắn muốn xóa thành viên ${memberEmail} ra khỏi doanh nghiệp không?`)
+    ) {
       return;
     }
 
@@ -150,7 +154,7 @@ export default class OrganizationComponent implements OnInit {
 
     try {
       await this.orgService.removeMember(org.id, memberId);
-      this.successMessage.set(`Đã xóa thành viên khỏi tổ chức thành công!`);
+      this.successMessage.set(`Đã xóa thành viên khỏi doanh nghiệp thành công!`);
 
       // Reload members list
       const membersList = await this.orgService.getMembers(org.id);

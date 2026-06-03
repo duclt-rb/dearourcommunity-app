@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, resource, linkedSignal } from '@angular/core';
+import { Component, inject, linkedSignal } from '@angular/core';
 import { form, FormField, required } from '@angular/forms/signals';
 import {
   LucideUsers,
@@ -13,8 +13,8 @@ import {
   LucideUserX,
   LucideSearch,
 } from '@lucide/angular';
-import { MentorService } from '../../core/services/mentor.service';
-import type { Mentor, MentorType } from '@dearourcommunity/client';
+import type { CreateMentorDto, MentorType } from '@dearourcommunity/client';
+import { MentorsStore } from './mentors.store';
 
 @Component({
   selector: 'app-mentors',
@@ -33,56 +33,39 @@ import type { Mentor, MentorType } from '@dearourcommunity/client';
     LucideUserX,
     LucideSearch,
   ],
+  providers: [MentorsStore],
   templateUrl: './mentors.html',
   styleUrl: './mentors.css',
 })
 export default class MentorsComponent {
-  private mentorService = inject(MentorService);
+  private store = inject(MentorsStore);
 
-  // Search
-  searchQuery = signal('');
+  // State (alias signal của store để template dùng trực tiếp)
+  readonly searchQuery = this.store.searchQuery;
+  readonly activeTypeFilter = this.store.activeTypeFilter;
+  readonly mode = this.store.mode;
+  readonly selectedMentorId = this.store.selectedMentorId;
+  readonly isLoading = this.store.isLoading;
+  readonly isSaving = this.store.isSaving;
+  readonly saveSuccess = this.store.saveSuccess;
+  readonly saveError = this.store.saveError;
+  readonly isDeleting = this.store.isDeleting;
+  readonly deleteError = this.store.deleteError;
+  readonly confirmDeleteId = this.store.confirmDeleteId;
 
-  // Mode: 'list' | 'create' | 'edit'
-  mode = signal<'list' | 'create' | 'edit'>('list');
+  // Computed
+  readonly mentors = this.store.mentors;
+  readonly filteredMentors = this.store.filteredMentors;
+  readonly selectedMentor = this.store.selectedMentor;
 
-  // Active filter tab
-  activeTypeFilter = signal<'all' | MentorType>('all');
-
-  // Resource
-  mentorsResource = resource({
-    loader: () => this.mentorService.list(),
-  });
-
-  mentors = computed<Mentor[]>(() => this.mentorsResource.value() ?? []);
-
-  // Filtered list
-  filteredMentors = computed(() => {
-    const all = this.mentors();
-    const query = this.searchQuery().toLowerCase().trim();
-    const filter = this.activeTypeFilter();
-
-    return all
-      .filter((m) => {
-        const matchesType = filter === 'all' || (m.types && m.types.includes(filter as MentorType));
-        const matchesQuery =
-          !query ||
-          m.name.toLowerCase().includes(query) ||
-          m.position.toLowerCase().includes(query) ||
-          (m.tags && m.tags.some((t) => t.toLowerCase().includes(query)));
-        return matchesType && matchesQuery;
-      })
-      .sort((a, b) => a.sortOrder - b.sortOrder);
-  });
-
-  // Selected mentor
-  selectedMentorId = signal<string | null>(null);
-
-  selectedMentor = computed<Mentor | null>(() => {
-    const list = this.mentors();
-    const id = this.selectedMentorId();
-    if (!list.length || !id) return null;
-    return list.find((m) => m.id === id) ?? null;
-  });
+  // Methods (giữ nguyên binding ở template)
+  readonly setSearch = this.store.setSearch;
+  readonly setTypeFilter = this.store.setTypeFilter;
+  readonly openEdit = this.store.openEdit;
+  readonly closePanel = this.store.closePanel;
+  readonly requestDelete = this.store.requestDelete;
+  readonly cancelDelete = this.store.cancelDelete;
+  readonly confirmDelete = this.store.confirmDelete;
 
   // Form model
   mentorModel = linkedSignal({
@@ -108,15 +91,6 @@ export default class MentorsComponent {
     required(m.position, { message: 'Chức vụ là bắt buộc' });
   });
 
-  // Status
-  isSaving = signal(false);
-  saveSuccess = signal(false);
-  saveError = signal<string | null>(null);
-
-  isDeleting = signal<string | null>(null);
-  deleteError = signal<string | null>(null);
-  confirmDeleteId = signal<string | null>(null);
-
   // Auto-generate slug from name
   generateSlug(name: string): string {
     return name
@@ -136,9 +110,8 @@ export default class MentorsComponent {
     }));
   }
 
-  // Open create mode
+  // Mở chế độ tạo mới — reset model form rồi báo store đổi panel
   openCreate() {
-    this.selectedMentorId.set(null);
     this.mentorModel.set({
       name: '',
       slug: '',
@@ -148,32 +121,14 @@ export default class MentorsComponent {
       bio: '',
       tagsInput: '',
       isActive: true,
-      sortOrder: this.mentors().length + 1,
+      sortOrder: this.store.nextSortOrder(),
       typeYouth: false,
       typeOrganization: false,
     });
-    this.saveSuccess.set(false);
-    this.saveError.set(null);
-    this.mode.set('create');
+    this.store.openCreate();
   }
 
-  // Open edit mode
-  openEdit(mentor: Mentor) {
-    this.selectedMentorId.set(mentor.id);
-    this.saveSuccess.set(false);
-    this.saveError.set(null);
-    this.mode.set('edit');
-  }
-
-  // Close panel
-  closePanel() {
-    this.mode.set('list');
-    this.selectedMentorId.set(null);
-    this.saveSuccess.set(false);
-    this.saveError.set(null);
-  }
-
-  // Save (create or update)
+  // Save (create or update) — dựng DTO rồi ủy quyền cho store
   async save(e: Event) {
     e.preventDefault();
     this.mentorForm().markAsTouched();
@@ -189,7 +144,7 @@ export default class MentorsComponent {
       .map((t) => t.trim())
       .filter(Boolean);
 
-    const dto = {
+    const dto: CreateMentorDto = {
       name: m.name,
       slug: m.slug,
       position: m.position,
@@ -202,63 +157,7 @@ export default class MentorsComponent {
       sortOrder: Number(m.sortOrder),
     };
 
-    this.isSaving.set(true);
-    this.saveSuccess.set(false);
-    this.saveError.set(null);
-
-    try {
-      if (this.mode() === 'create') {
-        await this.mentorService.create(dto);
-      } else {
-        const mentor = this.selectedMentor();
-        if (!mentor) return;
-        await this.mentorService.update(mentor.id, dto);
-      }
-
-      this.saveSuccess.set(true);
-      await this.mentorsResource.reload();
-      setTimeout(() => {
-        this.saveSuccess.set(false);
-        this.closePanel();
-      }, 1500);
-    } catch (err) {
-      console.error(err);
-      const errMsg = err instanceof Error ? err.message : 'Có lỗi xảy ra.';
-      this.saveError.set(errMsg);
-    } finally {
-      this.isSaving.set(false);
-    }
-  }
-
-  // Delete
-  requestDelete(id: string) {
-    this.confirmDeleteId.set(id);
-  }
-
-  cancelDelete() {
-    this.confirmDeleteId.set(null);
-    this.deleteError.set(null);
-  }
-
-  async confirmDelete() {
-    const id = this.confirmDeleteId();
-    if (!id) return;
-
-    this.isDeleting.set(id);
-    this.deleteError.set(null);
-
-    try {
-      await this.mentorService.delete(id);
-      this.confirmDeleteId.set(null);
-      if (this.selectedMentorId() === id) this.closePanel();
-      await this.mentorsResource.reload();
-    } catch (err) {
-      console.error(err);
-      const errMsg = err instanceof Error ? err.message : 'Không thể xóa mentor.';
-      this.deleteError.set(errMsg);
-    } finally {
-      this.isDeleting.set(null);
-    }
+    await this.store.save(dto);
   }
 
   getTypeLabel(types: MentorType[] | null): string {

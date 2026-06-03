@@ -23,6 +23,10 @@ export class ClientService {
     return this.client.mentors;
   }
 
+  get mentorBookings() {
+    return this.client.mentorBookings;
+  }
+
   get org() {
     return this.client.org;
   }

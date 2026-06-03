@@ -1,16 +1,19 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import { CheckoutStore } from '../checkout.store';
+import { CheckoutStore, type PaymentMethod } from '../checkout.store';
 import { ProfileStore } from '../../profile/profile.store';
 import {
   LucideCheck,
   LucideTag,
   LucideX,
   LucideSend,
-  LucideCreditCard,
   LucideArrowLeft,
+  LucideLandmark,
+  LucideCopy,
+  LucideCircleCheck,
 } from '@lucide/angular';
 import LogoComponent from '../../shared/logo/logo';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-billing',
@@ -21,8 +24,10 @@ import LogoComponent from '../../shared/logo/logo';
     LucideTag,
     LucideX,
     LucideSend,
-    LucideCreditCard,
     LucideArrowLeft,
+    LucideLandmark,
+    LucideCopy,
+    LucideCircleCheck,
     LogoComponent,
   ],
   templateUrl: './billing.html',
@@ -32,8 +37,16 @@ export default class BillingComponent implements OnInit {
   readonly store = inject(CheckoutStore);
   readonly profileStore = inject(ProfileStore);
 
+  // MoMo tạm khoá trên production (đang phát triển — "Sắp ra mắt")
+  readonly momoDisabled = environment.production;
+
   ngOnInit() {
     this.profileStore.loadProfile();
+
+    // Production: MoMo chưa mở → mặc định chuyển sang chuyển khoản ngân hàng
+    if (this.momoDisabled && this.paymentMethod() === 'momo') {
+      this.selectPaymentMethod('bank');
+    }
   }
 
   // Aliases for 100% template compatibility
@@ -43,7 +56,21 @@ export default class BillingComponent implements OnInit {
   couponError = this.store.couponError;
   loading = this.store.isLoading;
   paymentError = this.store.paymentError;
-  finalPrice = this.store.finalPrice;
+  paymentMethod = this.store.paymentMethod;
+  bankTransferSubmitted = this.store.bankTransferSubmitted;
+  bankTransfer = this.store.bankTransfer;
+  bankCreating = this.store.bankCreating;
+  bankCreateError = this.store.bankCreateError;
+
+  readonly copiedField = signal<string | null>(null);
+
+  // Số tiền phải trả để hiển thị: với chuyển khoản đã tạo giao dịch thì lấy số thực thu
+  // (đã trừ coupon) do server trả; còn lại hiển thị giá gốc của gói (MoMo tự xử lý giảm giá).
+  readonly displayTotal = computed<number>(() => {
+    const bank = this.bankTransfer();
+    if (this.paymentMethod() === 'bank' && bank) return bank.amount;
+    return this.store.originalPrice();
+  });
 
   get originalPrice(): number {
     return this.store.originalPrice();
@@ -65,7 +92,38 @@ export default class BillingComponent implements OnInit {
     this.store.removeCoupon();
   }
 
+  selectPaymentMethod(method: PaymentMethod) {
+    // Chặn chọn MoMo khi đang khoá (production)
+    if (method === 'momo' && this.momoDisabled) return;
+    this.store.selectPaymentMethod(method);
+    // Khi chọn chuyển khoản, tạo giao dịch để lấy thông tin TK + nội dung CK từ server
+    if (method === 'bank') {
+      this.store.prepareBankTransfer();
+    }
+  }
+
+  // Thử tạo lại giao dịch chuyển khoản sau khi gặp lỗi
+  retryBankTransfer() {
+    this.store.prepareBankTransfer();
+  }
+
   confirmPayment() {
-    this.store.confirmPayment();
+    if (this.paymentMethod() === 'bank') {
+      this.store.confirmBankTransfer();
+    } else {
+      this.store.confirmPayment();
+    }
+  }
+
+  async copyToClipboard(value: string, field: string) {
+    try {
+      await navigator.clipboard.writeText(value);
+      this.copiedField.set(field);
+      setTimeout(() => {
+        if (this.copiedField() === field) this.copiedField.set(null);
+      }, 1500);
+    } catch (err) {
+      console.error('Failed to copy to clipboard', err);
+    }
   }
 }

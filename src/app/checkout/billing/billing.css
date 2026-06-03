@@ -352,7 +352,7 @@
   font-weight: 500;
   border-radius: var(--radius-pill, 50px);
   padding: 16px 28px;
-  width: 180px;
+  width: fit-content;
   letter-spacing: 0.4px;
   line-height: 24px;
   border: none;
@@ -417,33 +417,66 @@
 }
 
 /* ─── Payment Option ─── */
+/* Selection accent is locked to the brand primary (purple) for BOTH methods.
+   A method's own brand colour (MoMo pink) lives only on its logo, never as the
+   selection accent. Keeps one UI accent across the selector. */
 .payment-option {
   width: 100%;
   display: flex;
   align-items: center;
   gap: 16px;
   padding: 16px;
-  border-radius: 12px;
-  border: 2px solid #dbdbdc;
+  border-radius: var(--radius-input, 12px);
+  border: 1.5px solid var(--color-border, #d2d2d2);
   background: #fff;
   text-align: left;
-  transition: border-color 0.2s;
   cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.1s ease;
 }
 .payment-option:hover {
-  border-color: rgba(28, 28, 28, 0.3);
+  border-color: var(--color-primary, #8f50e2);
+  background: rgba(143, 80, 226, 0.03);
+}
+.payment-option:active {
+  transform: translateY(1px);
+}
+.payment-option:focus-visible {
+  outline: none;
+  border-color: var(--color-primary, #8f50e2);
+  box-shadow: 0 0 0 3px rgba(143, 80, 226, 0.18);
 }
 .payment-option.selected {
-  border-color: var(--color-momo, #ae2070);
-  background: rgba(174, 32, 112, 0.05);
+  border-color: var(--color-primary, #8f50e2);
+  background: rgba(143, 80, 226, 0.05);
+  box-shadow: 0 0 0 3px rgba(143, 80, 226, 0.12);
 }
 .payment-option.disabled {
-  background: rgba(28, 28, 28, 0.05);
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: 0.6;
+  background: var(--color-gray-50, #fafafa);
 }
 .payment-option.disabled:hover {
-  border-color: #dbdbdc;
+  border-color: var(--color-border, #d2d2d2);
+  background: var(--color-gray-50, #fafafa);
+}
+.payment-option.disabled .payment-icon-box {
+  filter: grayscale(1);
+}
+.payment-option-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(143, 80, 226, 0.1);
+  color: var(--color-primary, #8f50e2);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  vertical-align: middle;
 }
 .payment-icon-box {
   width: 44px;
@@ -453,12 +486,19 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  background: var(--color-gray-100, #f5f5f5);
+  color: var(--color-gray-600, #8a8a8a);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
-.payment-icon-box.selected {
-  background: rgba(174, 32, 112, 0.1);
+.payment-option.selected .payment-icon-box {
+  background: rgba(143, 80, 226, 0.1);
+  color: var(--color-primary, #8f50e2);
 }
-.payment-icon-box.dim {
-  background: rgba(28, 28, 28, 0.05);
+.payment-texts {
+  flex: 1;
+  min-width: 0;
 }
 .payment-option-name {
   font-size: 16px;
@@ -466,12 +506,7 @@
   line-height: 24px;
   letter-spacing: 0.4px;
   display: block;
-}
-.payment-option-name.selected {
   color: var(--color-dark, #1c1c1c);
-}
-.payment-option-name.dim {
-  color: rgba(28, 28, 28, 0.5);
 }
 .payment-option-desc {
   font-size: 13px;
@@ -480,23 +515,192 @@
   line-height: 18px;
 }
 .radio-circle {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  border: 2px solid rgba(28, 28, 28, 0.2);
+  border: 2px solid var(--color-gray-300, #d9d9d9);
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: border-color 0.2s ease;
 }
 .radio-circle.selected {
-  border-color: var(--color-momo, #ae2070);
+  border-color: var(--color-primary, #8f50e2);
 }
 .radio-dot {
-  width: 10px;
-  height: 10px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
-  background: var(--color-momo, #ae2070);
+  background: var(--color-primary, #8f50e2);
+  animation: radio-pop 0.18s ease;
+}
+@keyframes radio-pop {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .payment-option,
+  .payment-icon-box,
+  .radio-circle {
+    transition: none;
+  }
+  .payment-option:active {
+    transform: none;
+  }
+  .radio-dot {
+    animation: none;
+  }
+}
+
+/* ===== Bank transfer panel ===== */
+.bank-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #dbdbdc;
+  background: rgba(28, 28, 28, 0.02);
+}
+.bank-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px 0;
+  font-size: 14px;
+  color: rgba(28, 28, 28, 0.6);
+  letter-spacing: 0.14px;
+}
+.bank-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+}
+.bank-error-text {
+  font-size: 14px;
+  color: var(--color-error, #e5484d);
+  letter-spacing: 0.14px;
+  text-align: center;
+}
+.bank-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.bank-qr-img {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #dbdbdc;
+  padding: 8px;
+}
+.bank-qr-caption {
+  font-size: 13px;
+  color: rgba(28, 28, 28, 0.5);
+  letter-spacing: 0.14px;
+  text-align: center;
+}
+.bank-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.bank-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px dashed rgba(28, 28, 28, 0.12);
+}
+.bank-field:last-child {
+  border-bottom: none;
+}
+.bank-field-label {
+  font-size: 14px;
+  color: rgba(28, 28, 28, 0.5);
+  letter-spacing: 0.14px;
+  flex-shrink: 0;
+}
+.bank-field-value {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-dark, #1c1c1c);
+  letter-spacing: 0.2px;
+  text-align: right;
+  word-break: break-word;
+}
+.bank-field-discount {
+  color: var(--color-accent-green, #16a34a);
+}
+.bank-field-original {
+  text-decoration: line-through;
+  color: rgba(28, 28, 28, 0.4);
+  font-weight: 400;
+  margin-right: 6px;
+}
+.coupon-note {
+  margin-top: 8px;
+  font-size: 13px;
+  color: rgba(28, 28, 28, 0.5);
+  letter-spacing: 0.14px;
+}
+.bank-field-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-primary, #8f50e2);
+  padding: 0;
+}
+.bank-field-copy:hover .bank-field-value {
+  color: var(--color-primary, #8f50e2);
+}
+.bank-note {
+  font-size: 13px;
+  line-height: 18px;
+  color: rgba(28, 28, 28, 0.55);
+  letter-spacing: 0.14px;
+  margin: 0;
+}
+.bank-submitted {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 12px 0;
+}
+.bank-submitted-icon {
+  color: #22c55e;
+}
+.bank-submitted-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-dark, #1c1c1c);
+  margin: 0;
+}
+.bank-submitted-desc {
+  font-size: 14px;
+  line-height: 20px;
+  color: rgba(28, 28, 28, 0.6);
+  letter-spacing: 0.14px;
+  margin: 0;
+  max-width: 320px;
 }
 
 .spinner-sm {

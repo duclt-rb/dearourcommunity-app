@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth.guard';
 import { systemGuard } from './core/system.guard';
+import { nonProdGuard } from './core/non-prod.guard';
 import { checkoutGuard } from './checkout/checkout.guard';
 import { receiptGuard } from './checkout/receipt.guard';
 
@@ -41,10 +42,6 @@ export const routes: Routes = [
         loadComponent: () => import('./profile/certificates/certificates'),
       },
       {
-        path: 'plans',
-        loadComponent: () => import('./profile/plans/plans'),
-      },
-      {
         path: 'edit-profile',
         loadComponent: () => import('./profile/edit-profile/edit-profile'),
       },
@@ -69,11 +66,12 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'packages',
+        redirectTo: 'transactions',
         pathMatch: 'full',
       },
       {
         path: 'packages',
+        canActivate: [nonProdGuard],
         loadComponent: () => import('./system/packages/packages'),
       },
       {
@@ -82,7 +80,12 @@ export const routes: Routes = [
       },
       {
         path: 'mentors',
+        canActivate: [nonProdGuard],
         loadComponent: () => import('./system/mentors/mentors'),
+      },
+      {
+        path: 'mentor-bookings',
+        loadComponent: () => import('./system/mentor-bookings/mentor-bookings'),
       },
     ],
   },

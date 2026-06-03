@@ -14,15 +14,19 @@ import LogoComponent from '../../shared/logo/logo';
 import { CheckoutStore } from '../checkout.store';
 import { PaymentService } from '../../core/services/payment.service';
 import { ProfileStore } from '../../profile/profile.store';
+import { environment } from '../../../environments/environment';
 
-// Định nghĩa hằng số bản đồ tên các gói học tập
+// Bản đồ tên gói (chỉ dùng làm tên dự phòng hiển thị trên biên nhận khi
+// không có tên thật từ API). Đồng bộ ID theo master data mới (client ≥0.6.10).
 const PACKAGE_NAME_MAP: Record<string, string> = {
-  'youth-basic': 'Gói Youth Basic',
-  'youth-standard': 'Gói Youth Standard',
-  'youth-premium': 'Gói Youth Premium',
-  'organization-basic': 'Gói Organization Basic',
-  'organization-standard': 'Gói Organization Standard',
-  'organization-premium': 'Gói Organization Premium',
+  'youth-a': 'Gói Youth A',
+  'youth-b': 'Gói Youth B',
+  'youth-c': 'Gói Youth C',
+  'youth-c-plus': 'Gói Youth C+',
+  'org-a': 'Gói Doanh nghiệp A',
+  'org-b': 'Gói Doanh nghiệp B',
+  'org-c': 'Gói Doanh nghiệp C',
+  'org-p': 'Gói Doanh nghiệp P',
 };
 
 @Component({
@@ -38,6 +42,9 @@ export default class ReceiptComponent {
   private paymentService = inject(PaymentService);
   private profileStore = inject(ProfileStore);
   readonly store = inject(CheckoutStore);
+
+  // Trang chọn/quản lý gói nay nằm ở app chính
+  readonly packagesUrl = `${environment.appUrl}/packages`;
 
   // Chọn trực tiếp từ Router Store bằng Signal!
   readonly routeResultCode = this.ngrxStore.selectSignal(selectQueryResultCode);

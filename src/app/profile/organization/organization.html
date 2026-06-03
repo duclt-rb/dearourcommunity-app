@@ -2,9 +2,9 @@
   <div class="organization-section">
     <!-- Header Section -->
     <div class="profile-page-header">
-      <h1 class="profile-page-title">Quản lý Tổ chức</h1>
+      <h1 class="profile-page-title">Quản lý Doanh nghiệp</h1>
       <p class="profile-page-subtitle">
-        Quản lý thành viên và theo dõi việc đăng ký học trong gói tổ chức của bạn.
+        Quản lý thành viên và theo dõi việc đăng ký học trong gói doanh nghiệp của bạn.
       </p>
     </div>
 
@@ -20,17 +20,18 @@
     @if (loading()) {
       <div class="loading-state">
         <div class="spinner"></div>
-        <p>Đang tải thông tin tổ chức...</p>
+        <p>Đang tải thông tin doanh nghiệp...</p>
       </div>
     } @else {
       <!-- Main Dashboard Content -->
       @if (!activeOrg()) {
         <div class="empty-state">
           <div class="icon">🏢</div>
-          <p>Không tìm thấy tổ chức nào liên kết với tài khoản này.</p>
+          <p>Không tìm thấy doanh nghiệp nào liên kết với tài khoản này.</p>
           <p class="field-help mt-2">
-            Tài khoản của bạn đã được đăng ký gói tổ chức nhưng chưa được thiết lập tổ chức trên hệ
-            thống. Vui lòng liên hệ bộ phận hỗ trợ của Dear Our Community để kích hoạt.
+            Tài khoản của bạn đã được đăng ký gói doanh nghiệp nhưng chưa được thiết lập doanh
+            nghiệp trên hệ thống. Vui lòng liên hệ bộ phận hỗ trợ của Dear Our Community để kích
+            hoạt.
           </p>
         </div>
       } @else {
@@ -38,7 +39,7 @@
         <div class="stats-card">
           <div class="stat-block">
             <span class="stat-value-text">{{ activeOrg()?.name }}</span>
-            <span class="stat-label">Tổ chức</span>
+            <span class="stat-label">Doanh nghiệp</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-block">
@@ -64,7 +65,7 @@
             <div class="form-card-header">
               <h3 class="form-card-title">Mời Thành viên Mới</h3>
               <p class="field-help">
-                Nhập email của người bạn muốn cấp quyền học để gửi lời mời tham gia tổ chức.
+                Nhập email của người bạn muốn cấp quyền học để gửi lời mời tham gia doanh nghiệp.
               </p>
             </div>
 
@@ -119,7 +120,7 @@
               <h3 class="section-title-small">
                 Danh sách thành viên ({{ members()?.length || 0 }})
               </h3>
-              <p class="field-help">Tất cả thành viên trực thuộc tài khoản tổ chức của bạn.</p>
+              <p class="field-help">Tất cả thành viên trực thuộc tài khoản doanh nghiệp của bạn.</p>
             </div>
 
             <button
@@ -149,7 +150,7 @@
 
           @if ((members()?.length ?? 0) === 0) {
             <div class="empty-state" style="padding: 40px; border-radius: var(--radius-card)">
-              <p>Chưa có thành viên nào trực thuộc tổ chức này.</p>
+              <p>Chưa có thành viên nào trực thuộc doanh nghiệp này.</p>
             </div>
           } @else {
             <div class="table-container">

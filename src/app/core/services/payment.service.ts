@@ -1,6 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { ClientService } from './client.service';
-import { CreatePaymentDto, ValidateCouponDto } from '@dearourcommunity/client';
+import type {
+  ConfirmBankTransferDto,
+  CreateBankTransferDto,
+  CreatePaymentDto,
+  RejectTransactionDto,
+  TransactionsQuery,
+  ValidateCouponDto,
+} from '@dearourcommunity/client';
 
 @Injectable({ providedIn: 'root' })
 export class PaymentService {
@@ -13,6 +20,24 @@ export class PaymentService {
    */
   createPayment(dto: CreatePaymentDto) {
     return this.clientService.payment.createPayment(dto);
+  }
+
+  /**
+   * Tạo yêu cầu chuyển khoản ngân hàng cho gói học phí
+   * POST /api/v1/payment/bank/create
+   * Trả về thông tin tài khoản nhận + nội dung chuyển khoản (= orderId) để hiển thị cho user
+   */
+  createBankTransfer(dto: CreateBankTransferDto) {
+    return this.clientService.payment.createBankTransfer(dto);
+  }
+
+  /**
+   * Người dùng báo đã chuyển khoản → giao dịch chuyển sang `awaiting_confirmation`,
+   * vào hàng đợi chờ admin đối soát/duyệt.
+   * POST /api/v1/payment/bank/confirm
+   */
+  confirmBankTransfer(dto: ConfirmBankTransferDto) {
+    return this.clientService.payment.confirmBankTransfer(dto);
   }
 
   /**
@@ -33,10 +58,27 @@ export class PaymentService {
   }
 
   /**
-   * Lấy danh sách tất cả các giao dịch hệ thống (chỉ admin mới có quyền)
+   * Lấy danh sách giao dịch hệ thống có phân trang + lọc (chỉ admin mới có quyền)
    * GET /api/v1/payment/transactions
+   * Trả về `Paginated<Transaction>` ({ items, meta }).
    */
-  getTransactions() {
-    return this.clientService.payment.getTransactions();
+  getTransactions(query?: TransactionsQuery) {
+    return this.clientService.payment.getTransactions(query);
+  }
+
+  /**
+   * Admin duyệt giao dịch chuyển khoản → kích hoạt gói → `success`
+   * POST /api/v1/payment/admin/transactions/:id/approve
+   */
+  approveTransaction(id: string) {
+    return this.clientService.payment.approveTransaction(id);
+  }
+
+  /**
+   * Admin từ chối giao dịch chuyển khoản → `failed`
+   * POST /api/v1/payment/admin/transactions/:id/reject
+   */
+  rejectTransaction(id: string, dto: RejectTransactionDto) {
+    return this.clientService.payment.rejectTransaction(id, dto);
   }
 }

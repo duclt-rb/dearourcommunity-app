@@ -2,14 +2,14 @@
   <div class="auth-form">
     <div class="auth-form__header">
       <app-logo class="auth-form__logo"></app-logo>
-      <h2 class="auth-form__title">Welcome back</h2>
-      <p class="auth-form__subtitle">Sign in to your account to continue</p>
+      <h2 class="auth-form__title">Chào mừng trở lại</h2>
+      <p class="auth-form__subtitle">Đăng nhập để tiếp tục</p>
     </div>
 
     <form class="auth-form__body" (submit)="onSubmit($event)">
       <!-- Email -->
       <div class="field">
-        <label for="email" class="field__label">Email address</label>
+        <label for="email" class="field__label">Email</label>
         <span class="p-input-icon-left field__input-wrapper">
           <svg lucideMail [size]="18" strokeWidth="1.5"></svg>
           <input
@@ -30,8 +30,8 @@
       <!-- Password -->
       <div class="field">
         <div class="field__label-row">
-          <label for="password" class="field__label">Password</label>
-          <a href="#" class="field__link">Forgot password?</a>
+          <label for="password" class="field__label">Mật khẩu</label>
+          <a href="#" class="field__link">Quên mật khẩu?</a>
         </div>
         <span class="p-input-icon-left field__input-wrapper">
           <svg lucideLock [size]="18" strokeWidth="1.5"></svg>
@@ -40,7 +40,7 @@
             [type]="showPassword() ? 'text' : 'password'"
             pInputText
             [pt]="inputPt"
-            placeholder="Enter your password"
+            placeholder="Nhập mật khẩu"
             [formField]="loginForm.password"
             autocomplete="current-password"
           />
@@ -48,7 +48,7 @@
             type="button"
             class="field__toggle"
             (click)="showPassword.set(!showPassword())"
-            [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+            [attr.aria-label]="showPassword() ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'"
           >
             @if (showPassword()) {
               <svg lucideEyeOff [size]="18" strokeWidth="1.5"></svg>
@@ -70,7 +70,7 @@
       <!-- Submit -->
       <p-button
         type="submit"
-        label="Sign in"
+        label="Đăng nhập"
         [pt]="submitPt"
         styleClass="auth-form__submit"
         [loading]="loading()"
@@ -79,7 +79,7 @@
     </form>
 
     <div class="auth-form__divider">
-      <span>or continue with</span>
+      <span>hoặc tiếp tục với</span>
     </div>
 
     <!-- Social Login -->
@@ -117,9 +117,9 @@
 
     <!-- Register Link -->
     <p class="auth-form__footer">
-      Don't have an account?
+      Chưa có tài khoản?
       <a routerLink="/auth/register" queryParamsHandling="preserve" class="auth-form__link"
-        >Register</a
+        >Đăng ký</a
       >
     </p>
   </div>

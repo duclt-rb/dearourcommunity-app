@@ -1,0 +1,190 @@
+import { computed, inject } from '@angular/core';
+import {
+  patchState,
+  signalStore,
+  withComputed,
+  withHooks,
+  withMethods,
+  withState,
+} from '@ngrx/signals';
+import { ApiError, type MentorBooking, type MentorBookingStatus } from '@dearourcommunity/client';
+import { MentorBookingService } from '../../core/services/mentor-booking.service';
+
+function toErrorMessage(err: unknown): string {
+  if (err instanceof ApiError) {
+    // 409: booking đã được xử lý trước đó; 404: không tìm thấy; 400: dữ liệu không hợp lệ
+    if (err.code === 409) {
+      return 'Yêu cầu này đã được xử lý trước đó. Vui lòng làm mới danh sách.';
+    }
+    if (err.code === 404) {
+      return 'Không tìm thấy yêu cầu đặt mentor.';
+    }
+    return err.message || 'Thao tác thất bại. Vui lòng thử lại.';
+  }
+  console.error('Mentor booking action failed', err);
+  return 'Thao tác thất bại. Vui lòng thử lại.';
+}
+
+const initialState = {
+  // Dữ liệu — tải toàn bộ rồi lọc/tìm kiếm client-side (list() trả mảng, không phân trang)
+  bookings: [] as MentorBooking[],
+  isLoading: false,
+  loadError: null as string | null,
+
+  // Tìm kiếm & lọc (client-side)
+  searchQuery: '',
+  statusFilter: 'all' as MentorBookingStatus | 'all',
+
+  // Modal chi tiết
+  selectedBooking: null as MentorBooking | null,
+
+  // Trạng thái thao tác admin (duyệt / từ chối)
+  actionLoadingId: null as string | null,
+  actionError: null as string | null,
+  confirmRejectId: null as string | null,
+  rejectReason: '',
+};
+
+export const MentorBookingsStore = signalStore(
+  withState(initialState),
+  withComputed((store) => {
+    // Lọc theo trạng thái + tìm kiếm, mới nhất lên đầu
+    const filteredBookings = computed(() => {
+      const list = store.bookings();
+      const query = store.searchQuery().toLowerCase().trim();
+      const status = store.statusFilter();
+
+      return list
+        .filter((b) => {
+          const matchesStatus = status === 'all' || b.status === status;
+          if (!matchesStatus) return false;
+          if (!query) return true;
+          return (
+            b.name.toLowerCase().includes(query) ||
+            b.email.toLowerCase().includes(query) ||
+            b.phone.toLowerCase().includes(query) ||
+            b.occupation.toLowerCase().includes(query) ||
+            (b.mentor?.name?.toLowerCase().includes(query) ?? false)
+          );
+        })
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    });
+
+    // Thống kê theo trạng thái (trên toàn bộ danh sách đã tải)
+    const stats = computed(() => {
+      const list = store.bookings();
+      let pendingCount = 0;
+      let approvedCount = 0;
+      let rejectedCount = 0;
+      for (const b of list) {
+        if (b.status === 'pending') pendingCount++;
+        else if (b.status === 'approved') approvedCount++;
+        else if (b.status === 'rejected') rejectedCount++;
+      }
+      return { pendingCount, approvedCount, rejectedCount, totalCount: list.length };
+    });
+
+    const hasActiveFilters = computed(
+      () => store.searchQuery().trim() !== '' || store.statusFilter() !== 'all',
+    );
+
+    return { filteredBookings, stats, hasActiveFilters };
+  }),
+  withMethods((store, bookingService = inject(MentorBookingService)) => {
+    async function load() {
+      patchState(store, { isLoading: true, loadError: null });
+      try {
+        const items = await bookingService.list();
+        patchState(store, { bookings: items });
+      } catch (err) {
+        patchState(store, { loadError: toErrorMessage(err) });
+      } finally {
+        patchState(store, { isLoading: false });
+      }
+    }
+
+    return {
+      load,
+      refresh: () => load(),
+
+      // Tìm kiếm & lọc (client-side)
+      setSearch(value: string) {
+        patchState(store, { searchQuery: value });
+      },
+      setStatusFilter(value: MentorBookingStatus | 'all') {
+        patchState(store, { statusFilter: value });
+      },
+      clearFilters() {
+        patchState(store, { searchQuery: '', statusFilter: 'all' });
+      },
+
+      // Modal chi tiết
+      viewDetails(b: MentorBooking) {
+        patchState(store, {
+          selectedBooking: b,
+          confirmRejectId: null,
+          rejectReason: '',
+          actionError: null,
+        });
+      },
+      closeDetails() {
+        patchState(store, {
+          selectedBooking: null,
+          confirmRejectId: null,
+          rejectReason: '',
+          actionError: null,
+        });
+      },
+
+      // Luồng từ chối (yêu cầu xác nhận 2 bước, kèm lý do tuỳ chọn)
+      startReject(id: string) {
+        patchState(store, { confirmRejectId: id, rejectReason: '', actionError: null });
+      },
+      cancelReject() {
+        patchState(store, { confirmRejectId: null, rejectReason: '' });
+      },
+      setRejectReason(value: string) {
+        patchState(store, { rejectReason: value });
+      },
+
+      /** Duyệt yêu cầu → hệ thống gửi mail thanh toán cho user. */
+      async approve(b: MentorBooking) {
+        patchState(store, { actionLoadingId: b.id, actionError: null });
+        try {
+          await bookingService.approve(b.id);
+          patchState(store, { selectedBooking: null, confirmRejectId: null, actionError: null });
+          await load();
+        } catch (err) {
+          patchState(store, { actionError: toErrorMessage(err) });
+        } finally {
+          patchState(store, { actionLoadingId: null });
+        }
+      },
+
+      /** Từ chối yêu cầu, kèm lý do (tuỳ chọn) gửi mail báo user. */
+      async confirmReject(b: MentorBooking) {
+        const reason = store.rejectReason().trim();
+        patchState(store, { actionLoadingId: b.id, actionError: null });
+        try {
+          await bookingService.reject(b.id, reason || undefined);
+          patchState(store, {
+            selectedBooking: null,
+            confirmRejectId: null,
+            rejectReason: '',
+            actionError: null,
+          });
+          await load();
+        } catch (err) {
+          patchState(store, { actionError: toErrorMessage(err) });
+        } finally {
+          patchState(store, { actionLoadingId: null });
+        }
+      },
+    };
+  }),
+  withHooks({
+    onInit(store) {
+      store.load();
+    },
+  }),
+);

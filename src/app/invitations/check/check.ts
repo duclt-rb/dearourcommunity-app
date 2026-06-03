@@ -88,7 +88,7 @@ export default class CheckInvitationComponent implements OnInit {
   });
 
   orgName = computed(() => {
-    return this.invitation()?.organizationName || 'Tổ chức';
+    return this.invitation()?.organizationName || 'Doanh nghiệp';
   });
 
   async ngOnInit() {

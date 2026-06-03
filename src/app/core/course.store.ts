@@ -108,7 +108,7 @@ export const CourseStore = signalStore(
         });
       } catch (err) {
         patchState(store, {
-          error: err instanceof Error ? err.message : 'Failed to load courses',
+          error: err instanceof Error ? err.message : 'Không thể tải danh sách khóa học',
           isLoading: false,
         });
       }

@@ -4,7 +4,7 @@
     <div class="navbar-brand">
       <div class="brand-logo-glow"></div>
       <span class="navbar-logo-text">DEAR OUR COMMUNITY</span>
-      <span class="navbar-badge">ADMIN PANEL</span>
+      <span class="navbar-badge">TRANG QUẢN TRỊ</span>
     </div>
     <a routerLink="/profile/dashboard" class="btn-back">
       <svg lucideArrowLeft [size]="16" strokeWidth="2"></svg>
@@ -22,15 +22,22 @@
 
       <!-- Sub-navigation tabs (Packages & Transactions) -->
       <div class="system-main-tabs">
-        <a class="system-main-tab" routerLink="packages" routerLinkActive="active">
-          Quản lý gói học
-        </a>
+        @if (showAdminTools) {
+          <a class="system-main-tab" routerLink="packages" routerLinkActive="active">
+            Quản lý gói học
+          </a>
+        }
         <a class="system-main-tab" routerLink="transactions" routerLinkActive="active">
           Lịch sử giao dịch
         </a>
-        <a class="system-main-tab" routerLink="mentors" routerLinkActive="active">
-          Quản lý Mentor
+        <a class="system-main-tab" routerLink="mentor-bookings" routerLinkActive="active">
+          Đặt lịch Mentor
         </a>
+        @if (showAdminTools) {
+          <a class="system-main-tab" routerLink="mentors" routerLinkActive="active">
+            Quản lý Mentor
+          </a>
+        }
       </div>
     </div>
 
