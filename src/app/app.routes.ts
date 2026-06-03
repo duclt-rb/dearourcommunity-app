@@ -3,6 +3,7 @@ import { authGuard } from './core/auth.guard';
 import { systemGuard } from './core/system.guard';
 import { nonProdGuard } from './core/non-prod.guard';
 import { checkoutGuard } from './checkout/checkout.guard';
+import { accountMatchGuard } from './checkout/account-match.guard';
 import { receiptGuard } from './checkout/receipt.guard';
 
 export const routes: Routes = [
@@ -100,8 +101,12 @@ export const routes: Routes = [
       },
       {
         path: 'billing',
-        canActivate: [checkoutGuard],
+        canActivate: [checkoutGuard, accountMatchGuard],
         loadComponent: () => import('./checkout/billing/billing'),
+      },
+      {
+        path: 'wrong-account',
+        loadComponent: () => import('./checkout/wrong-account/wrong-account'),
       },
       {
         path: 'receipt',

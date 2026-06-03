@@ -1,0 +1,31 @@
+<main class="wa">
+  <div class="wa__inner">
+    <span class="wa__eyebrow">
+      <i class="wa__dot"></i>
+      Sai tài khoản
+    </span>
+
+    <h1 class="wa__title">Bạn đang thanh toán bằng sai tài khoản.</h1>
+
+    <p class="wa__desc">
+      Liên kết thanh toán này dành cho một tài khoản khác. Đăng xuất và đăng nhập lại bằng đúng tài
+      khoản để tiếp tục.
+    </p>
+
+    <dl class="wa__accounts">
+      <div class="wa__row">
+        <dt>Đang đăng nhập</dt>
+        <dd class="wa__email wa__email--wrong">{{ currentEmail || '—' }}</dd>
+      </div>
+      <div class="wa__row">
+        <dt>Cần dùng</dt>
+        <dd class="wa__email wa__email--right">{{ expectedEmail || '—' }}</dd>
+      </div>
+    </dl>
+
+    <button type="button" class="wa__btn" (click)="logout()">
+      <svg lucideLogOut [size]="17" strokeWidth="1.75"></svg>
+      Đăng xuất &amp; đăng nhập lại
+    </button>
+  </div>
+</main>
