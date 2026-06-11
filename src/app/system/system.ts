@@ -11,6 +11,6 @@ import { environment } from '../../environments/environment';
   styleUrl: './system.css',
 })
 export default class SystemComponent {
-  // Quản lý gói học & Mentor chỉ bật ở môi trường non-production (local/dev)
-  readonly showAdminTools = !environment.production;
+  // Quản lý gói học chỉ bật ở môi trường non-production (local/dev); Mentor luôn hiển thị
+  readonly showPackagesTab = !environment.production;
 }

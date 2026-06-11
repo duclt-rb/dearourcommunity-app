@@ -81,7 +81,6 @@ export const routes: Routes = [
       },
       {
         path: 'mentors',
-        canActivate: [nonProdGuard],
         loadComponent: () => import('./system/mentors/mentors'),
       },
       {

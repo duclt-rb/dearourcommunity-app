@@ -22,7 +22,7 @@
 
       <!-- Sub-navigation tabs (Packages & Transactions) -->
       <div class="system-main-tabs">
-        @if (showAdminTools) {
+        @if (showPackagesTab) {
           <a class="system-main-tab" routerLink="packages" routerLinkActive="active">
             Quản lý gói học
           </a>
@@ -33,11 +33,9 @@
         <a class="system-main-tab" routerLink="mentor-bookings" routerLinkActive="active">
           Đặt lịch Mentor
         </a>
-        @if (showAdminTools) {
-          <a class="system-main-tab" routerLink="mentors" routerLinkActive="active">
-            Quản lý Mentor
-          </a>
-        }
+        <a class="system-main-tab" routerLink="mentors" routerLinkActive="active">
+          Quản lý Mentor
+        </a>
       </div>
     </div>
 
