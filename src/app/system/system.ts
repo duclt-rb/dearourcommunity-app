@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { LucideArrowLeft } from '@lucide/angular';
-import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-system',
@@ -10,7 +9,4 @@ import { environment } from '../../environments/environment';
   templateUrl: './system.html',
   styleUrl: './system.css',
 })
-export default class SystemComponent {
-  // Quản lý gói học chỉ bật ở môi trường non-production (local/dev); Mentor luôn hiển thị
-  readonly showPackagesTab = !environment.production;
-}
+export default class SystemComponent {}

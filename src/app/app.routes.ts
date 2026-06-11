@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth.guard';
 import { systemGuard } from './core/system.guard';
-import { nonProdGuard } from './core/non-prod.guard';
 import { checkoutGuard } from './checkout/checkout.guard';
 import { accountMatchGuard } from './checkout/account-match.guard';
 import { receiptGuard } from './checkout/receipt.guard';
@@ -72,7 +71,6 @@ export const routes: Routes = [
       },
       {
         path: 'packages',
-        canActivate: [nonProdGuard],
         loadComponent: () => import('./system/packages/packages'),
       },
       {
