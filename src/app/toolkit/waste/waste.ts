@@ -18,6 +18,7 @@ import {
   COMPLIANT_OPTIONS,
   CONTRACTOR_SCALE,
   DISPOSAL_OPTIONS,
+  PRIORITY_OPTIONS,
   YES_NO_OPTIONS,
 } from './waste.types';
 
@@ -58,6 +59,7 @@ export default class WasteToolkitComponent {
   readonly compliantOptions = COMPLIANT_OPTIONS;
   readonly contractorScale = CONTRACTOR_SCALE;
   readonly actionStatusOptions = ACTION_STATUS_OPTIONS;
+  readonly priorityOptions = PRIORITY_OPTIONS;
 
   readonly weeks = Array.from({ length: WEEKS }, (_, i) => i);
   readonly months = Array.from({ length: MONTHS }, (_, i) => i);

@@ -194,6 +194,41 @@
               </ul>
             </div>
           }
+
+          <h3 class="waste__group-title waste__group-title--spaced">Tổng kết điểm đánh giá</h3>
+          <div class="waste__table-scroll">
+            <table class="waste__table">
+              <thead>
+                <tr>
+                  <th class="waste__table-head-cell">Nhóm</th>
+                  <th>Đầy đủ</th>
+                  <th>Một phần</th>
+                  <th>Chưa có</th>
+                  <th>N/A</th>
+                  <th class="waste__col-priority">Ưu tiên</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of store.assessmentResults(); track r.id) {
+                  <tr>
+                    <td class="waste__table-head-cell">{{ r.topic }}</td>
+                    <td class="waste__num">{{ r.full }}</td>
+                    <td class="waste__num">{{ r.partial }}</td>
+                    <td class="waste__num">{{ r.none }}</td>
+                    <td class="waste__num">{{ r.na }}</td>
+                    <td class="waste__col-priority">
+                      <app-select-field
+                        [options]="priorityOptions"
+                        placeholder="— Chọn —"
+                        [value]="store.assessmentPriorityOf(r.id)"
+                        (valueChange)="store.setAssessmentPriority(r.id, $event)"
+                      />
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         </section>
       }
 

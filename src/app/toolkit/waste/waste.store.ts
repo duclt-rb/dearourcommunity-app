@@ -35,6 +35,7 @@ interface WasteState {
   streams: Record<string, StreamRow>;
   mappingCosts: Record<string, number | null>;
   assessment: Record<string, string>;
+  assessmentPriority: Record<string, string>;
   contractorInfo: Record<string, string>;
   contractorScores: Record<string, string>;
   foodCostPerKg: number | null;
@@ -51,6 +52,7 @@ const initialState: WasteState = {
   streams: {},
   mappingCosts: {},
   assessment: {},
+  assessmentPriority: {},
   contractorInfo: {},
   contractorScores: {},
   foodCostPerKg: null,
@@ -228,6 +230,9 @@ export const WasteStore = signalStore(
     setAssessment(id: string, value: string) {
       patchState(store, (s) => ({ assessment: { ...s.assessment, [id]: value } }));
     },
+    setAssessmentPriority(id: string, value: string) {
+      patchState(store, (s) => ({ assessmentPriority: { ...s.assessmentPriority, [id]: value } }));
+    },
     setContractorInfo(key: string, value: string) {
       patchState(store, (s) => ({ contractorInfo: { ...s.contractorInfo, [key]: value } }));
     },
@@ -267,6 +272,7 @@ export const WasteStore = signalStore(
       store.streams()[id]?.[field] ?? (field === 'volume' ? null : ''),
     mappingCostOf: (id: string) => store.mappingCosts()[id] ?? null,
     assessmentOf: (id: string) => store.assessment()[id] ?? '',
+    assessmentPriorityOf: (id: string) => store.assessmentPriority()[id] ?? '',
     contractorInfoOf: (key: string) => store.contractorInfo()[key] ?? '',
     contractorScoreOf: (id: string) => store.contractorScores()[id] ?? '',
     foodLogOf: (id: string, week: number) => store.foodLog()[id]?.[week] ?? null,
@@ -303,6 +309,7 @@ export const WasteStore = signalStore(
           streams: store.streams(),
           mappingCosts: store.mappingCosts(),
           assessment: store.assessment(),
+          assessmentPriority: store.assessmentPriority(),
           contractorInfo: store.contractorInfo(),
           contractorScores: store.contractorScores(),
           foodCostPerKg: store.foodCostPerKg(),

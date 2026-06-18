@@ -114,6 +114,12 @@ export const ACTION_STATUS_OPTIONS: SegmentOptionLite[] = [
   { value: 'done', label: 'Hoàn thành' },
 ];
 
+export const PRIORITY_OPTIONS: SegmentOptionLite[] = [
+  { value: 'critical', label: 'Critical' },
+  { value: 'important', label: 'Important' },
+  { value: 'optional', label: 'Optional' },
+];
+
 export const CONTRACTOR_SCALE: SegmentOptionLite[] = [
   { value: '1', label: '1' },
   { value: '2', label: '2' },

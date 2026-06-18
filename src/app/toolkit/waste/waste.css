@@ -408,6 +408,16 @@
   font-weight: 500;
   color: var(--color-gray-800);
 }
+.waste__band {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.waste__col-priority {
+  min-width: 180px;
+  text-align: left !important;
+}
 
 /* ── Action plan ── */
 .waste__actions {
