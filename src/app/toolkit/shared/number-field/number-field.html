@@ -1,0 +1,21 @@
+<label class="number-field">
+  @if (label()) {
+    <span class="number-field__label">{{ label() }}</span>
+  }
+  <span class="number-field__wrap">
+    <input
+      class="number-field__input"
+      type="number"
+      inputmode="numeric"
+      [placeholder]="placeholder()"
+      [value]="value() ?? ''"
+      (input)="onInput($event)"
+    />
+    @if (suffix()) {
+      <span class="number-field__suffix">{{ suffix() }}</span>
+    }
+  </span>
+  @if (hint()) {
+    <span class="number-field__hint">{{ hint() }}</span>
+  }
+</label>

@@ -1,0 +1,564 @@
+<div class="waste">
+  <!-- Top bar -->
+  <header class="waste__bar">
+    <div class="waste__bar-inner">
+      <app-logo height="72px" class="waste__logo" />
+      <span class="waste__bar-progress"> Bước {{ store.currentStep() + 1 }}/{{ totalSteps }} </span>
+    </div>
+    <div class="waste__stepper">
+      @for (step of steps; track step.kind; let i = $index) {
+        <button
+          type="button"
+          class="waste__step"
+          [class.is-active]="i === store.currentStep()"
+          [class.is-done]="i < store.currentStep()"
+          (click)="goToStep(i)"
+        >
+          <span
+            class="waste__step-bar"
+            [style.background]="i <= store.currentStep() ? stepColor(step) : null"
+          ></span>
+          <span class="waste__step-label">{{ step.label }}</span>
+        </button>
+      }
+    </div>
+  </header>
+
+  <main class="waste__main">
+    <!-- Intro for first step only -->
+    @if (store.currentStep() === 0) {
+      <div class="waste__intro">
+        <p class="waste__sector">{{ config.sector }}</p>
+        <h1 class="waste__title">{{ config.name }}</h1>
+        <p class="waste__lead">
+          Lập bản đồ chất thải, đánh giá thực hành, chấm điểm nhà thầu, theo dõi rác thực phẩm và
+          chi phí, rồi xây kế hoạch 90 ngày. Dữ liệu được lưu tự động trên trình duyệt của bạn.
+        </p>
+      </div>
+    }
+    @switch (currentStepData().kind) {
+      <!-- ════ STEP: WASTE MAPPING ════ -->
+      @case ('mapping') {
+        <section class="waste__section">
+          <h2 class="waste__section-title">Bản đồ chất thải</h2>
+          <p class="waste__section-note">Liệt kê mọi loại chất thải doanh nghiệp tạo ra.</p>
+
+          <div class="waste__grid2">
+            @for (f of config.mappingFields; track f.label) {
+              @if (f.type === 'date') {
+                <app-date-field
+                  [label]="f.label"
+                  [value]="store.mappingInfoOf(f.label)"
+                  (valueChange)="store.setMappingInfo(f.label, $event)"
+                />
+              } @else {
+                <app-text-field
+                  [label]="f.label"
+                  [hint]="f.hint || ''"
+                  [value]="store.mappingInfoOf(f.label)"
+                  (valueChange)="store.setMappingInfo(f.label, $event)"
+                />
+              }
+            }
+          </div>
+
+          @for (group of config.wasteStreamGroups; track group.label) {
+            <h3 class="waste__group-title waste__group-title--spaced">{{ group.label }}</h3>
+            <div class="waste__streams">
+              @for (s of group.streams; track s.id) {
+                <div class="waste__stream">
+                  <div class="waste__stream-head">
+                    <span class="waste__stream-label">{{ s.label }}</span>
+                    <app-segmented-field
+                      [options]="yesNoOptions"
+                      [ariaLabel]="'Có phát sinh ' + s.label"
+                      [value]="$any(store.streamField(s.id, 'produce'))"
+                      (valueChange)="store.setStreamField(s.id, 'produce', $event)"
+                    />
+                  </div>
+                  @if (store.streamField(s.id, 'produce') === 'yes') {
+                    <div class="waste__stream-body">
+                      <app-number-field
+                        label="Khối lượng / tuần"
+                        [suffix]="s.unit"
+                        [value]="$any(store.streamField(s.id, 'volume'))"
+                        (valueChange)="store.setStreamField(s.id, 'volume', $event)"
+                      />
+                      <app-select-field
+                        label="Cách xử lý hiện tại"
+                        [options]="disposalOptions"
+                        [value]="$any(store.streamField(s.id, 'method'))"
+                        (valueChange)="store.setStreamField(s.id, 'method', $event)"
+                      />
+                      <app-text-field
+                        label="Ai thu gom?"
+                        [value]="$any(store.streamField(s.id, 'collector'))"
+                        (valueChange)="store.setStreamField(s.id, 'collector', $event)"
+                      />
+                      <div class="waste__field">
+                        <span class="waste__field-label">Có tuân thủ?</span>
+                        <app-segmented-field
+                          [options]="compliantOptions"
+                          [value]="$any(store.streamField(s.id, 'compliant'))"
+                          (valueChange)="store.setStreamField(s.id, 'compliant', $event)"
+                        />
+                      </div>
+                      <div class="waste__stream-notes">
+                        <app-textarea-field
+                          label="Ghi chú"
+                          placeholder="Ghi chú / lưu ý về luồng chất thải này"
+                          [rows]="2"
+                          [value]="$any(store.streamField(s.id, 'notes'))"
+                          (valueChange)="store.setStreamField(s.id, 'notes', $event)"
+                        />
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          <h3 class="waste__group-title waste__group-title--spaced">
+            Ước tính chi phí chất thải (VND / tháng)
+          </h3>
+          <div class="waste__grid2">
+            @for (item of config.mappingCostItems; track item.id) {
+              <app-number-field
+                [label]="item.label"
+                suffix="₫/tháng"
+                [value]="store.mappingCostOf(item.id)"
+                (valueChange)="store.setMappingCost(item.id, $event)"
+              />
+            }
+          </div>
+        </section>
+      }
+
+      <!-- ════ STEP: PRACTICES ASSESSMENT ════ -->
+      @case ('assessment') {
+        <section class="waste__section">
+          <h2 class="waste__section-title">Đánh giá thực hành quản lý chất thải</h2>
+          <p class="waste__section-note">
+            Chấm trung thực: Đầy đủ · Một phần · Chưa có · N/A (Không áp dụng).
+          </p>
+
+          @for (group of config.assessmentGroups; track group.id) {
+            <div class="waste__qgroup">
+              <h3 class="waste__group-title">{{ group.topic }}</h3>
+              <ul class="waste__questions">
+                @for (q of group.questions; track q.id) {
+                  <li class="waste__question">
+                    <div class="waste__question-body">
+                      <p class="waste__question-text">{{ q.text }}</p>
+                      <p class="waste__question-risk">
+                        <svg lucideTriangleAlert [size]="13" strokeWidth="1.8"></svg>
+                        <span>{{ q.risk }}</span>
+                      </p>
+                      @if (q.ref) {
+                        <p class="waste__question-ref">{{ q.ref }}</p>
+                      }
+                    </div>
+                    <app-segmented-field
+                      class="waste__question-scale"
+                      [options]="assessmentOptions"
+                      [ariaLabel]="q.text"
+                      [value]="store.assessmentOf(q.id)"
+                      (valueChange)="store.setAssessment(q.id, $event)"
+                    />
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+        </section>
+      }
+
+      <!-- ════ STEP: CONTRACTOR EVALUATION ════ -->
+      @case ('contractor') {
+        <section class="waste__section">
+          <h2 class="waste__section-title">Đánh giá nhà thầu xử lý chất thải</h2>
+          <p class="waste__section-note">Chấm mỗi tiêu chí từ 1 đến 5. Điểm có trọng số tự tính.</p>
+
+          <div class="waste__grid2">
+            @for (f of config.contractorFields; track f.label) {
+              @if (f.type === 'date') {
+                <app-date-field
+                  [label]="f.label"
+                  [value]="store.contractorInfoOf(f.label)"
+                  (valueChange)="store.setContractorInfo(f.label, $event)"
+                />
+              } @else {
+                <app-text-field
+                  [label]="f.label"
+                  [hint]="f.hint || ''"
+                  [value]="store.contractorInfoOf(f.label)"
+                  (valueChange)="store.setContractorInfo(f.label, $event)"
+                />
+              }
+            }
+          </div>
+
+          <div class="waste__criteria">
+            @for (c of config.contractorCriteria; track c.id) {
+              <div class="waste__criterion">
+                <div class="waste__criterion-head">
+                  <span class="waste__criterion-label">{{ c.label }}</span>
+                  <span class="waste__criterion-weight">Trọng số {{ c.weight }}%</span>
+                </div>
+                <p class="waste__criterion-desc">{{ c.desc }}</p>
+                <p class="waste__criterion-verify">Cách xác minh: {{ c.verify }}</p>
+                <app-segmented-field
+                  [options]="contractorScale"
+                  [ariaLabel]="c.label"
+                  [value]="store.contractorScoreOf(c.id)"
+                  (valueChange)="store.setContractorScore(c.id, $event)"
+                />
+              </div>
+            }
+          </div>
+
+          <div class="waste__callout">
+            <span>Điểm có trọng số (trên 5)</span>
+            <strong>
+              <span class="waste__dot" [class]="'is-' + store.contractorVerdictBand().tone"></span>
+              {{ store.contractorTotal().toFixed(2) }} · {{ store.contractorVerdictBand().label }}
+            </strong>
+          </div>
+        </section>
+      }
+
+      <!-- ════ STEP: FOOD WASTE TRACKER ════ -->
+      @case ('food') {
+        <section class="waste__section">
+          <h2 class="waste__section-title">Nhật ký rác thực phẩm</h2>
+          <p class="waste__section-note">Ghi lượng rác (kg) theo tuần và nguồn. Chi phí tự tính.</p>
+
+          <div class="waste__assumption">
+            <app-number-field
+              label="Chi phí thực phẩm trung bình mỗi kg"
+              suffix="₫/kg"
+              placeholder="VD: 35000"
+              [value]="store.foodCostPerKg()"
+              (valueChange)="store.setFoodCost($event)"
+            />
+          </div>
+
+          <div class="waste__table-scroll">
+            <table class="waste__table">
+              <thead>
+                <tr>
+                  <th class="waste__table-head-cell">Nguồn rác</th>
+                  @for (w of weeks; track w) {
+                    <th>Tuần {{ w + 1 }}</th>
+                  }
+                  <th>TB (kg)</th>
+                  <th>Chi phí/tuần</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of store.foodResults().rows; track row.id; let r = $index) {
+                  <tr>
+                    <td class="waste__table-head-cell">{{ row.label }}</td>
+                    @for (w of weeks; track w) {
+                      <td>
+                        <input
+                          class="waste__cell"
+                          type="number"
+                          inputmode="numeric"
+                          [value]="store.foodLogOf(row.id, w) ?? ''"
+                          (input)="
+                            store.setFoodLog(
+                              row.id,
+                              w,
+                              $any($event.target).value === '' ? null : +$any($event.target).value
+                            )
+                          "
+                        />
+                      </td>
+                    }
+                    <td class="waste__num">{{ num(row.avg) }}</td>
+                    <td class="waste__num">{{ vnd(row.weeklyCost) }} ₫</td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td class="waste__table-head-cell">Tổng</td>
+                  <td [attr.colspan]="weeks.length"></td>
+                  <td class="waste__num">{{ num(store.foodResults().totalAvg) }}</td>
+                  <td class="waste__num">{{ vnd(store.foodResults().weeklyCost) }} ₫</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="waste__callout">
+            <span>Ước tính chi phí rác thực phẩm mỗi năm</span>
+            <strong>{{ vnd(store.foodResults().annualCost) }} ₫</strong>
+          </div>
+        </section>
+      }
+
+      <!-- ════ STEP: MONTHLY DASHBOARD ════ -->
+      @case ('dashboard') {
+        <section class="waste__section">
+          <h2 class="waste__section-title">Dashboard 12 tháng</h2>
+          <p class="waste__section-note">Ghi khối lượng và chi phí thực tế mỗi tháng.</p>
+
+          <h3 class="waste__group-title">Khối lượng chất thải</h3>
+          <div class="waste__table-scroll">
+            <table class="waste__table">
+              <thead>
+                <tr>
+                  <th class="waste__table-head-cell">Loại</th>
+                  @for (m of months; track m) {
+                    <th>{{ monthLabels[m] }}</th>
+                  }
+                  <th>Năm</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of store.dashResults().volRows; track row.id) {
+                  <tr>
+                    <td class="waste__table-head-cell">{{ row.label }}</td>
+                    @for (m of months; track m) {
+                      <td>
+                        <input
+                          class="waste__cell"
+                          type="number"
+                          inputmode="numeric"
+                          [value]="store.dashVolumeOf(row.id, m) ?? ''"
+                          (input)="
+                            store.setDashVolume(
+                              row.id,
+                              m,
+                              $any($event.target).value === '' ? null : +$any($event.target).value
+                            )
+                          "
+                        />
+                      </td>
+                    }
+                    <td class="waste__num">{{ num(row.total) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="waste__group-title waste__group-title--spaced">Chi phí xử lý (VND)</h3>
+          <div class="waste__table-scroll">
+            <table class="waste__table">
+              <thead>
+                <tr>
+                  <th class="waste__table-head-cell">Khoản mục</th>
+                  @for (m of months; track m) {
+                    <th>{{ monthLabels[m] }}</th>
+                  }
+                  <th>Năm</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of store.dashResults().costRows; track row.id) {
+                  <tr>
+                    <td class="waste__table-head-cell">{{ row.label }}</td>
+                    @for (m of months; track m) {
+                      <td>
+                        <input
+                          class="waste__cell"
+                          type="number"
+                          inputmode="numeric"
+                          [value]="store.dashCostOf(row.id, m) ?? ''"
+                          (input)="
+                            store.setDashCost(
+                              row.id,
+                              m,
+                              $any($event.target).value === '' ? null : +$any($event.target).value
+                            )
+                          "
+                        />
+                      </td>
+                    }
+                    <td class="waste__num">{{ vnd(row.total) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="waste__callout-row">
+            <div class="waste__callout">
+              <span>Tổng khối lượng / năm</span>
+              <strong>{{ num(store.dashResults().totalVol) }}</strong>
+            </div>
+            <div class="waste__callout">
+              <span>Tổng chi phí / năm</span>
+              <strong>{{ vnd(store.dashResults().totalCost) }} ₫</strong>
+            </div>
+            <div class="waste__callout">
+              <span>Chi phí / kg</span>
+              <strong>{{ vnd(store.dashResults().costPerKg) }} ₫</strong>
+            </div>
+          </div>
+        </section>
+      }
+
+      <!-- ════ STEP: 90-DAY ACTION PLAN ════ -->
+      @case ('plan') {
+        <section class="waste__section">
+          <h2 class="waste__section-title">Kế hoạch hành động 90 ngày</h2>
+          <p class="waste__section-note">
+            Tập trung tối đa 8–10 việc. Làm tốt 8 việc hơn làm dở 20 việc.
+          </p>
+
+          <div class="waste__grid2">
+            @for (f of config.planFields; track f.label) {
+              @if (f.type === 'date') {
+                <app-date-field
+                  [label]="f.label"
+                  [value]="store.planInfoOf(f.label)"
+                  (valueChange)="store.setPlanInfo(f.label, $event)"
+                />
+              } @else {
+                <app-text-field
+                  [label]="f.label"
+                  [hint]="f.hint || ''"
+                  [value]="store.planInfoOf(f.label)"
+                  (valueChange)="store.setPlanInfo(f.label, $event)"
+                />
+              }
+            }
+          </div>
+
+          <div class="waste__actions">
+            @for (a of config.actions; track a.id; let i = $index) {
+              <div class="waste__action">
+                <div class="waste__action-head">
+                  <span class="waste__action-num">{{ i + 1 }}</span>
+                  <span class="waste__action-prio" [class]="'is-' + a.priority">
+                    {{ priorityLabels[a.priority] }}
+                  </span>
+                  <span class="waste__action-target">{{ a.targetDay }}</span>
+                </div>
+                <p class="waste__action-text">{{ a.action }}</p>
+                <p class="waste__action-measure">Đo lường thành công: {{ a.measure }}</p>
+                <div class="waste__action-fields">
+                  <app-text-field
+                    label="Người phụ trách"
+                    [value]="store.actionOf(a.id, 'owner')"
+                    (valueChange)="store.setAction(a.id, 'owner', $event)"
+                  />
+                  <div class="waste__field">
+                    <span class="waste__field-label">Trạng thái</span>
+                    <app-segmented-field
+                      [options]="actionStatusOptions"
+                      [value]="store.actionOf(a.id, 'status')"
+                      (valueChange)="store.setAction(a.id, 'status', $event)"
+                    />
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- ════ STEP: RESULTS ════ -->
+      @case ('results') {
+        <section class="waste__section">
+          <h2 class="waste__section-title">Kết quả</h2>
+          <p class="waste__section-note">Tổng hợp từ các bước bạn vừa hoàn thành.</p>
+
+          <div class="waste__overall">
+            <div>
+              <p class="waste__overall-label">Mức độ sẵn sàng (đánh giá thực hành)</p>
+              <p class="waste__overall-score">{{ store.assessmentOverall() }}%</p>
+            </div>
+            <p class="waste__overall-band">
+              <span class="waste__dot" [class]="'is-' + store.assessmentOverallBand().tone"></span>
+              {{ store.assessmentOverallBand().label }}
+            </p>
+          </div>
+
+          <div class="waste__chart">
+            <h3 class="waste__group-title">Điểm theo nhóm</h3>
+            <app-score-pie
+              [slices]="pieSlices()"
+              [centerLabel]="store.assessmentOverall() + '%'"
+              centerSub="Sẵn sàng"
+            />
+          </div>
+
+          <div class="waste__summary">
+            @for (r of store.assessmentResults(); track r.id) {
+              <div class="waste__summary-row">
+                <div class="waste__summary-top">
+                  <span class="waste__summary-label">{{ r.topic }}</span>
+                  <span class="waste__summary-score">
+                    Đầy đủ {{ r.full }} · Một phần {{ r.partial }} · Chưa có {{ r.none }}
+                  </span>
+                </div>
+                <app-meter [percent]="r.percent" [color]="sectionColors[r.id]" />
+                <div class="waste__summary-foot">
+                  <span>{{ r.percent }}%</span>
+                  <span class="waste__summary-band">
+                    <span class="waste__dot" [class]="'is-' + r.band.tone"></span>
+                    {{ r.band.label }}
+                  </span>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="waste__result-cards">
+            <div class="waste__result-card">
+              <p class="waste__result-card-label">Đánh giá nhà thầu</p>
+              <p class="waste__result-card-value">{{ store.contractorTotal().toFixed(2) }}/5</p>
+              <p class="waste__result-card-sub">
+                <span
+                  class="waste__dot"
+                  [class]="'is-' + store.contractorVerdictBand().tone"
+                ></span>
+                {{ store.contractorVerdictBand().label }}
+              </p>
+            </div>
+            <div class="waste__result-card">
+              <p class="waste__result-card-label">Chi phí rác thực phẩm / năm</p>
+              <p class="waste__result-card-value">{{ vnd(store.foodResults().annualCost) }} ₫</p>
+            </div>
+            <div class="waste__result-card">
+              <p class="waste__result-card-label">Tổng chi phí xử lý / năm</p>
+              <p class="waste__result-card-value">{{ vnd(store.dashResults().totalCost) }} ₫</p>
+              <p class="waste__result-card-sub">
+                Chi phí/kg: {{ vnd(store.dashResults().costPerKg) }} ₫
+              </p>
+            </div>
+          </div>
+        </section>
+      }
+    }
+
+    <!-- Step navigation -->
+    <nav class="waste__nav">
+      <button
+        type="button"
+        class="waste__nav-btn waste__nav-btn--ghost"
+        [disabled]="isFirstStep()"
+        (click)="prevStep()"
+      >
+        Quay lại
+      </button>
+
+      @if (currentStepData().kind === 'results') {
+        <button type="button" class="waste__nav-btn waste__nav-btn--ghost" (click)="resetScan()">
+          <svg lucideRotateCcw [size]="16" strokeWidth="2"></svg>
+          Làm lại
+        </button>
+      } @else if (store.currentStep() === totalSteps - 2) {
+        <button type="button" class="waste__nav-btn" (click)="nextStep()">Hoàn tất</button>
+      } @else {
+        <button type="button" class="waste__nav-btn" (click)="nextStep()">Tiếp tục</button>
+      }
+    </nav>
+  </main>
+</div>

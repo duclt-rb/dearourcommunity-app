@@ -1,0 +1,66 @@
+app-select-field {
+  display: block;
+}
+.select-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.select-field__label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-gray-800);
+}
+
+/* PrimeNG Select trigger — match the other fields */
+.select-field__control.p-select {
+  width: 100%;
+  height: 42px;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  background: var(--color-bg);
+}
+.select-field__control.p-select.p-focus,
+.select-field__control.p-select:not(.p-disabled):hover {
+  border-color: var(--color-primary);
+  box-shadow: none;
+}
+.select-field__control.p-select.p-focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 16%, transparent);
+}
+.select-field__control .p-select-label {
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  font-size: 0.9375rem;
+  color: var(--color-gray-900);
+}
+.select-field__control .p-select-label.p-placeholder {
+  color: var(--color-gray-500);
+}
+.select-field__control .p-select-dropdown {
+  width: 36px;
+  color: var(--color-gray-500);
+}
+
+/* Overlay panel — force light surface (appended to body) */
+.p-select-overlay {
+  background: #ffffff !important;
+  color: var(--color-gray-900) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-card) !important;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.12) !important;
+}
+.p-select-overlay .p-select-option {
+  color: var(--color-gray-800) !important;
+  padding: 9px 14px !important;
+  font-size: 0.9375rem !important;
+}
+.p-select-overlay .p-select-option:not(.p-select-option-selected):hover {
+  background: var(--color-bg-muted) !important;
+}
+.p-select-overlay .p-select-option.p-select-option-selected {
+  background: var(--color-primary-50) !important;
+  color: var(--color-primary-700) !important;
+}

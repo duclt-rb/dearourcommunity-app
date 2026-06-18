@@ -1,0 +1,13 @@
+<div class="segmented-field" role="group" [attr.aria-label]="ariaLabel()">
+  @for (opt of options(); track opt.value) {
+    <button
+      type="button"
+      class="segmented-field__btn"
+      [class.is-active]="value() === opt.value"
+      [attr.aria-pressed]="value() === opt.value"
+      (click)="select(opt.value)"
+    >
+      {{ opt.label }}
+    </button>
+  }
+</div>

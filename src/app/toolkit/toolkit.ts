@@ -4,11 +4,12 @@ import { ActivatedRoute } from '@angular/router';
 import { findToolkit, Toolkit } from './toolkit.data';
 import { getQuickScan } from './quick-scan/quick-scan.data';
 import { QuickScanComponent } from './quick-scan/quick-scan';
+import WasteToolkitComponent from './waste/waste';
 
 @Component({
   selector: 'app-toolkit',
   standalone: true,
-  imports: [CommonModule, QuickScanComponent],
+  imports: [CommonModule, QuickScanComponent, WasteToolkitComponent],
   templateUrl: './toolkit.html',
 })
 export default class ToolkitComponent implements OnInit {
@@ -17,6 +18,7 @@ export default class ToolkitComponent implements OnInit {
   id = signal<string | null>(null);
   toolkit = computed<Toolkit | undefined>(() => findToolkit(this.id()));
   quickScan = computed(() => getQuickScan(this.id()));
+  isWaste = computed(() => this.id() === 'waste-toolkit');
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {

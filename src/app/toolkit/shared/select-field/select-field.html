@@ -1,0 +1,15 @@
+<label class="select-field">
+  @if (label()) {
+    <span class="select-field__label">{{ label() }}</span>
+  }
+  <p-select
+    [options]="options()"
+    optionLabel="label"
+    optionValue="value"
+    [placeholder]="placeholder()"
+    [ngModel]="value()"
+    (ngModelChange)="value.set($event)"
+    appendTo="body"
+    styleClass="select-field__control"
+  />
+</label>
