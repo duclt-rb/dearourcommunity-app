@@ -80,7 +80,8 @@
                     <div class="waste__stream-body">
                       <app-number-field
                         label="Khối lượng / tuần"
-                        [suffix]="s.unit"
+                        [suffix]="' ' + s.unit"
+                        [maxFractionDigits]="1"
                         [value]="$any(store.streamField(s.id, 'volume'))"
                         (valueChange)="store.setStreamField(s.id, 'volume', $event)"
                       />
@@ -124,14 +125,36 @@
           </h3>
           <div class="waste__grid2">
             @for (item of config.mappingCostItems; track item.id) {
-              <app-number-field
-                [label]="item.label"
-                suffix="₫/tháng"
-                [value]="store.mappingCostOf(item.id)"
-                (valueChange)="store.setMappingCost(item.id, $event)"
-              />
+              <div class="waste__cost-item">
+                <app-number-field
+                  [label]="item.label"
+                  [currency]="true"
+                  [value]="store.mappingCostOf(item.id)"
+                  (valueChange)="store.setMappingCost(item.id, $event)"
+                />
+                <p class="waste__cost-annual">
+                  ≈ {{ vnd((store.mappingCostOf(item.id) ?? 0) * 12) }} VNĐ/năm
+                </p>
+              </div>
             }
           </div>
+
+          <div class="waste__callout-row waste__callout-row--two">
+            <div class="waste__callout">
+              <span>Tổng chi phí / tháng</span>
+              <strong>{{ vnd(store.mappingCostMonthly()) }} VNĐ</strong>
+            </div>
+            <div class="waste__callout">
+              <span>Tổng chi phí / năm</span>
+              <strong>{{ vnd(store.mappingCostAnnual()) }} VNĐ</strong>
+            </div>
+          </div>
+
+          <p class="waste__insight">
+            💡 Lưu ý quan trọng: Các doanh nghiệp lần đầu theo dõi chi phí chất thải thường phát
+            hiện họ đang chi nhiều hơn 20–40% so với dự kiến. Con số này trở thành mốc cơ sở của bạn
+            — mỗi cải tiến bạn thực hiện đều giúp giảm nó.
+          </p>
         </section>
       }
 
@@ -237,8 +260,8 @@
           <div class="waste__assumption">
             <app-number-field
               label="Chi phí thực phẩm trung bình mỗi kg"
-              suffix="₫/kg"
-              placeholder="VD: 35000"
+              [currency]="true"
+              placeholder="VD: 35.000 VNĐ"
               [value]="store.foodCostPerKg()"
               (valueChange)="store.setFoodCost($event)"
             />
@@ -264,7 +287,7 @@
                       <td>
                         <input
                           class="waste__cell"
-                          type="number"
+                          type="text"
                           inputmode="numeric"
                           [value]="store.foodLogOf(row.id, w) ?? ''"
                           (input)="
@@ -278,7 +301,7 @@
                       </td>
                     }
                     <td class="waste__num">{{ num(row.avg) }}</td>
-                    <td class="waste__num">{{ vnd(row.weeklyCost) }} ₫</td>
+                    <td class="waste__num">{{ vnd(row.weeklyCost) }} VNĐ</td>
                   </tr>
                 }
               </tbody>
@@ -287,7 +310,7 @@
                   <td class="waste__table-head-cell">Tổng</td>
                   <td [attr.colspan]="weeks.length"></td>
                   <td class="waste__num">{{ num(store.foodResults().totalAvg) }}</td>
-                  <td class="waste__num">{{ vnd(store.foodResults().weeklyCost) }} ₫</td>
+                  <td class="waste__num">{{ vnd(store.foodResults().weeklyCost) }} VNĐ</td>
                 </tr>
               </tfoot>
             </table>
@@ -295,7 +318,7 @@
 
           <div class="waste__callout">
             <span>Ước tính chi phí rác thực phẩm mỗi năm</span>
-            <strong>{{ vnd(store.foodResults().annualCost) }} ₫</strong>
+            <strong>{{ vnd(store.foodResults().annualCost) }} VNĐ</strong>
           </div>
         </section>
       }
@@ -326,7 +349,7 @@
                       <td>
                         <input
                           class="waste__cell"
-                          type="number"
+                          type="text"
                           inputmode="numeric"
                           [value]="store.dashVolumeOf(row.id, m) ?? ''"
                           (input)="
@@ -366,7 +389,7 @@
                       <td>
                         <input
                           class="waste__cell"
-                          type="number"
+                          type="text"
                           inputmode="numeric"
                           [value]="store.dashCostOf(row.id, m) ?? ''"
                           (input)="
@@ -393,11 +416,11 @@
             </div>
             <div class="waste__callout">
               <span>Tổng chi phí / năm</span>
-              <strong>{{ vnd(store.dashResults().totalCost) }} ₫</strong>
+              <strong>{{ vnd(store.dashResults().totalCost) }} VNĐ</strong>
             </div>
             <div class="waste__callout">
               <span>Chi phí / kg</span>
-              <strong>{{ vnd(store.dashResults().costPerKg) }} ₫</strong>
+              <strong>{{ vnd(store.dashResults().costPerKg) }} VNĐ</strong>
             </div>
           </div>
         </section>
@@ -524,13 +547,13 @@
             </div>
             <div class="waste__result-card">
               <p class="waste__result-card-label">Chi phí rác thực phẩm / năm</p>
-              <p class="waste__result-card-value">{{ vnd(store.foodResults().annualCost) }} ₫</p>
+              <p class="waste__result-card-value">{{ vnd(store.foodResults().annualCost) }} VNĐ</p>
             </div>
             <div class="waste__result-card">
               <p class="waste__result-card-label">Tổng chi phí xử lý / năm</p>
-              <p class="waste__result-card-value">{{ vnd(store.dashResults().totalCost) }} ₫</p>
+              <p class="waste__result-card-value">{{ vnd(store.dashResults().totalCost) }} VNĐ</p>
               <p class="waste__result-card-sub">
-                Chi phí/kg: {{ vnd(store.dashResults().costPerKg) }} ₫
+                Chi phí/kg: {{ vnd(store.dashResults().costPerKg) }} VNĐ
               </p>
             </div>
           </div>

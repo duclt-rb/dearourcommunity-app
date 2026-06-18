@@ -2,19 +2,19 @@
   @if (label()) {
     <span class="number-field__label">{{ label() }}</span>
   }
-  <span class="number-field__wrap">
-    <input
-      class="number-field__input"
-      type="number"
-      inputmode="numeric"
-      [placeholder]="placeholder()"
-      [value]="value() ?? ''"
-      (input)="onInput($event)"
-    />
-    @if (suffix()) {
-      <span class="number-field__suffix">{{ suffix() }}</span>
-    }
-  </span>
+  <p-inputnumber
+    [ngModel]="value()"
+    (ngModelChange)="value.set($event)"
+    mode="decimal"
+    locale="vi-VN"
+    [useGrouping]="true"
+    [maxFractionDigits]="maxFractionDigits()"
+    [suffix]="currency() ? ' VNĐ' : suffix()"
+    [placeholder]="placeholder()"
+    [fluid]="true"
+    styleClass="number-field__control"
+    inputStyleClass="number-field__input"
+  />
   @if (hint()) {
     <span class="number-field__hint">{{ hint() }}</span>
   }

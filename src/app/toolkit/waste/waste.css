@@ -296,6 +296,29 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
+.waste__callout-row--two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.waste__cost-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.waste__cost-annual {
+  font-size: 0.75rem;
+  color: var(--color-gray-500);
+  font-variant-numeric: tabular-nums;
+}
+.waste__insight {
+  margin-top: 16px;
+  padding: 14px 18px;
+  border-radius: var(--radius-card);
+  background: var(--color-warning-50);
+  border: 1px solid var(--color-warning-100);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--color-gray-700);
+}
 .waste__callout-row .waste__callout {
   margin-top: 0;
   flex-direction: column;

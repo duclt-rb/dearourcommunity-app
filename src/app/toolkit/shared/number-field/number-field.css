@@ -1,4 +1,4 @@
-:host {
+app-number-field {
   display: block;
 }
 .number-field {
@@ -11,10 +11,8 @@
   font-weight: 500;
   color: var(--color-gray-800);
 }
-.number-field__wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
+.number-field__control {
+  width: 100%;
 }
 .number-field__input {
   width: 100%;
@@ -30,17 +28,13 @@
     border-color 0.18s ease,
     box-shadow 0.18s ease;
 }
-.number-field__input:focus {
+.number-field__input:enabled:focus {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 16%, transparent);
 }
-.number-field__suffix {
-  position: absolute;
-  right: 14px;
-  font-size: 0.8125rem;
+.number-field__input::placeholder {
   color: var(--color-gray-500);
-  pointer-events: none;
 }
 .number-field__hint {
   font-size: 0.75rem;

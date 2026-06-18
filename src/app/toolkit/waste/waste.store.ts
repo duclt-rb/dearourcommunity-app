@@ -145,6 +145,15 @@ export const WasteStore = signalStore(
       });
     }),
 
+    mappingCostMonthly: computed(() => {
+      const costs = store.mappingCosts();
+      return WASTE_TOOLKIT.mappingCostItems.reduce((sum, i) => sum + (costs[i.id] ?? 0), 0);
+    }),
+    mappingCostAnnual: computed(() => {
+      const costs = store.mappingCosts();
+      return WASTE_TOOLKIT.mappingCostItems.reduce((sum, i) => sum + (costs[i.id] ?? 0), 0) * 12;
+    }),
+
     contractorTotal: computed(() => {
       const s = store.contractorScores();
       return WASTE_TOOLKIT.contractorCriteria.reduce((sum, c) => {
