@@ -16,8 +16,8 @@ const FNB: QuickScanConfig = {
     { label: 'Số năm hoạt động' },
     { label: 'Người thực hiện đánh giá' },
     { label: 'Vai trò / Phòng ban' },
-    { label: 'Ngày đánh giá' },
-    { label: 'Đã từng đào tạo ESG chưa?', hint: 'Có / Không' },
+    { label: 'Ngày đánh giá', type: 'date' },
+    { label: 'Đã từng đào tạo ESG chưa?', type: 'boolean' },
     { label: 'Mối quan tâm ESG chính', hint: 'VD: Rác thải, Năng lượng, Nghỉ việc, Tuân thủ' },
   ],
   pillars: [
@@ -366,7 +366,7 @@ const SUPPLY: QuickScanConfig = {
     { label: 'Số nhà cung cấp đang hoạt động (ước tính)' },
     { label: 'Người thực hiện đánh giá' },
     { label: 'Vai trò / Phòng ban' },
-    { label: 'Ngày đánh giá' },
+    { label: 'Ngày đánh giá', type: 'date' },
     {
       label: 'Mối quan tâm ESG chính',
       hint: 'VD: Rác thải, Năng lượng, Tuân thủ lao động, Chất lượng NCC',

@@ -54,12 +54,30 @@
           <p class="quick-scan__section-note">Điền trước khi bắt đầu đánh giá.</p>
           <div class="quick-scan__profile">
             @for (field of config().profileFields; track field.label) {
-              <app-text-field
-                [label]="field.label"
-                [hint]="field.hint || ''"
-                [value]="store.profileOf(field.label)"
-                (valueChange)="store.setProfile(field.label, $event)"
-              />
+              @switch (field.type) {
+                @case ('date') {
+                  <app-date-field
+                    [label]="field.label"
+                    [value]="store.profileOf(field.label)"
+                    (valueChange)="store.setProfile(field.label, $event)"
+                  />
+                }
+                @case ('boolean') {
+                  <app-bool-field
+                    [label]="field.label"
+                    [value]="store.profileOf(field.label)"
+                    (valueChange)="store.setProfile(field.label, $event)"
+                  />
+                }
+                @default {
+                  <app-text-field
+                    [label]="field.label"
+                    [hint]="field.hint || ''"
+                    [value]="store.profileOf(field.label)"
+                    (valueChange)="store.setProfile(field.label, $event)"
+                  />
+                }
+              }
             }
           </div>
         </section>
@@ -143,7 +161,13 @@
             </div>
             <div class="quick-scan__overall-right">
               <p class="quick-scan__overall-percent">{{ store.totalPercent() }}%</p>
-              <p class="quick-scan__overall-maturity">{{ store.totalMaturity() }}</p>
+              <p class="quick-scan__overall-maturity">
+                <span
+                  class="quick-scan__maturity-dot"
+                  [class]="'is-' + store.totalMaturityTone()"
+                ></span>
+                {{ store.totalMaturity() }}
+              </p>
             </div>
           </div>
 
@@ -166,7 +190,10 @@
                 <app-meter [percent]="r.percent" [color]="colorFor(r.key)" />
                 <div class="quick-scan__summary-foot">
                   <span>{{ r.percent }}%</span>
-                  <span>{{ r.maturity }}</span>
+                  <span class="quick-scan__summary-maturity">
+                    <span class="quick-scan__maturity-dot" [class]="'is-' + r.maturityTone"></span>
+                    {{ r.maturity }}
+                  </span>
                 </div>
               </div>
             }

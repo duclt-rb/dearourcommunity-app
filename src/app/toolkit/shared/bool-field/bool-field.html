@@ -1,0 +1,23 @@
+<div class="bool-field">
+  <span class="bool-field__label">{{ label() }}</span>
+  <div class="bool-field__options" role="group" [attr.aria-label]="label()">
+    <button
+      type="button"
+      class="bool-field__btn"
+      [class.is-active]="value() === trueLabel()"
+      [attr.aria-pressed]="value() === trueLabel()"
+      (click)="select(trueLabel())"
+    >
+      {{ trueLabel() }}
+    </button>
+    <button
+      type="button"
+      class="bool-field__btn"
+      [class.is-active]="value() === falseLabel()"
+      [attr.aria-pressed]="value() === falseLabel()"
+      (click)="select(falseLabel())"
+    >
+      {{ falseLabel() }}
+    </button>
+  </div>
+</div>

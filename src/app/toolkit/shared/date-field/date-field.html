@@ -1,0 +1,13 @@
+<label class="date-field">
+  <span class="date-field__label">{{ label() }}</span>
+  <p-datepicker
+    [ngModel]="dateValue()"
+    (ngModelChange)="onSelect($event)"
+    dateFormat="dd/mm/yy"
+    [showIcon]="true"
+    iconDisplay="input"
+    appendTo="body"
+    styleClass="date-field__picker"
+    inputStyleClass="date-field__input"
+  />
+</label>

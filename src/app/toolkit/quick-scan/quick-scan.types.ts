@@ -1,8 +1,12 @@
 export type PillarKey = 'environment' | 'social' | 'governance';
 
+export type ProfileFieldType = 'text' | 'date' | 'boolean';
+
 export interface ProfileField {
   label: string;
   hint?: string;
+  /** Control to render; defaults to 'text'. */
+  type?: ProfileFieldType;
 }
 
 export interface ScanQuestion {
@@ -46,21 +50,31 @@ export interface QuickScanConfig {
   priorityFocus: PriorityFocus[];
 }
 
+export type MaturityTone = 'error' | 'warning' | 'success';
+
 export interface MaturityLevel {
   label: string;
   /** Inclusive lower bound, as a percentage 0–100. */
   min: number;
+  tone: MaturityTone;
 }
 
-/** Shared 3-band maturity scale derived from the Results Dashboard. */
+/**
+ * Maturity scale from the Results Dashboard formula:
+ * < 40% → Early Stage, < 70% → Developing, else Established.
+ */
 export const MATURITY_LEVELS: MaturityLevel[] = [
-  { label: 'Đã dẫn dắt', min: 70 },
-  { label: 'Đang phát triển', min: 40 },
-  { label: 'Giai đoạn đầu', min: 0 },
+  { label: 'Established', min: 70, tone: 'success' },
+  { label: 'Developing', min: 40, tone: 'warning' },
+  { label: 'Early Stage', min: 0, tone: 'error' },
 ];
 
+export function maturityLevelFor(percent: number): MaturityLevel {
+  return (
+    MATURITY_LEVELS.find((l) => percent >= l.min) ?? MATURITY_LEVELS[MATURITY_LEVELS.length - 1]
+  );
+}
+
 export function maturityFor(percent: number): string {
-  const level =
-    MATURITY_LEVELS.find((l) => percent >= l.min) ?? MATURITY_LEVELS[MATURITY_LEVELS.length - 1];
-  return level.label;
+  return maturityLevelFor(percent).label;
 }

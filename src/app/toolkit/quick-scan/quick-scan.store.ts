@@ -7,7 +7,14 @@ import {
   withMethods,
   withState,
 } from '@ngrx/signals';
-import { maturityFor, PillarKey, PillarSection, QuickScanConfig } from './quick-scan.types';
+import {
+  maturityFor,
+  maturityLevelFor,
+  MaturityTone,
+  PillarKey,
+  PillarSection,
+  QuickScanConfig,
+} from './quick-scan.types';
 
 /** Persisted slice of the scan, keyed per toolkit id in localStorage. */
 interface PersistedScan {
@@ -57,6 +64,7 @@ interface PillarResult {
   max: number;
   percent: number;
   maturity: string;
+  maturityTone: MaturityTone;
 }
 
 type StepKind = 'profile' | 'pillar' | 'results';
@@ -98,13 +106,15 @@ export const QuickScanStore = signalStore(
           .flatMap((g) => g.questions)
           .reduce((sum, q) => sum + (scores[q.id] ?? 0), 0);
         const percent = pillar.maxScore > 0 ? Math.round((score / pillar.maxScore) * 100) : 0;
+        const level = maturityLevelFor(percent);
         return {
           key: pillar.key,
           label: pillar.label,
           score,
           max: pillar.maxScore,
           percent,
-          maturity: maturityFor(percent),
+          maturity: level.label,
+          maturityTone: level.tone,
         };
       });
     }),
@@ -152,6 +162,7 @@ export const QuickScanStore = signalStore(
   // ── Maturity label needs totalPercent ──
   withComputed((store) => ({
     totalMaturity: computed(() => maturityFor(store.totalPercent())),
+    totalMaturityTone: computed<MaturityTone>(() => maturityLevelFor(store.totalPercent()).tone),
   })),
 
   withMethods((store) => ({

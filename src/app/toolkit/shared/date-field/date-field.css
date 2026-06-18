@@ -1,0 +1,91 @@
+app-date-field {
+  display: block;
+}
+.date-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.date-field__label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-gray-800);
+}
+
+/* PrimeNG DatePicker host + input (ViewEncapsulation.None) */
+.date-field__picker {
+  width: 100%;
+  display: block;
+}
+.date-field__input {
+  width: 100%;
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  background: var(--color-bg);
+  font-size: 0.9375rem;
+  font-family: inherit;
+  color: var(--color-gray-900);
+}
+.date-field__input:enabled:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 16%, transparent);
+}
+
+/* Input icon — vertically centered */
+.date-field__picker {
+  position: relative;
+}
+.date-field__picker .p-datepicker-input-icon-container,
+.date-field__picker .p-datepicker-input-icon {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  margin-top: 0;
+  transform: translateY(-50%);
+  color: var(--color-gray-500);
+  pointer-events: none;
+}
+.date-field__input {
+  padding-right: 40px;
+}
+
+/* Calendar popup — force light surface (appended to body, styled globally) */
+.p-datepicker-panel {
+  background: #ffffff !important;
+  color: var(--color-gray-900) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-card) !important;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.12) !important;
+}
+.p-datepicker-panel .p-datepicker-header {
+  background: #ffffff !important;
+  color: var(--color-gray-900) !important;
+  border-bottom: 1px solid var(--color-border-light) !important;
+}
+.p-datepicker-panel .p-datepicker-title,
+.p-datepicker-panel .p-datepicker-select-month,
+.p-datepicker-panel .p-datepicker-select-year,
+.p-datepicker-panel .p-datepicker-prev-button,
+.p-datepicker-panel .p-datepicker-next-button,
+.p-datepicker-panel .p-datepicker-weekday,
+.p-datepicker-panel .p-datepicker-day {
+  color: var(--color-gray-800) !important;
+}
+.p-datepicker-panel .p-datepicker-prev-button:hover,
+.p-datepicker-panel .p-datepicker-next-button:hover,
+.p-datepicker-panel .p-datepicker-select-month:hover,
+.p-datepicker-panel .p-datepicker-select-year:hover,
+.p-datepicker-panel .p-datepicker-day:not(.p-datepicker-day-selected):hover {
+  background: var(--color-bg-muted) !important;
+}
+.p-datepicker-panel .p-datepicker-today .p-datepicker-day {
+  background: var(--color-primary-50) !important;
+  color: var(--color-primary-700) !important;
+}
+.p-datepicker-panel .p-datepicker-day-selected {
+  background: var(--color-primary) !important;
+  color: #ffffff !important;
+}

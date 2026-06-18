@@ -8,6 +8,8 @@ import {
   LucideUsers,
 } from '@lucide/angular';
 import LogoComponent from '../../shared/logo/logo';
+import { BoolFieldComponent } from '../shared/bool-field/bool-field';
+import { DateFieldComponent } from '../shared/date-field/date-field';
 import { MeterComponent } from '../shared/meter/meter';
 import { PriorityBadgeComponent } from '../shared/priority-badge/priority-badge';
 import { PieSlice, ScorePieComponent } from '../shared/score-pie/score-pie';
@@ -36,6 +38,8 @@ const PILLAR_COLORS: Record<PillarKey, string> = {
     LogoComponent,
     ScoreScaleComponent,
     TextFieldComponent,
+    DateFieldComponent,
+    BoolFieldComponent,
     MeterComponent,
     PriorityBadgeComponent,
     ScorePieComponent,
