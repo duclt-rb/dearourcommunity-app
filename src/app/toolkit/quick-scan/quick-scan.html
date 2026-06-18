@@ -1,0 +1,209 @@
+<div class="quick-scan">
+  <!-- Top bar -->
+  <header class="quick-scan__bar">
+    <div class="quick-scan__bar-inner">
+      <a routerLink="/" class="quick-scan__back">
+        <svg lucideArrowLeft [size]="16" strokeWidth="2"></svg>
+        <span>Trang chủ</span>
+      </a>
+      <div class="quick-scan__bar-right">
+        <span class="quick-scan__bar-progress">
+          Bước {{ store.currentStep() + 1 }}/{{ store.totalSteps() }}
+        </span>
+        <button type="button" class="quick-scan__reset" (click)="resetScan()">
+          <svg lucideRotateCcw [size]="14" strokeWidth="2"></svg>
+          <span>Làm lại</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step progress -->
+    <div class="quick-scan__stepper">
+      @for (step of store.steps(); track step.label; let i = $index) {
+        <button
+          type="button"
+          class="quick-scan__step"
+          [class.is-active]="i === store.currentStep()"
+          [class.is-done]="i < store.currentStep()"
+          [attr.aria-current]="i === store.currentStep() ? 'step' : null"
+          (click)="store.goToStep(i)"
+        >
+          <span class="quick-scan__step-bar"></span>
+          <span class="quick-scan__step-label">{{ step.label }}</span>
+        </button>
+      }
+    </div>
+  </header>
+
+  <main class="quick-scan__main">
+    @switch (store.currentStepData()?.kind) {
+      <!-- Step: Business profile -->
+      @case ('profile') {
+        <section class="quick-scan__section">
+          <p class="quick-scan__sector">{{ config().sector }}</p>
+          <h1 class="quick-scan__title">{{ config().name }}</h1>
+          <p class="quick-scan__lead">
+            Tự đánh giá nhanh mức độ sẵn sàng ESG của doanh nghiệp. Với mỗi câu hỏi, chọn mức độ phù
+            hợp với thực tế của bạn.
+          </p>
+          <ul class="quick-scan__legend">
+            @for (opt of scaleOptions; track opt.value) {
+              <li>
+                <span class="quick-scan__legend-num">{{ opt.value }}</span> {{ opt.label }}
+              </li>
+            }
+          </ul>
+
+          <h2 class="quick-scan__section-title quick-scan__section-title--spaced">
+            Thông tin doanh nghiệp
+          </h2>
+          <p class="quick-scan__section-note">Điền trước khi bắt đầu đánh giá.</p>
+          <div class="quick-scan__profile">
+            @for (field of config().profileFields; track field.label) {
+              <app-text-field
+                [label]="field.label"
+                [hint]="field.hint || ''"
+                [value]="store.profileOf(field.label)"
+                (valueChange)="store.setProfile(field.label, $event)"
+              />
+            }
+          </div>
+        </section>
+      }
+
+      <!-- Step: Pillar -->
+      @case ('pillar') {
+        @if (store.currentPillar(); as pillar) {
+          <section class="quick-scan__section">
+            <div class="quick-scan__pillar-head">
+              <span class="quick-scan__pillar-icon" [attr.data-pillar]="pillar.key">
+                @switch (pillar.key) {
+                  @case ('environment') {
+                    <svg lucideLeaf [size]="20" strokeWidth="1.6"></svg>
+                  }
+                  @case ('social') {
+                    <svg lucideUsers [size]="20" strokeWidth="1.6"></svg>
+                  }
+                  @case ('governance') {
+                    <svg lucideLandmark [size]="20" strokeWidth="1.6"></svg>
+                  }
+                }
+              </span>
+              <div>
+                <h2 class="quick-scan__section-title">{{ pillar.label }}</h2>
+                <p class="quick-scan__section-note">
+                  Đã trả lời {{ store.pillarAnswered(pillar) }}/{{
+                    store.pillarQuestionCount(pillar)
+                  }}
+                  câu
+                </p>
+              </div>
+            </div>
+
+            @for (group of pillar.groups; track group.topic) {
+              <div class="quick-scan__group">
+                <div class="quick-scan__group-head">
+                  <h3 class="quick-scan__group-title">{{ group.topic }}</h3>
+                  @if (group.priority) {
+                    <app-priority-badge />
+                  }
+                </div>
+
+                <ul class="quick-scan__questions">
+                  @for (q of group.questions; track q.id) {
+                    <li class="quick-scan__question">
+                      <div class="quick-scan__question-body">
+                        <p class="quick-scan__question-text">{{ q.text }}</p>
+                        <p class="quick-scan__question-risk">
+                          <svg lucideTriangleAlert [size]="13" strokeWidth="1.8"></svg>
+                          <span>{{ q.risk }}</span>
+                        </p>
+                      </div>
+                      <app-score-scale
+                        [ariaLabel]="q.text"
+                        [value]="store.scoreOf(q.id)"
+                        (valueChange)="store.setScore(q.id, $event)"
+                      />
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+          </section>
+        }
+      }
+
+      <!-- Step: Results -->
+      @case ('results') {
+        <section class="quick-scan__section quick-scan__results">
+          <h2 class="quick-scan__section-title">Kết quả</h2>
+          <p class="quick-scan__section-note">Tổng hợp từ các bước bạn vừa hoàn thành.</p>
+
+          <div class="quick-scan__overall">
+            <div>
+              <p class="quick-scan__overall-label">Tổng điểm</p>
+              <p class="quick-scan__overall-score">
+                {{ store.totalScore()
+                }}<span class="quick-scan__overall-max">/ {{ store.totalMax() }}</span>
+              </p>
+            </div>
+            <div class="quick-scan__overall-right">
+              <p class="quick-scan__overall-percent">{{ store.totalPercent() }}%</p>
+              <p class="quick-scan__overall-maturity">{{ store.totalMaturity() }}</p>
+            </div>
+          </div>
+
+          <div class="quick-scan__pillars-summary">
+            @for (r of store.results(); track r.key) {
+              <div class="quick-scan__summary-row">
+                <div class="quick-scan__summary-top">
+                  <span class="quick-scan__summary-label">{{ r.label }}</span>
+                  <span class="quick-scan__summary-score">{{ r.score }} / {{ r.max }}</span>
+                </div>
+                <app-meter [percent]="r.percent" />
+                <div class="quick-scan__summary-foot">
+                  <span>{{ r.percent }}%</span>
+                  <span>{{ r.maturity }}</span>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="quick-scan__focus">
+            <h3 class="quick-scan__group-title">Khu vực ưu tiên (3–6 tháng tới)</h3>
+            <ul class="quick-scan__focus-list">
+              @for (f of config().priorityFocus; track f.area) {
+                <li class="quick-scan__focus-item">
+                  <div class="quick-scan__focus-head">
+                    <span class="quick-scan__focus-area">{{ f.area }}</span>
+                    <span class="quick-scan__focus-pillar">{{ f.pillar }}</span>
+                  </div>
+                  <p class="quick-scan__focus-benefit">{{ f.benefit }}</p>
+                </li>
+              }
+            </ul>
+          </div>
+        </section>
+      }
+    }
+
+    <!-- Step navigation -->
+    <nav class="quick-scan__nav">
+      <button
+        type="button"
+        class="quick-scan__nav-btn quick-scan__nav-btn--ghost"
+        [disabled]="store.isFirstStep()"
+        (click)="store.prevStep()"
+      >
+        Quay lại
+      </button>
+      @if (!store.isLastStep()) {
+        <button type="button" class="quick-scan__nav-btn" (click)="store.nextStep()">
+          Tiếp tục
+        </button>
+      } @else {
+        <a routerLink="/" class="quick-scan__nav-btn">Hoàn tất</a>
+      }
+    </nav>
+  </main>
+</div>

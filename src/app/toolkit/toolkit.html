@@ -1,14 +1,18 @@
 <!-- Toolkit page (public) -->
-@if (toolkit(); as tk) {
-  <div>
-    <h1>{{ tk.name }}</h1>
-    <p>ID: {{ tk.id }}</p>
+@if (quickScan(); as scan) {
+  <app-quick-scan [config]="scan" />
+} @else if (toolkit(); as tk) {
+  <div class="mx-auto max-w-[760px] px-6 py-24 text-center">
+    <h1 class="text-2xl font-semibold text-gray-900">{{ tk.name }}</h1>
     @if (tk.comingSoon) {
-      <p>Coming soon</p>
+      <p class="mt-3 text-gray-600">Công cụ này sẽ sớm ra mắt.</p>
+    } @else {
+      <p class="mt-3 text-gray-600">Nội dung công cụ đang được cập nhật.</p>
     }
   </div>
 } @else {
-  <div>
-    <p>Không tìm thấy toolkit: {{ id() }}</p>
+  <div class="mx-auto max-w-[760px] px-6 py-24 text-center">
+    <h1 class="text-2xl font-semibold text-gray-900">Không tìm thấy công cụ</h1>
+    <p class="mt-3 text-gray-600">Đường dẫn không hợp lệ: {{ id() }}</p>
   </div>
 }

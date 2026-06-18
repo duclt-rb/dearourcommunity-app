@@ -1,0 +1,33 @@
+:host {
+  display: block;
+}
+.text-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.text-field__label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-gray-800);
+}
+.text-field__input {
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  background: var(--color-bg);
+  font-size: 0.9375rem;
+  color: var(--color-gray-900);
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+.text-field__input::placeholder {
+  color: var(--color-gray-500);
+}
+.text-field__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 16%, transparent);
+}

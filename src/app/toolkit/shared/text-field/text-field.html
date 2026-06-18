@@ -1,0 +1,10 @@
+<label class="text-field">
+  <span class="text-field__label">{{ label() }}</span>
+  <input
+    class="text-field__input"
+    type="text"
+    [placeholder]="hint()"
+    [value]="value()"
+    (input)="onInput($event)"
+  />
+</label>

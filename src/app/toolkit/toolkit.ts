@@ -2,11 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { findToolkit, Toolkit } from './toolkit.data';
+import { getQuickScan } from './quick-scan/quick-scan.data';
+import { QuickScanComponent } from './quick-scan/quick-scan';
 
 @Component({
   selector: 'app-toolkit',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, QuickScanComponent],
   templateUrl: './toolkit.html',
 })
 export default class ToolkitComponent implements OnInit {
@@ -14,6 +16,7 @@ export default class ToolkitComponent implements OnInit {
 
   id = signal<string | null>(null);
   toolkit = computed<Toolkit | undefined>(() => findToolkit(this.id()));
+  quickScan = computed(() => getQuickScan(this.id()));
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {

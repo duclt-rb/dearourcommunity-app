@@ -1,0 +1,14 @@
+<div class="score-scale" role="group" [attr.aria-label]="ariaLabel()">
+  @for (opt of options(); track opt.value) {
+    <button
+      type="button"
+      class="score-scale__btn"
+      [class.is-active]="value() === opt.value"
+      [attr.aria-pressed]="value() === opt.value"
+      (click)="select(opt.value)"
+    >
+      <span class="score-scale__num">{{ opt.value }}</span>
+      <span class="score-scale__label">{{ opt.label }}</span>
+    </button>
+  }
+</div>

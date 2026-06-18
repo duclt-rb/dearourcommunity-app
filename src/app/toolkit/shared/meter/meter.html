@@ -1,0 +1,9 @@
+<div
+  class="meter"
+  role="progressbar"
+  aria-valuemin="0"
+  aria-valuemax="100"
+  [attr.aria-valuenow]="clamped()"
+>
+  <span class="meter__fill" [style.width.%]="clamped()"></span>
+</div>
