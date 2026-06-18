@@ -1,0 +1,34 @@
+,,,,,,,,,,,,,,
+,MONTHLY WASTE DASHBOARD — 12-Month Rolling Tracker,,,,,,,,,,,,,
+,,,,,,,,,,,,,,
+,"Record actual waste volumes and disposal costs each month. Auto-calculates cost per kg, monthly totals, and trend indicators.",,,,,,,,,,,,,
+,,,,,,,,,,,,,,
+,SECTION A — MONTHLY WASTE VOLUMES (kg),,,,,,,,,,,,,
+,WASTE CATEGORY,Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec,"ANNUAL
+TOTAL (kg)"
+,Food / Organic Waste (kg),,,,,,,,,,,,,0
+,"Recyclables (plastic, paper, glass, metal) (kg)",,,,,,,,,,,,,0
+,General / Mixed Waste (kg),,,,,,,,,,,,,0
+,Hazardous Waste (kg),,,,,,,,,,,,,0
+,Cooking Oil / Grease (litres),,,,,,,,,,,,,0
+,Production Scrap (if applicable) (kg),,,,,,,,,,,,,0
+,Other (kg),,,,,,,,,,,,,0
+,TOTAL WASTE VOLUME,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+,,,,,,,,,,,,,,
+,SECTION B — MONTHLY DISPOSAL COSTS (VND),,,,,,,,,,,,,
+,COST CATEGORY,Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec,"ANNUAL
+TOTAL (VND)"
+,Waste contractor fees,,,,,,,,,,,,,0
+,Municipality fees,,,,,,,,,,,,,0
+,Hazardous waste disposal,,,,,,,,,,,,,0
+,Equipment / bags / bins,,,,,,,,,,,,,0
+,Other disposal costs,,,,,,,,,,,,,0
+,TOTAL DISPOSAL COST,0,0,0,0,0,0,0,0,0,0,0,0,0
+,,,,,,,,,,,,,,
+,SECTION C — COST PER KG & TREND INDICATORS (auto-calculated),,,,,,,,,,,,,
+,METRIC,Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec,AVERAGE
+,Cost per kg of waste (VND/kg),,,,,,,,,,,,,
+,Month-on-month volume change (%),"""""",,,,,,,,,,,,
+,Month-on-month cost change (%),"""""",,,,,,,,,,,,
+,,,,,,,,,,,,,,
+,💡  Target: Cost per kg should decrease over time as separation improves and waste volumes are reduced. A 10% reduction in total waste volume in 90 days is an achievable first target for most businesses.,,,,,,,,,,,,,

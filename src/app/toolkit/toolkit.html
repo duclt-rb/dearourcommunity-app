@@ -1,0 +1,14 @@
+<!-- Toolkit page (public) -->
+@if (toolkit(); as tk) {
+  <div>
+    <h1>{{ tk.name }}</h1>
+    <p>ID: {{ tk.id }}</p>
+    @if (tk.comingSoon) {
+      <p>Coming soon</p>
+    }
+  </div>
+} @else {
+  <div>
+    <p>Không tìm thấy toolkit: {{ id() }}</p>
+  </div>
+}

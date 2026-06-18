@@ -1,0 +1,25 @@
+,,,,,
+,🏛 GOVERNANCE — Supply Chain SMEs,,,,
+,,,,,
+,Score: 0 = Not in place  |  1 = Partially  |  2 = Fully in place,,,,
+,,,,,
+,TOPIC AREA,QUESTION / PRACTICE,"SCORE
+(0–2)",BUSINESS RISK IF NOT DONE,NOTES / EVIDENCE
+,"🔐 Data Compliance
+(PRIORITY)","Do you collect and store customer, supplier, or employee data? If yes, is access to this data restricted and secured?",,Data breach; violation of Vietnamese data protection law (Decree 13/2023); civil and regulatory liability,
+,,Do you have basic data backup and recovery procedures in place?,,"Permanent loss of business records from ransomware, hardware failure, or fire",
+,,"Are staff trained on basic data security practices (e.g. password management, not sharing credentials)?",,Internal breach; fraud; loss of business confidentiality,
+,"⚖️ Legal Risk Management
+& Compliance
+(PRIORITY)","Are all your operating licences (business registration, environmental permit, fire safety) current and valid?",,Risk of shutdown orders; fines; inability to operate legally,
+,,"Do you have a way to track when permits, certifications, or regulatory filings are due?",,Lapses discovered only during inspections; reactive compliance more costly than proactive,
+,,Do you conduct an internal compliance review at least once a year?,,Compliance gaps accumulate; penalties escalate when discovered,
+,,Are you aware of the ESG-related regulations most likely to affect your sector in the next 2–3 years?,,Unprepared for incoming requirements; reactive changes more expensive and disruptive,
+,"📣 Customer & Stakeholder
+Engagement","Do you have a standard process to receive, respond to, and track customer complaints?",,Repeated complaints go unresolved; customer churn; negative word-of-mouth,
+,,"Do you communicate product quality, safety, or improvement efforts to customers or buyers?",,Missed opportunity to build buyer trust and reduce audit frequency,
+,"🚫 Anti-Corruption
+& Ethics","Do procurement staff understand what constitutes a conflict of interest, inappropriate gift, or facilitation payment?",,Procurement fraud; inflated input costs; legal exposure for the business,
+,,Do you have a basic code of conduct communicated to all staff?,,Misconduct goes unchecked; disciplinary incidents harder to manage without documented standards,
+,,,,,
+,TOTAL SCORE  (🏛 Governance),,0,Max possible: 22,

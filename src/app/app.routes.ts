@@ -113,6 +113,10 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'toolkit/:id',
+    loadComponent: () => import('./toolkit/toolkit'),
+  },
+  {
     path: 'course/:courseId/lesson/:lessonId',
     loadComponent: () => import('./courses/lesson-player/lesson-player'),
   },
