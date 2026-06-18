@@ -64,9 +64,9 @@ export interface MaturityLevel {
  * < 40% → Early Stage, < 70% → Developing, else Established.
  */
 export const MATURITY_LEVELS: MaturityLevel[] = [
-  { label: 'Established', min: 70, tone: 'success' },
-  { label: 'Developing', min: 40, tone: 'warning' },
-  { label: 'Early Stage', min: 0, tone: 'error' },
+  { label: 'Đã thiết lập', min: 70, tone: 'success' },
+  { label: 'Đang phát triển', min: 40, tone: 'warning' },
+  { label: 'Giai đoạn đầu', min: 0, tone: 'error' },
 ];
 
 export function maturityLevelFor(percent: number): MaturityLevel {

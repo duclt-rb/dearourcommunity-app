@@ -5,11 +5,11 @@ export interface Toolkit {
 }
 
 export const TOOLKITS: Toolkit[] = [
-  { id: 'esg-quick-scan-fnb', name: 'ESG Quick Scan — F&B' },
-  { id: 'esg-quick-scan-supply-chain', name: 'ESG Quick Scan — Chuỗi Cung Ứng' },
-  { id: 'waste-toolkit', name: 'Waste Toolkit' },
-  { id: 'coming-soon-1', name: 'Toolkit mới (coming soon)', comingSoon: true },
-  { id: 'coming-soon-2', name: 'Toolkit mới (coming soon)', comingSoon: true },
+  { id: 'esg-quick-scan-fnb', name: 'Đánh giá nhanh ESG — F&B' },
+  { id: 'esg-quick-scan-supply-chain', name: 'Đánh giá nhanh ESG — Chuỗi Cung Ứng' },
+  { id: 'waste-toolkit', name: 'Bộ công cụ Chất thải' },
+  { id: 'coming-soon-1', name: 'Bộ công cụ mới (sắp ra mắt)', comingSoon: true },
+  { id: 'coming-soon-2', name: 'Bộ công cụ mới (sắp ra mắt)', comingSoon: true },
 ];
 
 export function findToolkit(id: string | null): Toolkit | undefined {
