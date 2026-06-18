@@ -9,6 +9,8 @@ import { Component, computed, input } from '@angular/core';
 export class MeterComponent {
   /** Fill percentage, 0–100. */
   percent = input.required<number>();
+  /** Any CSS color for the fill. */
+  color = input<string>('var(--color-primary)');
 
   readonly clamped = computed(() => Math.max(0, Math.min(100, this.percent())));
 }

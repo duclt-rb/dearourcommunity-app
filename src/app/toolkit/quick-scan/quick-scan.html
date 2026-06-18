@@ -2,19 +2,10 @@
   <!-- Top bar -->
   <header class="quick-scan__bar">
     <div class="quick-scan__bar-inner">
-      <a routerLink="/" class="quick-scan__back">
-        <svg lucideArrowLeft [size]="16" strokeWidth="2"></svg>
-        <span>Trang chủ</span>
-      </a>
-      <div class="quick-scan__bar-right">
-        <span class="quick-scan__bar-progress">
-          Bước {{ store.currentStep() + 1 }}/{{ store.totalSteps() }}
-        </span>
-        <button type="button" class="quick-scan__reset" (click)="resetScan()">
-          <svg lucideRotateCcw [size]="14" strokeWidth="2"></svg>
-          <span>Làm lại</span>
-        </button>
-      </div>
+      <app-logo height="72px" class="quick-scan__logo" />
+      <span class="quick-scan__bar-progress">
+        Bước {{ store.currentStep() + 1 }}/{{ store.totalSteps() }}
+      </span>
     </div>
 
     <!-- Step progress -->
@@ -28,7 +19,10 @@
           [attr.aria-current]="i === store.currentStep() ? 'step' : null"
           (click)="store.goToStep(i)"
         >
-          <span class="quick-scan__step-bar"></span>
+          <span
+            class="quick-scan__step-bar"
+            [style.background]="i <= store.currentStep() ? stepColor(step) : null"
+          ></span>
           <span class="quick-scan__step-label">{{ step.label }}</span>
         </button>
       }
@@ -153,6 +147,15 @@
             </div>
           </div>
 
+          <div class="quick-scan__chart">
+            <h3 class="quick-scan__group-title">Điểm theo nhóm</h3>
+            <app-score-pie
+              [slices]="pieSlices()"
+              [centerLabel]="store.totalScore() + '/' + store.totalMax()"
+              centerSub="Tổng điểm"
+            />
+          </div>
+
           <div class="quick-scan__pillars-summary">
             @for (r of store.results(); track r.key) {
               <div class="quick-scan__summary-row">
@@ -160,7 +163,7 @@
                   <span class="quick-scan__summary-label">{{ r.label }}</span>
                   <span class="quick-scan__summary-score">{{ r.score }} / {{ r.max }}</span>
                 </div>
-                <app-meter [percent]="r.percent" />
+                <app-meter [percent]="r.percent" [color]="colorFor(r.key)" />
                 <div class="quick-scan__summary-foot">
                   <span>{{ r.percent }}%</span>
                   <span>{{ r.maturity }}</span>
@@ -197,12 +200,24 @@
       >
         Quay lại
       </button>
-      @if (!store.isLastStep()) {
+
+      @if (store.currentStepData()?.kind === 'results') {
+        <button
+          type="button"
+          class="quick-scan__nav-btn quick-scan__nav-btn--ghost"
+          (click)="resetScan()"
+        >
+          <svg lucideRotateCcw [size]="16" strokeWidth="2"></svg>
+          Làm lại
+        </button>
+      } @else if (store.currentStep() === store.totalSteps() - 2) {
+        <button type="button" class="quick-scan__nav-btn" (click)="store.nextStep()">
+          Hoàn tất
+        </button>
+      } @else {
         <button type="button" class="quick-scan__nav-btn" (click)="store.nextStep()">
           Tiếp tục
         </button>
-      } @else {
-        <a routerLink="/" class="quick-scan__nav-btn">Hoàn tất</a>
       }
     </nav>
   </main>

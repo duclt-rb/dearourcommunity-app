@@ -1,0 +1,34 @@
+<div class="score-pie">
+  <svg class="score-pie__svg" viewBox="0 0 100 100" role="img" aria-label="Điểm theo nhóm">
+    <circle class="score-pie__track" cx="50" cy="50" [attr.r]="radius" />
+    @if (total() > 0) {
+      @for (seg of segments(); track seg.label) {
+        <circle
+          class="score-pie__seg"
+          cx="50"
+          cy="50"
+          [attr.r]="radius"
+          [style.stroke]="seg.color"
+          [attr.stroke-dasharray]="seg.dasharray"
+          [attr.stroke-dashoffset]="seg.dashoffset"
+        />
+      }
+    }
+    @if (centerLabel()) {
+      <text class="score-pie__center" x="50" y="49">{{ centerLabel() }}</text>
+      @if (centerSub()) {
+        <text class="score-pie__center-sub" x="50" y="61">{{ centerSub() }}</text>
+      }
+    }
+  </svg>
+
+  <ul class="score-pie__legend">
+    @for (seg of segments(); track seg.label) {
+      <li class="score-pie__legend-item">
+        <span class="score-pie__dot" [style.background]="seg.color"></span>
+        <span class="score-pie__legend-label">{{ seg.label }}</span>
+        <span class="score-pie__legend-val">{{ seg.value }} · {{ seg.percent }}%</span>
+      </li>
+    }
+  </ul>
+</div>
