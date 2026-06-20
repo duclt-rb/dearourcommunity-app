@@ -52,6 +52,21 @@ export interface ActionItem {
   measure: string;
 }
 
+export type ChecklistPriority = 'critical' | 'important' | 'standard';
+export interface ChecklistItem {
+  id: string;
+  priority: ChecklistPriority;
+  text: string;
+}
+
+export interface ReviewMilestone {
+  id: string;
+  title: string;
+  day: string;
+  check: string;
+  target: string;
+}
+
 export interface WasteToolkitConfig {
   id: string;
   name: string;
@@ -62,11 +77,13 @@ export interface WasteToolkitConfig {
   assessmentGroups: AssessmentGroup[];
   contractorFields: FieldDef[];
   contractorCriteria: ContractorCriterion[];
+  contractorChecklist: ChecklistItem[];
   foodSources: NamedItem[];
   dashboardVolumeCategories: NamedItem[];
   dashboardCostCategories: NamedItem[];
   planFields: FieldDef[];
   actions: ActionItem[];
+  reviewMilestones: ReviewMilestone[];
 }
 
 export interface SegmentOptionLite {

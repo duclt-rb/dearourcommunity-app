@@ -331,6 +331,48 @@ export const WASTE_TOOLKIT: WasteToolkitConfig = {
       verify: 'Soát 6 tháng hóa đơn so với mức đã thỏa thuận.',
     },
   ],
+  contractorChecklist: [
+    {
+      id: 'cl-1',
+      priority: 'critical',
+      text: 'Có giấy phép thu gom chất thải DONRE còn hiệu lực, bao gồm các loại rác bạn phát sinh',
+    },
+    {
+      id: 'cl-2',
+      priority: 'critical',
+      text: 'Cung cấp phiếu chuyển giao hoặc biên bản xử lý cho mỗi lần thu gom',
+    },
+    {
+      id: 'cl-3',
+      priority: 'critical',
+      text: 'Cung cấp được địa chỉ cơ sở xử lý được cấp phép mà họ sử dụng',
+    },
+    {
+      id: 'cl-4',
+      priority: 'important',
+      text: 'Có tối thiểu 2 năm hoạt động — yêu cầu tham chiếu khách hàng',
+    },
+    {
+      id: 'cl-5',
+      priority: 'important',
+      text: 'Sẵn sàng ký hợp đồng dịch vụ bằng văn bản kèm nghĩa vụ cung cấp chứng từ xử lý',
+    },
+    {
+      id: 'cl-6',
+      priority: 'standard',
+      text: 'Tần suất thu gom phù hợp nhu cầu vận hành của bạn',
+    },
+    {
+      id: 'cl-7',
+      priority: 'standard',
+      text: 'Giá có chứng từ và gồm mọi khoản phí (không phí ẩn)',
+    },
+    {
+      id: 'cl-8',
+      priority: 'standard',
+      text: 'Có đầu mối liên hệ chuyên trách khi có sự cố dịch vụ',
+    },
+  ],
 
   // 🍱 Food Waste Tracker
   foodSources: [
@@ -440,6 +482,32 @@ export const WASTE_TOOLKIT: WasteToolkitConfig = {
         'Nhựa dùng một lần: Rà soát các món nhựa dùng một lần. Chọn 1–2 món thay bằng giải pháp tái sử dụng trong 90 ngày',
       targetDay: 'Ngày 45',
       measure: 'Thay được ít nhất 1 món nhựa dùng một lần',
+    },
+  ],
+  reviewMilestones: [
+    {
+      id: 'm30',
+      title: 'Check-in 30 ngày',
+      day: 'Ngày 30',
+      check:
+        'Thùng đã lắp và đang dùng chưa? Chứng từ nhà thầu đã về chưa? Đã bắt đầu theo dõi rác thực phẩm chưa?',
+      target: 'Hoàn thành ít nhất 3 hành động Quan trọng nhất',
+    },
+    {
+      id: 'm60',
+      title: 'Check-in 60 ngày',
+      day: 'Ngày 60',
+      check:
+        'Phân loại có hiệu quả không? Dữ liệu 2 tháng đầu cho thấy gì? Có vấn đề gì với nhà thầu không?',
+      target: 'Thấy được xu hướng khối lượng rác; đã tính được chi phí/kg',
+    },
+    {
+      id: 'm90',
+      title: 'Review cuối 90 ngày',
+      day: 'Ngày 90',
+      check:
+        'Hoàn thành bao nhiêu hành động? Khối lượng và chi phí rác thay đổi thế nào? Mang gì sang tháng 4 trở đi?',
+      target: 'Giảm 10% luồng rác mục tiêu; hoàn thành mọi hành động Quan trọng nhất',
     },
   ],
 };

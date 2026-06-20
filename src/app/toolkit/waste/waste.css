@@ -15,7 +15,7 @@
   border-bottom: 1px solid var(--color-border-light);
 }
 .waste__bar-inner {
-  max-width: 840px;
+  max-width: 1080px;
   margin: 0 auto;
   padding: 12px 24px;
   display: flex;
@@ -31,7 +31,7 @@
   font-variant-numeric: tabular-nums;
 }
 .waste__stepper {
-  max-width: 840px;
+  max-width: 1080px;
   margin: 0 auto;
   padding: 0 24px 14px;
   display: flex;
@@ -74,7 +74,7 @@
 
 /* ── Layout ── */
 .waste__main {
-  max-width: 840px;
+  max-width: 1080px;
   margin: 0 auto;
   padding: 32px 24px 96px;
 }
@@ -270,6 +270,96 @@
   color: var(--color-gray-500);
 }
 
+/* ── Contractor replacement checklist ── */
+.waste__checklist {
+  margin-top: 24px;
+  padding: 18px 20px;
+  border: 1px solid var(--color-error-100);
+  border-radius: var(--radius-card);
+  background: var(--color-error-50);
+}
+.waste__checks {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.waste__check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-gray-800);
+  cursor: pointer;
+}
+.waste__check-box {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  border: 1.5px solid var(--color-border);
+  border-radius: 5px;
+  background: #ffffff;
+  cursor: pointer;
+  display: inline-grid;
+  place-content: center;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+.waste__check-box::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  transform: scale(0);
+  transform-origin: center;
+  transition: transform 0.15s ease;
+  box-shadow: inset 1em 1em #fff;
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+.waste__check-box:checked {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.waste__check-box:checked::before {
+  transform: scale(1);
+}
+.waste__check-box:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 16%, transparent);
+}
+.waste__check-prio {
+  flex-shrink: 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+}
+.waste__check-prio.is-critical {
+  color: var(--color-error-700);
+  background: var(--color-error-100);
+}
+.waste__check-prio.is-important {
+  color: var(--color-warning-700);
+  background: var(--color-warning-50);
+}
+.waste__check-prio.is-standard {
+  color: var(--color-gray-700);
+  background: var(--color-gray-100);
+}
+.waste__check-text {
+  flex: 1;
+}
+.waste__check-box:checked + .waste__check-prio + .waste__check-text {
+  text-decoration: line-through;
+  color: var(--color-gray-500);
+}
+
 /* ── Callouts ── */
 .waste__callout {
   margin-top: 24px;
@@ -373,15 +463,20 @@
   font-weight: 600;
   color: var(--color-gray-700);
 }
+.waste__table tbody td {
+  background: var(--color-bg);
+}
 .waste__table-head-cell {
   text-align: left !important;
   position: sticky;
   left: 0;
+  z-index: 2;
   background: var(--color-bg);
   font-weight: 500;
   min-width: 180px;
 }
 .waste__table thead .waste__table-head-cell {
+  z-index: 3;
   background: var(--color-bg-muted);
 }
 .waste__table tfoot td {
@@ -402,6 +497,17 @@
 .waste__cell:focus {
   outline: none;
   border-color: var(--color-primary);
+}
+.waste__cell-text {
+  width: 150px;
+  text-align: left;
+}
+.waste__cell-money {
+  min-width: 160px;
+}
+.waste__cell-money .number-field__input {
+  height: 34px;
+  font-size: 0.8125rem;
 }
 .waste__num {
   font-variant-numeric: tabular-nums;
@@ -486,8 +592,49 @@
 .waste__action-fields {
   margin-top: 14px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
+}
+
+/* ── Review milestones ── */
+.waste__milestones {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.waste__milestone {
+  padding: 16px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-card);
+  background: var(--color-bg);
+}
+.waste__milestone-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.waste__milestone-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+.waste__milestone-day {
+  font-size: 0.75rem;
+  color: var(--color-gray-500);
+  white-space: nowrap;
+}
+.waste__milestone-check {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-gray-600);
+}
+.waste__milestone-target {
+  margin-top: 10px;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-gray-800);
 }
 
 /* ── Results ── */
@@ -653,6 +800,7 @@
   .waste__grid2,
   .waste__stream-body,
   .waste__action-fields,
+  .waste__milestones,
   .waste__callout-row,
   .waste__result-cards {
     grid-template-columns: 1fr;

@@ -283,6 +283,33 @@
               {{ store.contractorTotal().toFixed(2) }} · {{ store.contractorVerdictBand().label }}
             </strong>
           </div>
+
+          @if (store.contractorTotal() > 0 && store.contractorTotal() < 2.5) {
+            <div class="waste__checklist">
+              <h3 class="waste__group-title">Điểm thấp — Checklist chọn nhà thầu thay thế</h3>
+              <p class="waste__section-note">
+                Không ký hợp đồng với nhà thầu mới trước khi xác minh xong tất cả mục Bắt buộc.
+              </p>
+              <ul class="waste__checks">
+                @for (item of config.contractorChecklist; track item.id) {
+                  <li>
+                    <label class="waste__check">
+                      <input
+                        type="checkbox"
+                        class="waste__check-box"
+                        [checked]="store.contractorCheckOf(item.id)"
+                        (change)="store.toggleContractorCheck(item.id, $any($event.target).checked)"
+                      />
+                      <span class="waste__check-prio" [class]="'is-' + item.priority">
+                        {{ checklistPriorityLabels[item.priority] }}
+                      </span>
+                      <span class="waste__check-text">{{ item.text }}</span>
+                    </label>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
         </section>
       }
 
@@ -355,13 +382,89 @@
             <span>Ước tính chi phí rác thực phẩm mỗi năm</span>
             <strong>{{ vnd(store.foodResults().annualCost) }} VNĐ</strong>
           </div>
+
+          <h3 class="waste__group-title waste__group-title--spaced">
+            Tổng hợp chi phí & theo dõi giảm thiểu theo tháng
+          </h3>
+          <p class="waste__section-note">
+            Chi phí và mức thay đổi tự tính từ tổng rác và chi phí mỗi kg.
+          </p>
+          <div class="waste__table-scroll">
+            <table class="waste__table">
+              <thead>
+                <tr>
+                  <th class="waste__table-head-cell">Tháng</th>
+                  <th>Tổng rác (kg)</th>
+                  <th>Chi phí ước tính</th>
+                  <th>So tháng trước</th>
+                  <th>Nguồn lớn nhất</th>
+                  <th>Hành động giảm thiểu</th>
+                  <th>Kết quả</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of store.foodMonthlyRows(); track row.index) {
+                  <tr>
+                    <td class="waste__table-head-cell">{{ monthFullLabels[row.index] }}</td>
+                    <td>
+                      <input
+                        class="waste__cell"
+                        type="text"
+                        inputmode="numeric"
+                        [value]="store.foodMonthOf(row.index, 'waste') ?? ''"
+                        (input)="
+                          store.setFoodMonth(
+                            row.index,
+                            'waste',
+                            $any($event.target).value === '' ? null : +$any($event.target).value
+                          )
+                        "
+                      />
+                    </td>
+                    <td class="waste__num">{{ vnd(row.estCost) }} VNĐ</td>
+                    <td class="waste__num">
+                      @if (row.vsPrev !== null) {
+                        {{ row.vsPrev > 0 ? '+' : '' }}{{ row.vsPrev.toFixed(0) }}%
+                      } @else {
+                        —
+                      }
+                    </td>
+                    <td>
+                      <input
+                        class="waste__cell waste__cell-text"
+                        type="text"
+                        [value]="store.foodMonthOf(row.index, 'top')"
+                        (input)="store.setFoodMonth(row.index, 'top', $any($event.target).value)"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        class="waste__cell waste__cell-text"
+                        type="text"
+                        [value]="store.foodMonthOf(row.index, 'action')"
+                        (input)="store.setFoodMonth(row.index, 'action', $any($event.target).value)"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        class="waste__cell waste__cell-text"
+                        type="text"
+                        [value]="store.foodMonthOf(row.index, 'result')"
+                        (input)="store.setFoodMonth(row.index, 'result', $any($event.target).value)"
+                      />
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         </section>
       }
 
       <!-- ════ STEP: MONTHLY DASHBOARD ════ -->
       @case ('dashboard') {
         <section class="waste__section">
-          <h2 class="waste__section-title">Dashboard 12 tháng</h2>
+          <h2 class="waste__section-title">Tổng quan 12 tháng</h2>
           <p class="waste__section-note">Ghi khối lượng và chi phí thực tế mỗi tháng.</p>
 
           <h3 class="waste__group-title">Khối lượng chất thải</h3>
@@ -401,6 +504,15 @@
                   </tr>
                 }
               </tbody>
+              <tfoot>
+                <tr>
+                  <td class="waste__table-head-cell">Tổng cộng</td>
+                  @for (mn of store.dashTrend().months; track mn.index) {
+                    <td class="waste__num">{{ num(mn.volume) }}</td>
+                  }
+                  <td class="waste__num">{{ num(store.dashResults().totalVol) }}</td>
+                </tr>
+              </tfoot>
             </table>
           </div>
 
@@ -421,19 +533,11 @@
                   <tr>
                     <td class="waste__table-head-cell">{{ row.label }}</td>
                     @for (m of months; track m) {
-                      <td>
-                        <input
-                          class="waste__cell"
-                          type="text"
-                          inputmode="numeric"
-                          [value]="store.dashCostOf(row.id, m) ?? ''"
-                          (input)="
-                            store.setDashCost(
-                              row.id,
-                              m,
-                              $any($event.target).value === '' ? null : +$any($event.target).value
-                            )
-                          "
+                      <td class="waste__cell-money">
+                        <app-number-field
+                          [currency]="true"
+                          [value]="store.dashCostOf(row.id, m)"
+                          (valueChange)="store.setDashCost(row.id, m, $event)"
                         />
                       </td>
                     }
@@ -441,6 +545,15 @@
                   </tr>
                 }
               </tbody>
+              <tfoot>
+                <tr>
+                  <td class="waste__table-head-cell">Tổng cộng</td>
+                  @for (mn of store.dashTrend().months; track mn.index) {
+                    <td class="waste__num">{{ vnd(mn.cost) }}</td>
+                  }
+                  <td class="waste__num">{{ vnd(store.dashResults().totalCost) }}</td>
+                </tr>
+              </tfoot>
             </table>
           </div>
 
@@ -458,6 +571,63 @@
               <strong>{{ vnd(store.dashResults().costPerKg) }} VNĐ</strong>
             </div>
           </div>
+
+          <h3 class="waste__group-title waste__group-title--spaced">
+            Chi phí/kg & chỉ số xu hướng
+          </h3>
+          <div class="waste__table-scroll">
+            <table class="waste__table">
+              <thead>
+                <tr>
+                  <th class="waste__table-head-cell">Chỉ số</th>
+                  @for (m of months; track m) {
+                    <th>{{ monthLabels[m] }}</th>
+                  }
+                  <th>TB</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="waste__table-head-cell">Chi phí/kg (VNĐ)</td>
+                  @for (mn of store.dashTrend().months; track mn.index) {
+                    <td class="waste__num">{{ mn.volume > 0 ? vnd(mn.costPerKg) : '—' }}</td>
+                  }
+                  <td class="waste__num">{{ vnd(store.dashTrend().avgCostPerKg) }}</td>
+                </tr>
+                <tr>
+                  <td class="waste__table-head-cell">Thay đổi khối lượng (%)</td>
+                  @for (mn of store.dashTrend().months; track mn.index) {
+                    <td class="waste__num">
+                      @if (mn.volChange !== null) {
+                        {{ mn.volChange > 0 ? '+' : '' }}{{ mn.volChange.toFixed(0) }}%
+                      } @else {
+                        —
+                      }
+                    </td>
+                  }
+                  <td class="waste__num">—</td>
+                </tr>
+                <tr>
+                  <td class="waste__table-head-cell">Thay đổi chi phí (%)</td>
+                  @for (mn of store.dashTrend().months; track mn.index) {
+                    <td class="waste__num">
+                      @if (mn.costChange !== null) {
+                        {{ mn.costChange > 0 ? '+' : '' }}{{ mn.costChange.toFixed(0) }}%
+                      } @else {
+                        —
+                      }
+                    </td>
+                  }
+                  <td class="waste__num">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="waste__insight">
+            💡 Mục tiêu: Chi phí/kg nên giảm dần khi phân loại tốt hơn và khối lượng rác giảm. Giảm
+            10% tổng khối lượng trong 90 ngày là mục tiêu khả thi cho hầu hết doanh nghiệp.
+          </p>
         </section>
       }
 
@@ -488,6 +658,9 @@
             }
           </div>
 
+          <h3 class="waste__group-title waste__group-title--spaced">
+            Danh sách hành động — Ưu tiên theo tác động & khả thi
+          </h3>
           <div class="waste__actions">
             @for (a of config.actions; track a.id; let i = $index) {
               <div class="waste__action">
@@ -506,6 +679,11 @@
                     [value]="store.actionOf(a.id, 'owner')"
                     (valueChange)="store.setAction(a.id, 'owner', $event)"
                   />
+                  <app-date-field
+                    label="Ngày bắt đầu"
+                    [value]="store.actionOf(a.id, 'start')"
+                    (valueChange)="store.setAction(a.id, 'start', $event)"
+                  />
                   <div class="waste__field">
                     <span class="waste__field-label">Trạng thái</span>
                     <app-segmented-field
@@ -515,6 +693,22 @@
                     />
                   </div>
                 </div>
+              </div>
+            }
+          </div>
+
+          <h3 class="waste__group-title waste__group-title--spaced">
+            Mốc review — Kiểm tra ngày 30, 60 và 90
+          </h3>
+          <div class="waste__milestones">
+            @for (m of config.reviewMilestones; track m.id) {
+              <div class="waste__milestone">
+                <div class="waste__milestone-head">
+                  <span class="waste__milestone-title">{{ m.title }}</span>
+                  <span class="waste__milestone-day">{{ m.day }}</span>
+                </div>
+                <p class="waste__milestone-check">{{ m.check }}</p>
+                <p class="waste__milestone-target">🎯 {{ m.target }}</p>
               </div>
             }
           </div>

@@ -77,11 +77,30 @@ export default class WasteToolkitComponent {
     'T11',
     'T12',
   ];
+  readonly monthFullLabels = [
+    'Tháng 1',
+    'Tháng 2',
+    'Tháng 3',
+    'Tháng 4',
+    'Tháng 5',
+    'Tháng 6',
+    'Tháng 7',
+    'Tháng 8',
+    'Tháng 9',
+    'Tháng 10',
+    'Tháng 11',
+    'Tháng 12',
+  ];
 
   readonly priorityLabels: Record<string, string> = {
     critical: 'Quan trọng nhất',
     important: 'Quan trọng',
     quickwin: 'Dễ làm ngay',
+  };
+  readonly checklistPriorityLabels: Record<string, string> = {
+    critical: 'Bắt buộc',
+    important: 'Quan trọng',
+    standard: 'Tiêu chuẩn',
   };
 
   readonly steps: Step[] = [
@@ -89,7 +108,7 @@ export default class WasteToolkitComponent {
     { kind: 'assessment', label: 'Đánh giá' },
     { kind: 'contractor', label: 'Nhà thầu' },
     { kind: 'food', label: 'Rác thực phẩm' },
-    { kind: 'dashboard', label: 'Dashboard' },
+    { kind: 'dashboard', label: 'Tổng quan' },
     { kind: 'plan', label: 'Kế hoạch 90 ngày' },
     { kind: 'results', label: 'Kết quả' },
   ];

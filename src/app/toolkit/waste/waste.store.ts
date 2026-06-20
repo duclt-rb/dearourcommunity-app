@@ -29,6 +29,13 @@ interface ActionRow {
   target: string;
   status: string;
 }
+interface FoodMonthRow {
+  waste: number | null;
+  top: string;
+  action: string;
+  result: string;
+}
+const EMPTY_FOOD_MONTH: FoodMonthRow = { waste: null, top: '', action: '', result: '' };
 
 interface WasteState {
   mappingInfo: Record<string, string>;
@@ -38,8 +45,10 @@ interface WasteState {
   assessmentPriority: Record<string, string>;
   contractorInfo: Record<string, string>;
   contractorScores: Record<string, string>;
+  contractorChecklist: Record<string, boolean>;
   foodCostPerKg: number | null;
   foodLog: Record<string, (number | null)[]>;
+  foodMonthly: Record<string, FoodMonthRow>;
   dashVolumes: Record<string, (number | null)[]>;
   dashCosts: Record<string, (number | null)[]>;
   planInfo: Record<string, string>;
@@ -55,8 +64,10 @@ const initialState: WasteState = {
   assessmentPriority: {},
   contractorInfo: {},
   contractorScores: {},
+  contractorChecklist: {},
   foodCostPerKg: null,
   foodLog: {},
+  foodMonthly: {},
   dashVolumes: {},
   dashCosts: {},
   planInfo: {},
@@ -177,6 +188,29 @@ export const WasteStore = signalStore(
       return { rows, totalAvg, weeklyCost, annualCost: weeklyCost * 52 };
     }),
 
+    foodMonthlyRows: computed(() => {
+      const monthly = store.foodMonthly();
+      const cost = store.foodCostPerKg() ?? 0;
+      let prev: number | null = null;
+      return Array.from({ length: MONTHS }, (_, i) => {
+        const row = monthly[i] ?? EMPTY_FOOD_MONTH;
+        const waste = row.waste;
+        const estCost = (waste ?? 0) * cost;
+        const vsPrev =
+          prev != null && prev > 0 && waste != null ? ((waste - prev) / prev) * 100 : null;
+        if (waste != null) prev = waste;
+        return {
+          index: i,
+          waste,
+          estCost,
+          vsPrev,
+          top: row.top,
+          action: row.action,
+          result: row.result,
+        };
+      });
+    }),
+
     dashResults: computed(() => {
       const vols = store.dashVolumes();
       const costs = store.dashCosts();
@@ -197,6 +231,34 @@ export const WasteStore = signalStore(
         totalCost,
         costPerKg: totalVol > 0 ? totalCost / totalVol : 0,
       };
+    }),
+
+    dashTrend: computed(() => {
+      const vols = store.dashVolumes();
+      const costs = store.dashCosts();
+      const base = Array.from({ length: MONTHS }, (_, m) => {
+        const volume = WASTE_TOOLKIT.dashboardVolumeCategories.reduce(
+          (s, c) => s + (vols[c.id]?.[m] ?? 0),
+          0,
+        );
+        const cost = WASTE_TOOLKIT.dashboardCostCategories.reduce(
+          (s, c) => s + (costs[c.id]?.[m] ?? 0),
+          0,
+        );
+        return { volume, cost, costPerKg: volume > 0 ? cost / volume : 0 };
+      });
+      const months = base.map((mn, i) => {
+        const prev = i > 0 ? base[i - 1] : null;
+        const volChange =
+          prev && prev.volume > 0 ? ((mn.volume - prev.volume) / prev.volume) * 100 : null;
+        const costChange = prev && prev.cost > 0 ? ((mn.cost - prev.cost) / prev.cost) * 100 : null;
+        return { index: i, ...mn, volChange, costChange };
+      });
+      const scored = months.filter((m) => m.volume > 0);
+      const avgCostPerKg = scored.length
+        ? scored.reduce((a, m) => a + m.costPerKg, 0) / scored.length
+        : 0;
+      return { months, avgCostPerKg };
     }),
   })),
 
@@ -239,12 +301,25 @@ export const WasteStore = signalStore(
     setContractorScore(id: string, value: string) {
       patchState(store, (s) => ({ contractorScores: { ...s.contractorScores, [id]: value } }));
     },
+    toggleContractorCheck(id: string, checked: boolean) {
+      patchState(store, (s) => ({
+        contractorChecklist: { ...s.contractorChecklist, [id]: checked },
+      }));
+    },
     setFoodCost(value: number | null) {
       patchState(store, { foodCostPerKg: value });
     },
     setFoodLog(id: string, week: number, value: number | null) {
       patchState(store, (s) => ({
         foodLog: { ...s.foodLog, [id]: setCell(s.foodLog[id], week, value, WEEKS) },
+      }));
+    },
+    setFoodMonth(month: number, field: keyof FoodMonthRow, value: string | number | null) {
+      patchState(store, (s) => ({
+        foodMonthly: {
+          ...s.foodMonthly,
+          [month]: { ...(s.foodMonthly[month] ?? EMPTY_FOOD_MONTH), [field]: value },
+        },
       }));
     },
     setDashVolume(id: string, month: number, value: number | null) {
@@ -275,7 +350,10 @@ export const WasteStore = signalStore(
     assessmentPriorityOf: (id: string) => store.assessmentPriority()[id] ?? '',
     contractorInfoOf: (key: string) => store.contractorInfo()[key] ?? '',
     contractorScoreOf: (id: string) => store.contractorScores()[id] ?? '',
+    contractorCheckOf: (id: string) => store.contractorChecklist()[id] ?? false,
     foodLogOf: (id: string, week: number) => store.foodLog()[id]?.[week] ?? null,
+    foodMonthOf: (month: number, field: keyof FoodMonthRow) =>
+      store.foodMonthly()[month]?.[field] ?? (field === 'waste' ? null : ''),
     dashVolumeOf: (id: string, month: number) => store.dashVolumes()[id]?.[month] ?? null,
     dashCostOf: (id: string, month: number) => store.dashCosts()[id]?.[month] ?? null,
     planInfoOf: (key: string) => store.planInfo()[key] ?? '',
@@ -312,8 +390,10 @@ export const WasteStore = signalStore(
           assessmentPriority: store.assessmentPriority(),
           contractorInfo: store.contractorInfo(),
           contractorScores: store.contractorScores(),
+          contractorChecklist: store.contractorChecklist(),
           foodCostPerKg: store.foodCostPerKg(),
           foodLog: store.foodLog(),
+          foodMonthly: store.foodMonthly(),
           dashVolumes: store.dashVolumes(),
           dashCosts: store.dashCosts(),
           planInfo: store.planInfo(),
