@@ -6,7 +6,7 @@ export interface Toolkit {
 
 export const TOOLKITS: Toolkit[] = [
   { id: 'esg-quick-scan-fnb', name: 'Đánh giá nhanh ESG — Dịch vụ F&B' },
-  { id: 'esg-quick-scan-supply-chain', name: 'Đánh giá nhanh ESG — Chuỗi Cung Ứng' },
+  { id: 'esg-quick-scan-supply-chain', name: 'Đánh giá nhanh ESG — Sản xuất' },
   { id: 'waste-toolkit', name: 'Bộ công cụ Chất thải' },
   { id: 'coming-soon-1', name: 'Bộ công cụ mới (sắp ra mắt)', comingSoon: true },
   { id: 'coming-soon-2', name: 'Bộ công cụ mới (sắp ra mắt)', comingSoon: true },
