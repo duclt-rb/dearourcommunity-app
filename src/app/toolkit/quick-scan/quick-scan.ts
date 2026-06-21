@@ -16,7 +16,7 @@ import { PieSlice, ScorePieComponent } from '../shared/score-pie/score-pie';
 import { SCORE_SCALE_OPTIONS, ScoreScaleComponent } from '../shared/score-scale/score-scale';
 import { TextFieldComponent } from '../shared/text-field/text-field';
 import { QuickScanStore, Step } from './quick-scan.store';
-import { PillarKey, QuickScanConfig } from './quick-scan.types';
+import { ActionPlanField, PillarKey, QuickScanConfig } from './quick-scan.types';
 
 /** A distinct, lighter hue per pillar (E = green, S = blue, G = brand purple). */
 const PILLAR_COLORS: Record<PillarKey, string> = {
@@ -54,6 +54,15 @@ export class QuickScanComponent {
 
   readonly store = inject(QuickScanStore);
   readonly scaleOptions = SCORE_SCALE_OPTIONS;
+
+  /** Status choices for the action-plan rows. */
+  readonly statusOptions = ['Chưa bắt đầu', 'Đang làm', 'Hoàn thành'];
+
+  /** Persist an action-plan cell edit from a native input/select event. */
+  onPlanInput(area: string, field: ActionPlanField, event: Event): void {
+    const target = event.target as HTMLInputElement | HTMLSelectElement;
+    this.store.setActionPlan(area, field, target.value);
+  }
 
   /** Pillar scores mapped to pie slices for the results chart. */
   pieSlices = computed<PieSlice[]>(() =>

@@ -445,6 +445,14 @@
   overflow-x: auto;
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-card);
+  /* Hide the scrollbar but keep horizontal scrolling (drag / trackpad / shift+wheel). */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* legacy Edge/IE */
+}
+.waste__table-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none; /* Chrome, Safari, Edge */
 }
 .waste__table {
   border-collapse: collapse;
@@ -594,6 +602,15 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
+}
+
+/* Single full-width field inside a milestone card (e.g. Ngày họp). */
+.waste__milestone-field {
+  margin-top: 14px;
+}
+.waste__milestone-field app-date-field,
+.waste__milestone-field app-date-field input {
+  width: 100%;
 }
 
 /* ── Review milestones ── */

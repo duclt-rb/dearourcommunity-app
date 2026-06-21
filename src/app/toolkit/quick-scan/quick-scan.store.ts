@@ -8,6 +8,8 @@ import {
   withState,
 } from '@ngrx/signals';
 import {
+  ActionPlanField,
+  ActionPlanRow,
   maturityFor,
   maturityLevelFor,
   MaturityTone,
@@ -20,6 +22,8 @@ import {
 interface PersistedScan {
   scores: Record<string, number>;
   profile: Record<string, string>;
+  /** Action plan rows keyed by priority-focus area. Optional for back-compat. */
+  actionPlan?: Record<string, ActionPlanRow>;
   currentStep: number;
 }
 
@@ -82,6 +86,8 @@ interface QuickScanState {
   scores: Record<string, number>;
   /** business profile field label -> value. */
   profile: Record<string, string>;
+  /** priority-focus area -> action plan row. */
+  actionPlan: Record<string, ActionPlanRow>;
   currentStep: number;
 }
 
@@ -89,6 +95,7 @@ const initialState: QuickScanState = {
   config: null,
   scores: {},
   profile: {},
+  actionPlan: {},
   currentStep: 0,
 };
 
@@ -178,6 +185,7 @@ export const QuickScanStore = signalStore(
         config,
         scores: saved?.scores ?? {},
         profile: saved?.profile ?? {},
+        actionPlan: saved?.actionPlan ?? {},
         currentStep: Math.max(0, Math.min(totalSteps - 1, saved?.currentStep ?? 0)),
       });
     },
@@ -185,7 +193,7 @@ export const QuickScanStore = signalStore(
     reset(): void {
       const config = store.config();
       if (config) clearPersisted(config.id);
-      patchState(store, { scores: {}, profile: {}, currentStep: 0 });
+      patchState(store, { scores: {}, profile: {}, actionPlan: {}, currentStep: 0 });
     },
 
     scoreOf(id: string): number | undefined {
@@ -200,6 +208,18 @@ export const QuickScanStore = signalStore(
     },
     setProfile(label: string, value: string): void {
       patchState(store, (state) => ({ profile: { ...state.profile, [label]: value } }));
+    },
+
+    actionPlanOf(area: string, field: ActionPlanField): string {
+      return store.actionPlan()[area]?.[field] ?? '';
+    },
+    setActionPlan(area: string, field: ActionPlanField, value: string): void {
+      patchState(store, (state) => ({
+        actionPlan: {
+          ...state.actionPlan,
+          [area]: { ...state.actionPlan[area], [field]: value },
+        },
+      }));
     },
 
     pillarAnswered(pillar: PillarSection): number {
@@ -234,6 +254,7 @@ export const QuickScanStore = signalStore(
         savePersisted(config.id, {
           scores: store.scores(),
           profile: store.profile(),
+          actionPlan: store.actionPlan(),
           currentStep: store.currentStep(),
         });
       });

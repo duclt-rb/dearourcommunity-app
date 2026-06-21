@@ -5,6 +5,7 @@ import { findToolkit, Toolkit } from './toolkit.data';
 import { getQuickScan } from './quick-scan/quick-scan.data';
 import { QuickScanComponent } from './quick-scan/quick-scan';
 import WasteToolkitComponent from './waste/waste';
+import { getWasteToolkit } from './waste/waste.data';
 
 @Component({
   selector: 'app-toolkit',
@@ -18,7 +19,7 @@ export default class ToolkitComponent implements OnInit {
   id = signal<string | null>(null);
   toolkit = computed<Toolkit | undefined>(() => findToolkit(this.id()));
   quickScan = computed(() => getQuickScan(this.id()));
-  isWaste = computed(() => this.id() === 'waste-toolkit');
+  wasteToolkit = computed(() => getWasteToolkit(this.id()));
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {

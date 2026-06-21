@@ -213,6 +213,78 @@
               }
             </ul>
           </div>
+
+          <div class="quick-scan__plan">
+            <h3 class="quick-scan__group-title">Kế hoạch hành động 3–6 tháng</h3>
+            <p class="quick-scan__section-note">
+              Hoàn thành cùng đội ngũ. Nội dung được lưu tự động trên trình duyệt.
+            </p>
+            <div class="quick-scan__plan-scroll">
+              <table class="quick-scan__plan-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Lĩnh vực ưu tiên</th>
+                    <th scope="col">Hành động cụ thể</th>
+                    <th scope="col">Người phụ trách</th>
+                    <th scope="col">Thời hạn</th>
+                    <th scope="col">Trạng thái</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (f of config().priorityFocus; track f.area) {
+                    <tr>
+                      <th scope="row" class="quick-scan__plan-area">{{ f.area }}</th>
+                      <td>
+                        <input
+                          type="text"
+                          class="quick-scan__plan-input"
+                          placeholder="Mô tả hành động"
+                          [value]="store.actionPlanOf(f.area, 'action')"
+                          (input)="onPlanInput(f.area, 'action', $event)"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          class="quick-scan__plan-input"
+                          placeholder="Tên / bộ phận"
+                          [value]="store.actionPlanOf(f.area, 'owner')"
+                          (input)="onPlanInput(f.area, 'owner', $event)"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          class="quick-scan__plan-input"
+                          placeholder="VD: 30/09/2026"
+                          [value]="store.actionPlanOf(f.area, 'deadline')"
+                          (input)="onPlanInput(f.area, 'deadline', $event)"
+                        />
+                      </td>
+                      <td>
+                        <select
+                          class="quick-scan__plan-input quick-scan__plan-select"
+                          (change)="onPlanInput(f.area, 'status', $event)"
+                        >
+                          <option value="" [selected]="store.actionPlanOf(f.area, 'status') === ''">
+                            —
+                          </option>
+                          @for (s of statusOptions; track s) {
+                            <option
+                              [value]="s"
+                              [selected]="store.actionPlanOf(f.area, 'status') === s"
+                            >
+                              {{ s }}
+                            </option>
+                          }
+                        </select>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
         </section>
       }
     }

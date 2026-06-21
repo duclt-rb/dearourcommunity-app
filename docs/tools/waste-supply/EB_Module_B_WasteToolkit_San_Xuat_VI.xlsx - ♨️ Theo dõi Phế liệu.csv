@@ -1,0 +1,26 @@
+,,,,,,,
+,THEO DÕI PHẾ LIỆU & RÁC THẢI SẢN XUẤT,,,,,,
+,,,,,,,
+,Theo dõi khối lượng theo tuần. Nhập chi phí xử lý bình quân (VNĐ/kg) để quy ra tiền. Lưu ý: phế liệu tái chế có thể có giá trị thu hồi (bán).,,,,,,
+,,,,,,,
+,Chi phí xử lý bình quân (VNĐ/kg):,,,,,,"2,000"
+,,,,,,,
+,NGUỒN / LOẠI,"Tuần 1
+(kg)","Tuần 2
+(kg)","Tuần 3
+(kg)","Tuần 4
+(kg)","TỔNG
+(kg/tháng)","CHI PHÍ
+(VNĐ/tháng)"
+,Phế liệu tái chế (kim loại/nhựa/giấy/gỗ),,,,,0,0
+,Phế liệu không tái chế,,,,,0,0
+,Sản phẩm lỗi / hàng hủy,,,,,0,0
+,Rác thải nguy hại,,,,,0,0
+,Bùn thải xử lý nước thải,,,,,0,0
+,Bao bì đầu vào,,,,,0,0
+,Rác sinh hoạt / văn phòng,,,,,0,0
+,Khác,,,,,0,0
+,TỔNG CỘNG,,,,,0,0
+,ƯỚC TÍNH CHI PHÍ MẤT MÁT / NĂM (VNĐ),,,,,,0
+,,,,,,,
+,Mẹo: phế liệu tái chế thường BÁN được — hãy ghi cả giá trị thu hồi để thấy net. Rác nguy hại có chi phí xử lý cao hơn nhiều; có thể nhập riêng đơn giá cho dòng đó.,,,,,,

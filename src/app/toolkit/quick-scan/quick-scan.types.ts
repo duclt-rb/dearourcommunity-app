@@ -39,6 +39,10 @@ export interface PriorityFocus {
   benefit: string;
 }
 
+/** Editable columns of the 3–6 month action plan, one row per priority area. */
+export type ActionPlanField = 'action' | 'owner' | 'deadline' | 'status';
+export type ActionPlanRow = Partial<Record<ActionPlanField, string>>;
+
 export interface QuickScanConfig {
   id: string;
   /** Tool name shown in the header. */

@@ -61,26 +61,47 @@ export interface ChecklistItem {
 
 export interface ReviewMilestone {
   id: string;
+  /** Mốc (e.g. "30 ngày"). */
   title: string;
-  day: string;
-  check: string;
-  target: string;
+  /** Trọng tâm của buổi rà soát. */
+  focus: string;
+}
+
+/** Sector-specific copy for the weekly tracker step (food waste vs. scrap). */
+export interface TrackerLabels {
+  /** Stepper label. */
+  stepLabel: string;
+  /** Section title + note. */
+  title: string;
+  note: string;
+  /** Cost-per-kg input. */
+  costLabel: string;
+  costPlaceholder: string;
+  /** First column header of the weekly table. */
+  sourceHeader: string;
+  /** Annual cost callout. */
+  annualLabel: string;
+  /** Label of the matching card on the results step. */
+  resultCardLabel: string;
+  /** Ghi chú/mẹo hiển thị cuối bảng tracker (như dòng cuối tab nguồn). */
+  tip: string;
 }
 
 export interface WasteToolkitConfig {
   id: string;
   name: string;
   sector: string;
+  /** Intro paragraph shown on the first step. */
+  introLead: string;
+  /** Copy for the weekly tracker step. */
+  tracker: TrackerLabels;
   mappingFields: FieldDef[];
   wasteStreamGroups: WasteStreamGroup[];
-  mappingCostItems: NamedItem[];
   assessmentGroups: AssessmentGroup[];
   contractorFields: FieldDef[];
   contractorCriteria: ContractorCriterion[];
   contractorChecklist: ChecklistItem[];
   foodSources: NamedItem[];
-  dashboardVolumeCategories: NamedItem[];
-  dashboardCostCategories: NamedItem[];
   planFields: FieldDef[];
   actions: ActionItem[];
   reviewMilestones: ReviewMilestone[];
@@ -164,9 +185,9 @@ export function readinessFor(percent: number): MaturityBand {
   );
 }
 
-/** Contractor verdict from a 0–5 weighted score. */
+/** Contractor verdict from a 0–100 weighted score (Giữ lại / Có điều kiện / Thay thế). */
 export function contractorVerdict(score: number): MaturityBand {
-  if (score >= 4) return { label: 'Tốt — tiếp tục hợp tác', min: 4, tone: 'success' };
-  if (score >= 2.5) return { label: 'Cần cải thiện', min: 2.5, tone: 'warning' };
-  return { label: 'Nên thay thế nhà thầu', min: 0, tone: 'error' };
+  if (score >= 80) return { label: 'Giữ lại', min: 80, tone: 'success' };
+  if (score >= 50) return { label: 'Có điều kiện', min: 50, tone: 'warning' };
+  return { label: 'Thay thế', min: 0, tone: 'error' };
 }

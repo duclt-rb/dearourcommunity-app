@@ -374,6 +374,86 @@
   color: var(--color-gray-600);
 }
 
+/* ── Action plan (matches the waste toolkit table style) ── */
+.quick-scan__plan {
+  margin-top: 36px;
+}
+.quick-scan__plan-scroll {
+  margin-top: 16px;
+  overflow-x: auto;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-card);
+  /* Hide the scrollbar but keep horizontal scrolling. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.quick-scan__plan-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+.quick-scan__plan-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+.quick-scan__plan-table th,
+.quick-scan__plan-table td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border-light);
+  white-space: nowrap;
+}
+.quick-scan__plan-table thead th {
+  background: var(--color-bg-muted);
+  font-weight: 600;
+  color: var(--color-gray-700);
+}
+.quick-scan__plan-table tbody td {
+  background: var(--color-bg);
+}
+.quick-scan__plan-table thead th:first-child,
+.quick-scan__plan-area {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  min-width: 180px;
+}
+.quick-scan__plan-table thead th:first-child {
+  z-index: 3;
+  background: var(--color-bg-muted);
+}
+.quick-scan__plan-area {
+  font-weight: 500;
+  color: var(--color-gray-900);
+  background: var(--color-bg);
+  white-space: normal;
+}
+.quick-scan__plan-input {
+  width: 100%;
+  min-width: 150px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.8125rem;
+  color: var(--color-gray-900);
+  background: var(--color-bg);
+}
+.quick-scan__plan-input::placeholder {
+  color: var(--color-gray-400);
+}
+.quick-scan__plan-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+.quick-scan__plan-select {
+  min-width: 140px;
+  cursor: pointer;
+}
+
 /* ── Step navigation ── */
 .quick-scan__nav {
   display: flex;

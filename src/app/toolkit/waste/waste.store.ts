@@ -7,17 +7,21 @@ import {
   withMethods,
   withState,
 } from '@ngrx/signals';
-import { WASTE_TOOLKIT } from './waste.data';
-import { contractorVerdict, MaturityBand, readinessFor } from './waste.types';
+import { getWasteToolkit } from './waste.data';
+import { contractorVerdict, MaturityBand, readinessFor, WasteToolkitConfig } from './waste.types';
 
-export const WEEKS = 6;
+export const WEEKS = 4;
 export const MONTHS = 12;
 
-const STORAGE_KEY = 'doc:waste-toolkit';
+const STORAGE_PREFIX = 'doc:waste-toolkit:';
+/** Fallback config used before the component calls `init()`. */
+const DEFAULT_CONFIG = getWasteToolkit('waste-toolkit') as WasteToolkitConfig;
 
 interface StreamRow {
   produce: string;
   volume: number | null;
+  /** Per-stream estimated cost (VNĐ/tháng) — matches the source mapping table. */
+  cost: number | null;
   method: string;
   collector: string;
   compliant: string;
@@ -29,18 +33,19 @@ interface ActionRow {
   target: string;
   status: string;
 }
-interface FoodMonthRow {
-  waste: number | null;
-  top: string;
-  action: string;
-  result: string;
+interface MilestoneRow {
+  meetDate: string;
+  note: string;
 }
-const EMPTY_FOOD_MONTH: FoodMonthRow = { waste: null, top: '', action: '', result: '' };
+const EMPTY_MILESTONE: MilestoneRow = { meetDate: '', note: '' };
 
 interface WasteState {
+  /** Active toolkit config (set via init); not persisted. */
+  config: WasteToolkitConfig;
+  /** localStorage key for the active toolkit; null until init. Not persisted. */
+  storageKey: string | null;
   mappingInfo: Record<string, string>;
   streams: Record<string, StreamRow>;
-  mappingCosts: Record<string, number | null>;
   assessment: Record<string, string>;
   assessmentPriority: Record<string, string>;
   contractorInfo: Record<string, string>;
@@ -48,18 +53,20 @@ interface WasteState {
   contractorChecklist: Record<string, boolean>;
   foodCostPerKg: number | null;
   foodLog: Record<string, (number | null)[]>;
-  foodMonthly: Record<string, FoodMonthRow>;
-  dashVolumes: Record<string, (number | null)[]>;
-  dashCosts: Record<string, (number | null)[]>;
+  /** Monthly totals (length 12) — direct entry, like the source monthly tab. */
+  dashMonthlyVol: (number | null)[];
+  dashMonthlyCost: (number | null)[];
   planInfo: Record<string, string>;
   actions: Record<string, ActionRow>;
+  milestones: Record<string, MilestoneRow>;
   currentStep: number;
 }
 
 const initialState: WasteState = {
+  config: DEFAULT_CONFIG,
+  storageKey: null,
   mappingInfo: {},
   streams: {},
-  mappingCosts: {},
   assessment: {},
   assessmentPriority: {},
   contractorInfo: {},
@@ -67,17 +74,18 @@ const initialState: WasteState = {
   contractorChecklist: {},
   foodCostPerKg: null,
   foodLog: {},
-  foodMonthly: {},
-  dashVolumes: {},
-  dashCosts: {},
+  dashMonthlyVol: [],
+  dashMonthlyCost: [],
   planInfo: {},
   actions: {},
+  milestones: {},
   currentStep: 0,
 };
 
 const EMPTY_ROW: StreamRow = {
   produce: '',
   volume: null,
+  cost: null,
   method: '',
   collector: '',
   compliant: '',
@@ -85,19 +93,19 @@ const EMPTY_ROW: StreamRow = {
 };
 const EMPTY_ACTION: ActionRow = { owner: '', start: '', target: '', status: '' };
 
-function loadPersisted(): Partial<WasteState> | null {
+function loadPersisted(key: string): Partial<WasteState> | null {
   if (typeof localStorage === 'undefined') return null;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(key);
     return raw ? (JSON.parse(raw) as Partial<WasteState>) : null;
   } catch {
     return null;
   }
 }
-function savePersisted(state: WasteState): void {
+function savePersisted(key: string, state: Omit<WasteState, 'config' | 'storageKey'>): void {
   if (typeof localStorage === 'undefined') return;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(key, JSON.stringify(state));
   } catch {
     // ignore
   }
@@ -129,7 +137,7 @@ export const WasteStore = signalStore(
   withComputed((store) => ({
     assessmentResults: computed<AssessmentResult[]>(() => {
       const a = store.assessment();
-      return WASTE_TOOLKIT.assessmentGroups.map((g) => {
+      return store.config().assessmentGroups.map((g) => {
         let full = 0,
           partial = 0,
           none = 0,
@@ -158,107 +166,57 @@ export const WasteStore = signalStore(
       });
     }),
 
-    mappingCostMonthly: computed(() => {
-      const costs = store.mappingCosts();
-      return WASTE_TOOLKIT.mappingCostItems.reduce((sum, i) => sum + (costs[i.id] ?? 0), 0);
-    }),
-    mappingCostAnnual: computed(() => {
-      const costs = store.mappingCosts();
-      return WASTE_TOOLKIT.mappingCostItems.reduce((sum, i) => sum + (costs[i.id] ?? 0), 0) * 12;
-    }),
+    // Total mapping cost = sum of per-stream cost (VNĐ/tháng), matching the source table.
+    mappingCostMonthly: computed(() =>
+      Object.values(store.streams()).reduce((sum, r) => sum + (r.cost ?? 0), 0),
+    ),
+    mappingCostAnnual: computed(
+      () => Object.values(store.streams()).reduce((sum, r) => sum + (r.cost ?? 0), 0) * 12,
+    ),
 
+    // Weighted total on 0–100, like the source: điểm(0–5)/5 × trọng số(%), cộng dồn.
     contractorTotal: computed(() => {
       const s = store.contractorScores();
-      return WASTE_TOOLKIT.contractorCriteria.reduce((sum, c) => {
+      return store.config().contractorCriteria.reduce((sum, c) => {
         const v = Number(s[c.id]);
-        return sum + (v ? (v * c.weight) / 100 : 0);
+        return sum + (v ? (v / 5) * c.weight : 0);
       }, 0);
     }),
 
     foodResults: computed(() => {
+      // Like the source tracker: TỔNG (kg/tháng) = tổng 4 tuần; chi phí/tháng = tổng × đơn giá;
+      // ước tính/năm = chi phí/tháng × 12.
       const log = store.foodLog();
       const cost = store.foodCostPerKg() ?? 0;
-      const rows = WASTE_TOOLKIT.foodSources.map((src) => {
-        const weeks = (log[src.id] ?? []).filter((v): v is number => v != null);
-        const avg = weeks.length ? weeks.reduce((a, b) => a + b, 0) / weeks.length : 0;
-        return { id: src.id, label: src.label, avg, weeklyCost: avg * cost };
+      const rows = store.config().foodSources.map((src) => {
+        const total = sumArr(log[src.id]);
+        return { id: src.id, label: src.label, total, monthlyCost: total * cost };
       });
-      const totalAvg = rows.reduce((a, r) => a + r.avg, 0);
-      const weeklyCost = totalAvg * cost;
-      return { rows, totalAvg, weeklyCost, annualCost: weeklyCost * 52 };
+      const totalMonthly = rows.reduce((a, r) => a + r.total, 0);
+      const monthlyCost = totalMonthly * cost;
+      return { rows, totalMonthly, monthlyCost, annualCost: monthlyCost * 12 };
     }),
 
-    foodMonthlyRows: computed(() => {
-      const monthly = store.foodMonthly();
-      const cost = store.foodCostPerKg() ?? 0;
+    // 📊 Theo dõi Hàng tháng — direct monthly totals (no category breakdown), like the source tab.
+    dashRows: computed(() => {
+      const vols = store.dashMonthlyVol();
+      const costs = store.dashMonthlyCost();
       let prev: number | null = null;
-      return Array.from({ length: MONTHS }, (_, i) => {
-        const row = monthly[i] ?? EMPTY_FOOD_MONTH;
-        const waste = row.waste;
-        const estCost = (waste ?? 0) * cost;
-        const vsPrev =
-          prev != null && prev > 0 && waste != null ? ((waste - prev) / prev) * 100 : null;
-        if (waste != null) prev = waste;
-        return {
-          index: i,
-          waste,
-          estCost,
-          vsPrev,
-          top: row.top,
-          action: row.action,
-          result: row.result,
-        };
-      });
-    }),
-
-    dashResults: computed(() => {
-      const vols = store.dashVolumes();
-      const costs = store.dashCosts();
-      const volRows = WASTE_TOOLKIT.dashboardVolumeCategories.map((c) => ({
-        ...c,
-        total: sumArr(vols[c.id]),
-      }));
-      const costRows = WASTE_TOOLKIT.dashboardCostCategories.map((c) => ({
-        ...c,
-        total: sumArr(costs[c.id]),
-      }));
-      const totalVol = volRows.reduce((a, r) => a + r.total, 0);
-      const totalCost = costRows.reduce((a, r) => a + r.total, 0);
-      return {
-        volRows,
-        costRows,
-        totalVol,
-        totalCost,
-        costPerKg: totalVol > 0 ? totalCost / totalVol : 0,
-      };
-    }),
-
-    dashTrend: computed(() => {
-      const vols = store.dashVolumes();
-      const costs = store.dashCosts();
-      const base = Array.from({ length: MONTHS }, (_, m) => {
-        const volume = WASTE_TOOLKIT.dashboardVolumeCategories.reduce(
-          (s, c) => s + (vols[c.id]?.[m] ?? 0),
-          0,
-        );
-        const cost = WASTE_TOOLKIT.dashboardCostCategories.reduce(
-          (s, c) => s + (costs[c.id]?.[m] ?? 0),
-          0,
-        );
-        return { volume, cost, costPerKg: volume > 0 ? cost / volume : 0 };
-      });
-      const months = base.map((mn, i) => {
-        const prev = i > 0 ? base[i - 1] : null;
+      return Array.from({ length: MONTHS }, (_, m) => {
+        const vol = vols[m] ?? null;
+        const cost = costs[m] ?? null;
+        const costPerKg = vol && vol > 0 ? (cost ?? 0) / vol : 0;
         const volChange =
-          prev && prev.volume > 0 ? ((mn.volume - prev.volume) / prev.volume) * 100 : null;
-        const costChange = prev && prev.cost > 0 ? ((mn.cost - prev.cost) / prev.cost) * 100 : null;
-        return { index: i, ...mn, volChange, costChange };
+          prev != null && prev > 0 && vol != null ? ((vol - prev) / prev) * 100 : null;
+        if (vol != null) prev = vol;
+        return { index: m, vol, cost, costPerKg, volChange };
       });
-      const scored = months.filter((m) => m.volume > 0);
-      const avgCostPerKg = scored.length
-        ? scored.reduce((a, m) => a + m.costPerKg, 0) / scored.length
-        : 0;
-      return { months, avgCostPerKg };
+    }),
+
+    dashTotals: computed(() => {
+      const totalVol = sumArr(store.dashMonthlyVol());
+      const totalCost = sumArr(store.dashMonthlyCost());
+      return { totalVol, totalCost, costPerKg: totalVol > 0 ? totalCost / totalVol : 0 };
     }),
   })),
 
@@ -269,6 +227,16 @@ export const WasteStore = signalStore(
       const partial = results.reduce((a, r) => a + r.partial, 0);
       const answered = results.reduce((a, r) => a + r.answered, 0);
       return answered > 0 ? Math.round(((full * 1 + partial * 0.5) / answered) * 100) : 0;
+    }),
+    // Tổng số mục theo từng mức (✓/△/✗/N/A) trên toàn bộ đánh giá — như dòng tổng hợp của file.
+    assessmentTotals: computed(() => {
+      const r = store.assessmentResults();
+      return {
+        full: r.reduce((a, x) => a + x.full, 0),
+        partial: r.reduce((a, x) => a + x.partial, 0),
+        none: r.reduce((a, x) => a + x.none, 0),
+        na: r.reduce((a, x) => a + x.na, 0),
+      };
     }),
     contractorVerdictBand: computed(() => contractorVerdict(store.contractorTotal())),
   })),
@@ -285,9 +253,6 @@ export const WasteStore = signalStore(
       patchState(store, (s) => ({
         streams: { ...s.streams, [id]: { ...(s.streams[id] ?? EMPTY_ROW), [field]: value } },
       }));
-    },
-    setMappingCost(id: string, value: number | null) {
-      patchState(store, (s) => ({ mappingCosts: { ...s.mappingCosts, [id]: value } }));
     },
     setAssessment(id: string, value: string) {
       patchState(store, (s) => ({ assessment: { ...s.assessment, [id]: value } }));
@@ -314,22 +279,14 @@ export const WasteStore = signalStore(
         foodLog: { ...s.foodLog, [id]: setCell(s.foodLog[id], week, value, WEEKS) },
       }));
     },
-    setFoodMonth(month: number, field: keyof FoodMonthRow, value: string | number | null) {
+    setDashVol(month: number, value: number | null) {
       patchState(store, (s) => ({
-        foodMonthly: {
-          ...s.foodMonthly,
-          [month]: { ...(s.foodMonthly[month] ?? EMPTY_FOOD_MONTH), [field]: value },
-        },
+        dashMonthlyVol: setCell(s.dashMonthlyVol, month, value, MONTHS),
       }));
     },
-    setDashVolume(id: string, month: number, value: number | null) {
+    setDashCost(month: number, value: number | null) {
       patchState(store, (s) => ({
-        dashVolumes: { ...s.dashVolumes, [id]: setCell(s.dashVolumes[id], month, value, MONTHS) },
-      }));
-    },
-    setDashCost(id: string, month: number, value: number | null) {
-      patchState(store, (s) => ({
-        dashCosts: { ...s.dashCosts, [id]: setCell(s.dashCosts[id], month, value, MONTHS) },
+        dashMonthlyCost: setCell(s.dashMonthlyCost, month, value, MONTHS),
       }));
     },
     setPlanInfo(key: string, value: string) {
@@ -340,24 +297,30 @@ export const WasteStore = signalStore(
         actions: { ...s.actions, [id]: { ...(s.actions[id] ?? EMPTY_ACTION), [field]: value } },
       }));
     },
+    setMilestone(id: string, field: keyof MilestoneRow, value: string) {
+      patchState(store, (s) => ({
+        milestones: {
+          ...s.milestones,
+          [id]: { ...(s.milestones[id] ?? EMPTY_MILESTONE), [field]: value },
+        },
+      }));
+    },
 
     // ── getters ──
     mappingInfoOf: (key: string) => store.mappingInfo()[key] ?? '',
     streamField: (id: string, field: keyof StreamRow) =>
-      store.streams()[id]?.[field] ?? (field === 'volume' ? null : ''),
-    mappingCostOf: (id: string) => store.mappingCosts()[id] ?? null,
+      store.streams()[id]?.[field] ?? (field === 'volume' || field === 'cost' ? null : ''),
     assessmentOf: (id: string) => store.assessment()[id] ?? '',
     assessmentPriorityOf: (id: string) => store.assessmentPriority()[id] ?? '',
     contractorInfoOf: (key: string) => store.contractorInfo()[key] ?? '',
     contractorScoreOf: (id: string) => store.contractorScores()[id] ?? '',
     contractorCheckOf: (id: string) => store.contractorChecklist()[id] ?? false,
     foodLogOf: (id: string, week: number) => store.foodLog()[id]?.[week] ?? null,
-    foodMonthOf: (month: number, field: keyof FoodMonthRow) =>
-      store.foodMonthly()[month]?.[field] ?? (field === 'waste' ? null : ''),
-    dashVolumeOf: (id: string, month: number) => store.dashVolumes()[id]?.[month] ?? null,
-    dashCostOf: (id: string, month: number) => store.dashCosts()[id]?.[month] ?? null,
+    dashVolOf: (month: number) => store.dashMonthlyVol()[month] ?? null,
+    dashCostOf: (month: number) => store.dashMonthlyCost()[month] ?? null,
     planInfoOf: (key: string) => store.planInfo()[key] ?? '',
     actionOf: (id: string, field: keyof ActionRow) => store.actions()[id]?.[field] ?? '',
+    milestoneOf: (id: string, field: keyof MilestoneRow) => store.milestones()[id]?.[field] ?? '',
 
     // ── stepper ──
     goToStep(index: number, total: number) {
@@ -365,27 +328,37 @@ export const WasteStore = signalStore(
       patchState(store, { currentStep: clamped });
       if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
     },
+    /**
+     * Bind the store to a toolkit config and rehydrate its persisted state.
+     * Each toolkit variant persists under its own key so they don't collide.
+     */
+    init(config: WasteToolkitConfig) {
+      if (store.storageKey()) return; // already initialised
+      const key = STORAGE_PREFIX + config.id;
+      const saved = loadPersisted(key);
+      patchState(store, { ...(saved ?? {}), config, storageKey: key });
+    },
     reset() {
-      if (typeof localStorage !== 'undefined') {
+      const key = store.storageKey();
+      if (key && typeof localStorage !== 'undefined') {
         try {
-          localStorage.removeItem(STORAGE_KEY);
+          localStorage.removeItem(key);
         } catch {
           // ignore
         }
       }
-      patchState(store, { ...initialState });
+      patchState(store, { ...initialState, config: store.config(), storageKey: key });
     },
   })),
 
   withHooks({
     onInit(store) {
-      const saved = loadPersisted();
-      if (saved) patchState(store, saved);
       effect(() => {
-        savePersisted({
+        const key = store.storageKey();
+        if (!key) return; // not initialised yet — nothing to persist
+        savePersisted(key, {
           mappingInfo: store.mappingInfo(),
           streams: store.streams(),
-          mappingCosts: store.mappingCosts(),
           assessment: store.assessment(),
           assessmentPriority: store.assessmentPriority(),
           contractorInfo: store.contractorInfo(),
@@ -393,11 +366,11 @@ export const WasteStore = signalStore(
           contractorChecklist: store.contractorChecklist(),
           foodCostPerKg: store.foodCostPerKg(),
           foodLog: store.foodLog(),
-          foodMonthly: store.foodMonthly(),
-          dashVolumes: store.dashVolumes(),
-          dashCosts: store.dashCosts(),
+          dashMonthlyVol: store.dashMonthlyVol(),
+          dashMonthlyCost: store.dashMonthlyCost(),
           planInfo: store.planInfo(),
           actions: store.actions(),
+          milestones: store.milestones(),
           currentStep: store.currentStep(),
         });
       });

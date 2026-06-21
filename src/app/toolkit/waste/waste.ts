@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, ViewEncapsulation } from '@angular/core';
+import { Component, computed, inject, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { LucideRotateCcw, LucideTriangleAlert } from '@lucide/angular';
 import LogoComponent from '../../shared/logo/logo';
 import { DateFieldComponent } from '../shared/date-field/date-field';
@@ -10,8 +10,7 @@ import { SegmentedFieldComponent } from '../shared/segmented-field/segmented-fie
 import { SelectFieldComponent } from '../shared/select-field/select-field';
 import { TextFieldComponent } from '../shared/text-field/text-field';
 import { TextareaFieldComponent } from '../shared/textarea-field/textarea-field';
-import { WASTE_TOOLKIT } from './waste.data';
-import { MONTHS, WasteStore, WEEKS } from './waste.store';
+import { WasteStore, WEEKS } from './waste.store';
 import {
   ACTION_STATUS_OPTIONS,
   ASSESSMENT_OPTIONS,
@@ -19,6 +18,7 @@ import {
   CONTRACTOR_SCALE,
   DISPOSAL_OPTIONS,
   PRIORITY_OPTIONS,
+  WasteToolkitConfig,
   YES_NO_OPTIONS,
 } from './waste.types';
 
@@ -49,9 +49,17 @@ interface Step {
   styleUrl: './waste.css',
   encapsulation: ViewEncapsulation.None,
 })
-export default class WasteToolkitComponent {
+export default class WasteToolkitComponent implements OnInit {
   readonly store = inject(WasteStore);
-  readonly config = WASTE_TOOLKIT;
+  @Input({ required: true }) config!: WasteToolkitConfig;
+
+  ngOnInit(): void {
+    this.store.init(this.config);
+    // The weekly tracker step is labelled per sector (food waste vs. scrap).
+    this.steps = this.steps.map((s) =>
+      s.kind === 'food' ? { ...s, label: this.config.tracker.stepLabel } : s,
+    );
+  }
 
   readonly assessmentOptions = ASSESSMENT_OPTIONS;
   readonly yesNoOptions = YES_NO_OPTIONS;
@@ -62,21 +70,6 @@ export default class WasteToolkitComponent {
   readonly priorityOptions = PRIORITY_OPTIONS;
 
   readonly weeks = Array.from({ length: WEEKS }, (_, i) => i);
-  readonly months = Array.from({ length: MONTHS }, (_, i) => i);
-  readonly monthLabels = [
-    'T1',
-    'T2',
-    'T3',
-    'T4',
-    'T5',
-    'T6',
-    'T7',
-    'T8',
-    'T9',
-    'T10',
-    'T11',
-    'T12',
-  ];
   readonly monthFullLabels = [
     'Tháng 1',
     'Tháng 2',
@@ -103,7 +96,7 @@ export default class WasteToolkitComponent {
     standard: 'Tiêu chuẩn',
   };
 
-  readonly steps: Step[] = [
+  steps: Step[] = [
     { kind: 'mapping', label: 'Bản đồ' },
     { kind: 'assessment', label: 'Đánh giá' },
     { kind: 'contractor', label: 'Nhà thầu' },
@@ -121,6 +114,11 @@ export default class WasteToolkitComponent {
     staff: '#ddd6fe',
     food: '#fbcfe8',
     pollution: '#99f6e4',
+    hazardous: '#fecaca',
+    reduction: '#bbf7d0',
+    foodwaste: '#fbcfe8',
+    plastic: '#a5f3fc',
+    hygiene: '#fde68a',
   };
 
   /** Assessment achieved points per section, mapped to pie slices. */
@@ -132,24 +130,15 @@ export default class WasteToolkitComponent {
     })),
   );
 
-  /** Light pastel color per wizard step (used by the progress bar). */
-  private readonly stepColors: Record<Step['kind'], string> = {
-    mapping: '#a7f3d0',
-    assessment: '#bfdbfe',
-    contractor: '#fde68a',
-    food: '#ddd6fe',
-    dashboard: '#fbcfe8',
-    plan: '#99f6e4',
-    results: '#fdba74',
-  };
-
-  stepColor(step: Step): string {
-    return this.stepColors[step.kind];
-  }
-
   totalSteps = this.steps.length;
   currentStepData = computed<Step>(() => this.steps[this.store.currentStep()]);
   isFirstStep = computed(() => this.store.currentStep() === 0);
+
+  /** Completion percentage (0–100) based on how many tabs have been finished. */
+  progressPercent = computed(() => {
+    const last = this.totalSteps - 1;
+    return last > 0 ? Math.round((this.store.currentStep() / last) * 100) : 0;
+  });
   isLastStep = computed(() => this.store.currentStep() === this.totalSteps - 1);
 
   goToStep(index: number): void {
