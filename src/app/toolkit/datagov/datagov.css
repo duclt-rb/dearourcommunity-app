@@ -1,0 +1,741 @@
+.datagov {
+  min-height: 100dvh;
+  background: var(--color-bg-subtle);
+  color: var(--color-gray-900);
+  font-family: var(--font-sans);
+}
+
+/* ── Top bar + stepper ── */
+.datagov__bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+  backdrop-filter: saturate(160%) blur(10px);
+  border-bottom: 1px solid var(--color-border-light);
+}
+.datagov__bar-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.datagov__logo {
+  flex-shrink: 0;
+}
+.datagov__bar-progress {
+  font-size: 0.8125rem;
+  color: var(--color-gray-600);
+  font-variant-numeric: tabular-nums;
+}
+.datagov__stepper {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px 14px;
+  display: flex;
+  gap: 8px;
+}
+.datagov__step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+.datagov__step-bar {
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--color-gray-200);
+  transition: background 0.2s ease;
+}
+.datagov__step.is-done .datagov__step-bar {
+  opacity: 0.5;
+}
+.datagov__step.is-active .datagov__step-bar {
+  opacity: 1;
+}
+.datagov__step-label {
+  font-size: 0.6875rem;
+  color: var(--color-gray-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.datagov__step.is-active .datagov__step-label {
+  color: var(--color-gray-900);
+  font-weight: 500;
+}
+
+/* ── Layout ── */
+.datagov__main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 32px 24px 96px;
+}
+.datagov__intro {
+  padding-bottom: 28px;
+}
+.datagov__sector {
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 10px;
+}
+.datagov__title {
+  font-size: 1.875rem;
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+}
+.datagov__lead {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-gray-700);
+  max-width: 64ch;
+}
+
+.datagov__section {
+  padding-top: 4px;
+}
+.datagov__section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.datagov__section-note {
+  font-size: 0.875rem;
+  color: var(--color-gray-600);
+  margin-top: 4px;
+  margin-bottom: 22px;
+}
+
+.datagov__group-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-gray-900);
+}
+.datagov__group-title--spaced {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.datagov__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.datagov__field-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-gray-800);
+}
+
+/* ── Add-row button ── */
+.datagov__add {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill);
+  border: 1px dashed var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-gray-700);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+.datagov__add:hover {
+  border-color: var(--color-primary-300);
+  background: var(--color-primary-50);
+  color: var(--color-primary-700);
+}
+
+/* ── Assessment questions ── */
+.datagov__qgroup {
+  margin-top: 28px;
+}
+.datagov__qgroup-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.datagov__qgroup-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-gray-700);
+  font-variant-numeric: tabular-nums;
+}
+.datagov__questions {
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+}
+.datagov__question {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+.datagov__question-body {
+  flex: 1;
+  min-width: 0;
+}
+.datagov__question-text {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+.datagov__question-risk {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-gray-600);
+}
+.datagov__question-risk svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.datagov__question-ref {
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: var(--color-primary-700);
+}
+.datagov__question-scale {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+/* ── Checklist (incident steps) ── */
+.datagov__checks {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.datagov__check {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-card);
+  background: var(--color-bg);
+  cursor: pointer;
+}
+.datagov__check-box {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  border: 1.5px solid var(--color-border);
+  border-radius: 5px;
+  background: #ffffff;
+  cursor: pointer;
+  display: inline-grid;
+  place-content: center;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+.datagov__check-box::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  transform: scale(0);
+  transform-origin: center;
+  transition: transform 0.15s ease;
+  box-shadow: inset 1em 1em #fff;
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+.datagov__check-box:checked {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.datagov__check-box:checked::before {
+  transform: scale(1);
+}
+.datagov__check-box:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 16%, transparent);
+}
+.datagov__check-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.datagov__check-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-gray-900);
+}
+.datagov__check-text {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-gray-600);
+}
+.datagov__check-box:checked ~ .datagov__check-body .datagov__check-title {
+  text-decoration: line-through;
+  color: var(--color-gray-500);
+}
+
+/* ── Incident log ── */
+.datagov__log {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.datagov__log-row {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-card);
+  background: var(--color-bg);
+}
+.datagov__log-top {
+  display: grid;
+  grid-template-columns: 180px 1fr auto;
+  align-items: end;
+  gap: 14px;
+}
+.datagov__log-row app-textarea-field {
+  width: 100%;
+}
+.datagov__log-del {
+  height: 40px;
+  width: 40px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg);
+  color: var(--color-gray-500);
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+.datagov__log-del:hover {
+  color: var(--color-error-600);
+  border-color: var(--color-error-200);
+}
+
+/* ── Callout ── */
+.datagov__callout {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: var(--radius-card);
+  background: var(--color-primary-50);
+  font-size: 0.875rem;
+  color: var(--color-gray-700);
+}
+.datagov__callout strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  color: var(--color-gray-900);
+}
+.datagov__insight {
+  margin-top: 16px;
+  padding: 14px 18px;
+  border-radius: var(--radius-card);
+  background: var(--color-warning-50);
+  border: 1px solid var(--color-warning-100);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--color-gray-700);
+}
+
+/* ── Status dot ── */
+.datagov__dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.datagov__dot.is-error {
+  background: var(--color-error-500);
+}
+.datagov__dot.is-warning {
+  background: var(--color-warning-500);
+}
+.datagov__dot.is-success {
+  background: var(--color-success-500);
+}
+
+/* ── Tables ── */
+.datagov__table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-card);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.datagov__table-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+.datagov__table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.8125rem;
+}
+.datagov__table th,
+.datagov__table td {
+  padding: 8px 10px;
+  text-align: center;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--color-border-light);
+  white-space: nowrap;
+}
+.datagov__table thead th {
+  background: var(--color-bg-muted);
+  font-weight: 600;
+  color: var(--color-gray-700);
+}
+.datagov__table tbody td {
+  background: var(--color-bg);
+}
+.datagov__table-head-cell {
+  text-align: left !important;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--color-bg);
+  font-weight: 500;
+  min-width: 220px;
+  white-space: normal;
+}
+.datagov__table thead .datagov__table-head-cell {
+  z-index: 3;
+  background: var(--color-bg-muted);
+}
+.datagov__cell {
+  width: 56px;
+  height: 42px;
+  padding: 0 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  text-align: left;
+  color: var(--color-gray-900);
+  background: var(--color-bg);
+}
+.datagov__cell:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+.datagov__cell-text {
+  width: 160px;
+}
+.datagov__cell-select {
+  display: inline-block;
+  min-width: 180px;
+}
+.datagov__cell-date {
+  min-width: 150px;
+}
+.datagov__cell-owner {
+  min-width: 150px;
+}
+.datagov__freq {
+  color: var(--color-gray-600);
+}
+.datagov__col-status {
+  min-width: 220px;
+  text-align: left !important;
+}
+
+/* ── Action plan ── */
+.datagov__actions {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.datagov__action {
+  padding: 16px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-card);
+  background: var(--color-bg);
+}
+.datagov__action-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.datagov__action-num {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-gray-100);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-gray-700);
+}
+.datagov__action-prio {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+}
+.datagov__action-prio.is-critical {
+  color: var(--color-error-700);
+  background: var(--color-error-50);
+}
+.datagov__action-prio.is-important {
+  color: var(--color-warning-700);
+  background: var(--color-warning-50);
+}
+.datagov__action-prio.is-quickwin {
+  color: var(--color-success-700);
+  background: var(--color-success-50);
+}
+.datagov__action-area {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-gray-700);
+}
+.datagov__action-target {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--color-gray-500);
+}
+.datagov__action-text {
+  margin-top: 10px;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+.datagov__action-measure {
+  margin-top: 6px;
+  font-size: 0.8125rem;
+  color: var(--color-gray-600);
+}
+.datagov__action-fields {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+/* ── Review milestones ── */
+.datagov__milestones {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.datagov__milestone {
+  padding: 16px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-card);
+  background: var(--color-bg);
+}
+.datagov__milestone-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.datagov__milestone-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+.datagov__milestone-check {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-gray-600);
+}
+.datagov__milestone-field {
+  margin-top: 14px;
+}
+.datagov__milestone-field app-date-field,
+.datagov__milestone-field app-date-field input {
+  width: 100%;
+}
+
+/* ── Results ── */
+.datagov__overall {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 22px 24px;
+  border-radius: var(--radius-card);
+  background: var(--color-primary-900);
+  color: #fff;
+}
+.datagov__overall-label {
+  font-size: 0.8125rem;
+  opacity: 0.75;
+}
+.datagov__overall-score {
+  font-size: 2.25rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+.datagov__overall-band {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9375rem;
+}
+.datagov__chart {
+  margin-top: 28px;
+}
+.datagov__chart app-score-pie {
+  margin-top: 16px;
+}
+.datagov__summary {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.datagov__summary-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.datagov__summary-label {
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+.datagov__summary-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  color: var(--color-gray-600);
+  white-space: nowrap;
+}
+.datagov__summary-suggest {
+  margin-top: 8px;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-gray-600);
+}
+
+/* ── Nav ── */
+.datagov__nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border-light);
+}
+.datagov__nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 132px;
+  height: 46px;
+  padding: 0 22px;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    transform 0.08s ease;
+}
+.datagov__nav-btn:hover {
+  background: var(--color-primary-hover);
+}
+.datagov__nav-btn:active {
+  transform: translateY(1px);
+}
+.datagov__nav-btn--ghost {
+  background: transparent;
+  border-color: var(--color-border);
+  color: var(--color-gray-800);
+}
+.datagov__nav-btn--ghost:hover {
+  background: var(--color-bg-muted);
+}
+.datagov__nav-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .datagov__main {
+    padding: 24px 16px 72px;
+  }
+  .datagov__stepper {
+    padding: 0 16px 14px;
+  }
+  .datagov__step-label {
+    display: none;
+  }
+  .datagov__step.is-active .datagov__step-label {
+    display: block;
+  }
+  .datagov__action-fields,
+  .datagov__milestones {
+    grid-template-columns: 1fr;
+  }
+  .datagov__log-top {
+    grid-template-columns: 1fr;
+  }
+  .datagov__question {
+    flex-direction: column;
+    gap: 14px;
+  }
+  .datagov__question-scale {
+    width: 100%;
+  }
+  .datagov__nav-btn {
+    min-width: 0;
+    flex: 1;
+  }
+}

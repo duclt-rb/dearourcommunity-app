@@ -42,7 +42,7 @@ app-date-field {
 .date-field__picker .p-datepicker-input-icon {
   position: absolute;
   top: 50%;
-  right: 14px;
+  right: 6px;
   margin-top: 0;
   transform: translateY(-50%);
   color: var(--color-gray-500);

@@ -1,0 +1,16 @@
+,ỨNG PHÓ SỰ CỐ DỮ LIỆU CÁ NHÂN
+
+,THÔNG BÁO TRONG 72 GIỜ kể từ khi PHÁT HIỆN sự cố (nếu sự cố có thể gây hại) — theo Luật BVDLCN 2025.
+
+,ĐÃ XONG?,BƯỚC,NỘI DUNG
+,,1. Phát hiện & ghi nhận,"Ghi lại thời điểm phát hiện, ai phát hiện, mô tả ban đầu về sự cố."
+,,2. Ngăn chặn,Cô lập hệ thống/tài khoản bị ảnh hưởng; ngăn dữ liệu tiếp tục bị lộ.
+,,3. Đánh giá mức độ,Loại & lượng dữ liệu bị ảnh hưởng; có dữ liệu nhạy cảm không; nguy cơ gây hại cho chủ thể.
+,,4. Thông báo cơ quan (≤72 giờ),"Nếu sự cố có thể gây hại, thông báo cơ quan chuyên trách (Bộ Công an) trong 72 giờ kể từ khi phát hiện."
+,,5. Thông báo chủ thể dữ liệu,"Khi có nguy cơ cao gây hại, thông báo cho cá nhân bị ảnh hưởng & hướng dẫn họ tự bảo vệ."
+,,6. Khắc phục,"Vá lỗ hổng, khôi phục dữ liệu từ sao lưu, đổi mật khẩu/khóa truy cập."
+,,7. Ghi nhận & lưu hồ sơ,"Lập hồ sơ sự cố đầy đủ (diễn biến, xử lý, thông báo) để phục vụ thanh tra & chứng minh tuân thủ."
+,,8. Rút kinh nghiệm,"Phân tích nguyên nhân gốc; cập nhật quy trình, phân quyền & đào tạo để tránh tái diễn."
+
+,NHẬT KÝ SỰ CỐ DỮ LIỆU
+,NGÀY,MÔ TẢ SỰ CỐ,MỨC ĐỘ

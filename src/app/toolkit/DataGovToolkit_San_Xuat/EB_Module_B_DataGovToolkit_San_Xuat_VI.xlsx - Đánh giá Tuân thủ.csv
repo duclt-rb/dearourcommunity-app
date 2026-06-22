@@ -1,0 +1,52 @@
+,ĐÁNH GIÁ TUÂN THỦ BẢO VỆ DỮ LIỆU — 40 câu hỏi · 6 nhóm
+
+,Chấm điểm trung thực: Đầy đủ = Đã làm đầy đủ; Một phần = Làm một phần; Chưa làm = Chưa làm; N/A = Không áp dụng. Đối chiếu với PDPL 2025 & Nghị định 356/2025. Phần đào tạo chuyên sâu cùng chuyên gia Data Protectify.
+
+,NHÓM,CÂU HỎI / THỰC HÀNH,ĐIỂM (Đầy đủ/Một phần/Chưa làm/N/A),RỦI RO NẾU CHƯA LÀM,THAM CHIẾU PHÁP LÝ / GHI CHÚ
+,Thu thập & Đồng ý,"DN có xác định rõ những loại dữ liệu cá nhân nào đang thu thập (nhân viên, ứng viên, NCC, khách B2B) không?",,CAO — Không biết mình giữ dữ liệu gì = không thể bảo vệ,Luật BVDLCN 2025 (minh bạch)
+,,DN chỉ thu thập dữ liệu thực sự cần thiết cho mục đích cụ thể (tối thiểu hóa) không?,,CAO — Thu thập thừa làm tăng rủi ro & trách nhiệm,PDPL (tối thiểu hóa dữ liệu)
+,,DN có lấy sự đồng ý rõ ràng của người lao động/ứng viên trước khi thu thập & xử lý dữ liệu không?,,NGHIÊM TRỌNG — Xử lý không có cơ sở pháp lý là vi phạm,PDPL (đồng ý)
+,,"Với dữ liệu sinh trắc học chấm công (vân tay/khuôn mặt), DN có xử lý như dữ liệu NHẠY CẢM với đồng ý riêng không?",,"NGHIÊM TRỌNG — Dữ liệu sinh trắc là dữ liệu nhạy cảm, yêu cầu bảo vệ cao hơn",PDPL (dữ liệu nhạy cảm)
+,,DN có thông báo cho cá nhân về mục đích xử lý tại thời điểm thu thập không?,,CAO — Thu thập ngầm vi phạm nguyên tắc minh bạch,PDPL (minh bạch)
+,,DN có cơ chế để cá nhân rút lại sự đồng ý không?,,CAO — Không cho rút đồng ý là vi phạm quyền chủ thể,PDPL (quyền chủ thể)
+,,"DN có biện pháp bảo vệ tăng cường khi xử lý dữ liệu của nhóm đặc biệt (trẻ em, người hạn chế năng lực) không?",,CAO — Nhóm đặc biệt được bảo vệ tăng cường,PDPL (nhóm đặc biệt)
+,Cơ sở pháp lý & Minh bạch,DN có chính sách quyền riêng tư (privacy policy) bằng văn bản & dễ tiếp cận không?,,CAO — Thiếu chính sách = thiếu minh bạch & cơ sở tuân thủ,PDPL (minh bạch)
+,,Mỗi hoạt động xử lý dữ liệu có cơ sở pháp lý rõ ràng (đồng ý / hợp đồng / nghĩa vụ pháp lý) không?,,NGHIÊM TRỌNG — Xử lý không có cơ sở pháp lý là vi phạm,PDPL (cơ sở xử lý)
+,,DN có nêu rõ thời gian lưu trữ dữ liệu cho từng mục đích không?,,TRUNG BÌNH — Lưu vô thời hạn vi phạm nguyên tắc giới hạn lưu trữ,PDPL (giới hạn lưu trữ)
+,,DN chỉ sử dụng dữ liệu đúng mục đích đã thông báo (không dùng cho mục đích khác) không?,,CAO — Dùng sai mục đích là vi phạm,PDPL (giới hạn mục đích)
+,,DN có rà soát & cập nhật chính sách quyền riêng tư định kỳ không?,,TRUNG BÌNH — Chính sách lỗi thời không phản ánh thực tế xử lý,Cải tiến liên tục
+,,DN có đảm bảo dữ liệu chính xác & cập nhật khi cần không?,,TRUNG BÌNH — Dữ liệu sai gây quyết định sai & khiếu nại,PDPL (chính xác)
+,,DN KHÔNG mua/bán dữ liệu cá nhân dưới mọi hình thức chứ?,,NGHIÊM TRỌNG — Mua/bán DLCN bị cấm hoàn toàn; phạt tới 10× doanh thu vi phạm hoặc 3 tỷ VNĐ,PDPL (cấm mua bán dữ liệu)
+,An ninh & Lưu trữ,Quyền truy cập dữ liệu cá nhân có được giới hạn theo vai trò (chỉ người cần mới truy cập) không?,,NGHIÊM TRỌNG — Truy cập tràn lan = rủi ro rò rỉ nội bộ,PDPL (biện pháp bảo vệ); ISO 27001
+,,"Dữ liệu nhạy cảm (sinh trắc, sức khỏe NLĐ) có được mã hóa/bảo vệ tăng cường không?",,NGHIÊM TRỌNG — Dữ liệu nhạy cảm yêu cầu biện pháp cao hơn,PDPL; ISO 27001/27701
+,,DN có sao lưu dữ liệu & quy trình phục hồi không?,,CAO — Mất dữ liệu vĩnh viễn do mã độc/hỏng phần cứng,ISO 27001 (sao lưu)
+,,"Nhân viên có được đào tạo về bảo mật (mật khẩu mạnh, không chia sẻ tài khoản, cảnh giác lừa đảo) không?",,CAO — Con người là điểm yếu lớn nhất,ISO 27001 (nhận thức)
+,,Dữ liệu giấy & thiết bị lưu trữ có được khóa/bảo vệ vật lý không?,,TRUNG BÌNH — Hồ sơ giấy & USB thất lạc cũng là rò rỉ,ISO 27001 (an ninh vật lý)
+,,DN có quy trình xóa/hủy dữ liệu an toàn khi hết thời hạn lưu không?,,CAO — Giữ dữ liệu quá hạn làm tăng rủi ro & vi phạm,PDPL (giới hạn lưu trữ)
+,,"Hệ thống CNTT có được cập nhật bản vá & bảo vệ (diệt mã độc, tường lửa) không?",,CAO — Hệ thống lỗi thời dễ bị tấn công,Luật An ninh mạng 2018
+,Quyền của Chủ thể Dữ liệu,"DN có quy trình tiếp nhận & xử lý yêu cầu của cá nhân (xem, sửa, xóa dữ liệu) không?",,CAO — Không đáp ứng quyền chủ thể là vi phạm,PDPL (quyền chủ thể)
+,,Cá nhân có thể yêu cầu xóa dữ liệu/rút đồng ý một cách dễ dàng không?,,CAO — Cản trở quyền xóa là vi phạm,PDPL (quyền xóa)
+,,DN có phản hồi yêu cầu của chủ thể trong thời hạn hợp lý không?,,TRUNG BÌNH — Chậm trễ gây khiếu nại & vi phạm,PDPL
+,,DN có thể cung cấp cho cá nhân bản sao dữ liệu của họ khi được yêu cầu không?,,TRUNG BÌNH — Quyền truy cập dữ liệu của chủ thể,PDPL
+,,DN có cơ chế tiếp nhận khiếu nại về dữ liệu cá nhân không?,,TRUNG BÌNH — Khiếu nại không kênh chính thức leo thang ra ngoài,PDPL
+,,DN có ghi nhận & lưu vết việc xử lý các yêu cầu của chủ thể không?,,THẤP — Không lưu vết khó chứng minh tuân thủ,Trách nhiệm giải trình
+,Bên thứ ba & Chuyển dữ liệu,"DN có hợp đồng xử lý dữ liệu (DPA) với các bên thứ ba xử lý dữ liệu thay mình (cloud, phần mềm HR, chấm công) không?",,"NGHIÊM TRỌNG — Bên thứ ba làm sai, DN vẫn chịu trách nhiệm",PDPL (bên xử lý)
+,,DN có đánh giá năng lực bảo vệ dữ liệu của nhà cung cấp/đối tác trước khi chia sẻ không?,,CAO — Chia sẻ với bên yếu kém = rủi ro rò rỉ,ISO 27001 (quản lý NCC)
+,,DN có biết dữ liệu của mình có được lưu trữ/xử lý ở nước ngoài không (cloud nước ngoài)?,,CAO — Chuyển dữ liệu ra nước ngoài có yêu cầu riêng,PDPL (chuyển xuyên biên giới)
+,,"Nếu chuyển dữ liệu ra nước ngoài, DN có nắm yêu cầu đánh giá tác động chuyển dữ liệu (CTIA) không?",,CAO — Vi phạm chuyển dữ liệu xuyên biên giới bị phạt tới 5% doanh thu,PDPL; Nghị định 356/2025
+,,DN có ràng buộc bên thứ ba chỉ dùng dữ liệu đúng mục đích & bảo mật không?,,CAO — Bên thứ ba dùng sai mục đích là rủi ro lớn,PDPL (bên xử lý)
+,,DN có rà soát định kỳ danh sách bên thứ ba được chia sẻ dữ liệu không?,,THẤP — Danh sách lỗi thời = chia sẻ ngoài kiểm soát,Quản trị dữ liệu
+,"Quản trị, DPO & Trách nhiệm",DN có người/bộ phận chịu trách nhiệm bảo vệ dữ liệu cá nhân (DPO nội bộ hoặc thuê ngoài) không?,,CAO — Không ai phụ trách = không tuân thủ,PDPL (nhân sự BVDLCN)
+,,DN có xác định mình có thuộc diện phải có DPO/làm DPIA không (xử lý dữ liệu nhạy cảm/lượng lớn)?,,CAO — DN nhỏ được miễn DPO/DPIA tới 2031 TRỪ KHI xử lý dữ liệu nhạy cảm/lượng lớn,PDPL; miễn trừ SME (Nghị định 356/2025)
+,,DN có quy trình ứng phó sự cố dữ liệu & biết phải thông báo trong 72 giờ không?,,NGHIÊM TRỌNG — Thiếu quy trình = lỡ hạn thông báo 72 giờ,PDPL (thông báo 72 giờ)
+,,DN có đào tạo nhân viên định kỳ về bảo vệ dữ liệu cá nhân không?,,CAO — Nhân viên thiếu nhận thức là rủi ro hàng đầu,PDPL (đào tạo)
+,,DN có lập & lưu hồ sơ về hoạt động xử lý dữ liệu (để chứng minh tuân thủ) không?,,CAO — Không hồ sơ = không chứng minh được khi thanh tra,PDPL (trách nhiệm giải trình)
+,,DN có rà soát tuân thủ bảo vệ dữ liệu định kỳ (nội bộ hoặc cùng chuyên gia) không?,,TRUNG BÌNH — Khoảng trống tuân thủ tích lũy,Cải tiến liên tục
+,,"DN có nắm mức phạt theo PDPL (tới 3 tỷ VNĐ, hoặc 5% doanh thu với vi phạm chuyển dữ liệu) để đánh giá rủi ro không?",,TRUNG BÌNH — Đánh giá thấp rủi ro = không ưu tiên nguồn lực,PDPL (chế tài)
+
+,TỔNG HỢP KẾT QUẢ ĐÁNH GIÁ
+,Số mục Đầy đủ,0
+,Số mục Một phần,0
+,Số mục Chưa làm,0
+,Số mục N/A (Không áp dụng),0
+,ĐIỂM TUÂN THỦ DỮ LIỆU (%),0%,,Rủi ro cao — Ưu tiên các mục NGHIÊM TRỌNG

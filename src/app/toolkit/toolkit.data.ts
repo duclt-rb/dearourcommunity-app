@@ -1,4 +1,4 @@
-export type ToolkitGroup = 'quick-scan' | 'waste';
+export type ToolkitGroup = 'quick-scan' | 'waste' | 'datagov' | 'energy';
 
 export interface Toolkit {
   id: string;
@@ -44,6 +44,38 @@ export const TOOLKITS: Toolkit[] = [
     sector: 'Sản xuất',
     description:
       'Lập bản đồ rác sản xuất, đánh giá thực hành (40 câu), chấm nhà thầu, theo dõi phế liệu, kiểm soát ô nhiễm & EPR.',
+  },
+  {
+    id: 'datagov-toolkit-fnb',
+    name: 'Quản trị Dữ liệu & Bảo vệ DLCN — Dịch vụ F&B',
+    group: 'datagov',
+    sector: 'Dịch vụ F&B',
+    description:
+      'Bản đồ dữ liệu cá nhân, đánh giá tuân thủ PDPL (40 câu), ứng phó sự cố 72 giờ, theo dõi nghĩa vụ pháp lý & kế hoạch 90 ngày.',
+  },
+  {
+    id: 'datagov-toolkit-san-xuat',
+    name: 'Quản trị Dữ liệu & Bảo vệ DLCN — Sản xuất',
+    group: 'datagov',
+    sector: 'Sản xuất',
+    description:
+      'Bản đồ dữ liệu (nhân viên, sinh trắc, CCTV), đánh giá tuân thủ PDPL (40 câu), ứng phó sự cố, theo dõi pháp lý & kế hoạch 90 ngày.',
+  },
+  {
+    id: 'energy-toolkit-fnb',
+    name: 'Bộ công cụ Hiệu quả Năng lượng — Dịch vụ F&B',
+    group: 'energy',
+    sector: 'Dịch vụ F&B',
+    description:
+      'Bản đồ năng lượng 12 tháng, đánh giá thực hành (40 câu), kiểm kê thiết bị (kWh), tìm cơ hội tiết kiệm (ROI), theo dõi cường độ & kế hoạch 90 ngày.',
+  },
+  {
+    id: 'energy-toolkit-supply',
+    name: 'Bộ công cụ Hiệu quả Năng lượng — Sản xuất',
+    group: 'energy',
+    sector: 'Sản xuất',
+    description:
+      'Bản đồ năng lượng, đánh giá thực hành (40 câu), kiểm kê thiết bị (máy nén khí, động cơ…), cơ hội tiết kiệm (ROI), theo dõi cường độ & kế hoạch 90 ngày.',
   },
   {
     id: 'coming-soon-1',

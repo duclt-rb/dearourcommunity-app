@@ -1,0 +1,53 @@
+,,,,,
+,ĐÁNH GIÁ THỰC HÀNH QUẢN LÝ NĂNG LƯỢNG — 40 câu hỏi · 6 nhóm,,,,
+,,,,,
+,Chấm điểm trung thực:  Đầy đủ   Một phần   Chưa có   N/A = Không áp dụng. Phần đào tạo chuyên sâu cùng chuyên gia VIoT.,,,,
+,,,,,
+,NHÓM,CÂU HỎI / THỰC HÀNH,ĐIỂM (Đầy đủ/Một phần/Chưa có/N/A),RỦI RO / CƠ HỘI NẾU CHƯA LÀM,THAM CHIẾU / GHI CHÚ
+,Giám sát & Đo lường Năng lượng,DN có theo dõi tiêu thụ điện hằng tháng theo từng điểm bán & so sánh giữa các tháng không?,,CAO — Không đo = không kiểm soát,Luật SDNLTK&HQ 2010 (sửa đổi 2025); ISO 50001
+,,"DN có thiết bị giám sát điện năng (đồng hồ phụ/IoT) cho khu vực lớn (bếp, điều hòa) không?",,CAO — Không có đồng hồ phụ thì không biết khu nào tốn điện nhất,ISO 50001 (đo lường)
+,,"DN có biết hệ thống nào chiếm tỷ trọng điện lớn nhất (điều hòa, bếp, làm lạnh) không?",,CAO — Không biết điểm nóng = đầu tư sai chỗ,Phương pháp khảo sát VEEP
+,,DN có giải pháp phát hiện thất thoát/lãng phí điện không?,,TRUNG BÌNH — Thất thoát âm thầm làm tăng chi phí,Quản lý năng lượng
+,,DN có theo dõi công suất đỉnh & hệ số công suất không?,,TRUNG BÌNH — cosφ thấp/vượt công suất bị phụ phí,Biểu giá EVN
+,,DN có đặt mục tiêu tiết kiệm điện (%) cho năm nay không?,,TRUNG BÌNH — Không mục tiêu = không cải thiện,ISO 50001 (mục tiêu)
+,,DN có đối chiếu điện tiêu thụ với sản lượng (kWh/suất ăn hoặc kWh/triệu doanh thu) không?,,"CAO — Chỉ số cường độ cho thấy hiệu quả thật, giúp so sánh giữa chi nhánh",ISO 50001 (EnPI); VEEP
+,"Điều hòa, Thông gió & Làm lạnh",Nhiệt độ điều hòa khu khách có đặt hợp lý (≈25–26°C) & kiểm soát không?,,CAO — Mỗi 1°C thấp hơn ≈ +2–3% điện điều hòa,QCVN 09:2017/BXD
+,,"Điều hòa & hệ làm lạnh có bảo trì/vệ sinh định kỳ (lọc, dàn) không?",,"CAO — Dàn bẩn làm giảm hiệu suất, tăng điện",Bảo trì HVAC
+,,"Tủ lạnh/tủ đông/kho lạnh có gioăng kín, đóng cửa nhanh, không quá tải không?",,CAO — Gioăng hở & cửa mở lâu làm tăng điện làm lạnh đáng kể,Best practice làm lạnh
+,,Kho lạnh/tủ đông có rèm nhựa (PVC strip) & xả đá định kỳ không?,,TRUNG BÌNH — Đóng tuyết làm giảm hiệu suất,Bảo trì làm lạnh
+,,Khu có điều hòa có đóng kín cửa & cách nhiệt tốt không?,,TRUNG BÌNH — Thất thoát lạnh làm điều hòa chạy nhiều hơn,QCVN 09:2017/BXD
+,,Quạt hút mùi/thông gió bếp có vận hành đúng nhu cầu (không chạy thừa) không?,,TRUNG BÌNH — Hút mùi chạy full công suất liên tục tốn điện,Tối ưu vận hành
+,,DN có theo dõi tỷ trọng điện của điều hòa & làm lạnh trong tổng tiêu thụ không?,,TRUNG BÌNH — Đây thường là khoản điện lớn nhất của F&B,VEEP
+,Thiết bị Bếp & Nhà bếp,"Thiết bị bếp (lò, bếp, hấp) có được tắt/giảm khi không phục vụ & có quy trình bật-tắt theo giờ không?",,CAO — Thiết bị bếp chạy không cần thiết rất tốn điện,Tối ưu vận hành
+,,DN có lịch bật thiết bị theo nhu cầu (không bật sớm/để cả ngày) không?,,CAO — Khởi động sớm/để chạy cả ngày lãng phí lớn,Hành vi tiết kiệm
+,,Thiết bị bếp mới có ưu tiên loại tiết kiệm năng lượng/dán nhãn không?,,TRUNG BÌNH — Thiết bị không hiệu suất tốn điện suốt vòng đời,Nhãn năng lượng
+,,Máy hút mùi có hệ điều khiển theo nhu cầu (biến tần/cảm biến) không?,,TRUNG BÌNH — Hút mùi chạy full công suất liên tục tốn điện,Best practice
+,,Máy nước nóng/đun có được cách nhiệt & đặt nhiệt độ hợp lý không?,,TRUNG BÌNH — Đun quá nóng & thất thoát nhiệt lãng phí điện,Tối ưu vận hành
+,,DN có bảo trì thiết bị bếp định kỳ để giữ hiệu suất không?,,TRUNG BÌNH — Thiết bị thiếu bảo trì tiêu hao nhiều điện hơn,Bảo trì
+,,Thiết bị làm mát đồ uống/trưng bày có đặt xa nguồn nhiệt & thông thoáng không?,,THẤP — Đặt cạnh bếp/nắng làm tăng điện làm lạnh,Bố trí hợp lý
+,Chiếu sáng,DN đã chuyển sang đèn LED ở khu khách & khu bếp chưa?,,CAO — LED tiết kiệm 50–70% so với đèn cũ,Nhãn năng lượng / MEPS
+,,"Khu ít dùng (kho, WC) có cảm biến/hẹn giờ tắt đèn không?",,TRUNG BÌNH — Đèn cháy ở khu vực trống là lãng phí thuần,Best practice
+,,DN có tận dụng ánh sáng tự nhiên ban ngày khi khả thi không?,,THẤP — Bỏ lỡ nguồn sáng miễn phí,Thiết kế hiệu quả
+,,Đèn trang trí/biển hiệu có hẹn giờ/cảm biến ánh sáng không?,,THẤP — Đèn chạy ban ngày là lãng phí,Tối ưu vận hành
+,,Độ sáng có phù hợp không gian (không thừa) & tạo trải nghiệm tốt không?,,THẤP — Chiếu sáng quá mức vừa tốn điện vừa kém trải nghiệm,QCVN chiếu sáng
+,,Có người tắt đèn/thiết bị khu vực không dùng cuối ca không?,,TRUNG BÌNH — Không ai phụ trách = đèn/thiết bị chạy qua đêm,Hành vi tiết kiệm
+,Năng lượng tái tạo & Quản lý phụ tải,DN đã đánh giá tiềm năng lắp điện mặt trời mái nhà chưa?,,CAO — Bỏ lỡ cơ hội giảm chi phí điện & phát thải,Nghị định 58/2025/NĐ-CP (ĐMT mái tự dùng)
+,,DN có nắm quy định ĐMT mái tự sản tự tiêu không?,,TRUNG BÌNH — Cần nắm thủ tục theo công suất lắp đặt,Nghị định 58/2025/NĐ-CP
+,,"DN có biết khung giờ cao điểm & dịch tải (làm đá, giặt, sạc) sang giờ thấp điểm không?",,CAO — Chạy tải lớn vào giờ cao điểm rất tốn tiền,Biểu giá ToU EVN
+,,"Nếu đã lắp ĐMT, có giám sát & bảo trì tấm pin không?",,TRUNG BÌNH — Pin bẩn/lỗi làm giảm sản lượng,Vận hành ĐMT
+,,DN có theo dõi giờ tiêu thụ điện cao nhất trong ngày (load profile) không?,,TRUNG BÌNH — Không biết đỉnh tải = không tối ưu được,VEEP load profile
+,,DN có cân nhắc pin lưu trữ/dự phòng khi khả thi không?,,THẤP — BESS giúp cắt đỉnh & dự phòng mất điện,VEEP (BESS)
+,"Quản trị, Tuân thủ & Hành vi",DN có người phụ trách quản lý năng lượng/tiết kiệm điện không?,,CAO — Không ai sở hữu = không cải thiện,Luật SDNLTK&HQ
+,,"Nếu là cơ sở trọng điểm (công trình ≥500 TOE/năm), DN có thực hiện nghĩa vụ kiểm toán & báo cáo năng lượng không?",,NGHIÊM TRỌNG — Bắt buộc với cơ sở trọng điểm; vi phạm bị phạt,Nghị định 30/2026/NĐ-CP
+,,DN có dùng thiết bị dán nhãn năng lượng khi mua mới không?,,TRUNG BÌNH — Thiết bị không hiệu suất tốn điện suốt vòng đời,Dán nhãn NL/MEPS
+,,"DN có đào tạo nhân viên thói quen tiết kiệm điện (tắt thiết bị, đóng cửa kho lạnh) không?",,CAO — Hành vi quyết định phần lớn lãng phí,Hành vi tiết kiệm
+,,DN có lập kế hoạch tiết kiệm năng lượng hằng năm không?,,TRUNG BÌNH — Không kế hoạch = cải thiện rời rạc,Thông tư 25/2020/TT-BCT
+,,DN có truyền thông kết quả tiết kiệm tới đội ngũ không?,,THẤP — Không ghi nhận làm giảm động lực,Gắn kết nhân viên
+,,"DN có cân nhắc tín dụng xanh để tài trợ nâng cấp (LED, ĐMT, thiết bị) không?",,THẤP — Bỏ lỡ nguồn vốn ưu đãi cho đầu tư EE,Tín dụng xanh; Phân loại xanh QĐ 21/2025
+,,,,,
+,TỔNG HỢP KẾT QUẢ ĐÁNH GIÁ,,,,
+,Số mục Đầy đủ,0,,,
+,Số mục Một phần,0,,,
+,Số mục Chưa có,0,,,
+,Số mục N/A (Không áp dụng),0,,,
+,ĐIỂM QUẢN LÝ NĂNG LƯỢNG (%),0%,,Giai đoạn đầu — Bắt đầu từ giám sát & các mục NGHIÊM TRỌNG,

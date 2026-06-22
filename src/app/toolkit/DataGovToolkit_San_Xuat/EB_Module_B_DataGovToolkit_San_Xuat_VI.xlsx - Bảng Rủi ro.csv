@@ -1,0 +1,14 @@
+,BẢNG RỦI RO QUẢN TRỊ DỮ LIỆU
+
+,Tổng hợp tự động từ trang Đánh giá — điểm & mức rủi ro theo từng nhóm. Đèn đỏ = cần hành động ngay.
+
+,NHÓM QUẢN TRỊ DỮ LIỆU,ĐIỂM %,MỨC RỦI RO,GỢI Ý
+,Thu thập & Đồng ý,0%,Cao,"Nền tảng: chỉ thu thập dữ liệu cần thiết, có đồng ý hợp lệ"
+,Cơ sở pháp lý & Minh bạch,0%,Cao,Cần chính sách quyền riêng tư & cơ sở pháp lý cho mỗi hoạt động
+,An ninh & Lưu trữ,0%,Cao,"Phân quyền truy cập, mã hóa dữ liệu nhạy cảm, sao lưu"
+,Quyền của Chủ thể Dữ liệu,0%,Cao,Lập quy trình đáp ứng quyền của chủ thể dữ liệu
+,Bên thứ ba & Chuyển dữ liệu,0%,Cao,Ký DPA với bên thứ ba; rà soát chuyển dữ liệu xuyên biên giới
+,"Quản trị, DPO & Trách nhiệm",0%,Cao,Phân công người phụ trách; quy trình sự cố 72 giờ; lưu hồ sơ
+,TỔNG THỂ,0%,Cao,Mức độ sẵn sàng tuân thủ PDPL tổng thể
+
+,"Lưu ý SME: DN siêu nhỏ/nhỏ & khởi nghiệp được MIỄN nghĩa vụ chỉ định DPO và làm DPIA/CTIA tới năm 2031 — TRỪ KHI xử lý dữ liệu nhạy cảm hoặc lượng lớn. Các nghĩa vụ còn lại (đồng ý, bảo mật, thông báo 72 giờ, quyền chủ thể, cấm mua bán dữ liệu) áp dụng ngay."
