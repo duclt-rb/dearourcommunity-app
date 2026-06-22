@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Title } from '@angular/platform-browser';
+import { APP_TITLE } from '../core/title-strategy';
 import { findToolkit, Toolkit } from './toolkit.data';
 import { getQuickScan } from './quick-scan/quick-scan.data';
 import { QuickScanComponent } from './quick-scan/quick-scan';
@@ -25,6 +27,7 @@ import { getEnergyToolkit } from './energy/energy.data';
 })
 export default class ToolkitComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private titleService = inject(Title);
 
   id = signal<string | null>(null);
   toolkit = computed<Toolkit | undefined>(() => findToolkit(this.id()));
@@ -32,6 +35,13 @@ export default class ToolkitComponent implements OnInit {
   wasteToolkit = computed(() => getWasteToolkit(this.id()));
   dataGovToolkit = computed(() => getDataGov(this.id()));
   energyToolkit = computed(() => getEnergyToolkit(this.id()));
+
+  constructor() {
+    effect(() => {
+      const name = this.toolkit()?.name;
+      this.titleService.setTitle(name ? `${name} | ${APP_TITLE}` : `Bộ công cụ | ${APP_TITLE}`);
+    });
+  }
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
