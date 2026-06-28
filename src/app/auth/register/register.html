@@ -155,7 +155,23 @@
       <label class="checkbox-field">
         <input type="checkbox" [formField]="registerForm.agreeToTerms" />
         <span class="checkbox-field__label">
-          Tôi đồng ý với <a href="#" class="auth-form__link">điều khoản sử dụng</a>
+          Bằng cách đăng ký và/hoặc đăng nhập, sử dụng tài khoản của bạn, bạn đồng ý với
+          <a
+            href="https://dearourcommunity.asia/vi/terms-policy"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="auth-form__link"
+            >Điều khoản sử dụng</a
+          >
+          và
+          <a
+            href="https://dearourcommunity.asia/vi/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="auth-form__link"
+            >Chính sách bảo mật</a
+          >
+          của chúng tôi
         </span>
       </label>
       @if (registerForm.agreeToTerms().touched() && registerForm.agreeToTerms().invalid()) {
