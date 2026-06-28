@@ -49,9 +49,13 @@ export default class BillingComponent implements OnInit {
   ngOnInit() {
     this.profileStore.loadProfile();
 
-    // Production: MoMo chưa mở → mặc định chuyển sang chuyển khoản ngân hàng
+    // Production: MoMo chưa mở → mặc định chuyển sang chuyển khoản ngân hàng.
+    // Chỉ đặt phương thức, KHÔNG tạo giao dịch CK ở đây — vì lúc init còn đang ở
+    // bước Order, người dùng chưa nhập coupon. Nếu tạo ngay, bankTransfer sẽ được
+    // chốt với giá gốc (không coupon) và mức giảm không hiển thị ở màn chuyển khoản.
+    // Việc tạo giao dịch CK được hoãn tới khi sang bước 2 (goToPayment).
     if (this.momoDisabled && this.paymentMethod() === 'momo') {
-      this.selectPaymentMethod('bank');
+      this.store.selectPaymentMethod('bank');
     }
   }
 
@@ -94,6 +98,11 @@ export default class BillingComponent implements OnInit {
 
   goToPayment() {
     this.store.setStep(2);
+    // Tạo giao dịch CK khi sang bước thanh toán — lúc này coupon (nếu có) đã được
+    // áp dụng ở bước Order, nên bankTransfer sẽ phản ánh đúng mức giảm.
+    if (this.paymentMethod() === 'bank') {
+      this.store.prepareBankTransfer();
+    }
   }
 
   backToOrder() {
