@@ -45,7 +45,14 @@
               <span class="section-label">Gói đã chọn</span>
               <div class="course-row">
                 <span class="course-name">
-                  {{ store.selectedPackage()?.name }}
+                  @if (packageDetailUrl(); as url) {
+                    <a class="pkg-name-link" [href]="url" target="_blank" rel="noopener noreferrer">
+                      {{ store.selectedPackage()?.name }}
+                      <svg lucideExternalLink [size]="14" strokeWidth="2"></svg>
+                    </a>
+                  } @else {
+                    {{ store.selectedPackage()?.name }}
+                  }
                   <span
                     style="
                       display: inline-block;
@@ -374,7 +381,14 @@
                     gap: 8px;
                   "
                 >
-                  {{ store.selectedPackage()?.name }}
+                  @if (packageDetailUrl(); as url) {
+                    <a class="pkg-name-link" [href]="url" target="_blank" rel="noopener noreferrer">
+                      {{ store.selectedPackage()?.name }}
+                      <svg lucideExternalLink [size]="13" strokeWidth="2"></svg>
+                    </a>
+                  } @else {
+                    {{ store.selectedPackage()?.name }}
+                  }
                   <span
                     style="
                       display: inline-block;

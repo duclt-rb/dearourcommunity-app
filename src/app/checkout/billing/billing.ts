@@ -13,6 +13,7 @@ import {
   LucideLandmark,
   LucideCopy,
   LucideCircleCheck,
+  LucideExternalLink,
 } from '@lucide/angular';
 import LogoComponent from '../../shared/logo/logo';
 import { environment } from '../../../environments/environment';
@@ -32,6 +33,7 @@ import { environment } from '../../../environments/environment';
     LucideLandmark,
     LucideCopy,
     LucideCircleCheck,
+    LucideExternalLink,
     LogoComponent,
   ],
   templateUrl: './billing.html',
@@ -71,6 +73,12 @@ export default class BillingComponent implements OnInit {
   bankCreateError = this.store.bankCreateError;
 
   readonly copiedField = signal<string | null>(null);
+
+  // Link tới trang chi tiết gói trên website chính (mở tab mới)
+  readonly packageDetailUrl = computed<string | null>(() => {
+    const id = this.store.selectedPackage()?.id;
+    return id ? `${environment.appUrl}/vi/what-we-offer/${id}` : null;
+  });
 
   // Số tiền phải trả để hiển thị: với chuyển khoản đã tạo giao dịch thì lấy số thực thu
   // (đã trừ coupon) do server trả; còn lại hiển thị giá gốc của gói (MoMo tự xử lý giảm giá).
