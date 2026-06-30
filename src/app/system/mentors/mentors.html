@@ -261,17 +261,36 @@
             ></textarea>
           </div>
 
-          <!-- Tags -->
+          <!-- Tags (chip input: Enter hoặc dấu phẩy để thêm thẻ) -->
           <div class="field">
             <label for="mentor-tags" class="field__label">Thẻ</label>
-            <input
-              id="mentor-tags"
-              type="text"
-              [formField]="mentorForm.tagsInput"
-              placeholder="Nhập tags, phân cách bằng dấu phẩy (vd: Startup, Leadership, Tech)"
-              class="form-input"
-            />
-            <span class="field__hint">Phân cách các tag bằng dấu phẩy.</span>
+            <div class="tag-input" (click)="tagFieldRef.focus()">
+              @for (tag of mentorModel().tags; track tag; let i = $index) {
+                <span class="tag-chip">
+                  {{ tag }}
+                  <button
+                    type="button"
+                    class="tag-chip__remove"
+                    (click)="removeTag(i); $event.stopPropagation()"
+                    aria-label="Xoá thẻ"
+                  >
+                    <svg lucideX [size]="12" strokeWidth="2.5"></svg>
+                  </button>
+                </span>
+              }
+              <input
+                #tagFieldRef
+                id="mentor-tags"
+                type="text"
+                class="tag-input__field"
+                [value]="tagDraft()"
+                (input)="tagDraft.set($any($event.target).value)"
+                (keydown)="onTagKeydown($event)"
+                (blur)="addTagFromDraft()"
+                [placeholder]="mentorModel().tags.length ? '' : 'Nhập thẻ rồi nhấn Enter...'"
+              />
+            </div>
+            <span class="field__hint">Nhấn Enter hoặc dấu phẩy để thêm thẻ.</span>
           </div>
 
           <!-- Type Checkboxes & SortOrder & isActive -->

@@ -1,4 +1,4 @@
-import { Component, inject, linkedSignal } from '@angular/core';
+import { Component, inject, linkedSignal, signal } from '@angular/core';
 import { form, FormField, required } from '@angular/forms/signals';
 import {
   LucideUsers,
@@ -77,7 +77,7 @@ export default class MentorsComponent {
       avatarUrl: mentor?.avatarUrl ?? '',
       linkedinUrl: mentor?.linkedinUrl ?? '',
       bio: mentor?.bio ?? '',
-      tagsInput: mentor?.tags?.join(', ') ?? '',
+      tags: mentor?.tags ? [...mentor.tags] : [],
       isActive: mentor?.isActive ?? true,
       sortOrder: mentor?.sortOrder ?? 0,
       typeYouth: mentor?.types?.includes('youth') ?? false,
@@ -90,6 +90,46 @@ export default class MentorsComponent {
     required(m.slug, { message: 'Slug là bắt buộc' });
     required(m.position, { message: 'Chức vụ là bắt buộc' });
   });
+
+  // Ô nhập thẻ dạng chip: phần text đang gõ dở (chưa thành chip)
+  readonly tagDraft = signal('');
+
+  // Thêm thẻ từ phần đang gõ (hỗ trợ dán nhiều thẻ cách nhau bằng dấu phẩy); bỏ trùng (không phân biệt hoa/thường)
+  addTagFromDraft() {
+    const parts = this.tagDraft()
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean);
+    if (parts.length) {
+      this.mentorModel.update((m) => {
+        const existing = new Set(m.tags.map((t) => t.toLowerCase()));
+        const merged = [...m.tags];
+        for (const p of parts) {
+          if (!existing.has(p.toLowerCase())) {
+            existing.add(p.toLowerCase());
+            merged.push(p);
+          }
+        }
+        return { ...m, tags: merged };
+      });
+    }
+    this.tagDraft.set('');
+  }
+
+  removeTag(index: number) {
+    if (index < 0) return;
+    this.mentorModel.update((m) => ({ ...m, tags: m.tags.filter((_, i) => i !== index) }));
+  }
+
+  onTagKeydown(e: KeyboardEvent) {
+    if (e.key === 'Enter' || e.key === ',') {
+      // Chặn submit form / ký tự dấu phẩy — thay vào đó thêm thẻ
+      e.preventDefault();
+      this.addTagFromDraft();
+    } else if (e.key === 'Backspace' && this.tagDraft() === '') {
+      this.removeTag(this.mentorModel().tags.length - 1);
+    }
+  }
 
   // Auto-generate slug from name
   generateSlug(name: string): string {
@@ -119,7 +159,7 @@ export default class MentorsComponent {
       avatarUrl: '',
       linkedinUrl: '',
       bio: '',
-      tagsInput: '',
+      tags: [],
       isActive: true,
       sortOrder: this.store.nextSortOrder(),
       typeYouth: false,
@@ -134,15 +174,15 @@ export default class MentorsComponent {
     this.mentorForm().markAsTouched();
     if (this.mentorForm().invalid()) return;
 
+    // Chốt nốt thẻ đang gõ dở (chưa nhấn Enter) trước khi lưu
+    this.addTagFromDraft();
+
     const m = this.mentorModel();
     const types: MentorType[] = [];
     if (m.typeYouth) types.push('youth');
     if (m.typeOrganization) types.push('organization');
 
-    const tags = m.tagsInput
-      .split(',')
-      .map((t) => t.trim())
-      .filter(Boolean);
+    const tags = m.tags;
 
     const dto: CreateMentorDto = {
       name: m.name,
