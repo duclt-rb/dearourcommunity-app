@@ -1,0 +1,55 @@
+<!-- Trang khóa toolkit (CR-003) -->
+<div class="min-h-screen bg-gray-50">
+  <header class="border-b border-gray-200 bg-white">
+    <div class="mx-auto flex max-w-[1100px] items-center px-6 py-4">
+      <app-logo height="56px" />
+    </div>
+  </header>
+
+  <main class="mx-auto flex max-w-[720px] flex-col items-center px-6 py-20 text-center">
+    <span
+      class="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-100 text-amber-700"
+    >
+      <svg lucideLock [size]="28" strokeWidth="2"></svg>
+    </span>
+
+    <h1 class="mt-6 text-2xl font-semibold text-gray-900">Bạn chưa có quyền truy cập</h1>
+    <p class="mt-3 max-w-[520px] text-gray-600">
+      Công cụ này dành cho khách hàng đã mua gói có kèm bộ công cụ. Nâng cấp gói để bắt đầu sử dụng
+      — dữ liệu bạn nhập sẽ được lưu tự động trên trình duyệt.
+    </p>
+
+    @if (packages().length) {
+      <p class="mt-8 text-sm font-semibold uppercase tracking-wide text-gray-500">
+        Có trong các gói
+      </p>
+      <div class="mt-3 flex flex-wrap justify-center gap-2">
+        @for (pkg of packages(); track pkg.id) {
+          <a
+            [href]="access.packageDetailUrl(pkg.id)"
+            class="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 transition hover:border-[var(--color-primary-300)] hover:text-[var(--color-primary-600)] hover:shadow-sm"
+          >
+            {{ pkg.name }}
+            <svg lucideArrowRight [size]="14" strokeWidth="2"></svg>
+          </a>
+        }
+      </div>
+    }
+
+    <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+      <a
+        [href]="frontpageToolkitUrl"
+        class="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary-600)] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[var(--color-primary-700)]"
+      >
+        Xem giới thiệu bộ công cụ
+        <svg lucideArrowRight [size]="16" strokeWidth="2"></svg>
+      </a>
+      <a
+        [routerLink]="['/profile']"
+        class="inline-flex items-center rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:border-gray-400"
+      >
+        Về trang của tôi
+      </a>
+    </div>
+  </main>
+</div>

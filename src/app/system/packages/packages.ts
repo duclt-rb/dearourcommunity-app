@@ -16,7 +16,19 @@ import {
 import { InputText } from 'primeng/inputtext';
 import { PackagesService } from '../../core/services/packages.service';
 import { CourseService } from '../../core/services/course.service';
+import { TOOLKITS, type Toolkit, type ToolkitGroup } from '../../toolkit/toolkit.data';
 import type { Package, UpdatePackageDto } from '@dearourcommunity/client';
+
+// CR-002: quyền toolkit của gói lưu dạng flag `toolkit:<id>` trong app_packages.features (JSON).
+// Bỏ chọn = xóa key (không ghi false). Catalog hardcode mirror toolkit.data.ts — sẽ chuyển DB sau.
+const TOOLKIT_FLAG_PREFIX = 'toolkit:';
+
+const TOOLKIT_GROUP_LABELS: Record<ToolkitGroup, string> = {
+  'quick-scan': 'Đánh giá nhanh ESG (Quick Scan)',
+  waste: 'Bộ công cụ Chất thải',
+  datagov: 'Quản trị Dữ liệu & PDPL',
+  energy: 'Hiệu quả Năng lượng',
+};
 
 @Component({
   selector: 'app-packages',
@@ -108,6 +120,40 @@ export default class PackagesComponent {
       }));
     },
   });
+
+  // 5b. CR-002: catalog toolkit theo group + draft các toolkit đã gán cho gói đang chọn.
+  // Quick Scan tách section riêng khỏi các toolkit chuyên đề (cùng chung 1 draft/flag).
+  quickScanToolkits: Toolkit[] = TOOLKITS.filter((t) => !t.comingSoon && t.group === 'quick-scan');
+
+  toolkitGroups: { key: ToolkitGroup; label: string; items: Toolkit[] }[] = (
+    Object.keys(TOOLKIT_GROUP_LABELS) as ToolkitGroup[]
+  )
+    .filter((key) => key !== 'quick-scan')
+    .map((key) => ({
+      key,
+      label: TOOLKIT_GROUP_LABELS[key],
+      items: TOOLKITS.filter((t) => !t.comingSoon && t.group === key),
+    }))
+    .filter((g) => g.items.length > 0);
+
+  draftToolkitIds = linkedSignal({
+    source: this.selectedPackage,
+    computation: (pkg) =>
+      Object.entries(pkg?.features ?? {})
+        .filter(([key, value]) => value === true && key.startsWith(TOOLKIT_FLAG_PREFIX))
+        .map(([key]) => key.slice(TOOLKIT_FLAG_PREFIX.length)),
+  });
+
+  isToolkitSelected(id: string): boolean {
+    return this.draftToolkitIds().includes(id);
+  }
+
+  toggleToolkit(id: string) {
+    const current = this.draftToolkitIds();
+    this.draftToolkitIds.set(
+      current.includes(id) ? current.filter((t) => t !== id) : [...current, id],
+    );
+  }
 
   // 6. Computed list of courses in the selected package based on the local DRAFT list
   selectedPackageCourses = computed(() => {
@@ -210,6 +256,15 @@ export default class PackagesComponent {
         credits.push({ creditType: 'course_selection', amount: courseSelection });
       }
 
+      // CR-002: PATCH replace toàn bộ cột features → gửi object đã merge:
+      // giữ nguyên các flag không phải toolkit (marketing legacy), ghi lại flag toolkit theo draft.
+      const features: Record<string, boolean> = Object.fromEntries(
+        Object.entries(pkg.features ?? {}).filter(([key]) => !key.startsWith(TOOLKIT_FLAG_PREFIX)),
+      );
+      for (const id of this.draftToolkitIds()) {
+        features[`${TOOLKIT_FLAG_PREFIX}${id}`] = true;
+      }
+
       await this.packagesService.update(pkg.id, {
         name: model.name,
         description: model.description,
@@ -217,6 +272,7 @@ export default class PackagesComponent {
         price: model.isContactPrice ? -1 : Number(model.price),
         slots: Number(model.slots),
         credits,
+        features,
       });
 
       this.saveSuccess.set(true);

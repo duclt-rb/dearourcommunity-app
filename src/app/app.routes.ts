@@ -4,6 +4,7 @@ import { systemGuard } from './core/system.guard';
 import { checkoutGuard } from './checkout/checkout.guard';
 import { accountMatchGuard } from './checkout/account-match.guard';
 import { receiptGuard } from './checkout/receipt.guard';
+import { toolkitAccessGuard, toolkitCatalogRedirectGuard } from './toolkit/toolkit-access.guard';
 
 export const routes: Routes = [
   {
@@ -134,13 +135,21 @@ export const routes: Routes = [
     ],
   },
   {
+    // CR-003: app không còn trang danh sách toolkit — catalog nằm ở Frontpage.
     path: 'toolkit',
+    pathMatch: 'full',
+    canActivate: [toolkitCatalogRedirectGuard],
+    children: [],
+  },
+  {
+    path: 'toolkit/locked',
     title: 'Bộ công cụ',
-    loadComponent: () => import('./toolkit/toolkit-list'),
+    loadComponent: () => import('./toolkit/toolkit-locked'),
   },
   {
     path: 'toolkit/:id',
     title: 'Bộ công cụ',
+    canActivate: [toolkitAccessGuard],
     loadComponent: () => import('./toolkit/toolkit'),
   },
   {

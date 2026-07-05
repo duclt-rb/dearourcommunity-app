@@ -1204,3 +1204,42 @@
   margin: 0;
   line-height: 1.5;
 }
+
+/* ============================================================
+   Toolkit & Quick Scan trong gói (CR-002)
+   ============================================================ */
+
+.toolkit-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toolkit-group__label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.toolkit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px 16px;
+}
+
+.toolkit-option {
+  align-items: flex-start;
+}
+
+.toolkit-option input[type='checkbox'] {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.toolkit-option__sector {
+  font-style: normal;
+  color: var(--color-text-muted);
+}

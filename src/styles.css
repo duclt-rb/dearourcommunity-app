@@ -74,10 +74,14 @@
    BASE STYLES
    ================================================ */
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* Reset phải nằm trong layer `tailwind-base` (khai báo ở tailwind.css) — nếu để
+   unlayered nó sẽ đè mọi utility margin/padding của Tailwind (layer luôn thua unlayered). */
+@layer tailwind-base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 }
 
 body {

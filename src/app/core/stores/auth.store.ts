@@ -1,5 +1,5 @@
 import { computed, inject } from '@angular/core';
-import { ApiError, PackageType, RegisterDto } from '@dearourcommunity/client';
+import { ApiError, PackageType, RegisterDto, UserPackageInfo } from '@dearourcommunity/client';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { AuthService } from '../services/auth.service';
 
@@ -14,6 +14,8 @@ export interface AuthUser {
     name: string;
     type: PackageType;
   } | null;
+  /** Gói đang sở hữu (personal + kế thừa từ org) — auth.me() trả về (CR-003: gate toolkit). */
+  packages?: UserPackageInfo[];
 }
 
 export interface AuthState {

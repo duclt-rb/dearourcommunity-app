@@ -215,6 +215,62 @@
               </div>
             </div>
 
+            <!-- Quick Scan trong gói (CR-002 — flag `toolkit:<id>` trong features JSON) -->
+            <div class="credits-config-section">
+              <h4 class="credits-config-title">Quick Scan trong gói</h4>
+              <p class="credits-config-desc">
+                Chọn các bài đánh giá nhanh ESG mà người mua gói này được truy cập.
+              </p>
+              <div class="toolkit-grid">
+                @for (toolkit of quickScanToolkits; track toolkit.id) {
+                  <label class="field__checkbox toolkit-option">
+                    <input
+                      type="checkbox"
+                      [checked]="isToolkitSelected(toolkit.id)"
+                      (change)="toggleToolkit(toolkit.id)"
+                    />
+                    <span>
+                      {{ toolkit.name }}
+                      @if (toolkit.sector) {
+                        <em class="toolkit-option__sector">({{ toolkit.sector }})</em>
+                      }
+                    </span>
+                  </label>
+                }
+              </div>
+            </div>
+
+            <!-- Toolkit chuyên đề trong gói (CR-002) -->
+            <div class="credits-config-section">
+              <h4 class="credits-config-title">Toolkit trong gói</h4>
+              <p class="credits-config-desc">
+                Chọn các bộ công cụ ESG chuyên đề mà người mua gói này được truy cập. Danh sách lấy
+                theo toolkit hiện có trên trang Toolkit.
+              </p>
+              @for (group of toolkitGroups; track group.key) {
+                <div class="toolkit-group">
+                  <h5 class="toolkit-group__label">{{ group.label }}</h5>
+                  <div class="toolkit-grid">
+                    @for (toolkit of group.items; track toolkit.id) {
+                      <label class="field__checkbox toolkit-option">
+                        <input
+                          type="checkbox"
+                          [checked]="isToolkitSelected(toolkit.id)"
+                          (change)="toggleToolkit(toolkit.id)"
+                        />
+                        <span>
+                          {{ toolkit.name }}
+                          @if (toolkit.sector) {
+                            <em class="toolkit-option__sector">({{ toolkit.sector }})</em>
+                          }
+                        </span>
+                      </label>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+
             <!-- Submit Row -->
             <div class="form-actions">
               <button type="submit" class="btn primary" [disabled]="isSaving()">
