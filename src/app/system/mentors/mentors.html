@@ -391,6 +391,16 @@
           </div>
         </form>
       </div>
+
+      <!-- Lịch khả dụng — card nhúng dưới form, chỉ khi mentor ĐÃ tồn tại -->
+      @if (mode() === 'edit' && selectedMentor(); as m) {
+        <app-mentor-schedule [mentorId]="m.id" />
+      } @else {
+        <p class="schedule-hint">
+          <svg lucideCalendarClock [size]="15" strokeWidth="2"></svg>
+          Lưu mentor trước, sau đó cấu hình lịch khả dụng ngay tại đây.
+        </p>
+      }
     }
   </div>
 </div>

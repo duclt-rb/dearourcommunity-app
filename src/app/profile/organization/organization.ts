@@ -3,8 +3,21 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OrganizationService } from '../../core/services/organization.service';
 import { PackagesService } from '../../core/services/packages.service';
+import { PurchasesService } from '../../core/services/purchases.service';
 import { ProfileStore } from '../profile.store';
-import { OrganizationMember, Package, OrgMembership } from '@dearourcommunity/client';
+import {
+  CourseSelection,
+  CreditBalances,
+  OrganizationMember,
+  Package,
+  OrgMembership,
+} from '@dearourcommunity/client';
+
+/** Một khoá trong pool gán được — lấy từ dto.courses của (các) gói organization mà org đã mua. */
+interface PoolCourse {
+  courseId: number;
+  title: string;
+}
 
 @Component({
   selector: 'app-profile-organization',
@@ -16,6 +29,7 @@ import { OrganizationMember, Package, OrgMembership } from '@dearourcommunity/cl
 export default class OrganizationComponent implements OnInit {
   private orgService = inject(OrganizationService);
   private packageService = inject(PackagesService);
+  private purchasesService = inject(PurchasesService);
   store = inject(ProfileStore);
 
   // States
@@ -29,6 +43,14 @@ export default class OrganizationComponent implements OnInit {
 
   // Form states
   inviteEmail = signal('');
+
+  // ── Gán khoá cho thành viên (CR-001 — org-credit `course_selection`, owner-only) ──
+  orgCredits = signal<CreditBalances | null>(null);
+  courseSelections = signal<CourseSelection[] | null>(null);
+  coursePool = signal<PoolCourse[]>([]);
+  assignMemberUserId = signal('');
+  assignCourseId = signal('');
+  assignLoading = signal(false);
 
   // Computed properties
   activeOrg = computed<OrgMembership | null>(() => {
@@ -62,6 +84,20 @@ export default class OrganizationComponent implements OnInit {
     return emailRegex.test(email);
   });
 
+  /** Số suất chọn khoá còn lại của org. */
+  courseSelectionBalance = computed(() => this.orgCredits()?.course_selection ?? 0);
+
+  /** Thành viên đang hoạt động — nguồn cho select gán khoá. */
+  assignableMembers = computed(() => (this.members() ?? []).filter((m) => m.status === 'active'));
+
+  canAssign = computed(
+    () =>
+      !this.assignLoading() &&
+      this.courseSelectionBalance() > 0 &&
+      this.assignMemberUserId() !== '' &&
+      this.assignCourseId() !== '',
+  );
+
   async ngOnInit() {
     await this.loadData();
   }
@@ -76,6 +112,11 @@ export default class OrganizationComponent implements OnInit {
         // Fetch members
         const membersList = await this.orgService.getMembers(org.id);
         this.members.set(membersList);
+
+        // Dữ liệu gán khoá (owner-only guard ở BE)
+        if (this.isOwner()) {
+          await this.loadCourseAssignmentData(org.id);
+        }
       }
 
       // Fetch package details if packageId exists
@@ -94,6 +135,104 @@ export default class OrganizationComponent implements OnInit {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  /**
+   * Tải dữ liệu cho phần "Gán khoá cho thành viên": số dư org-credit, danh sách đã gán
+   * và pool khoá — pool lấy từ purchases của org: lọc purchase (completed, type package)
+   * của gói có packageType='organization' → dto.courses (PackageCourse có wpCourseId +
+   * course.postTitle để hiển thị tên).
+   */
+  async loadCourseAssignmentData(orgId: string) {
+    const [credits, selections, pool] = await Promise.all([
+      this.orgService.getCredits(orgId),
+      this.orgService.getCourseSelections(orgId),
+      this.buildCoursePool(orgId),
+    ]);
+    this.orgCredits.set(credits);
+    this.courseSelections.set(selections);
+    this.coursePool.set(pool);
+  }
+
+  private async buildCoursePool(orgId: string): Promise<PoolCourse[]> {
+    const purchases = await this.purchasesService.getOrgPurchases(orgId);
+    const packageIds = [
+      ...new Set(
+        purchases
+          .filter((p) => p.status === 'completed' && p.type === 'package')
+          .map((p) => p.packageId),
+      ),
+    ];
+
+    const packages = await Promise.all(
+      packageIds.map((id) => this.packageService.findById(id).catch(() => null)),
+    );
+
+    const pool = new Map<number, PoolCourse>();
+    for (const pkg of packages) {
+      if (!pkg || pkg.packageType !== 'organization') continue;
+      for (const pc of pkg.courses) {
+        if (!pool.has(pc.wpCourseId)) {
+          pool.set(pc.wpCourseId, {
+            courseId: pc.wpCourseId,
+            title: pc.course?.postTitle ?? `Khóa học #${pc.wpCourseId}`,
+          });
+        }
+      }
+    }
+    return [...pool.values()];
+  }
+
+  /** Owner gán khoá cho member — BE trừ 1 org-credit `course_selection` + enroll member. */
+  async onAssignSubmit(event: Event) {
+    event.preventDefault();
+    const org = this.activeOrg();
+    if (!org || !this.canAssign()) return;
+
+    const memberUserId = this.assignMemberUserId();
+    const courseId = Number(this.assignCourseId());
+
+    this.assignLoading.set(true);
+    this.successMessage.set(null);
+    this.errorMessage.set(null);
+
+    try {
+      await this.orgService.assignCourseSelection(org.id, { memberUserId, courseId });
+
+      const member = this.assignableMembers().find((m) => m.userId === memberUserId);
+      const course = this.coursePool().find((c) => c.courseId === courseId);
+      this.successMessage.set(
+        `Đã gán khoá "${course?.title ?? courseId}" cho ${
+          member ? this.getMemberDisplayName(member) : 'thành viên'
+        } thành công!`,
+      );
+      this.assignMemberUserId.set('');
+      this.assignCourseId.set('');
+
+      // Refresh số suất còn lại + danh sách đã gán
+      await this.loadCourseAssignmentData(org.id);
+    } catch (err) {
+      // Hiển thị message lỗi từ BE (vd hết lượt / member đã có khoá này)
+      console.error('Failed to assign course selection:', err);
+      const msg =
+        err instanceof Error ? err.message : 'Không thể gán khoá cho thành viên. Vui lòng thử lại.';
+      this.errorMessage.set(msg);
+    } finally {
+      this.assignLoading.set(false);
+    }
+  }
+
+  /** Tên hiển thị của người nhận khoá trong bảng đã gán. */
+  getSelectionMemberName(userId: string): string {
+    const member = (this.members() ?? []).find((m) => m.userId === userId);
+    return member ? this.getMemberDisplayName(member) : userId;
+  }
+
+  /** Tên khoá trong bảng đã gán (fallback #id nếu khoá không còn trong pool). */
+  getSelectionCourseTitle(wpCourseId: number): string {
+    return (
+      this.coursePool().find((c) => c.courseId === wpCourseId)?.title ?? `Khóa học #${wpCourseId}`
+    );
   }
 
   async onInviteSubmit(event: Event) {

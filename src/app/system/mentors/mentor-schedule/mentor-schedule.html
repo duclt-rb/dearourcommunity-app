@@ -1,0 +1,446 @@
+<div class="mentor-schedule">
+  <!-- Quản lý lịch khả dụng (CR-001 AMENDMENT 1 — slot là lịch thật, CRUD riêng).
+       Card NHÚNG dưới form edit mentor — mentor đang xem lấy từ input `mentorId`.
+       CHỈ XEM THÁNG: grid tháng read-only + panel chi tiết ngày (mọi action) + pattern generator. -->
+  <div class="schedule-card">
+    <div class="schedule-header">
+      <div class="schedule-title-row">
+        <svg lucideCalendarClock class="schedule-icon" [size]="24" strokeWidth="1.5"></svg>
+        <div>
+          <h2 class="schedule-title">Quản lý lịch khả dụng</h2>
+          <p class="schedule-subtitle">Khung giờ cụ thể học viên có thể đặt lịch (giờ Việt Nam).</p>
+        </div>
+      </div>
+
+      <div class="schedule-tools">
+        <!-- Month switcher -->
+        <div class="month-switcher">
+          <button
+            type="button"
+            class="month-nav-btn"
+            (click)="changeMonth(-1)"
+            [disabled]="isLoadingSlots()"
+            aria-label="Tháng trước"
+          >
+            <svg lucideChevronLeft [size]="16" strokeWidth="2"></svg>
+          </button>
+          <span class="month-label">{{ monthLabel() }}</span>
+          <button
+            type="button"
+            class="month-nav-btn"
+            (click)="changeMonth(1)"
+            [disabled]="isLoadingSlots()"
+            aria-label="Tháng sau"
+          >
+            <svg lucideChevronRight [size]="16" strokeWidth="2"></svg>
+          </button>
+        </div>
+        <button
+          type="button"
+          class="month-today-btn"
+          (click)="goToCurrentMonth()"
+          [disabled]="isCurrentMonth() || isLoadingSlots()"
+        >
+          Hôm nay
+        </button>
+      </div>
+    </div>
+
+    <div class="schedule-body">
+      <!-- Alerts -->
+      @if (slotNotice(); as notice) {
+        <div class="alert success">
+          <svg lucideCheck [size]="18" strokeWidth="2"></svg>
+          <span>{{ notice }}</span>
+        </div>
+      }
+      @if (slotActionError(); as err) {
+        <div class="alert error">
+          <svg lucideAlertCircle [size]="18" strokeWidth="2"></svg>
+          <span>{{ err }}</span>
+        </div>
+      }
+      @if (slotsError(); as err) {
+        <div class="alert error">
+          <svg lucideAlertCircle [size]="18" strokeWidth="2"></svg>
+          <span>{{ err }}</span>
+        </div>
+      }
+
+      <!-- Pattern generator "Thêm nhiều khung giờ" — độc lập với tháng đang xem, tính từ hôm nay -->
+      <div class="compose">
+        <button
+          type="button"
+          class="compose__toggle"
+          (click)="toggleComposeOpen()"
+          [attr.aria-expanded]="composeOpen()"
+        >
+          <svg lucidePlus [size]="16" strokeWidth="2.5"></svg>
+          <span>Thêm nhiều khung giờ</span>
+          <svg
+            lucideChevronDown
+            class="compose__chevron"
+            [class.is-open]="composeOpen()"
+            [size]="16"
+            strokeWidth="2"
+          ></svg>
+        </button>
+        @if (composeOpen()) {
+          <div class="compose__body">
+            <!-- Chọn THỨ trong tuần (pattern, không gắn với tháng đang xem) -->
+            <div class="field">
+              <span class="field__label">Thứ trong tuần</span>
+              <div class="compose__days">
+                @for (label of composeWeekdayOptions; track label; let i = $index) {
+                  <button
+                    type="button"
+                    class="compose__day"
+                    [class.is-selected]="composeWeekdays().includes(i)"
+                    (click)="toggleComposeWeekday(i)"
+                  >
+                    <span class="compose__day-name">{{ label }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Danh sách giờ -->
+            <div class="field">
+              <label for="compose-time" class="field__label">Giờ bắt đầu</label>
+              <div class="compose__time-row">
+                <p-datepicker
+                  inputId="compose-time"
+                  styleClass="compose__time-picker"
+                  [timeOnly]="true"
+                  hourFormat="24"
+                  [stepMinute]="15"
+                  placeholder="--:--"
+                  appendTo="body"
+                  [pt]="timePickerPt"
+                  [ngModel]="composeTimeDraft()"
+                  (ngModelChange)="composeTimeDraft.set($event)"
+                  (keydown.enter)="$event.preventDefault(); addComposeTime()"
+                />
+                <button
+                  type="button"
+                  class="btn ghost compose__time-add"
+                  [disabled]="!composeTimeDraft()"
+                  (click)="addComposeTime()"
+                >
+                  <svg lucidePlus [size]="14" strokeWidth="2.5"></svg>
+                  Thêm giờ
+                </button>
+              </div>
+              @if (composeTimes().length) {
+                <div class="compose__time-chips">
+                  @for (t of composeTimes(); track t) {
+                    <span class="time-chip">
+                      {{ t }}
+                      <button
+                        type="button"
+                        class="time-chip__remove"
+                        (click)="removeComposeTime(t)"
+                        aria-label="Xoá giờ"
+                      >
+                        <svg lucideX [size]="11" strokeWidth="2.5"></svg>
+                      </button>
+                    </span>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Áp dụng trong N tuần tới (kể từ hôm nay) -->
+            <div class="field">
+              <label for="compose-weeks" class="field__label">Áp dụng trong</label>
+              <select
+                id="compose-weeks"
+                class="form-input compose__repeat"
+                (change)="setComposeWeeksAhead(+$any($event.target).value)"
+              >
+                @for (opt of weeksAheadOptions; track opt.value) {
+                  <option [value]="opt.value" [selected]="opt.value === composeWeeksAhead()">
+                    {{ opt.label }}
+                  </option>
+                }
+              </select>
+              <span class="field__hint">Tính từ hôm nay — giờ đã qua sẽ tự bị bỏ.</span>
+            </div>
+
+            <div class="compose__footer">
+              @if (composePreviewCount() > 0) {
+                <span class="compose__preview">
+                  Sẽ tạo tối đa <strong>{{ composePreviewCount() }}</strong> khung giờ trong
+                  {{ composeWeeksAhead() }} tuần tới — khung trùng với khung đã có sẽ tự bị bỏ qua.
+                </span>
+              } @else {
+                <span class="compose__preview compose__preview--muted">
+                  Chọn ít nhất 1 thứ và 1 giờ để tạo khung.
+                </span>
+              }
+              <div class="compose__actions">
+                <button
+                  type="button"
+                  class="btn ghost compose__btn"
+                  [disabled]="
+                    (!composeWeekdays().length && !composeTimes().length) || isCreatingSlots()
+                  "
+                  (click)="clearCompose()"
+                >
+                  Xoá chọn
+                </button>
+                <button
+                  type="button"
+                  class="btn primary compose__btn"
+                  [disabled]="!composePreviewCount() || isCreatingSlots()"
+                  (click)="submitCompose()"
+                >
+                  @if (isCreatingSlots()) {
+                    <span class="spinner-small"></span> Đang tạo...
+                  } @else {
+                    <svg lucidePlus [size]="16" strokeWidth="2.5"></svg>
+                    Tạo khung giờ
+                  }
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Chú giải màu chip -->
+      <div class="slot-legend">
+        <span class="slot-legend__item">
+          <span class="slot-legend__dot slot-legend__dot--available"></span>Trống
+        </span>
+        <span class="slot-legend__item">
+          <span class="slot-legend__dot slot-legend__dot--booked"></span>Đã đặt
+        </span>
+        <span class="slot-legend__item">
+          <span class="slot-legend__dot slot-legend__dot--inactive"></span>Đã tắt
+        </span>
+        <span class="slot-legend__item">
+          <span class="slot-legend__dot slot-legend__dot--past"></span>Đã qua
+        </span>
+      </div>
+
+      <p class="month-hint">
+        Bấm vào một ngày trong lịch để xem và chỉnh sửa toàn bộ khung giờ của ngày đó.
+      </p>
+
+      <!-- Lịch tháng dạng calendar grid 7 cột × 5-6 hàng (chip read-only, click ngày mở panel) -->
+      <div class="month-grid-wrap">
+        <div class="month-grid">
+          @for (w of monthWeekdayHeaders; track w) {
+            <div class="month-grid__weekday">{{ w }}</div>
+          }
+          @for (day of monthDays(); track day.date) {
+            <div
+              class="month-grid__cell"
+              [class.is-out]="!day.inMonth"
+              [class.is-today]="isToday(day.date)"
+              [class.is-past]="isPastDay(day.date)"
+              [class.is-selected]="selectedDate() === day.date"
+              (click)="openDay(day.date)"
+              [title]="'Xem chi tiết ngày ' + dayNum(day.date)"
+            >
+              <div class="month-grid__cell-head">
+                <span class="month-grid__daynum">{{ dayOfMonth(day.date) }}</span>
+                @if (!isPastDay(day.date)) {
+                  <button
+                    type="button"
+                    class="month-grid__add"
+                    (click)="openDayAndFocusAdd(day.date); $event.stopPropagation()"
+                    title="Thêm khung giờ cho ngày này"
+                    aria-label="Thêm khung giờ cho ngày này"
+                  >
+                    <svg lucidePlus [size]="11" strokeWidth="2.5"></svg>
+                  </button>
+                }
+              </div>
+
+              @if (isLoadingSlots()) {
+                <!-- Skeleton giữ nguyên khung grid tháng -->
+                <span class="month-chip-skeleton"></span>
+                <span class="month-chip-skeleton"></span>
+              } @else {
+                @for (slot of visibleMonthSlots(day); track slot.id) {
+                  <span
+                    class="month-chip"
+                    [class.month-chip--available]="slotStatus(slot) === 'available'"
+                    [class.month-chip--booked]="slotStatus(slot) === 'booked'"
+                    [class.month-chip--inactive]="slotStatus(slot) === 'inactive'"
+                    [class.month-chip--past]="slotStatus(slot) === 'past'"
+                    [title]="slot.label + ' — ' + slotStatusLabel(slot)"
+                  >
+                    @if (slotStatus(slot) === 'booked') {
+                      <svg lucideLock [size]="9" strokeWidth="2.5"></svg>
+                    }
+                    {{ slotTime(slot) }}
+                  </span>
+                }
+                @if (hiddenMonthCount(day) > 0) {
+                  <span class="month-grid__more">+{{ hiddenMonthCount(day) }} nữa</span>
+                }
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Panel chi tiết ngày — expand ngay dưới grid, chứa toàn bộ action -->
+      @if (selectedDate(); as date) {
+        <div class="day-panel">
+          <div class="day-panel__header">
+            <h3 class="day-panel__title">{{ dayHeading(date) }}</h3>
+            <button
+              type="button"
+              class="day-panel__close"
+              (click)="closeDay()"
+              title="Đóng"
+              aria-label="Đóng panel ngày"
+            >
+              <svg lucideX [size]="16" strokeWidth="2"></svg>
+            </button>
+          </div>
+
+          @if (!selectedDaySlots().length) {
+            <p class="day-panel__empty">Chưa có khung giờ nào trong ngày này.</p>
+          } @else {
+            <div class="day-panel__list">
+              @for (slot of selectedDaySlots(); track slot.id) {
+                <div
+                  class="day-slot"
+                  [class.day-slot--booked]="slotStatus(slot) === 'booked'"
+                  [class.day-slot--inactive]="slotStatus(slot) === 'inactive'"
+                  [class.day-slot--past]="slotStatus(slot) === 'past'"
+                >
+                  <span class="day-slot__time">{{ slotTime(slot) }}</span>
+                  <span class="day-slot__label" [title]="slot.label">{{ slot.label }}</span>
+                  <span
+                    class="day-slot__badge"
+                    [class.day-slot__badge--available]="slotStatus(slot) === 'available'"
+                    [class.day-slot__badge--booked]="slotStatus(slot) === 'booked'"
+                    [class.day-slot__badge--inactive]="slotStatus(slot) === 'inactive'"
+                    [class.day-slot__badge--past]="slotStatus(slot) === 'past'"
+                  >
+                    {{ slotStatusShort(slot) }}
+                  </span>
+
+                  @if (slotActionId() === slot.id) {
+                    <span class="spinner-small day-slot__spinner"></span>
+                  } @else if (slotStatus(slot) === 'booked') {
+                    <span
+                      class="day-slot__locked"
+                      title="Đã có booking được duyệt — không thể chỉnh sửa"
+                    >
+                      <svg lucideLock [size]="14" strokeWidth="2"></svg>
+                    </span>
+                  } @else {
+                    <span class="day-slot__actions">
+                      @if (slotStatus(slot) !== 'past') {
+                        <button
+                          type="button"
+                          class="day-slot__action"
+                          (click)="toggleSlot(slot)"
+                          [disabled]="isCreatingSlots()"
+                          [title]="slot.isActive ? 'Tắt khung giờ' : 'Bật khung giờ'"
+                          [attr.aria-label]="slot.isActive ? 'Tắt khung giờ' : 'Bật khung giờ'"
+                        >
+                          <svg lucidePower [size]="14" strokeWidth="2.5"></svg>
+                        </button>
+                      }
+                      <button
+                        type="button"
+                        class="day-slot__action day-slot__action--danger"
+                        (click)="requestDeleteSlot(slot.id)"
+                        [disabled]="isCreatingSlots()"
+                        title="Xoá khung giờ"
+                        aria-label="Xoá khung giờ"
+                      >
+                        <svg lucideTrash2 [size]="14" strokeWidth="2"></svg>
+                      </button>
+                    </span>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Thêm giờ cho ngày này (chỉ hôm nay trở đi) -->
+          @if (!isPastDay(date)) {
+            <div class="day-panel__add">
+              <p-datepicker
+                inputId="day-add-time"
+                styleClass="day-panel__time-picker"
+                [timeOnly]="true"
+                hourFormat="24"
+                [stepMinute]="15"
+                placeholder="--:--"
+                appendTo="body"
+                [pt]="timePickerPt"
+                [ngModel]="dayAddTime()"
+                (ngModelChange)="dayAddTime.set($event)"
+                (keydown.enter)="$event.preventDefault(); submitDayAdd()"
+              />
+              <button
+                type="button"
+                class="btn primary day-panel__add-btn"
+                [disabled]="!dayAddTime() || isCreatingSlots()"
+                (click)="submitDayAdd()"
+              >
+                @if (isCreatingSlots()) {
+                  <span class="spinner-small"></span>
+                } @else {
+                  <svg lucidePlus [size]="14" strokeWidth="2.5"></svg>
+                }
+                Thêm giờ
+              </button>
+            </div>
+          } @else {
+            <p class="day-panel__past-hint">Ngày đã qua — chỉ có thể xoá khung giờ cũ.</p>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Slot Delete Confirmation Modal -->
+  @if (confirmDeleteSlotId()) {
+    <div class="modal-overlay" (click)="cancelDeleteSlot()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-icon-wrap danger">
+          <svg lucideTrash2 [size]="24" strokeWidth="1.5"></svg>
+        </div>
+        <h3 class="modal-title">Xác nhận xóa khung giờ</h3>
+        <p class="modal-desc">
+          Khung giờ sẽ bị xóa khỏi lịch khả dụng của mentor và học viên không thể đặt nữa. Hành động
+          này không thể hoàn tác.
+        </p>
+
+        <div class="modal-actions">
+          <button
+            type="button"
+            class="btn ghost"
+            (click)="cancelDeleteSlot()"
+            [disabled]="slotActionId() !== null"
+          >
+            Hủy bỏ
+          </button>
+          <button
+            type="button"
+            class="btn danger"
+            (click)="confirmDeleteSlot()"
+            [disabled]="slotActionId() !== null"
+          >
+            @if (slotActionId() !== null) {
+              <span class="spinner-small"></span> Đang xóa...
+            } @else {
+              Xác nhận xóa
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

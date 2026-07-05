@@ -42,7 +42,7 @@ export const selectQueryRedirect = selectQueryParam('redirect');
 // Selector giải mã và phân tích cú pháp extraData từ query param
 export const selectDecodedExtraData = createSelector(
   selectQueryExtraData,
-  (extraDataVal): { packageId?: string; userId?: string } | null => {
+  (extraDataVal): { packageId?: string; userId?: string; bookingId?: string } | null => {
     return typeof extraDataVal === 'string' ? safeParseExtraData(extraDataVal) : null;
   },
 );

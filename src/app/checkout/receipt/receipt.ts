@@ -11,6 +11,7 @@ import {
   selectQueryTransId,
 } from '../../core/router/router.selectors';
 import LogoComponent from '../../shared/logo/logo';
+import BookingSummaryComponent from '../booking-summary/booking-summary';
 import { CheckoutStore } from '../checkout.store';
 import { PaymentService } from '../../core/services/payment.service';
 import { ProfileStore } from '../../profile/profile.store';
@@ -31,7 +32,15 @@ const PACKAGE_NAME_MAP: Record<string, string> = {
 @Component({
   selector: 'app-receipt',
   standalone: true,
-  imports: [RouterLink, LucideCheck, LucideHome, LucideArrowRight, LucideCircleX, LogoComponent],
+  imports: [
+    RouterLink,
+    LucideCheck,
+    LucideHome,
+    LucideArrowRight,
+    LucideCircleX,
+    LogoComponent,
+    BookingSummaryComponent,
+  ],
   templateUrl: './receipt.html',
   styleUrl: './receipt.css',
 })
@@ -72,6 +81,13 @@ export default class ReceiptComponent {
   private activeTimeout: ReturnType<typeof setTimeout> | null = null;
 
   resultMessage = computed<string>(() => getMomoResultMessage(this.resultCode()));
+
+  // ── Lịch hẹn mentor gắn với đơn (CR-001) — render qua <app-booking-summary> ──
+  // Flow MoMo: bookingId nằm trong extraData (redirect làm mất state SPA);
+  // flow chuyển khoản: SPA không reload nên đọc từ CheckoutStore.bookingRef.
+  readonly bookingId = computed<string | null>(
+    () => this.extraDataObj()?.bookingId ?? this.store.bookingRef() ?? null,
+  );
 
   constructor() {
     // Đồng bộ cực kỳ đơn giản vì receiptGuard đã đảm bảo dữ liệu hợp lệ!

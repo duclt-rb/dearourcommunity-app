@@ -1,6 +1,7 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import type { MentorBooking } from '@dearourcommunity/client';
 import { CheckoutStore, type PaymentMethod } from '../checkout.store';
 import { ProfileStore } from '../../profile/profile.store';
 import {
@@ -13,9 +14,12 @@ import {
   LucideLandmark,
   LucideCopy,
   LucideCircleCheck,
+  LucideCircleX,
   LucideExternalLink,
+  LucideInfo,
 } from '@lucide/angular';
 import LogoComponent from '../../shared/logo/logo';
+import BookingSummaryComponent from '../booking-summary/booking-summary';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -33,8 +37,11 @@ import { environment } from '../../../environments/environment';
     LucideLandmark,
     LucideCopy,
     LucideCircleCheck,
+    LucideCircleX,
     LucideExternalLink,
+    LucideInfo,
     LogoComponent,
+    BookingSummaryComponent,
   ],
   templateUrl: './billing.html',
   styleUrl: './billing.css',
@@ -75,8 +82,31 @@ export default class BillingComponent implements OnInit {
   bankTransfer = this.store.bankTransfer;
   bankCreating = this.store.bankCreating;
   bankCreateError = this.store.bankCreateError;
+  paymentBlockedMsg = this.store.paymentBlockedMsg;
 
   readonly copiedField = signal<string | null>(null);
+
+  // ── CR-001: chặn thanh toán trùng booking (chủ động, trước khi user thao tác) ──
+  /** Booking do <app-booking-summary> fetch được, đẩy lên qua output bookingLoaded. */
+  readonly bookingInfo = signal<MentorBooking | null>(null);
+
+  onBookingLoaded(booking: MentorBooking) {
+    this.bookingInfo.set(booking);
+  }
+
+  /** Booking đã thanh toán hoặc đã duyệt → không cho thanh toán lại. */
+  readonly bookingAlreadyPaid = computed<boolean>(() => {
+    const b = this.bookingInfo();
+    return !!b && (b.paymentTransactionId !== null || b.status === 'approved');
+  });
+
+  /** Booking đã bị từ chối → không thể thanh toán. */
+  readonly bookingRejected = computed<boolean>(() => this.bookingInfo()?.status === 'rejected');
+
+  /** Chặn mọi thao tác thanh toán khi booking đã được xử lý xong. */
+  readonly bookingBlocked = computed<boolean>(
+    () => this.bookingAlreadyPaid() || this.bookingRejected(),
+  );
 
   // Link tới trang chi tiết gói trên website chính (mở tab mới)
   readonly packageDetailUrl = computed<string | null>(() => {
@@ -97,6 +127,8 @@ export default class BillingComponent implements OnInit {
   }
 
   goToPayment() {
+    // Booking đã xử lý xong (thanh toán/duyệt/từ chối) → không cho sang bước thanh toán
+    if (this.bookingBlocked()) return;
     this.store.setStep(2);
     // Tạo giao dịch CK khi sang bước thanh toán — lúc này coupon (nếu có) đã được
     // áp dụng ở bước Order, nên bankTransfer sẽ phản ánh đúng mức giảm.

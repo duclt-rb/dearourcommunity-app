@@ -39,6 +39,10 @@ export class ClientService {
     return this.client.course;
   }
 
+  get credits() {
+    return this.client.credits;
+  }
+
   get purchases() {
     return this.client.purchases;
   }

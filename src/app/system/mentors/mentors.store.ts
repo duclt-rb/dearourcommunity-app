@@ -116,7 +116,7 @@ export const MentorsStore = signalStore(
           saveError: null,
         });
       },
-      // Mở panel chỉnh sửa một mentor
+      // Mở panel chỉnh sửa một mentor (lịch khả dụng quản lý ở trang Lịch mentor riêng)
       openEdit(mentor: Mentor) {
         patchState(store, {
           selectedMentorId: mentor.id,

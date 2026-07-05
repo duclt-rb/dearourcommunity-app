@@ -1,4 +1,7 @@
 <div class="system-layout bookings-module">
+  <!-- Toast thông báo kết quả duyệt / từ chối -->
+  <p-toast position="top-right" />
+
   <!-- Stats Grid -->
   <div class="stats-grid">
     <div class="stat-card total">
@@ -137,7 +140,7 @@
               <th class="col-user">Người đăng ký</th>
               <th class="col-contact">Liên hệ</th>
               <th class="col-mentor">Mentor mong muốn</th>
-              <th class="col-occupation">Nghề nghiệp</th>
+              <th class="col-package">Gói</th>
               <th class="col-date">Ngày gửi</th>
               <th class="col-status text-center">Trạng thái</th>
               <th class="col-actions text-center">Thao tác</th>
@@ -149,7 +152,7 @@
                 <td class="col-user">
                   <div class="user-cell">
                     <span class="user-display-name">{{ b.name }}</span>
-                    <span class="user-email-text">Sinh năm {{ b.yearBirth }}</span>
+                    <span class="user-email-text">{{ getCareerStageLabel(b.careerStage) }}</span>
                   </div>
                 </td>
                 <td class="col-contact">
@@ -165,23 +168,44 @@
                     <span class="text-muted">Admin điều phối</span>
                   }
                 </td>
-                <td class="col-occupation">{{ b.occupation }}</td>
+                <td class="col-package">
+                  <div class="user-cell">
+                    <span class="package-type-badge" [class]="b.packageType">
+                      {{ getPackageTypeLabel(b.packageType) }}
+                    </span>
+                    @if (isPaid(b)) {
+                      <span class="paid-badge">Đã thanh toán</span>
+                    }
+                  </div>
+                </td>
                 <td class="col-date">{{ b.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
                 <td class="col-status text-center">
-                  <span class="status-badge" [class]="b.status">
-                    {{ getStatusLabel(b.status) }}
+                  <!-- pending + confirmedSlotIds = đã duyệt nhánh trả phí, chờ tiền về (R6) -->
+                  <span class="status-badge" [class]="getStatusBadgeClass(b)">
+                    {{ getStatusBadgeLabel(b) }}
                   </span>
                 </td>
                 <td class="col-actions text-center" (click)="$event.stopPropagation()">
                   @if (canReview(b)) {
+                    <!-- Duyệt nhanh không truyền slotIds → BE chốt TẤT CẢ khung giờ đề xuất (default-all).
+                         Booking "chờ thanh toán": bấm lần nữa = gửi lại mail link thanh toán. -->
                     <button
                       type="button"
                       class="btn-action-approve"
-                      title="Duyệt yêu cầu"
+                      [title]="getApproveTooltip(b)"
                       [disabled]="actionLoadingId() === b.id"
-                      (click)="approve(b)"
+                      (click)="quickApprove(b)"
                     >
-                      <svg lucideCheck [size]="16" strokeWidth="2"></svg>
+                      @if (actionLoadingId() === b.id) {
+                        <svg
+                          lucideLoaderCircle
+                          class="icon-spinning"
+                          [size]="16"
+                          strokeWidth="2"
+                        ></svg>
+                      } @else {
+                        <svg lucideCheck [size]="16" strokeWidth="2"></svg>
+                      }
                     </button>
                   }
                   <button type="button" class="btn-action-view" (click)="viewDetails(b)">
@@ -231,13 +255,16 @@
               <span class="summary-label">Người đăng ký</span>
               <span class="summary-value-text">{{ b.name }}</span>
               <span class="summary-sub">
-                {{ b.occupation }} · Sinh năm {{ b.yearBirth }} · {{ b.levelOfExperience }}
+                {{ getCareerStageLabel(b.careerStage) }} · {{ getPackageTypeLabel(b.packageType) }}
               </span>
             </div>
             <div class="summary-status">
-              <span class="status-badge large" [class]="b.status">
-                {{ getStatusLabel(b.status) }}
+              <span class="status-badge large" [class]="getStatusBadgeClass(b)">
+                {{ getStatusBadgeLabel(b) }}
               </span>
+              @if (isPaid(b)) {
+                <span class="paid-badge">Đã thanh toán</span>
+              }
             </div>
           </div>
 
@@ -251,18 +278,6 @@
               <svg lucidePhone [size]="14" strokeWidth="2"></svg>
               {{ b.phone }}
             </a>
-            @if (b.facebookLink) {
-              <a class="contact-chip" [href]="b.facebookLink" target="_blank" rel="noopener">
-                <svg lucideExternalLink [size]="14" strokeWidth="2"></svg>
-                Facebook
-              </a>
-            }
-            @if (b.linkedinLink) {
-              <a class="contact-chip" [href]="b.linkedinLink" target="_blank" rel="noopener">
-                <svg lucideExternalLink [size]="14" strokeWidth="2"></svg>
-                LinkedIn
-              </a>
-            }
           </div>
 
           <!-- Metadata grid -->
@@ -273,18 +288,52 @@
             </div>
 
             <div class="detail-field">
-              <span class="field-label">Lĩnh vực quan tâm</span>
-              <span class="field-value">{{ b.fieldOfInterest || 'Chưa cung cấp' }}</span>
+              <span class="field-label">Giai đoạn sự nghiệp</span>
+              <span class="field-value">{{ getCareerStageLabel(b.careerStage) }}</span>
             </div>
 
             <div class="detail-field">
-              <span class="field-label">Tần suất mong muốn</span>
+              <span class="field-label">Gói đặt lịch</span>
               <span class="field-value">
-                @if (b.availability.length) {
-                  {{ b.availability.length }} lựa chọn:
-                  @for (a of b.availability; track a; let last = $last) {
-                    {{ getAvailabilityLabel(a) }}{{ last ? '' : ', ' }}
-                  }
+                <span class="package-type-badge" [class]="b.packageType">
+                  {{ getPackageTypeLabel(b.packageType) }}
+                </span>
+              </span>
+            </div>
+
+            <div class="detail-field">
+              <span class="field-label">Thanh toán</span>
+              <span class="field-value">
+                @if (isExistingBranch(b)) {
+                  Dùng lượt có sẵn — không cần thanh toán
+                } @else if (isPaid(b)) {
+                  <span class="paid-badge">Đã thanh toán</span>
+                } @else {
+                  Chưa thanh toán
+                }
+              </span>
+            </div>
+
+            <div class="detail-field">
+              <span class="field-label">Khung giờ đề xuất</span>
+              <span class="field-value">
+                @if (b.selectedTimeSlots?.length) {
+                  <span class="slot-chips">
+                    @for (slot of b.selectedTimeSlots; track slot.slotId) {
+                      <span
+                        class="slot-chip"
+                        [class.slot-chip--confirmed]="isConfirmedSlot(b, slot.slotId)"
+                      >
+                        {{ slot.label }}
+                        @if (isConfirmedSlot(b, slot.slotId)) {
+                          <span class="slot-chip__confirmed-badge">
+                            <svg lucideCheck [size]="11" strokeWidth="2.5"></svg>
+                            Đã chốt
+                          </span>
+                        }
+                      </span>
+                    }
+                  </span>
                 } @else {
                   Chưa chọn
                 }
@@ -292,11 +341,11 @@
             </div>
 
             <div class="detail-field">
-              <span class="field-label">Hình thức trao đổi</span>
+              <span class="field-label">Chủ đề muốn trao đổi</span>
               <span class="field-value">
-                @if (b.communicationPreferences.length) {
-                  @for (c of b.communicationPreferences; track c; let last = $last) {
-                    {{ getCommunicationLabel(c) }}{{ last ? '' : ', ' }}
+                @if (b.discussionTopics?.length) {
+                  @for (t of b.discussionTopics; track t; let last = $last) {
+                    {{ getTopicLabel(t) }}{{ last ? '' : ', ' }}
                   }
                 } @else {
                   Chưa chọn
@@ -306,22 +355,100 @@
           </div>
 
           <!-- Long-form fields -->
-          @if (b.specificGoals) {
+          @if (b.problemDescription) {
             <div class="detail-message-box">
-              <span class="message-label">Mục tiêu cụ thể</span>
-              <p class="message-text">{{ b.specificGoals }}</p>
+              <span class="message-label">Vấn đề đang gặp</span>
+              <p class="message-text">{{ b.problemDescription }}</p>
             </div>
           }
-          @if (b.challenges) {
+          @if (b.triedSolutions) {
             <div class="detail-message-box">
-              <span class="message-label">Khó khăn đang gặp</span>
-              <p class="message-text">{{ b.challenges }}</p>
+              <span class="message-label">Đã thử những gì</span>
+              <p class="message-text">{{ b.triedSolutions }}</p>
             </div>
           }
-          @if (b.preferredTopics) {
+          @if (b.desiredOutcome) {
             <div class="detail-message-box">
-              <span class="message-label">Chủ đề mong muốn</span>
-              <p class="message-text">{{ b.preferredTopics }}</p>
+              <span class="message-label">Kết quả mong muốn</span>
+              <p class="message-text">{{ b.desiredOutcome }}</p>
+            </div>
+          }
+          @if (b.notesForMentor) {
+            <div class="detail-message-box">
+              <span class="message-label">Ghi chú cho mentor</span>
+              <p class="message-text">{{ b.notesForMentor }}</p>
+            </div>
+          }
+
+          <!-- Consents -->
+          <div class="consent-list">
+            <span class="field-label">Cam kết của người đăng ký</span>
+            <div class="consent-item" [class.ok]="b.consentAdvisory">
+              @if (b.consentAdvisory) {
+                <svg lucideCheck [size]="14" strokeWidth="2.5"></svg>
+              } @else {
+                <svg lucideX [size]="14" strokeWidth="2.5"></svg>
+              }
+              Hiểu rằng mentoring mang tính tham vấn, không thay thế tư vấn chuyên môn
+            </div>
+            <div class="consent-item" [class.ok]="b.consentPunctuality">
+              @if (b.consentPunctuality) {
+                <svg lucideCheck [size]="14" strokeWidth="2.5"></svg>
+              } @else {
+                <svg lucideX [size]="14" strokeWidth="2.5"></svg>
+              }
+              Cam kết tham gia đúng giờ, báo trước nếu cần đổi lịch
+            </div>
+            <div class="consent-item" [class.ok]="b.consentDataStorage">
+              @if (b.consentDataStorage) {
+                <svg lucideCheck [size]="14" strokeWidth="2.5"></svg>
+              } @else {
+                <svg lucideX [size]="14" strokeWidth="2.5"></svg>
+              }
+              Đồng ý cho lưu trữ thông tin để phục vụ buổi mentoring
+            </div>
+          </div>
+
+          <!-- Chọn khung giờ chốt (CR-001 Amendment 3) — mặc định tick TẤT CẢ, admin bỏ tick khung không muốn chốt.
+               Booking "chờ thanh toán" đã chốt giờ rồi → không hiện picker (bấm duyệt = resend mail). -->
+          @if (
+            canReview(b) &&
+            needsSlotChoice(b) &&
+            !isAwaitingPayment(b) &&
+            confirmRejectId() !== b.id
+          ) {
+            <div class="slot-picker">
+              <span class="slot-picker__label">
+                Khung giờ sẽ chốt khi duyệt <span class="slot-picker__required">*</span>
+              </span>
+              <p class="slot-picker__hint">
+                Bỏ tick khung giờ không muốn chốt — mỗi khung giờ chốt sẽ bị khoá trên lịch mentor.
+                Nút duyệt chỉ bật khi còn ít nhất 1 khung giờ được tick.
+              </p>
+              <div class="slot-picker__options">
+                @for (slot of b.selectedTimeSlots ?? []; track slot.slotId) {
+                  <label
+                    class="slot-picker__option"
+                    [class.slot-picker__option--selected]="isSlotTicked(slot.slotId)"
+                  >
+                    <input
+                      type="checkbox"
+                      class="slot-picker__checkbox"
+                      [checked]="isSlotTicked(slot.slotId)"
+                      (change)="toggleApproveSlot(slot.slotId)"
+                    />
+                    <span class="slot-picker__option-label">{{ slot.label }}</span>
+                    @if (isSlotTicked(slot.slotId)) {
+                      <svg
+                        lucideCheck
+                        class="slot-picker__check"
+                        [size]="15"
+                        strokeWidth="2.5"
+                      ></svg>
+                    }
+                  </label>
+                }
+              </div>
             </div>
           }
 
@@ -351,6 +478,17 @@
         </div>
 
         <!-- Modal Footer -->
+        @if (canReview(b) && !isExistingBranch(b) && confirmRejectId() !== b.id) {
+          <p class="approve-branch-note">
+            @if (isAwaitingPayment(b)) {
+              Booking đã duyệt, đang chờ học viên thanh toán — bấm
+              <strong>Gửi lại link thanh toán</strong> nếu học viên chưa nhận được mail.
+            } @else {
+              Duyệt sẽ gửi mail kèm link thanh toán — booking hiển thị
+              <strong>Đã duyệt · chờ thanh toán</strong> tới khi thanh toán xong.
+            }
+          </p>
+        }
         <div class="modal-footer">
           @if (canReview(b)) {
             @if (confirmRejectId() === b.id) {
@@ -368,8 +506,13 @@
                 [disabled]="actionLoadingId() === b.id"
                 (click)="confirmReject(b)"
               >
-                <svg lucideX [size]="16" strokeWidth="2"></svg>
-                Xác nhận từ chối
+                @if (actionLoadingId() === b.id) {
+                  <svg lucideLoaderCircle class="icon-spinning" [size]="16" strokeWidth="2"></svg>
+                  Đang từ chối...
+                } @else {
+                  <svg lucideX [size]="16" strokeWidth="2"></svg>
+                  Xác nhận từ chối
+                }
               </button>
             } @else {
               <button
@@ -383,11 +526,24 @@
               <button
                 type="button"
                 class="btn primary"
-                [disabled]="actionLoadingId() === b.id"
-                (click)="approve(b)"
+                [disabled]="
+                  actionLoadingId() === b.id ||
+                  (needsSlotChoice(b) && !isAwaitingPayment(b) && approveSlotIds().length === 0)
+                "
+                [title]="
+                  needsSlotChoice(b) && !isAwaitingPayment(b) && approveSlotIds().length === 0
+                    ? 'Tick ít nhất 1 khung giờ để chốt trước khi duyệt'
+                    : ''
+                "
+                (click)="approveSelected(b)"
               >
-                <svg lucideCheck [size]="16" strokeWidth="2"></svg>
-                Duyệt &amp; gửi mail
+                @if (actionLoadingId() === b.id) {
+                  <svg lucideLoaderCircle class="icon-spinning" [size]="16" strokeWidth="2"></svg>
+                  Đang xử lý...
+                } @else {
+                  <svg lucideCheck [size]="16" strokeWidth="2"></svg>
+                  {{ getApproveLabel(b) }}
+                }
               </button>
             }
           } @else {

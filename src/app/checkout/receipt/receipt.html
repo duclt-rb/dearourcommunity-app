@@ -53,6 +53,9 @@
         </div>
       </div>
 
+      <!-- Lịch hẹn mentor gắn với đơn (CR-001) — component tự ẩn nếu không có/không xem được -->
+      <app-booking-summary [bookingId]="bookingId()" />
+
       <!-- Buttons -->
       <div class="action-row">
         <a routerLink="/profile/dashboard" class="btn btn-primary">
@@ -106,7 +109,10 @@
         </a>
         <a
           routerLink="/checkout/billing"
-          [queryParams]="{ packageId: extraDataObj()?.packageId }"
+          [queryParams]="{
+            packageId: extraDataObj()?.packageId,
+            bookingId: extraDataObj()?.bookingId,
+          }"
           class="btn btn-primary"
         >
           Thử lại

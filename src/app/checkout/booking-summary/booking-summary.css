@@ -1,0 +1,73 @@
+/* ─── Lịch hẹn mentor (CR-001) — dạng tối giản, dùng chung billing & receipt ─── */
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* Không có booking (chưa fetch xong / 404 / không gắn booking) → không chiếm chỗ */
+:host:empty {
+  display: none;
+}
+
+.booking-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Đồng bộ với .section-label của billing ("Gói đã chọn" cũ) */
+.booking-summary__title {
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: rgba(28, 28, 28, 0.6);
+  letter-spacing: 0.14px;
+  line-height: 20px;
+}
+
+.booking-summary__mentor {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.booking-summary__avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--color-border, #d2d2d2);
+}
+
+.booking-summary__mentor-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.booking-summary__name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-dark, #1c1c1c);
+  line-height: 24px;
+}
+
+.booking-summary__position {
+  font-size: 13px;
+  color: rgba(28, 28, 28, 0.6);
+  line-height: 18px;
+}
+
+.booking-summary__slots {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.booking-summary__slot {
+  font-size: 14px;
+  color: rgba(28, 28, 28, 0.75);
+  line-height: 22px;
+}

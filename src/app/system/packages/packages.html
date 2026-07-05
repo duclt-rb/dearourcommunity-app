@@ -36,7 +36,13 @@
                 Slots: <strong>{{ pkg.slots }}</strong>
               </span>
               <span class="meta-price">
-                {{ pkg.price === 0 ? 'Miễn phí' : (pkg.price | number) + 'đ' }}
+                {{
+                  pkg.price === -1
+                    ? 'Liên hệ'
+                    : pkg.price === 0
+                      ? 'Miễn phí'
+                      : (pkg.price | number) + 'đ'
+                }}
               </span>
             </div>
           </div>
@@ -128,7 +134,19 @@
                   placeholder="Nhập giá tiền..."
                   class="w-full"
                 />
-                @if (packageForm.price().touched() && packageForm.price().invalid()) {
+                <label class="field__checkbox">
+                  <input
+                    type="checkbox"
+                    [checked]="packageModel().isContactPrice"
+                    (change)="toggleContactPrice($any($event.target).checked)"
+                  />
+                  <span>Liên hệ (giá thỏa thuận)</span>
+                </label>
+                @if (
+                  !packageModel().isContactPrice &&
+                  packageForm.price().touched() &&
+                  packageForm.price().invalid()
+                ) {
                   <span class="field__error">{{ packageForm.price().errors()[0].message }}</span>
                 }
               </div>
@@ -160,6 +178,41 @@
                 rows="4"
                 class="form-textarea"
               ></textarea>
+            </div>
+
+            <!-- Credit tặng khi mua (CR-001 Q11 — replace-all app_package_credits) -->
+            <div class="credits-config-section">
+              <h4 class="credits-config-title">Credit tặng khi mua gói</h4>
+              <p class="credits-config-desc">
+                Số lượt được cộng cho người mua khi thanh toán thành công. Để 0 hoặc trống nếu gói
+                không tặng loại credit đó.
+              </p>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="pkg-mentoring-credits" class="field__label">
+                    Số buổi mentoring 1-1
+                  </label>
+                  <input
+                    id="pkg-mentoring-credits"
+                    type="number"
+                    pInputText
+                    [formField]="packageForm.mentoringCredits"
+                    placeholder="0"
+                    class="w-full"
+                  />
+                </div>
+                <div class="field">
+                  <label for="pkg-course-credits" class="field__label">Số suất chọn khoá</label>
+                  <input
+                    id="pkg-course-credits"
+                    type="number"
+                    pInputText
+                    [formField]="packageForm.courseSelectionCredits"
+                    placeholder="0"
+                    class="w-full"
+                  />
+                </div>
+              </div>
             </div>
 
             <!-- Submit Row -->

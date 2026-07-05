@@ -1,0 +1,239 @@
+<div class="credits-module">
+  <!-- Lookup panel -->
+  <form class="lookup-panel" (submit)="onLookupSubmit($event)">
+    <div class="lookup-fields">
+      <div class="field">
+        <label for="credit-user-id" class="field__label">
+          User ID <span class="required-star">*</span>
+        </label>
+        <input
+          id="credit-user-id"
+          type="text"
+          class="form-input"
+          placeholder="UUID của user (app_users.id)"
+          [value]="lookupUserId()"
+          (input)="setLookupUserId($any($event.target).value)"
+        />
+      </div>
+      <div class="field">
+        <label for="credit-org-id" class="field__label">Organization ID (tuỳ chọn)</label>
+        <input
+          id="credit-org-id"
+          type="text"
+          class="form-input"
+          placeholder="Điền nếu cần xem/điều chỉnh credit thuộc org"
+          [value]="lookupOrgId()"
+          (input)="setLookupOrgId($any($event.target).value)"
+        />
+      </div>
+      <button type="submit" class="btn primary lookup-btn" [disabled]="isLoading()">
+        @if (isLoading()) {
+          <span class="spinner-small"></span> Đang tra cứu...
+        } @else {
+          <svg lucideSearch [size]="16" strokeWidth="2"></svg>
+          Tra cứu
+        }
+      </button>
+    </div>
+    @if (lookupError(); as err) {
+      <div class="alert error">
+        <svg lucideAlertCircle [size]="16" strokeWidth="2"></svg>
+        <span>{{ err }}</span>
+      </div>
+    }
+  </form>
+
+  @if (!hasResult()) {
+    <div class="empty-state-card">
+      <div class="empty-icon-wrap">
+        <svg lucideCoins [size]="48" strokeWidth="1"></svg>
+      </div>
+      <h3 class="empty-title">Tra cứu credit người dùng</h3>
+      <p class="empty-message">
+        Nhập User ID (kèm Organization ID nếu cần xem pool credit của doanh nghiệp) rồi nhấn
+        <strong>Tra cứu</strong> để xem số dư và lịch sử credit.
+      </p>
+    </div>
+  } @else if (overview(); as ov) {
+    <!-- Balances -->
+    <div class="balance-grid">
+      <div class="balance-card">
+        <span class="balance-label">Buổi mentoring 1-1</span>
+        <span class="balance-value">{{ ov.balances.mentoring_session }}</span>
+      </div>
+      <div class="balance-card">
+        <span class="balance-label">Suất chọn khoá</span>
+        <span class="balance-value">{{ ov.balances.course_selection }}</span>
+      </div>
+      <div class="balance-target">
+        <span class="target-label">Đang xem</span>
+        <code class="target-id">{{ activeUserId() }}</code>
+        @if (activeOrgId(); as orgId) {
+          <span class="target-label">trong org</span>
+          <code class="target-id">{{ orgId }}</code>
+        }
+      </div>
+    </div>
+
+    <!-- Adjust form -->
+    <form class="adjust-panel" (submit)="onAdjustSubmit($event)">
+      <div class="adjust-header">
+        <svg lucideSlidersHorizontal [size]="18" strokeWidth="2"></svg>
+        <div>
+          <h3 class="adjust-title">Điều chỉnh credit</h3>
+          <p class="adjust-desc">
+            Số lượng âm để trừ, dương để cộng. Ghi chú là bắt buộc (tối thiểu 3 ký tự) — nêu rõ lý
+            do CSKH.
+            @if (activeOrgId()) {
+              Điều chỉnh sẽ áp vào <strong>pool credit của org</strong> đang xem.
+            }
+          </p>
+        </div>
+      </div>
+
+      @if (adjustSuccess(); as msg) {
+        <div class="alert success">
+          <svg lucideCheck [size]="16" strokeWidth="2"></svg>
+          <span>{{ msg }}</span>
+        </div>
+      }
+      @if (adjustError(); as err) {
+        <div class="alert error">
+          <svg lucideAlertCircle [size]="16" strokeWidth="2"></svg>
+          <span>{{ err }}</span>
+        </div>
+      }
+
+      <div class="adjust-fields">
+        <div class="field">
+          <label for="adjust-type" class="field__label">Loại credit</label>
+          <select
+            id="adjust-type"
+            class="form-input"
+            [value]="adjustCreditType()"
+            (change)="setAdjustCreditType($any($event.target).value)"
+          >
+            <option
+              value="mentoring_session"
+              [selected]="adjustCreditType() === 'mentoring_session'"
+            >
+              Buổi mentoring 1-1
+            </option>
+            <option value="course_selection" [selected]="adjustCreditType() === 'course_selection'">
+              Suất chọn khoá
+            </option>
+          </select>
+        </div>
+        <div class="field field--narrow">
+          <label for="adjust-amount" class="field__label">
+            Số lượng <span class="required-star">*</span>
+          </label>
+          <input
+            id="adjust-amount"
+            type="number"
+            step="1"
+            class="form-input"
+            placeholder="VD: 1 hoặc -1"
+            [value]="adjustAmount()"
+            (input)="setAdjustAmount($any($event.target).value)"
+          />
+          @if (adjustAmount().trim() && !adjustAmountValid()) {
+            <span class="field__error">Số nguyên khác 0 (âm = trừ).</span>
+          }
+        </div>
+        <div class="field field--grow">
+          <label for="adjust-note" class="field__label">
+            Ghi chú (lý do) <span class="required-star">*</span>
+          </label>
+          <input
+            id="adjust-note"
+            type="text"
+            class="form-input"
+            placeholder="VD: Hoàn 1 buổi mentoring do mentor huỷ lịch"
+            [value]="adjustNote()"
+            (input)="setAdjustNote($any($event.target).value)"
+          />
+          @if (adjustNote().trim() && !adjustNoteValid()) {
+            <span class="field__error">Ghi chú tối thiểu 3 ký tự.</span>
+          }
+        </div>
+        <button type="submit" class="btn primary adjust-btn" [disabled]="!canAdjust()">
+          @if (isAdjusting()) {
+            <span class="spinner-small"></span> Đang lưu...
+          } @else {
+            Điều chỉnh
+          }
+        </button>
+      </div>
+    </form>
+
+    <!-- History -->
+    <div class="history-panel">
+      <div class="history-header">
+        <h3 class="history-title">Lịch sử credit ({{ ov.history.total }})</h3>
+        @if (historyTotalPages() > 1) {
+          <div class="history-pager">
+            <button
+              type="button"
+              class="pager-btn"
+              [disabled]="historyPage() <= 1 || isLoading()"
+              (click)="goToHistoryPage(historyPage() - 1)"
+              aria-label="Trang trước"
+            >
+              <svg lucideChevronLeft [size]="16" strokeWidth="2"></svg>
+            </button>
+            <span class="pager-info">{{ historyPage() }} / {{ historyTotalPages() }}</span>
+            <button
+              type="button"
+              class="pager-btn"
+              [disabled]="historyPage() >= historyTotalPages() || isLoading()"
+              (click)="goToHistoryPage(historyPage() + 1)"
+              aria-label="Trang sau"
+            >
+              <svg lucideChevronRight [size]="16" strokeWidth="2"></svg>
+            </button>
+          </div>
+        }
+      </div>
+
+      @if (!ov.history.items.length) {
+        <div class="empty-state-inner">
+          <p>Chưa có giao dịch credit nào.</p>
+        </div>
+      } @else {
+        <div class="table-container">
+          <table class="system-style-table">
+            <thead>
+              <tr>
+                <th>Loại giao dịch</th>
+                <th>Loại credit</th>
+                <th class="text-center">Số lượng</th>
+                <th>Nguồn</th>
+                <th>Ghi chú</th>
+                <th>Thời gian</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (tx of ov.history.items; track tx.id) {
+                <tr class="table-row">
+                  <td>
+                    <span class="kind-badge" [class]="tx.kind">{{ getKindLabel(tx.kind) }}</span>
+                  </td>
+                  <td>{{ getCreditTypeLabel(tx.creditType) }}</td>
+                  <td class="text-center">
+                    <span class="amount-value" [class.negative]="tx.amount < 0">
+                      {{ tx.amount > 0 ? '+' : '' }}{{ tx.amount }}
+                    </span>
+                  </td>
+                  <td>{{ getRefTypeLabel(tx.refType) }}</td>
+                  <td class="note-cell">{{ tx.note || '—' }}</td>
+                  <td>{{ tx.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+</div>

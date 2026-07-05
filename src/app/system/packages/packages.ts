@@ -1,6 +1,6 @@
 import { Component, inject, signal, computed, resource, linkedSignal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import { form, FormField, required } from '@angular/forms/signals';
+import { form, FormField, required, disabled } from '@angular/forms/signals';
 import {
   LucidePackage,
   LucideBookOpen,
@@ -16,7 +16,7 @@ import {
 import { InputText } from 'primeng/inputtext';
 import { PackagesService } from '../../core/services/packages.service';
 import { CourseService } from '../../core/services/course.service';
-import type { Package } from '@dearourcommunity/client';
+import type { Package, UpdatePackageDto } from '@dearourcommunity/client';
 
 @Component({
   selector: 'app-packages',
@@ -71,13 +71,20 @@ export default class PackagesComponent {
   });
 
   // 4. Signal-based form for updating package details
+  // CR-001 Q11: 2 field credit tặng khi mua — prefill từ pkg.credits; 0/trống = không có credit đó.
   packageModel = linkedSignal({
     source: this.selectedPackage,
     computation: (pkg) => ({
       name: pkg?.name ?? '',
       description: pkg?.description ?? '',
-      price: pkg?.price ?? 0,
+      // price === -1 nghĩa là "Liên hệ" (giá thỏa thuận) — bật checkbox, ẩn giá thật khỏi ô nhập.
+      isContactPrice: pkg?.price === -1,
+      price: pkg?.price === -1 ? 0 : (pkg?.price ?? 0),
       slots: pkg?.slots ?? 0,
+      mentoringCredits:
+        pkg?.credits?.find((c) => c.creditType === 'mentoring_session')?.amount ?? 0,
+      courseSelectionCredits:
+        pkg?.credits?.find((c) => c.creditType === 'course_selection')?.amount ?? 0,
     }),
   });
 
@@ -85,6 +92,8 @@ export default class PackagesComponent {
     required(p.name, { message: 'Tên gói học là bắt buộc' });
     required(p.price, { message: 'Giá gói học là bắt buộc' });
     required(p.slots, { message: 'Số lượng slot tối đa là bắt buộc' });
+    // "Liên hệ" (giá thỏa thuận) → khóa ô giá, giá sẽ được gửi lên -1 khi lưu.
+    disabled(p.price, ({ valueOf }) => valueOf(p.isContactPrice));
   });
 
   // 5. Writable signal representing the local draft courses list of the active package
@@ -104,13 +113,16 @@ export default class PackagesComponent {
   selectedPackageCourses = computed(() => {
     const draft = this.draftCourses();
     const masterCourses = this.courses();
+    // PackageCourse (SDK ≥0.13.0) trả kèm `course.postTitle` — fallback khi catalog chưa tải
+    const joinedCourses = this.selectedPackage()?.courses ?? [];
 
     return draft
       .map((pc) => {
         const detail = masterCourses.find((c) => Number(c.ID) === Number(pc.wpCourseId));
+        const joined = joinedCourses.find((o) => Number(o.wpCourseId) === Number(pc.wpCourseId));
         return {
           ...pc,
-          title: detail?.postTitle ?? `Khóa học #${pc.wpCourseId}`,
+          title: detail?.postTitle ?? joined?.course?.postTitle ?? `Khóa học #${pc.wpCourseId}`,
         };
       })
       .sort((a, b) => a.orderIndex - b.orderIndex);
@@ -162,6 +174,15 @@ export default class PackagesComponent {
     this.saveError.set(null);
   }
 
+  // Bật/tắt "Liên hệ" (giá thỏa thuận). Bật → xoá giá về 0 và ẩn ô giá; khi lưu sẽ gửi price = -1.
+  toggleContactPrice(checked: boolean) {
+    this.packageModel.update((m) => ({
+      ...m,
+      isContactPrice: checked,
+      price: checked ? 0 : m.price,
+    }));
+  }
+
   // Update Package Details
   async updatePackageDetails(e: Event) {
     e.preventDefault();
@@ -178,11 +199,24 @@ export default class PackagesComponent {
 
     try {
       const model = this.packageModel();
+
+      // CR-001 Q11: dto.credits là REPLACE-ALL — chỉ gửi row có amount ≥ 1
+      // (BE bắt amount ≥ 1 nếu gửi; tắt loại credit = bỏ row khỏi mảng, không gửi amount 0).
+      const credits: NonNullable<UpdatePackageDto['credits']> = [];
+      const mentoring = Math.floor(Number(model.mentoringCredits) || 0);
+      const courseSelection = Math.floor(Number(model.courseSelectionCredits) || 0);
+      if (mentoring >= 1) credits.push({ creditType: 'mentoring_session', amount: mentoring });
+      if (courseSelection >= 1) {
+        credits.push({ creditType: 'course_selection', amount: courseSelection });
+      }
+
       await this.packagesService.update(pkg.id, {
         name: model.name,
         description: model.description,
-        price: Number(model.price),
+        // "Liên hệ" → gửi price = -1; ngược lại gửi giá đã nhập.
+        price: model.isContactPrice ? -1 : Number(model.price),
         slots: Number(model.slots),
+        credits,
       });
 
       this.saveSuccess.set(true);

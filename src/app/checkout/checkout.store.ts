@@ -11,6 +11,19 @@ import { PaymentService } from '../core/services/payment.service';
 
 export type PaymentMethod = 'momo' | 'bank';
 
+/**
+ * CR-001 — guard chống thanh toán trùng booking: BE trả 400 kèm message tiếng Việt
+ * (đã thanh toán / đang chờ admin duyệt / đã bị từ chối) ở payment/create, bank/create
+ * và bank/confirm khi checkout gắn bookingId. Bắt đúng case đó để UI hiện nguyên văn
+ * message dạng notice thay vì lỗi đỏ chung chung "Thanh toán thất bại".
+ */
+function toBookingBlockedMessage(err: unknown, hasBookingRef: boolean): string | null {
+  if (hasBookingRef && err instanceof ApiError && err.code === 400 && err.message) {
+    return err.message;
+  }
+  return null;
+}
+
 export interface CheckoutState {
   selectedPackage: Package | null;
   step: number;
@@ -34,6 +47,12 @@ export interface CheckoutState {
   bankTransfer: CreateBankTransferResponse | null;
   bankCreating: boolean;
   bankCreateError: boolean;
+  // CR-001 5.3b — booking mentor chờ thanh toán (nhánh single). Đọc từ ?bookingId=
+  // trong link mail; gửi kèm khi tạo thanh toán để BE tự approve booking khi tiền về.
+  bookingRef: string | null;
+  // Message 400 từ guard chống thanh toán trùng booking (nguyên văn từ BE) —
+  // khác null → ẩn QR/nút xác nhận, hiện notice thân thiện thay vì lỗi đỏ.
+  paymentBlockedMsg: string | null;
 }
 
 const initialState: CheckoutState = {
@@ -57,6 +76,8 @@ const initialState: CheckoutState = {
   bankTransfer: null,
   bankCreating: false,
   bankCreateError: false,
+  bookingRef: null,
+  paymentBlockedMsg: null,
 };
 
 export const CheckoutStore = signalStore(
@@ -104,6 +125,16 @@ export const CheckoutStore = signalStore(
 
     selectPaymentMethod(method: PaymentMethod) {
       patchState(store, { paymentMethod: method, paymentError: false });
+    },
+
+    /**
+     * CR-001 5.3b: giữ ref booking mentor từ query param `?bookingId=` (link trong mail).
+     * Luôn set theo query hiện tại — vào checkout không có bookingId thì xoá ref cũ
+     * để không gắn nhầm booking vào giao dịch khác.
+     */
+    setBookingRef(bookingId: string | null) {
+      // Đổi lượt checkout → xoá notice chặn thanh toán của booking trước (nếu có)
+      patchState(store, { bookingRef: bookingId, paymentBlockedMsg: null });
     },
 
     async applyCoupon(code: string) {
@@ -194,6 +225,8 @@ export const CheckoutStore = signalStore(
           // Luôn gửi giá gốc; server tự tính giảm theo couponCode (SDK 0.6.8).
           amount: Number(store.originalPrice()),
           couponCode: store.couponApplied() ? store.appliedCode() : undefined,
+          // CR-001 5.3b — booking mentor chờ thanh toán (nếu đến từ link mail)
+          bookingId: store.bookingRef() ?? undefined,
         });
 
         if (response && response.payUrl) {
@@ -204,9 +237,12 @@ export const CheckoutStore = signalStore(
         }
       } catch (err) {
         console.error('Failed to create MoMo payment', err);
+        // 400 từ guard booking (đã thanh toán / chờ duyệt / bị từ chối) → notice, không phải lỗi đỏ
+        const blockedMsg = toBookingBlockedMessage(err, !!store.bookingRef());
         patchState(store, {
           isLoading: false,
-          paymentError: true,
+          paymentError: !blockedMsg,
+          paymentBlockedMsg: blockedMsg ?? store.paymentBlockedMsg(),
         });
       }
     },
@@ -241,7 +277,13 @@ export const CheckoutStore = signalStore(
       } catch (err) {
         // BE có thể trả 400 nếu số tiền không khớp giá gói / coupon không hợp lệ.
         console.error('Failed to create bank transfer', err);
-        patchState(store, { bankCreating: false, bankCreateError: true });
+        // 400 từ guard booking → notice chặn thanh toán, KHÔNG hiện khối "Thử lại"
+        const blockedMsg = toBookingBlockedMessage(err, !!store.bookingRef());
+        patchState(store, {
+          bankCreating: false,
+          bankCreateError: !blockedMsg,
+          paymentBlockedMsg: blockedMsg ?? store.paymentBlockedMsg(),
+        });
       }
     },
 
@@ -272,6 +314,8 @@ export const CheckoutStore = signalStore(
           packageId: pkg.id as PackageId,
           amount: Number(store.originalPrice()),
           couponCode: store.couponApplied() ? store.appliedCode() : undefined,
+          // CR-001 5.3b — booking mentor chờ thanh toán (nếu đến từ link mail)
+          bookingId: store.bookingRef() ?? undefined,
         });
 
         if (response.status === 'awaiting_confirmation' || response.status === 'success') {
@@ -281,7 +325,14 @@ export const CheckoutStore = signalStore(
         }
       } catch (err) {
         console.error('Failed to confirm bank transfer', err);
-        patchState(store, { isLoading: false, paymentError: true });
+        // 400 từ guard booking (orderId MỚI cho booking đã có giao dịch) → notice;
+        // confirm lại CÙNG orderId vẫn idempotent thành công phía BE nên không vào đây.
+        const blockedMsg = toBookingBlockedMessage(err, !!store.bookingRef());
+        patchState(store, {
+          isLoading: false,
+          paymentError: !blockedMsg,
+          paymentBlockedMsg: blockedMsg ?? store.paymentBlockedMsg(),
+        });
       }
     },
   })),

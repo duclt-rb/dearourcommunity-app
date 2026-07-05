@@ -113,6 +113,112 @@
           </form>
         }
 
+        <!-- Gán khoá cho thành viên (CR-001 — org-credit course_selection, Owner Only) -->
+        @if (isOwner()) {
+          <div class="form-card assign-course-card">
+            <div class="form-card-header">
+              <div class="assign-header-row">
+                <div>
+                  <h3 class="form-card-title">Gán khoá cho thành viên</h3>
+                  <p class="field-help">
+                    Dùng suất chọn khoá của doanh nghiệp để ghi danh thành viên vào một khoá học
+                    trong gói đã mua. Mỗi lượt gán trừ 1 suất.
+                  </p>
+                </div>
+                <div class="credit-balance-chip" [class.depleted]="courseSelectionBalance() === 0">
+                  <span class="credit-balance-value">{{ courseSelectionBalance() }}</span>
+                  <span class="credit-balance-label">suất còn lại</span>
+                </div>
+              </div>
+            </div>
+
+            @if (!coursePool().length) {
+              <p class="field-help">
+                Chưa có khoá học nào trong pool của gói doanh nghiệp — vui lòng kiểm tra gói đã mua.
+              </p>
+            } @else {
+              <form class="assign-form" (submit)="onAssignSubmit($event)" novalidate>
+                <div class="form-group assign-field">
+                  <label class="form-label" for="assignMember">Thành viên</label>
+                  <select
+                    id="assignMember"
+                    class="form-input"
+                    [ngModel]="assignMemberUserId()"
+                    (ngModelChange)="assignMemberUserId.set($event)"
+                    name="assignMember"
+                    [disabled]="assignLoading()"
+                  >
+                    <option value="">— Chọn thành viên —</option>
+                    @for (member of assignableMembers(); track member.id) {
+                      <option [value]="member.userId">
+                        {{ getMemberDisplayName(member) }} ({{ getMemberEmail(member) }})
+                      </option>
+                    }
+                  </select>
+                </div>
+
+                <div class="form-group assign-field">
+                  <label class="form-label" for="assignCourse">Khoá học</label>
+                  <select
+                    id="assignCourse"
+                    class="form-input"
+                    [ngModel]="assignCourseId()"
+                    (ngModelChange)="assignCourseId.set($event)"
+                    name="assignCourse"
+                    [disabled]="assignLoading()"
+                  >
+                    <option value="">— Chọn khoá học —</option>
+                    @for (course of coursePool(); track course.courseId) {
+                      <option [value]="course.courseId">{{ course.title }}</option>
+                    }
+                  </select>
+                </div>
+
+                <button type="submit" class="btn-primary assign-submit" [disabled]="!canAssign()">
+                  {{ assignLoading() ? 'Đang gán...' : 'Gán khoá' }}
+                </button>
+              </form>
+              @if (courseSelectionBalance() === 0) {
+                <span class="field-help danger-text">
+                  * Doanh nghiệp đã hết suất chọn khoá. Vui lòng liên hệ Dear Our Community nếu cần
+                  thêm.
+                </span>
+              }
+            }
+
+            <!-- Danh sách đã gán -->
+            <div class="assigned-list">
+              <h4 class="section-title-small">Đã gán ({{ courseSelections()?.length || 0 }})</h4>
+              @if ((courseSelections()?.length ?? 0) === 0) {
+                <p class="field-help">Chưa có khoá nào được gán cho thành viên.</p>
+              } @else {
+                <div class="table-container">
+                  <table class="system-style-table">
+                    <thead>
+                      <tr>
+                        <th>Thành viên</th>
+                        <th>Khoá học</th>
+                        <th>Ngày gán</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (selection of courseSelections() ?? []; track selection.id) {
+                        <tr class="table-row">
+                          <td>{{ getSelectionMemberName(selection.userId) }}</td>
+                          <td>{{ getSelectionCourseTitle(selection.wpCourseId) }}</td>
+                          <td class="join-date">
+                            {{ selection.enrolledAt || selection.createdAt | date: 'dd/MM/yyyy' }}
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
         <!-- Members List Section -->
         <div class="members-list-container">
           <div class="list-section-header">

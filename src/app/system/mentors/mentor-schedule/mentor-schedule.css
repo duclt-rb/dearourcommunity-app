@@ -1,0 +1,1046 @@
+/* ============================================================
+   MENTOR SCHEDULE — card nhúng trong màn Quản lý mentor (system/mentors)
+   Quản lý lịch khả dụng theo mentor (CR-001 AMENDMENT 1).
+   ViewEncapsulation.None — MỌI selector đều nằm dưới .mentor-schedule
+   (trừ keyframes, đặt tên prefix ms- để không đụng global).
+   ============================================================ */
+
+@keyframes ms-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ms-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes ms-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ms-slide-up {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.mentor-schedule {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  /* Nhúng dưới form edit mentor trong .system-content */
+  margin-top: 24px;
+
+  /* ────────────────────────────────────────────────────────
+     Field / input dùng chung trong trang
+     ──────────────────────────────────────────────────────── */
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .field__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-text-label);
+    letter-spacing: var(--tracking-2xs);
+    text-transform: uppercase;
+  }
+
+  .form-input {
+    height: 48px;
+    padding: 0 16px;
+    border: 1.5px solid var(--color-border-input);
+    border-radius: 12px;
+    background: var(--color-bg-input);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    transition: all 0.2s;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .form-input:focus {
+    border-color: var(--color-primary);
+    background: var(--color-bg);
+    box-shadow: 0 0 0 3px rgba(143, 80, 226, 0.15);
+  }
+
+  /* ────────────────────────────────────────────────────────
+     Buttons / alerts / spinner (dùng chung trong trang)
+     ──────────────────────────────────────────────────────── */
+
+  .btn {
+    height: 48px;
+    padding: 0 24px;
+    border: none;
+    border-radius: 12px;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .btn.primary {
+    background: var(--color-primary);
+    color: var(--color-bg);
+  }
+
+  .btn.primary:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(143, 80, 226, 0.25);
+  }
+
+  .btn.ghost {
+    background: transparent;
+    color: var(--color-text-secondary);
+    border: 1.5px solid var(--color-border-input);
+  }
+
+  .btn.ghost:hover:not(:disabled) {
+    background: var(--color-bg-subtle);
+    color: var(--color-text);
+  }
+
+  .btn.danger {
+    background: var(--color-error-600);
+    color: #fff;
+  }
+
+  .btn.danger:hover:not(:disabled) {
+    background: var(--color-error-700, #b91c1c);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .alert {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .alert.success {
+    background: var(--color-success-50);
+    border: 1px solid var(--color-success-200);
+    color: var(--color-success-700);
+  }
+
+  .alert.success svg {
+    color: var(--color-success-500);
+  }
+
+  .alert.error {
+    background: var(--color-error-50);
+    border: 1px solid var(--color-error-200);
+    color: var(--color-error-700);
+  }
+
+  .alert.error svg {
+    color: var(--color-error-500);
+  }
+
+  .spinner-small {
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: ms-spin 0.7s linear infinite;
+    display: inline-block;
+  }
+
+  /* ────────────────────────────────────────────────────────
+     Card lịch tuần
+     ──────────────────────────────────────────────────────── */
+
+  .schedule-card {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border-input);
+    border-radius: var(--radius-card);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .schedule-header {
+    padding: 24px 24px 20px;
+    border-bottom: 1.5px solid var(--color-border-divider);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .schedule-title-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .schedule-icon {
+    color: var(--color-primary);
+    background: var(--color-primary-50);
+    padding: 10px;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  .schedule-title {
+    font-size: var(--text-xl);
+    font-weight: 800;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .schedule-subtitle {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    margin: 2px 0 0;
+  }
+
+  .schedule-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* Cụm công cụ bên phải header: month switcher + Hôm nay */
+  .schedule-tools {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .month-switcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .month-nav-btn {
+    width: 34px;
+    height: 34px;
+    border: 1.5px solid var(--color-border-input);
+    border-radius: 10px;
+    background: var(--color-bg);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-icon-hover);
+    transition: all 0.2s;
+  }
+
+  .month-nav-btn:hover:not(:disabled) {
+    border-color: var(--color-primary-300);
+    background: var(--color-primary-50);
+    color: var(--color-primary);
+  }
+
+  .month-nav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .month-label {
+    min-width: 130px;
+    text-align: center;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .month-today-btn {
+    height: 34px;
+    padding: 0 12px;
+    border: 1.5px solid var(--color-border-input);
+    border-radius: 10px;
+    background: var(--color-bg);
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .month-today-btn:hover:not(:disabled) {
+    border-color: var(--color-primary-300);
+    background: var(--color-primary-50);
+    color: var(--color-primary);
+  }
+
+  .month-today-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* ── Pattern generator "Thêm nhiều khung giờ" (collapse được, độc lập với tháng) ── */
+
+  .compose {
+    border: 1px solid var(--color-border-divider);
+    border-radius: 14px;
+    background: var(--color-bg-input);
+  }
+
+  .compose__toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border: none;
+    background: none;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-text);
+    cursor: pointer;
+  }
+
+  .compose__toggle svg:first-child {
+    color: var(--color-primary);
+  }
+
+  .compose__chevron {
+    margin-left: auto;
+    color: var(--color-icon-hover);
+    transition: transform 0.2s;
+  }
+
+  .compose__chevron.is-open {
+    transform: rotate(180deg);
+  }
+
+  .compose__body {
+    padding: 0 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* 7 nút toggle THỨ (T2..CN) — pattern, không gắn ngày cụ thể nên không có ngày phụ/disable */
+  .compose__days {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .compose__day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 52px;
+    padding: 9px 10px;
+    border: 1.5px solid var(--color-border-input);
+    border-radius: 10px;
+    background: var(--color-bg);
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .compose__day-name {
+    font-size: var(--text-xs);
+    font-weight: 800;
+    color: var(--color-text);
+  }
+
+  .compose__day:hover:not(.is-selected) {
+    border-color: var(--color-primary-300);
+  }
+
+  .compose__day.is-selected {
+    border-color: var(--color-primary);
+    background: var(--color-primary-50);
+    box-shadow: 0 0 0 1px var(--color-primary);
+  }
+
+  .compose__day.is-selected .compose__day-name {
+    color: var(--color-primary);
+  }
+
+  /* Nhập giờ (p-datepicker timeOnly) + chip giờ */
+  .compose__time-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  /* Base look của input do timePickerPt; đây là width host + focus override */
+  .compose__time-picker {
+    width: 160px;
+    display: inline-flex;
+  }
+
+  .compose__time-picker input:enabled:focus {
+    border-color: var(--color-primary) !important;
+    background: var(--color-bg) !important;
+    box-shadow: 0 0 0 3px rgba(143, 80, 226, 0.15) !important;
+  }
+
+  .compose__time-picker input::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  .compose__time-add {
+    height: 44px;
+    padding: 0 16px;
+  }
+
+  .compose__time-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .time-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 6px 4px 10px;
+    border: 1px solid var(--color-primary-200);
+    border-radius: var(--radius-pill);
+    background: var(--color-primary-50);
+    color: var(--color-primary-700);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .time-chip__remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .time-chip__remove:hover {
+    background: var(--color-primary-100);
+  }
+
+  .compose__repeat {
+    max-width: 220px;
+    height: 44px;
+  }
+
+  .compose__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--color-border-divider);
+    padding-top: 14px;
+  }
+
+  .compose__preview {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .compose__preview strong {
+    color: var(--color-primary);
+  }
+
+  .compose__preview--muted {
+    color: var(--color-text-muted);
+  }
+
+  .compose__actions {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+  }
+
+  .compose__btn {
+    height: 44px;
+    padding: 0 18px;
+  }
+
+  /* Chú giải màu chip */
+  .slot-legend {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+
+  .slot-legend__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .slot-legend__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+  }
+
+  .slot-legend__dot--available {
+    border: 1.5px solid var(--color-primary);
+    background: var(--color-bg);
+  }
+
+  .slot-legend__dot--booked {
+    background: var(--color-primary);
+  }
+
+  .slot-legend__dot--inactive {
+    border: 1.5px dashed var(--color-gray-400);
+    background: var(--color-bg);
+  }
+
+  .slot-legend__dot--past {
+    background: var(--color-gray-200);
+  }
+
+  /* ────────────────────────────────────────────────────────
+     Month view — calendar grid 7 cột × 5-6 hàng (read-only)
+     ──────────────────────────────────────────────────────── */
+
+  .month-hint {
+    margin: 0;
+    padding: 10px 14px;
+    border: 1px dashed var(--color-border-divider);
+    border-radius: 12px;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  /* Màn hẹp: grid tháng scroll ngang trong card, không vỡ layout */
+  .month-grid-wrap {
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .month-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(96px, 1fr));
+    gap: 6px;
+    min-width: 740px;
+  }
+
+  .month-grid__weekday {
+    text-align: center;
+    padding: 2px 0 6px;
+    font-size: var(--text-xs);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-2xs);
+    color: var(--color-text-label);
+  }
+
+  /* Ô ngày — cả ô click được để drill-down sang week view của tuần chứa ngày đó */
+  .month-grid__cell {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-height: 92px;
+    padding: 6px;
+    border: 1px solid var(--color-border-divider);
+    border-radius: 10px;
+    background: var(--color-bg);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .month-grid__cell:hover {
+    border-color: var(--color-primary-300);
+    background: var(--color-primary-50);
+  }
+
+  .month-grid__cell.is-past {
+    background: var(--color-bg-subtle);
+  }
+
+  .month-grid__cell.is-past .month-grid__daynum {
+    color: var(--color-text-muted);
+    opacity: 0.7;
+  }
+
+  /* Ngày lấn từ tháng kề (đầu/cuối grid) — mờ hẳn */
+  .month-grid__cell.is-out {
+    opacity: 0.45;
+    background: var(--color-bg-subtle);
+  }
+
+  .month-grid__cell.is-today {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 1px var(--color-primary);
+  }
+
+  .month-grid__cell.is-today .month-grid__daynum {
+    color: var(--color-primary);
+  }
+
+  /* Ô đang mở panel chi tiết — highlight đậm hơn hover */
+  .month-grid__cell.is-selected {
+    border-color: var(--color-primary);
+    background: var(--color-primary-50);
+    box-shadow: 0 0 0 2px var(--color-primary);
+  }
+
+  .month-grid__cell.is-selected .month-grid__daynum {
+    color: var(--color-primary);
+  }
+
+  .month-grid__cell-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 18px;
+  }
+
+  .month-grid__daynum {
+    font-size: var(--text-xs);
+    font-weight: 800;
+    color: var(--color-text-label);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Nút "+" thêm nhanh — hiện khi hover ô (drill-down sang tuần + mở inline add) */
+  .month-grid__add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border: 1px dashed var(--color-border-input);
+    border-radius: 5px;
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.15s;
+  }
+
+  .month-grid__cell:hover .month-grid__add,
+  .month-grid__add:focus-visible {
+    opacity: 1;
+  }
+
+  .month-grid__add:hover {
+    border-color: var(--color-primary);
+    background: var(--color-bg);
+    color: var(--color-primary);
+  }
+
+  /* Chip giờ compact — chỉ HH:mm, màu theo trạng thái như chú giải */
+  .month-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px 6px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.5;
+    width: fit-content;
+  }
+
+  .month-chip--available {
+    border-color: var(--color-primary);
+    background: var(--color-bg);
+    color: var(--color-primary-700);
+  }
+
+  .month-chip--booked {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: var(--color-bg);
+  }
+
+  .month-chip--inactive {
+    border-style: dashed;
+    border-color: var(--color-gray-400);
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    text-decoration: line-through;
+  }
+
+  .month-chip--past {
+    border-color: var(--color-gray-200);
+    background: var(--color-gray-100);
+    color: var(--color-text-muted);
+    opacity: 0.75;
+  }
+
+  .month-grid__more {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
+  /* Skeleton chip khi tải tháng — giữ nguyên khung grid */
+  .month-chip-skeleton {
+    display: block;
+    height: 14px;
+    border-radius: 6px;
+    background: linear-gradient(
+      90deg,
+      var(--color-gray-100) 25%,
+      var(--color-gray-200) 50%,
+      var(--color-gray-100) 75%
+    );
+    background-size: 200% 100%;
+    animation: ms-shimmer 1.5s infinite;
+  }
+
+  /* ────────────────────────────────────────────────────────
+     Panel chi tiết ngày — expand ngay dưới grid tháng
+     ──────────────────────────────────────────────────────── */
+
+  .day-panel {
+    border: 1.5px solid var(--color-primary-200);
+    border-radius: 14px;
+    background: var(--color-bg);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: ms-slide-up 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .day-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px dashed var(--color-border-divider);
+    padding-bottom: 10px;
+  }
+
+  .day-panel__title {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: 800;
+    color: var(--color-text);
+  }
+
+  .day-panel__close {
+    width: 30px;
+    height: 30px;
+    border: 1.5px solid var(--color-border-input);
+    border-radius: 8px;
+    background: var(--color-bg);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-icon-hover);
+    transition: all 0.2s;
+  }
+
+  .day-panel__close:hover {
+    border-color: var(--color-error-300);
+    background: var(--color-error-50);
+    color: var(--color-error-600);
+  }
+
+  .day-panel__empty {
+    margin: 0;
+    padding: 12px 14px;
+    border: 1px dashed var(--color-gray-300);
+    border-radius: 10px;
+    background: var(--color-gray-50);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .day-panel__list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Một dòng slot trong panel — đủ chỗ cho label + badge + action */
+  .day-slot {
+    display: grid;
+    grid-template-columns: 52px 1fr auto auto;
+    gap: 10px;
+    align-items: center;
+    padding: 9px 12px;
+    border: 1.5px solid var(--color-border-input);
+    border-radius: 10px;
+    background: var(--color-bg);
+  }
+
+  .day-slot--booked {
+    border-color: var(--color-primary-300);
+    background: var(--color-primary-50);
+  }
+
+  .day-slot--inactive,
+  .day-slot--past {
+    opacity: 0.7;
+  }
+
+  .day-slot__time {
+    font-size: var(--text-sm);
+    font-weight: 800;
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .day-slot--inactive .day-slot__time {
+    text-decoration: line-through;
+    color: var(--color-text-muted);
+  }
+
+  .day-slot__label {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Badge trạng thái */
+  .day-slot__badge {
+    display: inline-block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-2xs);
+    padding: 2px 8px;
+    border-radius: var(--radius-pill);
+  }
+
+  .day-slot__badge--available {
+    background: var(--color-success-50);
+    color: var(--color-success-700);
+  }
+
+  .day-slot__badge--booked {
+    background: var(--color-primary-100);
+    color: var(--color-primary-700);
+  }
+
+  .day-slot__badge--inactive {
+    background: var(--color-gray-100);
+    color: var(--color-text-muted);
+  }
+
+  .day-slot__badge--past {
+    background: var(--color-bg-input);
+    color: var(--color-text-muted);
+  }
+
+  .day-slot__locked {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    color: var(--color-primary);
+  }
+
+  .day-slot__actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .day-slot__action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .day-slot__action:hover:not(:disabled) {
+    border-color: var(--color-primary-300);
+    background: var(--color-primary-50);
+    color: var(--color-primary);
+  }
+
+  .day-slot__action--danger:hover:not(:disabled) {
+    border-color: var(--color-error-300);
+    background: var(--color-error-50);
+    color: var(--color-error-600);
+  }
+
+  .day-slot__action:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .day-slot__spinner {
+    justify-self: center;
+  }
+
+  /* Ô thêm giờ (p-datepicker timeOnly) — chỉ ngày hôm nay trở đi */
+  .day-panel__add {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    border-top: 1px dashed var(--color-border-divider);
+    padding-top: 12px;
+  }
+
+  /* Base look của input do timePickerPt; đây là width host + focus override */
+  .day-panel__time-picker {
+    width: 160px;
+    display: inline-flex;
+  }
+
+  .day-panel__time-picker input:enabled:focus {
+    border-color: var(--color-primary) !important;
+    background: var(--color-bg) !important;
+    box-shadow: 0 0 0 3px rgba(143, 80, 226, 0.15) !important;
+  }
+
+  .day-panel__time-picker input::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  .day-panel__add-btn {
+    height: 44px;
+    padding: 0 18px;
+  }
+
+  .day-panel__past-hint {
+    margin: 0;
+    border-top: 1px dashed var(--color-border-divider);
+    padding-top: 12px;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+  }
+
+  /* ────────────────────────────────────────────────────────
+     Modal xác nhận xoá khung giờ
+     ──────────────────────────────────────────────────────── */
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 16px;
+    animation: ms-fade-in 0.15s ease;
+  }
+
+  .modal-card {
+    background: var(--color-bg);
+    border-radius: 20px;
+    padding: 32px;
+    max-width: 420px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15);
+    animation: ms-slide-up 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .modal-icon-wrap {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-icon-wrap.danger {
+    background: var(--color-error-50);
+    color: var(--color-error-600);
+  }
+
+  .modal-title {
+    font-size: var(--text-xl);
+    font-weight: 800;
+    color: var(--color-text);
+    margin: 0;
+    text-align: center;
+  }
+
+  .modal-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    text-align: center;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .modal-actions .btn {
+    flex: 1;
+  }
+}

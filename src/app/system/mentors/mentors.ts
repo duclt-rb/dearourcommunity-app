@@ -12,8 +12,10 @@ import {
   LucideUserCheck,
   LucideUserX,
   LucideSearch,
+  LucideCalendarClock,
 } from '@lucide/angular';
 import type { CreateMentorDto, MentorType } from '@dearourcommunity/client';
+import { MentorScheduleComponent } from './mentor-schedule/mentor-schedule';
 import { MentorsStore } from './mentors.store';
 
 @Component({
@@ -21,6 +23,7 @@ import { MentorsStore } from './mentors.store';
   standalone: true,
   imports: [
     FormField,
+    MentorScheduleComponent,
     LucideUsers,
     LucidePlus,
     LucideTrash2,
@@ -32,6 +35,7 @@ import { MentorsStore } from './mentors.store';
     LucideUserCheck,
     LucideUserX,
     LucideSearch,
+    LucideCalendarClock,
   ],
   providers: [MentorsStore],
   templateUrl: './mentors.html',
@@ -168,7 +172,9 @@ export default class MentorsComponent {
     this.store.openCreate();
   }
 
-  // Save (create or update) — dựng DTO rồi ủy quyền cho store
+  // Save (create or update) — dựng DTO rồi ủy quyền cho store.
+  // AMENDMENT 1: PATCH mentor chỉ còn field mentor thuần — lịch khả dụng quản lý
+  // bằng CRUD riêng trong card <app-mentor-schedule> nhúng dưới form.
   async save(e: Event) {
     e.preventDefault();
     this.mentorForm().markAsTouched();

@@ -1,0 +1,27 @@
+<!-- Lịch hẹn mentor gắn với đơn (CR-001) — tối giản: title + mentor (avatar, chức vị)
+     + khung giờ. Ẩn im lặng nếu không có booking / không xem được. -->
+@if (booking(); as mb) {
+  <div class="booking-summary">
+    <span class="booking-summary__title">Lịch hẹn mentor</span>
+
+    <div class="booking-summary__mentor">
+      @if (mb.mentor?.avatarUrl; as avatar) {
+        <img class="booking-summary__avatar" [src]="avatar" [alt]="mb.mentor?.name ?? ''" />
+      }
+      <div class="booking-summary__mentor-info">
+        <span class="booking-summary__name">
+          {{ mb.mentor?.name || 'Admin sẽ điều phối mentor phù hợp' }}
+        </span>
+        @if (mb.mentor?.position) {
+          <span class="booking-summary__position">{{ mb.mentor?.position }}</span>
+        }
+      </div>
+    </div>
+
+    <div class="booking-summary__slots">
+      @for (slot of slots(); track slot.slotId) {
+        <span class="booking-summary__slot">{{ slot.label }}</span>
+      }
+    </div>
+  </div>
+}

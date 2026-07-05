@@ -8,6 +8,12 @@ export const checkoutGuard: CanActivateFn = async (route) => {
   const store = inject(CheckoutStore);
   const packagesService = inject(PackagesService);
 
+  // CR-001 5.3b: link mail thanh toán booking mentor có dạng
+  // /checkout/billing?packageId=..&email=..&bookingId=.. — giữ bookingId vào state để
+  // gửi kèm khi tạo thanh toán (MoMo create / bank confirm). Luôn set theo query hiện
+  // tại: không có bookingId thì xoá ref cũ, tránh gắn nhầm vào lượt checkout khác.
+  store.setBookingRef(route.queryParams['bookingId'] ?? null);
+
   // Focus solely on selected package validation.
   // Assumes authentication check is already handled by authGuard.
   if (store.selectedPackage()) {

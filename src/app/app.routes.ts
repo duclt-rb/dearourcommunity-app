@@ -98,6 +98,11 @@ export const routes: Routes = [
         title: 'Quản lý lịch hẹn mentor',
         loadComponent: () => import('./system/mentor-bookings/mentor-bookings'),
       },
+      {
+        path: 'credits',
+        title: 'Điều chỉnh credit',
+        loadComponent: () => import('./system/credits/credits'),
+      },
     ],
   },
   {

@@ -492,6 +492,30 @@
   font-weight: 500;
 }
 
+/* Checkbox "Liên hệ" (giá thỏa thuận) dưới ô giá */
+.field__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  cursor: pointer;
+  user-select: none;
+}
+
+.field__checkbox input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.editor-form input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: var(--color-bg-input);
+}
+
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -1151,4 +1175,32 @@
 
 .pulse {
   animation: pulse 2s infinite;
+}
+
+/* ============================================================
+   Credit tặng khi mua gói (CR-001 Q11)
+   ============================================================ */
+
+.credits-config-section {
+  padding: 16px;
+  border: 1px solid var(--color-gray-200);
+  border-radius: 12px;
+  background: var(--color-gray-50);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.credits-config-title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.credits-config-desc {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.5;
 }

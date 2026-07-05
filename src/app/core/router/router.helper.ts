@@ -35,7 +35,9 @@ export function safeDecodeBase64(str: string): string {
  * Giải mã và phân tích cú pháp extraData từ query param một cách an toàn.
  * Hỗ trợ cả trường hợp extraData là chuỗi JSON thô hoặc chuỗi đã mã hóa Base64.
  */
-export function safeParseExtraData(str: string): { packageId?: string; userId?: string } | null {
+export function safeParseExtraData(
+  str: string,
+): { packageId?: string; userId?: string; bookingId?: string } | null {
   if (!str || str === 'undefined' || str === 'null') {
     return null;
   }

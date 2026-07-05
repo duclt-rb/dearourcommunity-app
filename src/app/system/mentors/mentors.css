@@ -1005,3 +1005,16 @@
 .modal-actions .btn {
   flex: 1;
 }
+
+/* Hint khi đang tạo mentor mới (chưa có id để gắn lịch — card lịch chỉ hiện ở mode edit) */
+.schedule-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 12px 16px;
+  border: 1px dashed var(--color-border-divider);
+  border-radius: 12px;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
