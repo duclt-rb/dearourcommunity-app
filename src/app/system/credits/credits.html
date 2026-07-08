@@ -65,6 +65,16 @@
         <span class="balance-label">Suất chọn khoá</span>
         <span class="balance-value">{{ ov.balances.course_selection }}</span>
       </div>
+      <!-- CR-005: credit Quick Scan / Toolkit (grant khi mua gói có gắn; chưa có luồng tiêu).
+           balanceOf() fallback 0 phòng BE chưa deploy CR-005 trả balances thiếu 2 key mới -->
+      <div class="balance-card">
+        <span class="balance-label">Lượt Quick Scan</span>
+        <span class="balance-value">{{ balanceOf(ov.balances, 'quick_scan') }}</span>
+      </div>
+      <div class="balance-card">
+        <span class="balance-label">Lượt Toolkit</span>
+        <span class="balance-value">{{ balanceOf(ov.balances, 'toolkit') }}</span>
+      </div>
       <div class="balance-target">
         <span class="target-label">Đang xem</span>
         <code class="target-id">{{ activeUserId() }}</code>
@@ -121,6 +131,12 @@
             </option>
             <option value="course_selection" [selected]="adjustCreditType() === 'course_selection'">
               Suất chọn khoá
+            </option>
+            <option value="quick_scan" [selected]="adjustCreditType() === 'quick_scan'">
+              Lượt Quick Scan
+            </option>
+            <option value="toolkit" [selected]="adjustCreditType() === 'toolkit'">
+              Lượt Toolkit
             </option>
           </select>
         </div>

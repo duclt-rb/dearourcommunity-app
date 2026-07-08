@@ -223,6 +223,11 @@
                   <span class="status-badge" [class]="t.status">
                     {{ getStatusLabel(t.status) }}
                   </span>
+                  @if (hasPendingInvoice(t)) {
+                    <span class="invoice-chip" title="Có yêu cầu xuất hoá đơn VAT chưa xử lý"
+                      >HĐ</span
+                    >
+                  }
                 </td>
                 <td class="col-actions text-center" (click)="$event.stopPropagation()">
                   @if (canReview(t)) {
@@ -394,6 +399,152 @@
               <div></div>
             }
           </div>
+
+          <!-- CR-004: khoá user đã chọn ở checkout — duyệt xong sẽ auto-enroll (cá nhân)
+               hoặc giữ chỗ suất cho tổ chức -->
+          @if (t.extraData?.courseIds?.length) {
+            <div class="detail-message-box">
+              <span class="message-label">
+                Khoá học đã chọn ({{ t.extraData?.courseIds?.length }})
+                @if (t.package?.packageType === 'organization') {
+                  — duyệt sẽ giữ chỗ suất cho tổ chức
+                } @else {
+                  — duyệt sẽ tự động ghi danh cho học viên
+                }
+              </span>
+              <ul class="selected-course-list">
+                @if (selectedCourseTitles(); as titles) {
+                  @for (title of titles; track $index) {
+                    <li>{{ title }}</li>
+                  }
+                } @else {
+                  @for (id of t.extraData?.courseIds ?? []; track $index) {
+                    <li>Khóa học #{{ id }}</li>
+                  }
+                }
+              </ul>
+            </div>
+          }
+
+          <!-- CR-006: Quick Scan/Toolkit user đã chọn — duyệt xong cấp quyền + trừ credit -->
+          @if (t.extraData?.toolkitIds?.length) {
+            <div class="detail-message-box">
+              <span class="message-label">
+                Quick Scan / Toolkit đã chọn ({{ t.extraData?.toolkitIds?.length }}) — duyệt sẽ cấp
+                quyền cho người mua
+              </span>
+              <ul class="selected-course-list">
+                @for (name of selectedToolkitNames(t); track $index) {
+                  <li>{{ name }}</li>
+                }
+              </ul>
+            </div>
+          }
+
+          <!-- CR-007: yêu cầu xuất hoá đơn VAT của giao dịch này -->
+          @if (invoiceRequestFor(t); as inv) {
+            <div class="detail-message-box">
+              <span class="message-label">
+                Hoá đơn VAT
+                @if (inv.status === 'issued') {
+                  — đã xuất
+                } @else {
+                  — chờ xuất
+                }
+              </span>
+              <ul class="selected-course-list">
+                @if (inv.buyerType === 'company') {
+                  <li>Công ty (theo GCNĐKKD): {{ inv.companyName }}</li>
+                  <li>MST: {{ inv.taxCode }}</li>
+                  <li>Người liên hệ nhận HĐ: {{ inv.buyerName }}</li>
+                } @else {
+                  <li>Người mua (theo CCCD): {{ inv.buyerName }}</li>
+                  <li>Số CCCD/CMND: {{ inv.idNumber }}</li>
+                  @if (inv.taxCode) {
+                    <li>MST cá nhân: {{ inv.taxCode }}</li>
+                  }
+                }
+                <li>Địa chỉ: {{ inv.address }}</li>
+                <li>Email nhận HĐ: {{ inv.email }}</li>
+                @if (inv.phone) {
+                  <li>SĐT liên hệ: {{ inv.phone }}</li>
+                }
+                @if (inv.buyerNote) {
+                  <li>Ghi chú của khách: {{ inv.buyerNote }}</li>
+                }
+              </ul>
+
+              @if (inv.status === 'issued') {
+                <p class="invoice-issued-line">
+                  Số hoá đơn <strong>{{ inv.invoiceNo }}</strong>
+                  @if (inv.invoiceSeries) {
+                    · ký hiệu {{ inv.invoiceSeries }}
+                  }
+                  @if (inv.issuedAt) {
+                    · {{ inv.issuedAt | date: 'dd/MM/yyyy HH:mm' }}
+                  }
+                  @if (inv.lookupUrl) {
+                    ·
+                    <a [href]="inv.lookupUrl" target="_blank" rel="noopener noreferrer"
+                      >Tra cứu HĐĐT</a
+                    >
+                  }
+                </p>
+              } @else if (t.status === 'success') {
+                <div class="invoice-issue-form" (click)="$event.stopPropagation()">
+                  <input
+                    class="invoice-issue-input"
+                    type="text"
+                    maxlength="50"
+                    placeholder="Số hoá đơn *"
+                    [value]="issueInvoiceNo()"
+                    (input)="issueInvoiceNo.set($any($event.target).value)"
+                  />
+                  <input
+                    class="invoice-issue-input"
+                    type="text"
+                    maxlength="20"
+                    placeholder="Ký hiệu (vd 1C26TDO)"
+                    [value]="issueInvoiceSeries()"
+                    (input)="issueInvoiceSeries.set($any($event.target).value)"
+                  />
+                  <input
+                    class="invoice-issue-input"
+                    type="text"
+                    maxlength="500"
+                    placeholder="Link tra cứu HĐĐT (tuỳ chọn)"
+                    [value]="issueLookupUrl()"
+                    (input)="issueLookupUrl.set($any($event.target).value)"
+                  />
+                  @if (issueLookupUrl().trim() && !issueLookupUrlValid()) {
+                    <p class="action-error-text">Link tra cứu phải là URL http/https hợp lệ.</p>
+                  }
+                  <button
+                    type="button"
+                    class="btn primary invoice-issue-btn"
+                    [disabled]="
+                      !issueInvoiceNo().trim() || !issueLookupUrlValid() || issueLoading()
+                    "
+                    (click)="markInvoiceIssued(t)"
+                  >
+                    {{ issueLoading() ? 'Đang lưu...' : 'Đã xuất hoá đơn — gửi mail khách' }}
+                  </button>
+                  @if (issueError()) {
+                    <p class="action-error-text">{{ issueError() }}</p>
+                  }
+                </div>
+              } @else if (t.status === 'pending' || t.status === 'awaiting_confirmation') {
+                <p class="invoice-pending-note">
+                  Duyệt giao dịch trước; sau khi kế toán phát hành hoá đơn ngoài hệ thống, quay lại
+                  đây nhập số hoá đơn để báo khách.
+                </p>
+              } @else {
+                <p class="invoice-pending-note">
+                  Giao dịch không thành công — yêu cầu hoá đơn này không cần xử lý.
+                </p>
+              }
+            </div>
+          }
 
           <!-- System Log Message -->
           @if (t.message) {

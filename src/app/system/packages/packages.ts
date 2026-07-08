@@ -97,6 +97,9 @@ export default class PackagesComponent {
         pkg?.credits?.find((c) => c.creditType === 'mentoring_session')?.amount ?? 0,
       courseSelectionCredits:
         pkg?.credits?.find((c) => c.creditType === 'course_selection')?.amount ?? 0,
+      // CR-005 — credit Quick Scan / Toolkit, cấu hình như 2 loại trên (default 1 khi tick flag)
+      quickScanCredits: pkg?.credits?.find((c) => c.creditType === 'quick_scan')?.amount ?? 0,
+      toolkitCredits: pkg?.credits?.find((c) => c.creditType === 'toolkit')?.amount ?? 0,
     }),
   });
 
@@ -150,9 +153,23 @@ export default class PackagesComponent {
 
   toggleToolkit(id: string) {
     const current = this.draftToolkitIds();
-    this.draftToolkitIds.set(
-      current.includes(id) ? current.filter((t) => t !== id) : [...current, id],
-    );
+    const adding = !current.includes(id);
+    this.draftToolkitIds.set(adding ? [...current, id] : current.filter((t) => t !== id));
+
+    // CR-005 — default 1: tick toolkit đầu tiên của nhóm mà credit tương ứng đang 0
+    // → tự điền 1 (admin vẫn sửa/xoá được trước khi lưu).
+    if (adding) {
+      const group = TOOLKITS.find((t) => t.id === id)?.group;
+      if (group === 'quick-scan' && Number(this.packageModel().quickScanCredits) === 0) {
+        this.packageModel.update((m) => ({ ...m, quickScanCredits: 1 }));
+      } else if (
+        group &&
+        group !== 'quick-scan' &&
+        Number(this.packageModel().toolkitCredits) === 0
+      ) {
+        this.packageModel.update((m) => ({ ...m, toolkitCredits: 1 }));
+      }
+    }
   }
 
   // 6. Computed list of courses in the selected package based on the local DRAFT list
@@ -251,10 +268,15 @@ export default class PackagesComponent {
       const credits: NonNullable<UpdatePackageDto['credits']> = [];
       const mentoring = Math.floor(Number(model.mentoringCredits) || 0);
       const courseSelection = Math.floor(Number(model.courseSelectionCredits) || 0);
+      const quickScan = Math.floor(Number(model.quickScanCredits) || 0);
+      const toolkit = Math.floor(Number(model.toolkitCredits) || 0);
       if (mentoring >= 1) credits.push({ creditType: 'mentoring_session', amount: mentoring });
       if (courseSelection >= 1) {
         credits.push({ creditType: 'course_selection', amount: courseSelection });
       }
+      // CR-005 — credit Quick Scan / Toolkit, replace-all cùng mảng như 2 loại trên
+      if (quickScan >= 1) credits.push({ creditType: 'quick_scan', amount: quickScan });
+      if (toolkit >= 1) credits.push({ creditType: 'toolkit', amount: toolkit });
 
       // CR-002: PATCH replace toàn bộ cột features → gửi object đã merge:
       // giữ nguyên các flag không phải toolkit (marketing legacy), ghi lại flag toolkit theo draft.

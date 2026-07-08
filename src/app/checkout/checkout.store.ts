@@ -11,12 +11,25 @@ import { PaymentService } from '../core/services/payment.service';
 
 export type PaymentMethod = 'momo' | 'bank';
 
+// CR-006 — id `esg-quick-scan-*` thuộc nhóm Quick Scan (credit quick_scan); còn lại là
+// toolkit chuyên đề (credit toolkit). Mirror quy ước BE (toolkits.service).
+export const QUICK_SCAN_ID_PREFIX = 'esg-quick-scan-';
+export const isQuickScanId = (id: string) => id.startsWith(QUICK_SCAN_ID_PREFIX);
+
 /**
  * CR-001 — guard chống thanh toán trùng booking: BE trả 400 kèm message tiếng Việt
  * (đã thanh toán / đang chờ admin duyệt / đã bị từ chối) ở payment/create, bank/create
  * và bank/confirm khi checkout gắn bookingId. Bắt đúng case đó để UI hiện nguyên văn
  * message dạng notice thay vì lỗi đỏ chung chung "Thanh toán thất bại".
  */
+/** Message 400 chung từ BE (vd validate bộ chọn khoá/toolkit) — hiện nguyên văn cho user sửa. */
+function toApiErrorMessage(err: unknown): string | null {
+  if (err instanceof ApiError && err.code === 400 && err.message) {
+    return err.message;
+  }
+  return null;
+}
+
 function toBookingBlockedMessage(err: unknown, hasBookingRef: boolean): string | null {
   if (hasBookingRef && err instanceof ApiError && err.code === 400 && err.message) {
     return err.message;
@@ -53,6 +66,20 @@ export interface CheckoutState {
   // Message 400 từ guard chống thanh toán trùng booking (nguyên văn từ BE) —
   // khác null → ẩn QR/nút xác nhận, hiện notice thân thiện thay vì lỗi đỏ.
   paymentBlockedMsg: string | null;
+  // CR-004 — khoá chọn tại checkout: gói có credit course_selection N>0 bắt buộc đúng N id
+  // KHÁC NHAU (mỗi khoá click chọn/bỏ chọn, không chọn trùng — kể cả gói org).
+  selectedCourseIds: number[];
+  // CR-006 — Quick Scan/Toolkit chọn tại checkout (id theo toolkit.data.ts, gộp cả 2 nhóm;
+  // phân nhóm bằng prefix `esg-quick-scan-`). Mỗi mục tối đa 1 lần.
+  selectedToolkitIds: string[];
+  // CR-006 amendment — mục user ĐÃ sở hữu (GET /toolkits/selections/me): loại khỏi pool chọn,
+  // và số mục bắt buộc = min(credit, pool còn lại) — khớp validate BE, tránh khoá cứng khi mua lại.
+  ownedToolkitIds: string[];
+  // Tương tự cho khoá học: id khoá user đã enroll (course.findMyEnrolled) — selection luôn đi
+  // kèm enroll nên "đã enroll" là đủ để khớp tập pickable của BE.
+  enrolledCourseIds: number[];
+  // Message 400 từ validate BE (vd bộ chọn không khớp) — hiện nguyên văn thay vì lỗi đỏ chung.
+  paymentErrorMsg: string | null;
 }
 
 const initialState: CheckoutState = {
@@ -78,25 +105,130 @@ const initialState: CheckoutState = {
   bankCreateError: false,
   bookingRef: null,
   paymentBlockedMsg: null,
+  selectedCourseIds: [],
+  selectedToolkitIds: [],
+  ownedToolkitIds: [],
+  enrolledCourseIds: [],
+  paymentErrorMsg: null,
 };
 
 export const CheckoutStore = signalStore(
   { providedIn: 'root' }, // Registered globally so the checkout flow can read the package selected via ?packageId= (from the main app's /packages page)
   withState(initialState),
-  withComputed(({ resultCode, amount, originalPrice, couponInfo }) => ({
-    // Coupon do server tính (changelog SDK 0.6.8): FE gửi giá gốc + couponCode, số tiền
-    // sau giảm lấy từ response createBankTransfer (bankTransfer.amount) — không tự trừ ở client.
-    paymentSuccess: computed(() => resultCode() === '0'),
-    amountFormatted: computed(() => amount().toLocaleString('vi-VN')),
-    // Mức giảm hiển thị sớm từ kết quả validate coupon (chỉ để xem trước; số thực thu vẫn
-    // do server chốt lại khi tạo thanh toán/chuyển khoản).
-    couponFinalPrice: computed(() => couponInfo()?.final_price ?? originalPrice()),
-    couponDiscount: computed(() => {
-      const info = couponInfo();
-      if (!info) return 0;
-      return Math.max(0, originalPrice() - info.final_price);
+  withComputed(
+    ({
+      resultCode,
+      amount,
+      originalPrice,
+      couponInfo,
+      selectedPackage,
+      selectedCourseIds,
+      selectedToolkitIds,
+      ownedToolkitIds,
+      enrolledCourseIds,
+    }) => ({
+      // Coupon do server tính (changelog SDK 0.6.8): FE gửi giá gốc + couponCode, số tiền
+      // sau giảm lấy từ response createBankTransfer (bankTransfer.amount) — không tự trừ ở client.
+      paymentSuccess: computed(() => resultCode() === '0'),
+      amountFormatted: computed(() => amount().toLocaleString('vi-VN')),
+      // Mức giảm hiển thị sớm từ kết quả validate coupon (chỉ để xem trước; số thực thu vẫn
+      // do server chốt lại khi tạo thanh toán/chuyển khoản).
+      couponFinalPrice: computed(() => couponInfo()?.final_price ?? originalPrice()),
+      couponDiscount: computed(() => {
+        const info = couponInfo();
+        if (!info) return 0;
+        return Math.max(0, originalPrice() - info.final_price);
+      }),
+      // Gói org: khoá chọn thành suất giữ chỗ, owner gán member sau (chỉ khác wording ở UI)
+      isOrgPackage: computed(() => selectedPackage()?.packageType === 'organization'),
+      selectedCourseCount: computed(() => selectedCourseIds().length),
+      // CR-004 amendment — pool khoá user CÒN chọn được (gói cá nhân: loại khoá đã enroll;
+      // gói org giữ nguyên — member chưa tồn tại lúc mua). Khớp tập pickable của BE.
+      pickableCourseIds: computed(() => {
+        const pkg = selectedPackage();
+        const poolIds = (pkg?.courses ?? []).map((pc) => Number(pc.wpCourseId));
+        if (pkg?.packageType === 'organization') return poolIds;
+        const enrolled = new Set(enrolledCourseIds());
+        return poolIds.filter((id) => !enrolled.has(id));
+      }),
+      // CR-006 amendment — pool Quick Scan/Toolkit còn chọn được (loại mục đã sở hữu)
+      pickableQuickScanIds: computed(() => {
+        const owned = new Set(ownedToolkitIds());
+        return Object.entries(selectedPackage()?.features ?? {})
+          .filter(([key, value]) => value === true && key.startsWith('toolkit:'))
+          .map(([key]) => key.slice('toolkit:'.length))
+          .filter((id) => isQuickScanId(id) && !owned.has(id));
+      }),
+      pickableToolkitIds: computed(() => {
+        const owned = new Set(ownedToolkitIds());
+        return Object.entries(selectedPackage()?.features ?? {})
+          .filter(([key, value]) => value === true && key.startsWith('toolkit:'))
+          .map(([key]) => key.slice('toolkit:'.length))
+          .filter((id) => !isQuickScanId(id) && !owned.has(id));
+      }),
+      selectedQuickScanCount: computed(() => selectedToolkitIds().filter(isQuickScanId).length),
+      selectedToolkitCount: computed(
+        () => selectedToolkitIds().filter((id) => !isQuickScanId(id)).length,
+      ),
     }),
-  })),
+  ),
+  withComputed(
+    ({ selectedPackage, pickableCourseIds, pickableQuickScanIds, pickableToolkitIds }) => ({
+      // Số mục BẮT BUỘC chọn = min(credit cấu hình, pool còn chọn được) — khớp validate BE
+      // (amendment 06/07: tránh khoá cứng khi user đã sở hữu hết pool / credit vượt pool)
+      requiredCourseSelections: computed(() =>
+        Math.min(
+          selectedPackage()?.credits?.find((c) => c.creditType === 'course_selection')?.amount ?? 0,
+          pickableCourseIds().length,
+        ),
+      ),
+      requiredQuickScanSelections: computed(() =>
+        Math.min(
+          selectedPackage()?.credits?.find((c) => c.creditType === 'quick_scan')?.amount ?? 0,
+          pickableQuickScanIds().length,
+        ),
+      ),
+      requiredToolkitSelections: computed(() =>
+        Math.min(
+          selectedPackage()?.credits?.find((c) => c.creditType === 'toolkit')?.amount ?? 0,
+          pickableToolkitIds().length,
+        ),
+      ),
+    }),
+  ),
+  withComputed(
+    ({
+      requiredCourseSelections,
+      selectedCourseIds,
+      requiredQuickScanSelections,
+      requiredToolkitSelections,
+      selectedQuickScanCount,
+      selectedToolkitCount,
+    }) => ({
+      // Đã chọn đủ N khoá (hoặc gói không yêu cầu)
+      courseSelectionComplete: computed(
+        () =>
+          requiredCourseSelections() === 0 ||
+          selectedCourseIds().length === requiredCourseSelections(),
+      ),
+      // CR-006 — đã chọn đủ theo TỪNG nhóm
+      quickScanSelectionComplete: computed(
+        () => selectedQuickScanCount() === requiredQuickScanSelections(),
+      ),
+      toolkitSelectionComplete: computed(
+        () => selectedToolkitCount() === requiredToolkitSelections(),
+      ),
+    }),
+  ),
+  withComputed(
+    ({ courseSelectionComplete, quickScanSelectionComplete, toolkitSelectionComplete }) => ({
+      // Tổng gate cho nút "Tiến hành thanh toán": đủ khoá + đủ Quick Scan + đủ Toolkit
+      checkoutSelectionComplete: computed(
+        () =>
+          courseSelectionComplete() && quickScanSelectionComplete() && toolkitSelectionComplete(),
+      ),
+    }),
+  ),
   withMethods((store, paymentService = inject(PaymentService)) => ({
     selectPackage(pkg: Package) {
       patchState(store, {
@@ -109,7 +241,56 @@ export const CheckoutStore = signalStore(
         couponValidating: false,
         couponInfo: null,
         step: 1,
+        // CR-004/CR-006 — đổi gói → làm lại lựa chọn khoá + toolkit (pool/số lượt theo gói)
+        selectedCourseIds: [],
+        selectedToolkitIds: [],
       });
+    },
+
+    // ── CR-004: chọn khoá tại checkout ─────────────────────────────────────────
+    /** Click chọn/bỏ chọn 1 khoá (mọi loại gói — mỗi khoá tối đa 1 lần, tối đa N khoá). */
+    toggleCourse(courseId: number) {
+      const ids = store.selectedCourseIds();
+      if (ids.includes(courseId)) {
+        patchState(store, { selectedCourseIds: ids.filter((id) => id !== courseId) });
+      } else if (ids.length < store.requiredCourseSelections()) {
+        patchState(store, { selectedCourseIds: [...ids, courseId] });
+      }
+    },
+
+    // ── CR-004/CR-006 amendment: nạp ngữ cảnh "đã sở hữu" để pool/số lượt khớp BE ──
+    /** Set khoá user đã enroll; đồng thời gỡ khỏi lựa chọn hiện tại nếu lỡ chọn trước đó. */
+    setEnrolledCourseIds(ids: number[]) {
+      const enrolled = new Set(ids);
+      patchState(store, {
+        enrolledCourseIds: ids,
+        selectedCourseIds: store.selectedCourseIds().filter((id) => !enrolled.has(id)),
+      });
+    },
+
+    /** Set toolkit user đã sở hữu; đồng thời gỡ khỏi lựa chọn hiện tại nếu lỡ chọn trước đó. */
+    setOwnedToolkitIds(ids: string[]) {
+      const owned = new Set(ids);
+      patchState(store, {
+        ownedToolkitIds: ids,
+        selectedToolkitIds: store.selectedToolkitIds().filter((id) => !owned.has(id)),
+      });
+    },
+
+    // ── CR-006: chọn Quick Scan / Toolkit tại checkout ──────────────────────────
+    /** Click chọn/bỏ chọn 1 mục — giới hạn theo credit của TỪNG nhóm (Quick Scan / Toolkit). */
+    toggleToolkit(toolkitId: string) {
+      const ids = store.selectedToolkitIds();
+      if (ids.includes(toolkitId)) {
+        patchState(store, { selectedToolkitIds: ids.filter((id) => id !== toolkitId) });
+        return;
+      }
+      const capacity = isQuickScanId(toolkitId)
+        ? store.requiredQuickScanSelections() - store.selectedQuickScanCount()
+        : store.requiredToolkitSelections() - store.selectedToolkitCount();
+      if (capacity > 0) {
+        patchState(store, { selectedToolkitIds: [...ids, toolkitId] });
+      }
     },
 
     setStep(step: number) {
@@ -217,7 +398,7 @@ export const CheckoutStore = signalStore(
         return;
       }
 
-      patchState(store, { isLoading: true, paymentError: false });
+      patchState(store, { isLoading: true, paymentError: false, paymentErrorMsg: null });
 
       try {
         const response = await paymentService.createPayment({
@@ -227,6 +408,13 @@ export const CheckoutStore = signalStore(
           couponCode: store.couponApplied() ? store.appliedCode() : undefined,
           // CR-001 5.3b — booking mentor chờ thanh toán (nếu đến từ link mail)
           bookingId: store.bookingRef() ?? undefined,
+          // CR-004 — khoá chọn tại checkout (gói có credit course_selection)
+          courseIds: store.requiredCourseSelections() > 0 ? store.selectedCourseIds() : undefined,
+          // CR-006 — Quick Scan/Toolkit chọn tại checkout
+          toolkitIds:
+            store.requiredQuickScanSelections() + store.requiredToolkitSelections() > 0
+              ? store.selectedToolkitIds()
+              : undefined,
         });
 
         if (response && response.payUrl) {
@@ -243,6 +431,8 @@ export const CheckoutStore = signalStore(
           isLoading: false,
           paymentError: !blockedMsg,
           paymentBlockedMsg: blockedMsg ?? store.paymentBlockedMsg(),
+          // CR-004/CR-006 — 400 validate (vd bộ chọn không khớp) hiện nguyên văn để user sửa
+          paymentErrorMsg: blockedMsg ? null : toApiErrorMessage(err),
         });
       }
     },
@@ -263,7 +453,7 @@ export const CheckoutStore = signalStore(
       // Đã có giao dịch hoặc đang tạo → không tạo trùng
       if (store.bankTransfer() || store.bankCreating()) return;
 
-      patchState(store, { bankCreating: true, bankCreateError: false });
+      patchState(store, { bankCreating: true, bankCreateError: false, paymentErrorMsg: null });
 
       try {
         const response = await paymentService.createBankTransfer({
@@ -271,6 +461,12 @@ export const CheckoutStore = signalStore(
           // Luôn gửi giá gốc; server tự tính giảm theo couponCode (SDK 0.6.8).
           amount: Number(store.originalPrice()),
           couponCode: store.couponApplied() ? store.appliedCode() : undefined,
+          // CR-004/CR-006 — validate sớm bộ khoá + toolkit đã chọn ngay từ bước lấy QR
+          courseIds: store.requiredCourseSelections() > 0 ? store.selectedCourseIds() : undefined,
+          toolkitIds:
+            store.requiredQuickScanSelections() + store.requiredToolkitSelections() > 0
+              ? store.selectedToolkitIds()
+              : undefined,
         });
 
         patchState(store, { bankTransfer: response, bankCreating: false });
@@ -283,6 +479,8 @@ export const CheckoutStore = signalStore(
           bankCreating: false,
           bankCreateError: !blockedMsg,
           paymentBlockedMsg: blockedMsg ?? store.paymentBlockedMsg(),
+          // CR-004/CR-006 — 400 validate hiện nguyên văn để user sửa lựa chọn
+          paymentErrorMsg: blockedMsg ? null : toApiErrorMessage(err),
         });
       }
     },
@@ -303,7 +501,7 @@ export const CheckoutStore = signalStore(
         return;
       }
 
-      patchState(store, { isLoading: true, paymentError: false });
+      patchState(store, { isLoading: true, paymentError: false, paymentErrorMsg: null });
 
       try {
         // SDK 0.7.0: bank/confirm mới là bước TẠO giao dịch (status awaiting_confirmation),
@@ -316,6 +514,12 @@ export const CheckoutStore = signalStore(
           couponCode: store.couponApplied() ? store.appliedCode() : undefined,
           // CR-001 5.3b — booking mentor chờ thanh toán (nếu đến từ link mail)
           bookingId: store.bookingRef() ?? undefined,
+          // CR-004/CR-006 — bước này persist bộ khoá + toolkit vào giao dịch (nguồn chân lý fulfillment)
+          courseIds: store.requiredCourseSelections() > 0 ? store.selectedCourseIds() : undefined,
+          toolkitIds:
+            store.requiredQuickScanSelections() + store.requiredToolkitSelections() > 0
+              ? store.selectedToolkitIds()
+              : undefined,
         });
 
         if (response.status === 'awaiting_confirmation' || response.status === 'success') {
@@ -332,6 +536,8 @@ export const CheckoutStore = signalStore(
           isLoading: false,
           paymentError: !blockedMsg,
           paymentBlockedMsg: blockedMsg ?? store.paymentBlockedMsg(),
+          // CR-004/CR-006 — 400 validate (vd bộ chọn không khớp) hiện nguyên văn để user sửa
+          paymentErrorMsg: blockedMsg ? null : toApiErrorMessage(err),
         });
       }
     },

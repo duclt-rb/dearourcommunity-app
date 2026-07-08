@@ -168,8 +168,19 @@
                     [disabled]="assignLoading()"
                   >
                     <option value="">— Chọn khoá học —</option>
-                    @for (course of coursePool(); track course.courseId) {
-                      <option [value]="course.courseId">{{ course.title }}</option>
+                    <!-- CR-004: org có suất giữ chỗ → chỉ hiện khoá còn suất (kèm số suất) -->
+                    @for (course of assignableCourses(); track course.courseId) {
+                      <option [value]="course.courseId">
+                        {{ course.title
+                        }}{{
+                          course.remaining !== null
+                            ? ' (còn ' +
+                              course.remaining +
+                              '
+              suất)'
+                            : ''
+                        }}
+                      </option>
                     }
                   </select>
                 </div>
@@ -182,6 +193,12 @@
                 <span class="field-help danger-text">
                   * Doanh nghiệp đã hết suất chọn khoá. Vui lòng liên hệ Dear Our Community nếu cần
                   thêm.
+                </span>
+              } @else if (allSlotsAssigned()) {
+                <!-- CR-004: hết suất giữ chỗ (dù credit tồn từ gói cũ) -->
+                <span class="field-help danger-text">
+                  * Các suất khoá học đã chọn khi mua gói đều đã được gán. Vui lòng liên hệ Dear Our
+                  Community nếu cần thêm.
                 </span>
               }
             }

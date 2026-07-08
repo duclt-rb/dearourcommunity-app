@@ -55,6 +55,16 @@ export class ClientService {
     return this.client.health;
   }
 
+  /** CR-006 — quyền Quick Scan/Toolkit theo user. */
+  get toolkits() {
+    return this.client.toolkits;
+  }
+
+  /** CR-007 — yêu cầu xuất hoá đơn VAT (admin). */
+  get invoices() {
+    return this.client.invoices;
+  }
+
   get token(): string | null {
     return this.client.token;
   }

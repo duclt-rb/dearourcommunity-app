@@ -56,6 +56,13 @@
       <!-- Lịch hẹn mentor gắn với đơn (CR-001) — component tự ẩn nếu không có/không xem được -->
       <app-booking-summary [bookingId]="bookingId()" />
 
+      <!-- CR-007 amendment 08/07 — yêu cầu xuất hoá đơn VAT sau khi thanh toán MoMo thành công -->
+      @if (orderId(); as oid) {
+        <div class="receipt-invoice-request">
+          <app-invoice-request-form [orderId]="oid" />
+        </div>
+      }
+
       <!-- Buttons -->
       <div class="action-row">
         <a routerLink="/profile/dashboard" class="btn btn-primary">

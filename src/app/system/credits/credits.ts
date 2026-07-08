@@ -66,6 +66,15 @@ export default class SystemCreditsComponent {
   readonly setAdjustNote = this.store.setAdjustNote;
   readonly submitAdjust = this.store.submitAdjust;
 
+  /**
+   * CR-005 — số dư theo loại, chịu được BE cũ chưa deploy migration trả `balances`
+   * thiếu key `quick_scan`/`toolkit` (type SDK khai đủ key nên `??` đặt trong template
+   * bị NG8102; ép Partial ở đây để fallback 0 hợp lệ về type).
+   */
+  balanceOf(balances: Partial<Record<CreditType, number>>, type: CreditType): number {
+    return balances[type] ?? 0;
+  }
+
   onLookupSubmit(e: Event) {
     e.preventDefault();
     this.lookup();
@@ -77,7 +86,19 @@ export default class SystemCreditsComponent {
   }
 
   getCreditTypeLabel(value: CreditType): string {
-    return value === 'mentoring_session' ? 'Buổi mentoring 1-1' : 'Suất chọn khoá';
+    switch (value) {
+      case 'mentoring_session':
+        return 'Buổi mentoring 1-1';
+      case 'course_selection':
+        return 'Suất chọn khoá';
+      // CR-005
+      case 'quick_scan':
+        return 'Lượt Quick Scan';
+      case 'toolkit':
+        return 'Lượt Toolkit';
+      default:
+        return value;
+    }
   }
 
   getKindLabel(value: CreditKind): string {

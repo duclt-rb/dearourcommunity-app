@@ -1,21 +1,32 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import type { Package } from '@dearourcommunity/client';
 import { environment } from '../../environments/environment';
+import { ClientService } from '../core/services/client.service';
 import { PackagesService } from '../core/services/packages.service';
 import { AuthStore } from '../core/stores/auth.store';
 
-// CR-003: quyền vào toolkit = user sở hữu ít nhất 1 gói có flag `toolkit:<id>` trong features
-// (union mọi gói, gồm gói kế thừa từ org). Nguồn flag: admin cấu hình ở /system/packages (CR-002).
+// CR-006: quyền vào toolkit = user có SELECTION trong app_toolkit_selections (chọn ở checkout
+// bằng credit / backfill grandfather / admin cấp) — KHÔNG còn là union flag gói (CR-003 cũ).
+// Flag `toolkit:<id>` trong features giờ chỉ là POOL để chọn ở checkout + CTA marketing.
 export const TOOLKIT_FLAG_PREFIX = 'toolkit:';
 
 @Injectable({ providedIn: 'root' })
 export class ToolkitAccessService {
   private authStore = inject(AuthStore);
   private packagesService = inject(PackagesService);
+  private clientService = inject(ClientService);
 
   /** Catalog gói (public GET /packages, có features + courses) — load 1 lần, share mọi nơi. */
   private catalog = signal<Package[]>([]);
   private catalogPromise: Promise<void> | null = null;
+
+  /** CR-006 — toolkitId user được dùng (GET /toolkits/selections/me), cache theo user + TTL. */
+  private selections = signal<Set<string>>(new Set());
+  private selectionsForUserId: string | null = null;
+  private selectionsPromise: Promise<void> | null = null;
+  private selectionsFetchedAt = 0;
+  /** TTL cache quyền — mua xong admin duyệt là quyền đổi, không thể cache cả session. */
+  private static readonly SELECTIONS_TTL_MS = 60_000;
 
   /** Fetch catalog nếu chưa có; lỗi mạng → catalog rỗng (fail-closed, thử lại ở lần gọi sau). */
   ensureCatalog(): Promise<void> {
@@ -30,24 +41,49 @@ export class ToolkitAccessService {
     return this.catalogPromise;
   }
 
+  /**
+   * CR-006 — fetch quyền toolkit của user hiện tại; đổi user (login lại) → fetch lại.
+   * Lỗi mạng → set rỗng (fail-closed) và thử lại ở lần gọi sau.
+   */
+  ensureSelections(): Promise<void> {
+    const userId = this.authStore.user()?.id ?? null;
+    if (!userId) {
+      this.selections.set(new Set());
+      this.selectionsForUserId = null;
+      return Promise.resolve();
+    }
+    const fresh = Date.now() - this.selectionsFetchedAt < ToolkitAccessService.SELECTIONS_TTL_MS;
+    if (this.selectionsForUserId === userId && this.selectionsPromise && fresh) {
+      return this.selectionsPromise;
+    }
+
+    this.selectionsForUserId = userId;
+    const promise = this.clientService.toolkits
+      .getMySelections()
+      .then((rows) => {
+        this.selections.set(new Set(rows.map((r) => r.toolkitId)));
+        this.selectionsFetchedAt = Date.now();
+      })
+      .catch((err: unknown) => {
+        console.error('[ToolkitAccess] Không tải được quyền toolkit', err);
+        this.selections.set(new Set());
+        this.selectionsPromise = null; // thử lại lần sau
+        this.selectionsFetchedAt = 0;
+      });
+    this.selectionsPromise = promise;
+    return promise;
+  }
+
+  /** Gọi sau khi mua/duyệt thành công để quyền mới hiện ngay không chờ TTL. */
+  invalidateSelections(): void {
+    this.selectionsPromise = null;
+    this.selectionsFetchedAt = 0;
+  }
+
   isAuthenticated = computed(() => this.authStore.isAuthenticated());
 
-  /** Union các toolkitId từ features của mọi gói user đang sở hữu. */
-  allowedToolkitIds = computed<Set<string>>(() => {
-    const ownedIds = new Set((this.authStore.user()?.packages ?? []).map((p) => p.id));
-    const allowed = new Set<string>();
-    if (!ownedIds.size) return allowed;
-
-    for (const pkg of this.catalog()) {
-      if (!ownedIds.has(pkg.id)) continue;
-      for (const [key, value] of Object.entries(pkg.features ?? {})) {
-        if (value === true && key.startsWith(TOOLKIT_FLAG_PREFIX)) {
-          allowed.add(key.slice(TOOLKIT_FLAG_PREFIX.length));
-        }
-      }
-    }
-    return allowed;
-  });
+  /** CR-006 — quyền = danh sách selection của user (không còn union flag gói). */
+  allowedToolkitIds = computed<Set<string>>(() => this.selections());
 
   canAccess(toolkitId: string): boolean {
     return this.allowedToolkitIds().has(toolkitId);

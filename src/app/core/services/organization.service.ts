@@ -59,10 +59,20 @@ export class OrganizationService {
   }
 
   /**
-   * Số dư credit thuộc org (mentoring_session / course_selection)
+   * Số dư MỌI loại credit thuộc org (đủ các key của CreditType, thiếu loại nào trả 0).
+   * Lưu ý: theo luồng mua chỉ course_selection của gói org thuộc pool org (R13 CR-001) —
+   * các loại khác về người mua, nhưng admin vẫn adjust tay vào org được (CR-005).
    * GET /api/v1/org/:orgId/credits (owner-only)
    */
   getCredits(orgId: string) {
     return this.clientService.org.getCredits(orgId);
+  }
+
+  /**
+   * CR-004 — suất khoá giữ chỗ từ checkout (reserved/assigned); org có slot thì chỉ gán
+   * được khoá còn suất reserved. GET /api/v1/org/:orgId/course-slots (owner-only)
+   */
+  getCourseSlots(orgId: string) {
+    return this.clientService.org.getCourseSlots(orgId);
   }
 }

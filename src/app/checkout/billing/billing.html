@@ -102,6 +102,149 @@
               />
             }
 
+            <!-- CR-004: gói có lượt chọn khoá → BẮT BUỘC chọn đúng N khoá tại checkout.
+                 Tiền về: gói cá nhân auto-enroll; gói org giữ chỗ suất để gán member sau. -->
+            @if (requiredSelections() > 0 && !store.bookingRef()) {
+              <div class="dashed-divider"></div>
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <span class="section-label">
+                  Chọn khoá học
+                  <span class="course-select-counter" [class.complete]="courseSelectionComplete()">
+                    {{ selectedCourseCount() }}/{{ requiredSelections() }}
+                  </span>
+                </span>
+                <p class="course-select-hint">
+                  @if (isOrgPackage()) {
+                    Gói của bạn có {{ requiredSelections() }} suất khoá học cho thành viên — mỗi
+                    khoá chỉ chọn một lần. Sau khi thanh toán được xác nhận, bạn gán thành viên vào
+                    các khoá này trong trang Tổ chức.
+                  } @else {
+                    Gói của bạn gồm {{ requiredSelections() }} khoá học tự chọn — sau khi thanh toán
+                    được xác nhận, các khoá này sẽ tự động được ghi danh cho bạn.
+                  }
+                </p>
+                <div class="course-select-grid">
+                  <!-- Mini card: click chọn/bỏ chọn, mỗi khoá tối đa 1 lần (amendment 06/07) -->
+                  @for (course of packageCourses(); track course.id; let i = $index) {
+                    <button
+                      type="button"
+                      class="course-card-mini"
+                      [class.selected]="isCourseSelected(course.id)"
+                      [disabled]="!isCourseSelected(course.id) && courseSelectionComplete()"
+                      (click)="toggleCourse(course.id)"
+                    >
+                      <span class="course-card-mini__thumb tone-{{ i % 4 }}">
+                        @if (course.thumbnailUrl) {
+                          <img
+                            class="course-card-mini__img"
+                            [src]="course.thumbnailUrl"
+                            alt=""
+                            loading="lazy"
+                          />
+                        } @else {
+                          <svg lucideBookOpen [size]="18" strokeWidth="2"></svg>
+                        }
+                      </span>
+                      <span class="course-card-mini__title">{{ course.title }}</span>
+                      <span
+                        class="course-card-mini__check"
+                        [class.checked]="isCourseSelected(course.id)"
+                      >
+                        @if (isCourseSelected(course.id)) {
+                          <svg lucideCheck [size]="12" strokeWidth="3"></svg>
+                        }
+                      </span>
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- CR-006: gói có lượt Quick Scan → BẮT BUỘC chọn đúng N bài từ pool của gói -->
+            @if (requiredQuickScans() > 0 && !store.bookingRef()) {
+              <div class="dashed-divider"></div>
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <span class="section-label">
+                  Chọn Quick Scan
+                  <span
+                    class="course-select-counter"
+                    [class.complete]="quickScanSelectionComplete()"
+                  >
+                    {{ selectedQuickScanCount() }}/{{ requiredQuickScans() }}
+                  </span>
+                </span>
+                <p class="course-select-hint">
+                  Gói của bạn gồm {{ requiredQuickScans() }} bài đánh giá nhanh ESG tự chọn — sau
+                  khi thanh toán được xác nhận, bạn dùng được ngay các bài đã chọn.
+                </p>
+                <div class="course-select-grid">
+                  @for (item of quickScanPool(); track item.id) {
+                    <button
+                      type="button"
+                      class="course-card-mini"
+                      [class.selected]="isToolkitSelected(item.id)"
+                      [disabled]="!isToolkitSelected(item.id) && quickScanSelectionComplete()"
+                      (click)="toggleToolkit(item.id)"
+                    >
+                      <span class="course-card-mini__thumb tone-1">
+                        <svg lucideZap [size]="18" strokeWidth="2"></svg>
+                      </span>
+                      <span class="course-card-mini__title">{{ item.title }}</span>
+                      <span
+                        class="course-card-mini__check"
+                        [class.checked]="isToolkitSelected(item.id)"
+                      >
+                        @if (isToolkitSelected(item.id)) {
+                          <svg lucideCheck [size]="12" strokeWidth="3"></svg>
+                        }
+                      </span>
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- CR-006: gói có lượt Toolkit chuyên đề → BẮT BUỘC chọn đúng N bộ từ pool của gói -->
+            @if (requiredToolkits() > 0 && !store.bookingRef()) {
+              <div class="dashed-divider"></div>
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <span class="section-label">
+                  Chọn Toolkit
+                  <span class="course-select-counter" [class.complete]="toolkitSelectionComplete()">
+                    {{ selectedToolkitCount() }}/{{ requiredToolkits() }}
+                  </span>
+                </span>
+                <p class="course-select-hint">
+                  Gói của bạn gồm {{ requiredToolkits() }} bộ công cụ ESG tự chọn — sau khi thanh
+                  toán được xác nhận, bạn dùng được ngay các bộ đã chọn.
+                </p>
+                <div class="course-select-grid">
+                  @for (item of toolkitPool(); track item.id) {
+                    <button
+                      type="button"
+                      class="course-card-mini"
+                      [class.selected]="isToolkitSelected(item.id)"
+                      [disabled]="!isToolkitSelected(item.id) && toolkitSelectionComplete()"
+                      (click)="toggleToolkit(item.id)"
+                    >
+                      <span class="course-card-mini__thumb tone-2">
+                        <svg lucideWrench [size]="18" strokeWidth="2"></svg>
+                      </span>
+                      <span class="course-card-mini__title">{{ item.title }}</span>
+                      <span
+                        class="course-card-mini__check"
+                        [class.checked]="isToolkitSelected(item.id)"
+                      >
+                        @if (isToolkitSelected(item.id)) {
+                          <svg lucideCheck [size]="12" strokeWidth="3"></svg>
+                        }
+                      </span>
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+
             <div class="dashed-divider"></div>
 
             <!-- Promo Code -->
@@ -205,10 +348,23 @@
             <span>Lịch hẹn đã bị từ chối — liên hệ hỗ trợ nếu cần.</span>
           </div>
         } @else {
-          <button class="btn-checkout" (click)="goToPayment()">
+          <button class="btn-checkout" [disabled]="!selectionComplete()" (click)="goToPayment()">
             Tiến hành thanh toán
             <svg lucideSend [size]="20" strokeWidth="2"></svg>
           </button>
+          @if (!selectionComplete()) {
+            <p class="course-select-remaining">
+              @if (!courseSelectionComplete()) {
+                Chọn thêm {{ requiredSelections() - selectedCourseCount() }} khoá học.
+              }
+              @if (!quickScanSelectionComplete()) {
+                Chọn thêm {{ requiredQuickScans() - selectedQuickScanCount() }} bài Quick Scan.
+              }
+              @if (!toolkitSelectionComplete()) {
+                Chọn thêm {{ requiredToolkits() - selectedToolkitCount() }} bộ toolkit.
+              }
+            </p>
+          }
         }
       </div>
     }
@@ -304,6 +460,12 @@
                       động và bạn có thể truy cập ngay tại trang cá nhân.
                     </p>
                   </div>
+                  <!-- CR-007 amendment 08/07 — yêu cầu xuất hoá đơn VAT SAU khi xác nhận chuyển khoản -->
+                  @if (bankTransfer(); as bank) {
+                    <div class="bank-invoice-request">
+                      <app-invoice-request-form [orderId]="bank.orderId" />
+                    </div>
+                  }
                 } @else if (bankCreating()) {
                   <div class="bank-loading">
                     <div class="spinner-sm"></div>
@@ -312,7 +474,11 @@
                 } @else if (bankCreateError()) {
                   <div class="bank-error">
                     <p class="bank-error-text">
-                      Không tạo được thông tin chuyển khoản. Vui lòng thử lại.
+                      <!-- CR-004/CR-006: 400 validate từ BE → hiện nguyên văn để user biết sửa gì -->
+                      {{
+                        paymentErrorMsg() ||
+                          'Không tạo được thông tin chuyển khoản. Vui lòng thử lại.'
+                      }}
                     </p>
                     <button type="button" class="btn-apply" (click)="retryBankTransfer()">
                       Thử lại
@@ -475,7 +641,10 @@
             <span>Lịch hẹn đã bị từ chối — liên hệ hỗ trợ nếu cần.</span>
           </div>
         } @else if (paymentError()) {
-          <p class="error-msg">Thanh toán thất bại. Vui lòng thử lại.</p>
+          <!-- CR-004/CR-006: 400 validate từ BE → hiện nguyên văn để user biết sửa gì -->
+          <p class="error-msg">
+            {{ paymentErrorMsg() || 'Thanh toán thất bại. Vui lòng thử lại.' }}
+          </p>
         }
 
         <div class="action-row">

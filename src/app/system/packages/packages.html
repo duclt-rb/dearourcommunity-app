@@ -212,6 +212,29 @@
                     class="w-full"
                   />
                 </div>
+                <!-- CR-005: credit Quick Scan / Toolkit — tự điền 1 khi tick flag bên dưới -->
+                <div class="field">
+                  <label for="pkg-quickscan-credits" class="field__label">Số lượt Quick Scan</label>
+                  <input
+                    id="pkg-quickscan-credits"
+                    type="number"
+                    pInputText
+                    [formField]="packageForm.quickScanCredits"
+                    placeholder="0"
+                    class="w-full"
+                  />
+                </div>
+                <div class="field">
+                  <label for="pkg-toolkit-credits" class="field__label">Số lượt Toolkit</label>
+                  <input
+                    id="pkg-toolkit-credits"
+                    type="number"
+                    pInputText
+                    [formField]="packageForm.toolkitCredits"
+                    placeholder="0"
+                    class="w-full"
+                  />
+                </div>
               </div>
             </div>
 

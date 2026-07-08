@@ -12,6 +12,7 @@ import {
 } from '../../core/router/router.selectors';
 import LogoComponent from '../../shared/logo/logo';
 import BookingSummaryComponent from '../booking-summary/booking-summary';
+import InvoiceRequestFormComponent from '../invoice-request-form/invoice-request-form';
 import { CheckoutStore } from '../checkout.store';
 import { PaymentService } from '../../core/services/payment.service';
 import { ProfileStore } from '../../profile/profile.store';
@@ -40,6 +41,7 @@ const PACKAGE_NAME_MAP: Record<string, string> = {
     LucideCircleX,
     LogoComponent,
     BookingSummaryComponent,
+    InvoiceRequestFormComponent,
   ],
   templateUrl: './receipt.html',
   styleUrl: './receipt.css',

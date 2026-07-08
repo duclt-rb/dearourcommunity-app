@@ -3,8 +3,12 @@ import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import type { MentorBooking } from '@dearourcommunity/client';
 import { CheckoutStore, type PaymentMethod } from '../checkout.store';
+import { findToolkit } from '../../toolkit/toolkit.data';
+import { CourseService } from '../../core/services/course.service';
+import { ToolkitAccessService } from '../../toolkit/toolkit-access.service';
 import { ProfileStore } from '../../profile/profile.store';
 import {
+  LucideBookOpen,
   LucideCheck,
   LucideTag,
   LucideX,
@@ -17,9 +21,12 @@ import {
   LucideCircleX,
   LucideExternalLink,
   LucideInfo,
+  LucideWrench,
+  LucideZap,
 } from '@lucide/angular';
 import LogoComponent from '../../shared/logo/logo';
 import BookingSummaryComponent from '../booking-summary/booking-summary';
+import InvoiceRequestFormComponent from '../invoice-request-form/invoice-request-form';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -28,6 +35,7 @@ import { environment } from '../../../environments/environment';
   imports: [
     DecimalPipe,
     RouterLink,
+    LucideBookOpen,
     LucideCheck,
     LucideTag,
     LucideX,
@@ -40,8 +48,11 @@ import { environment } from '../../../environments/environment';
     LucideCircleX,
     LucideExternalLink,
     LucideInfo,
+    LucideWrench,
+    LucideZap,
     LogoComponent,
     BookingSummaryComponent,
+    InvoiceRequestFormComponent,
   ],
   templateUrl: './billing.html',
   styleUrl: './billing.css',
@@ -49,12 +60,25 @@ import { environment } from '../../../environments/environment';
 export default class BillingComponent implements OnInit {
   readonly store = inject(CheckoutStore);
   readonly profileStore = inject(ProfileStore);
+  private readonly courseService = inject(CourseService);
+  private readonly toolkitAccess = inject(ToolkitAccessService);
 
   // MoMo tạm khoá trên production (đang phát triển — "Sắp ra mắt")
   readonly momoDisabled = environment.production;
 
   ngOnInit() {
     this.profileStore.loadProfile();
+    // CR-004/CR-006 amendment — nạp "đã sở hữu" để pool chọn + số lượt khớp validate BE
+    // (loại khoá đã enroll, toolkit đã có; required = min(credit, pool còn lại)).
+    // Best-effort: lỗi mạng → pool đầy đủ như cũ, BE vẫn là chốt chặn cuối.
+    void this.courseService
+      .findMyEnrolled()
+      .then((courses) => this.store.setEnrolledCourseIds(courses.map((c) => Number(c.id))))
+      .catch(() => undefined);
+    void this.toolkitAccess
+      .ensureSelections()
+      .then(() => this.store.setOwnedToolkitIds([...this.toolkitAccess.allowedToolkitIds()]))
+      .catch(() => undefined);
 
     // Production: MoMo chưa mở → mặc định chuyển sang chuyển khoản ngân hàng.
     // Chỉ đặt phương thức, KHÔNG tạo giao dịch CK ở đây — vì lúc init còn đang ở
@@ -83,6 +107,68 @@ export default class BillingComponent implements OnInit {
   bankCreating = this.store.bankCreating;
   bankCreateError = this.store.bankCreateError;
   paymentBlockedMsg = this.store.paymentBlockedMsg;
+  // CR-004/CR-006 — message 400 validate từ BE (hiện nguyên văn để user sửa lựa chọn)
+  paymentErrorMsg = this.store.paymentErrorMsg;
+
+  // ── CR-004: chọn khoá tại checkout ──
+  requiredSelections = this.store.requiredCourseSelections;
+  selectedCourseCount = this.store.selectedCourseCount;
+  courseSelectionComplete = this.store.courseSelectionComplete;
+  isOrgPackage = this.store.isOrgPackage;
+
+  // ── CR-006: chọn Quick Scan / Toolkit tại checkout ──
+  requiredQuickScans = this.store.requiredQuickScanSelections;
+  requiredToolkits = this.store.requiredToolkitSelections;
+  selectedQuickScanCount = this.store.selectedQuickScanCount;
+  selectedToolkitCount = this.store.selectedToolkitCount;
+  quickScanSelectionComplete = this.store.quickScanSelectionComplete;
+  toolkitSelectionComplete = this.store.toolkitSelectionComplete;
+  /** Gate tổng cho nút thanh toán: đủ khoá + đủ Quick Scan + đủ Toolkit. */
+  selectionComplete = this.store.checkoutSelectionComplete;
+
+  /** Pool Quick Scan / Toolkit CÒN chọn được (đã loại mục user sở hữu — amendment 06/07). */
+  readonly quickScanPool = computed(() =>
+    this.store.pickableQuickScanIds().map((id) => ({ id, title: findToolkit(id)?.name ?? id })),
+  );
+  readonly toolkitPool = computed(() =>
+    this.store.pickableToolkitIds().map((id) => ({ id, title: findToolkit(id)?.name ?? id })),
+  );
+
+  isToolkitSelected(id: string): boolean {
+    return this.store.selectedToolkitIds().includes(id);
+  }
+
+  toggleToolkit(id: string) {
+    this.store.toggleToolkit(id);
+  }
+
+  /**
+   * Pool khoá CÒN chọn được của gói (đã kèm tên + thumbnail từ GET /packages/:id, theo thứ tự
+   * admin sắp; amendment 06/07 — loại khoá user đã enroll để khớp validate BE).
+   */
+  readonly packageCourses = computed(() => {
+    const pkg = this.store.selectedPackage();
+    if (!pkg?.courses) return [];
+    const pickable = new Set(this.store.pickableCourseIds());
+    return [...pkg.courses]
+      .sort((a, b) => a.orderIndex - b.orderIndex)
+      .map((pc) => ({
+        // wp_course_id là bigint — BE serialize thành string, phải ép số để courseIds gửi lên đúng kiểu
+        id: Number(pc.wpCourseId),
+        title: pc.course?.postTitle ?? `Khoá học #${pc.wpCourseId}`,
+        // Ảnh đại diện khoá (SDK 0.18.0) — null/undefined → card fallback icon sách
+        thumbnailUrl: pc.course?.thumbnailUrl ?? null,
+      }))
+      .filter((c) => pickable.has(c.id));
+  });
+
+  isCourseSelected(courseId: number): boolean {
+    return this.store.selectedCourseIds().includes(courseId);
+  }
+
+  toggleCourse(courseId: number) {
+    this.store.toggleCourse(courseId);
+  }
 
   readonly copiedField = signal<string | null>(null);
 
@@ -129,6 +215,8 @@ export default class BillingComponent implements OnInit {
   goToPayment() {
     // Booking đã xử lý xong (thanh toán/duyệt/từ chối) → không cho sang bước thanh toán
     if (this.bookingBlocked()) return;
+    // CR-004/CR-006 — bắt buộc chọn đủ khoá + Quick Scan + Toolkit (nút đã disable, đây là chốt chặn)
+    if (!this.selectionComplete()) return;
     this.store.setStep(2);
     // Tạo giao dịch CK khi sang bước thanh toán — lúc này coupon (nếu có) đã được
     // áp dụng ở bước Order, nên bankTransfer sẽ phản ánh đúng mức giảm.

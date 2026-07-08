@@ -38,7 +38,7 @@ export const toolkitAccessGuard: CanActivateFn = async (route, state) => {
     return false;
   }
 
-  // Đảm bảo profile (gói sở hữu) + catalog gói (flags) đã sẵn sàng trước khi check.
+  // Đảm bảo profile + catalog (CTA trang khoá) + quyền toolkit (CR-006) sẵn sàng trước khi check.
   if (!authStore.user()) {
     await authStore.loadCurrentUser();
   }
@@ -49,6 +49,9 @@ export const toolkitAccessGuard: CanActivateFn = async (route, state) => {
     window.location.href = `/auth/login?redirect=${encodeURIComponent(state.url)}`;
     return false;
   }
+
+  // CR-006 — quyền theo selections (chọn ở checkout / backfill), không còn theo flag gói
+  await access.ensureSelections();
 
   if (access.canAccess(id)) {
     return true;

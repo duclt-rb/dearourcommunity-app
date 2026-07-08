@@ -9,6 +9,7 @@ import {
   CourseSelection,
   CreditBalances,
   OrganizationMember,
+  OrgCourseSlot,
   Package,
   OrgMembership,
 } from '@dearourcommunity/client';
@@ -17,6 +18,16 @@ import {
 interface PoolCourse {
   courseId: number;
   title: string;
+}
+
+/**
+ * CR-004 — khoá gán được cho member. `remaining` = số suất reserved còn lại (org có slot
+ * từ checkout); null = org mua trước CR-004, không ràng buộc suất theo khoá.
+ */
+interface AssignableCourse {
+  courseId: number;
+  title: string;
+  remaining: number | null;
 }
 
 @Component({
@@ -48,6 +59,8 @@ export default class OrganizationComponent implements OnInit {
   orgCredits = signal<CreditBalances | null>(null);
   courseSelections = signal<CourseSelection[] | null>(null);
   coursePool = signal<PoolCourse[]>([]);
+  // CR-004 — suất khoá giữ chỗ từ checkout (rỗng = org mua trước CR-004, gán tự do)
+  courseSlots = signal<OrgCourseSlot[]>([]);
   assignMemberUserId = signal('');
   assignCourseId = signal('');
   assignLoading = signal(false);
@@ -98,6 +111,34 @@ export default class OrganizationComponent implements OnInit {
       this.assignCourseId() !== '',
   );
 
+  /**
+   * CR-004 — nguồn cho dropdown "Khoá học": org có suất giữ chỗ → chỉ các khoá còn suất
+   * `reserved` (kèm số suất); org cũ không slot → toàn bộ pool như trước.
+   */
+  assignableCourses = computed<AssignableCourse[]>(() => {
+    const slots = this.courseSlots();
+    const pool = this.coursePool();
+    if (!slots.length) {
+      return pool.map((c) => ({ ...c, remaining: null }));
+    }
+    const remainingByCourse = new Map<number, number>();
+    for (const slot of slots) {
+      if (slot.status !== 'reserved') continue;
+      const id = Number(slot.wpCourseId);
+      remainingByCourse.set(id, (remainingByCourse.get(id) ?? 0) + 1);
+    }
+    return [...remainingByCourse.entries()].map(([courseId, remaining]) => ({
+      courseId,
+      title: pool.find((c) => c.courseId === courseId)?.title ?? `Khóa học #${courseId}`,
+      remaining,
+    }));
+  });
+
+  /** Org có slot nhưng đã gán hết mọi suất (dropdown trống dù pool có khoá). */
+  allSlotsAssigned = computed(
+    () => this.courseSlots().length > 0 && this.assignableCourses().length === 0,
+  );
+
   async ngOnInit() {
     await this.loadData();
   }
@@ -144,14 +185,17 @@ export default class OrganizationComponent implements OnInit {
    * course.postTitle để hiển thị tên).
    */
   async loadCourseAssignmentData(orgId: string) {
-    const [credits, selections, pool] = await Promise.all([
+    const [credits, selections, pool, slots] = await Promise.all([
       this.orgService.getCredits(orgId),
       this.orgService.getCourseSelections(orgId),
       this.buildCoursePool(orgId),
+      // CR-004 — suất giữ chỗ; org cũ trả mảng rỗng → dropdown dùng pool đầy đủ như trước
+      this.orgService.getCourseSlots(orgId).catch(() => [] as OrgCourseSlot[]),
     ]);
     this.orgCredits.set(credits);
     this.courseSelections.set(selections);
     this.coursePool.set(pool);
+    this.courseSlots.set(slots);
   }
 
   private async buildCoursePool(orgId: string): Promise<PoolCourse[]> {
@@ -172,9 +216,11 @@ export default class OrganizationComponent implements OnInit {
     for (const pkg of packages) {
       if (!pkg || pkg.packageType !== 'organization') continue;
       for (const pc of pkg.courses) {
-        if (!pool.has(pc.wpCourseId)) {
-          pool.set(pc.wpCourseId, {
-            courseId: pc.wpCourseId,
+        // wp_course_id là bigint — BE serialize thành string, ép số để khớp với slot/selection
+        const courseId = Number(pc.wpCourseId);
+        if (!pool.has(courseId)) {
+          pool.set(courseId, {
+            courseId,
             title: pc.course?.postTitle ?? `Khóa học #${pc.wpCourseId}`,
           });
         }
