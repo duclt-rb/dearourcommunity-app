@@ -58,8 +58,13 @@
     <!-- Balances -->
     <div class="balance-grid">
       <div class="balance-card">
-        <span class="balance-label">Buổi mentoring 1-1</span>
+        <span class="balance-label">Buổi mentoring 1-1 (cá nhân)</span>
         <span class="balance-value">{{ ov.balances.mentoring_session }}</span>
+      </div>
+      <!-- CR-008: pool mentoring doanh nghiệp; balanceOf() fallback 0 phòng BE chưa deploy migration -->
+      <div class="balance-card">
+        <span class="balance-label">Buổi mentoring 1-1 (doanh nghiệp)</span>
+        <span class="balance-value">{{ balanceOf(ov.balances, 'mentoring_session_org') }}</span>
       </div>
       <div class="balance-card">
         <span class="balance-label">Suất chọn khoá</span>
@@ -127,7 +132,13 @@
               value="mentoring_session"
               [selected]="adjustCreditType() === 'mentoring_session'"
             >
-              Buổi mentoring 1-1
+              Buổi mentoring 1-1 (cá nhân)
+            </option>
+            <option
+              value="mentoring_session_org"
+              [selected]="adjustCreditType() === 'mentoring_session_org'"
+            >
+              Buổi mentoring 1-1 (doanh nghiệp)
             </option>
             <option value="course_selection" [selected]="adjustCreditType() === 'course_selection'">
               Suất chọn khoá

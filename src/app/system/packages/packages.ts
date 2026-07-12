@@ -95,6 +95,9 @@ export default class PackagesComponent {
       slots: pkg?.slots ?? 0,
       mentoringCredits:
         pkg?.credits?.find((c) => c.creditType === 'mentoring_session')?.amount ?? 0,
+      // CR-008 — pool mentoring doanh nghiệp (gói mentor-org*)
+      mentoringOrgCredits:
+        pkg?.credits?.find((c) => c.creditType === 'mentoring_session_org')?.amount ?? 0,
       courseSelectionCredits:
         pkg?.credits?.find((c) => c.creditType === 'course_selection')?.amount ?? 0,
       // CR-005 — credit Quick Scan / Toolkit, cấu hình như 2 loại trên (default 1 khi tick flag)
@@ -267,10 +270,15 @@ export default class PackagesComponent {
       // (BE bắt amount ≥ 1 nếu gửi; tắt loại credit = bỏ row khỏi mảng, không gửi amount 0).
       const credits: NonNullable<UpdatePackageDto['credits']> = [];
       const mentoring = Math.floor(Number(model.mentoringCredits) || 0);
+      const mentoringOrg = Math.floor(Number(model.mentoringOrgCredits) || 0);
       const courseSelection = Math.floor(Number(model.courseSelectionCredits) || 0);
       const quickScan = Math.floor(Number(model.quickScanCredits) || 0);
       const toolkit = Math.floor(Number(model.toolkitCredits) || 0);
       if (mentoring >= 1) credits.push({ creditType: 'mentoring_session', amount: mentoring });
+      // CR-008 — pool mentoring doanh nghiệp
+      if (mentoringOrg >= 1) {
+        credits.push({ creditType: 'mentoring_session_org', amount: mentoringOrg });
+      }
       if (courseSelection >= 1) {
         credits.push({ creditType: 'course_selection', amount: courseSelection });
       }

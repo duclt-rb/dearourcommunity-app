@@ -88,7 +88,10 @@ export default class SystemCreditsComponent {
   getCreditTypeLabel(value: CreditType): string {
     switch (value) {
       case 'mentoring_session':
-        return 'Buổi mentoring 1-1';
+        return 'Buổi mentoring 1-1 (cá nhân)';
+      // CR-008
+      case 'mentoring_session_org':
+        return 'Buổi mentoring 1-1 (doanh nghiệp)';
       case 'course_selection':
         return 'Suất chọn khoá';
       // CR-005

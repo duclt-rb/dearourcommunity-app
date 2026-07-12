@@ -190,13 +190,27 @@
               <div class="form-grid">
                 <div class="field">
                   <label for="pkg-mentoring-credits" class="field__label">
-                    Số buổi mentoring 1-1
+                    Số buổi mentoring 1-1 (cá nhân)
                   </label>
                   <input
                     id="pkg-mentoring-credits"
                     type="number"
                     pInputText
                     [formField]="packageForm.mentoringCredits"
+                    placeholder="0"
+                    class="w-full"
+                  />
+                </div>
+                <!-- CR-008: pool mentoring doanh nghiệp (gói mentor-org*) -->
+                <div class="field">
+                  <label for="pkg-mentoring-org-credits" class="field__label">
+                    Số buổi mentoring 1-1 (doanh nghiệp)
+                  </label>
+                  <input
+                    id="pkg-mentoring-org-credits"
+                    type="number"
+                    pInputText
+                    [formField]="packageForm.mentoringOrgCredits"
                     placeholder="0"
                     class="w-full"
                   />
