@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import type { MentorBooking } from '@dearourcommunity/client';
 import { CheckoutStore, type PaymentMethod } from '../checkout.store';
 import { findToolkit } from '../../toolkit/toolkit.data';
@@ -26,7 +26,6 @@ import {
 } from '@lucide/angular';
 import LogoComponent from '../../shared/logo/logo';
 import BookingSummaryComponent from '../booking-summary/booking-summary';
-import InvoiceRequestFormComponent from '../invoice-request-form/invoice-request-form';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -52,7 +51,6 @@ import { environment } from '../../../environments/environment';
     LucideZap,
     LogoComponent,
     BookingSummaryComponent,
-    InvoiceRequestFormComponent,
   ],
   templateUrl: './billing.html',
   styleUrl: './billing.css',
@@ -62,6 +60,7 @@ export default class BillingComponent implements OnInit {
   readonly profileStore = inject(ProfileStore);
   private readonly courseService = inject(CourseService);
   private readonly toolkitAccess = inject(ToolkitAccessService);
+  private readonly router = inject(Router);
 
   // MoMo tạm khoá trên production (đang phát triển — "Sắp ra mắt")
   readonly momoDisabled = environment.production;
@@ -125,14 +124,26 @@ export default class BillingComponent implements OnInit {
   toolkitSelectionComplete = this.store.toolkitSelectionComplete;
   /** Gate tổng cho nút thanh toán: đủ khoá + đủ Quick Scan + đủ Toolkit. */
   selectionComplete = this.store.checkoutSelectionComplete;
+  // UX 15/07 — gói có lượt nhưng user sở hữu hết pool → khối info thay vì ẩn section;
+  // hết lựa chọn thực → store đã chọn sẵn, UI khoá thao tác và ghi chú.
+  quickScanFullyOwned = this.store.quickScanPoolFullyOwned;
+  toolkitFullyOwned = this.store.toolkitPoolFullyOwned;
+  quickScanForced = this.store.quickScanForced;
+  toolkitForced = this.store.toolkitForced;
 
-  /** Pool Quick Scan / Toolkit CÒN chọn được (đã loại mục user sở hữu — amendment 06/07). */
-  readonly quickScanPool = computed(() =>
-    this.store.pickableQuickScanIds().map((id) => ({ id, title: findToolkit(id)?.name ?? id })),
-  );
-  readonly toolkitPool = computed(() =>
-    this.store.pickableToolkitIds().map((id) => ({ id, title: findToolkit(id)?.name ?? id })),
-  );
+  /** Pool Quick Scan / Toolkit ĐẦY ĐỦ của gói — mục đã sở hữu hiện disabled + badge (UX 15/07). */
+  readonly quickScanPool = computed(() => {
+    const owned = new Set(this.store.ownedToolkitIds());
+    return this.store
+      .poolQuickScanIds()
+      .map((id) => ({ id, title: findToolkit(id)?.name ?? id, owned: owned.has(id) }));
+  });
+  readonly toolkitPool = computed(() => {
+    const owned = new Set(this.store.ownedToolkitIds());
+    return this.store
+      .poolToolkitIds()
+      .map((id) => ({ id, title: findToolkit(id)?.name ?? id, owned: owned.has(id) }));
+  });
 
   isToolkitSelected(id: string): boolean {
     return this.store.selectedToolkitIds().includes(id);
@@ -252,9 +263,17 @@ export default class BillingComponent implements OnInit {
     this.store.prepareBankTransfer();
   }
 
-  confirmPayment() {
+  async confirmPayment() {
     if (this.paymentMethod() === 'bank') {
-      this.store.confirmBankTransfer();
+      await this.store.confirmBankTransfer();
+      const bank = this.bankTransfer();
+      // UX 15/07 — xác nhận thành công → sang trang riêng (thông báo 72h + chứng từ
+      // + form hoá đơn VAT); lỗi thì ở lại billing hiện message như cũ.
+      if (this.bankTransferSubmitted() && bank) {
+        void this.router.navigate(['/checkout/bank-confirmation'], {
+          queryParams: { orderId: bank.orderId },
+        });
+      }
     } else {
       this.store.confirmPayment();
     }

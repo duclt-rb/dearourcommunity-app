@@ -4,6 +4,7 @@ import { systemGuard } from './core/system.guard';
 import { checkoutGuard } from './checkout/checkout.guard';
 import { accountMatchGuard } from './checkout/account-match.guard';
 import { receiptGuard } from './checkout/receipt.guard';
+import { bankConfirmationGuard } from './checkout/bank-confirmation/bank-confirmation.guard';
 import { toolkitAccessGuard, toolkitCatalogRedirectGuard } from './toolkit/toolkit-access.guard';
 
 export const routes: Routes = [
@@ -125,6 +126,14 @@ export const routes: Routes = [
         path: 'wrong-account',
         title: 'Sai tài khoản',
         loadComponent: () => import('./checkout/wrong-account/wrong-account'),
+      },
+      {
+        // UX 15/07 — màn xác nhận sau "Tôi đã chuyển khoản" (thông báo 72h + chứng từ
+        // + form hoá đơn VAT) tách khỏi billing; vào bằng ?orderId=
+        path: 'bank-confirmation',
+        title: 'Xác nhận chuyển khoản',
+        canActivate: [bankConfirmationGuard],
+        loadComponent: () => import('./checkout/bank-confirmation/bank-confirmation'),
       },
       {
         path: 'receipt',

@@ -226,10 +226,10 @@
   }
 }
 
-/* CR-007 amendment 08/07 — khối yêu cầu xuất hoá đơn VAT trên receipt */
+/* CR-007 amendment 08/07 — khối yêu cầu xuất hoá đơn VAT trên receipt (16/07: nới 480→750px) */
 .receipt-invoice-request {
   width: 100%;
-  max-width: 480px;
+  max-width: 750px;
   text-align: left;
   border: 1px solid #dbdbdc;
   border-radius: 12px;

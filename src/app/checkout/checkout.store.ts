@@ -8,8 +8,18 @@ import type {
   ValidateCouponResponse,
 } from '@dearourcommunity/client';
 import { PaymentService } from '../core/services/payment.service';
+import { ToolkitAccessService } from '../toolkit/toolkit-access.service';
 
 export type PaymentMethod = 'momo' | 'bank';
+
+/**
+ * UX CR-006 amendment 15/07 — message thay cho 400 nguyên văn khi quyền sở hữu
+ * Quick Scan/Toolkit đổi giữa chừng (admin duyệt/backfill sau khi trang đã load)
+ * và app đã tự đồng bộ lại lựa chọn.
+ */
+const OWNED_RECONCILED_MSG =
+  'Quyền Quick Scan/Toolkit của bạn vừa được cập nhật — mục bạn đã sở hữu được bỏ khỏi lựa chọn. ' +
+  'Vui lòng kiểm tra lại lựa chọn và thử lại.';
 
 // CR-006 — id `esg-quick-scan-*` thuộc nhóm Quick Scan (credit quick_scan); còn lại là
 // toolkit chuyên đề (credit toolkit). Mirror quy ước BE (toolkits.service).
@@ -124,7 +134,6 @@ export const CheckoutStore = signalStore(
       selectedPackage,
       selectedCourseIds,
       selectedToolkitIds,
-      ownedToolkitIds,
       enrolledCourseIds,
     }) => ({
       // Coupon do server tính (changelog SDK 0.6.8): FE gửi giá gốc + couponCode, số tiền
@@ -151,29 +160,53 @@ export const CheckoutStore = signalStore(
         const enrolled = new Set(enrolledCourseIds());
         return poolIds.filter((id) => !enrolled.has(id));
       }),
-      // CR-006 amendment — pool Quick Scan/Toolkit còn chọn được (loại mục đã sở hữu)
-      pickableQuickScanIds: computed(() => {
-        const owned = new Set(ownedToolkitIds());
-        return Object.entries(selectedPackage()?.features ?? {})
+      // CR-006 — FULL pool Quick Scan/Toolkit theo flag `toolkit:*` của gói, KỂ CẢ mục đã
+      // sở hữu (UX 15/07: mục sở hữu hiện disabled + badge "Đã sở hữu" thay vì ẩn không lý do)
+      poolQuickScanIds: computed(() =>
+        Object.entries(selectedPackage()?.features ?? {})
           .filter(([key, value]) => value === true && key.startsWith('toolkit:'))
           .map(([key]) => key.slice('toolkit:'.length))
-          .filter((id) => isQuickScanId(id) && !owned.has(id));
-      }),
-      pickableToolkitIds: computed(() => {
-        const owned = new Set(ownedToolkitIds());
-        return Object.entries(selectedPackage()?.features ?? {})
+          .filter(isQuickScanId),
+      ),
+      poolToolkitIds: computed(() =>
+        Object.entries(selectedPackage()?.features ?? {})
           .filter(([key, value]) => value === true && key.startsWith('toolkit:'))
           .map(([key]) => key.slice('toolkit:'.length))
-          .filter((id) => !isQuickScanId(id) && !owned.has(id));
-      }),
+          .filter((id) => !isQuickScanId(id)),
+      ),
+      // Credit cấu hình theo nhóm — để phân biệt "gói không có lượt" vs "đã sở hữu hết pool"
+      configuredQuickScanCredit: computed(
+        () => selectedPackage()?.credits?.find((c) => c.creditType === 'quick_scan')?.amount ?? 0,
+      ),
+      configuredToolkitCredit: computed(
+        () => selectedPackage()?.credits?.find((c) => c.creditType === 'toolkit')?.amount ?? 0,
+      ),
       selectedQuickScanCount: computed(() => selectedToolkitIds().filter(isQuickScanId).length),
       selectedToolkitCount: computed(
         () => selectedToolkitIds().filter((id) => !isQuickScanId(id)).length,
       ),
     }),
   ),
+  withComputed(({ poolQuickScanIds, poolToolkitIds, ownedToolkitIds }) => ({
+    // CR-006 amendment — pool còn chọn được (loại mục đã sở hữu) — khớp tập pickable của BE
+    pickableQuickScanIds: computed(() => {
+      const owned = new Set(ownedToolkitIds());
+      return poolQuickScanIds().filter((id) => !owned.has(id));
+    }),
+    pickableToolkitIds: computed(() => {
+      const owned = new Set(ownedToolkitIds());
+      return poolToolkitIds().filter((id) => !owned.has(id));
+    }),
+  })),
   withComputed(
-    ({ selectedPackage, pickableCourseIds, pickableQuickScanIds, pickableToolkitIds }) => ({
+    ({
+      selectedPackage,
+      pickableCourseIds,
+      pickableQuickScanIds,
+      pickableToolkitIds,
+      configuredQuickScanCredit,
+      configuredToolkitCredit,
+    }) => ({
       // Số mục BẮT BUỘC chọn = min(credit cấu hình, pool còn chọn được) — khớp validate BE
       // (amendment 06/07: tránh khoá cứng khi user đã sở hữu hết pool / credit vượt pool)
       requiredCourseSelections: computed(() =>
@@ -183,16 +216,49 @@ export const CheckoutStore = signalStore(
         ),
       ),
       requiredQuickScanSelections: computed(() =>
-        Math.min(
-          selectedPackage()?.credits?.find((c) => c.creditType === 'quick_scan')?.amount ?? 0,
-          pickableQuickScanIds().length,
-        ),
+        Math.min(configuredQuickScanCredit(), pickableQuickScanIds().length),
       ),
       requiredToolkitSelections: computed(() =>
-        Math.min(
-          selectedPackage()?.credits?.find((c) => c.creditType === 'toolkit')?.amount ?? 0,
-          pickableToolkitIds().length,
-        ),
+        Math.min(configuredToolkitCredit(), pickableToolkitIds().length),
+      ),
+    }),
+  ),
+  withComputed(
+    ({
+      poolQuickScanIds,
+      poolToolkitIds,
+      pickableQuickScanIds,
+      pickableToolkitIds,
+      configuredQuickScanCredit,
+      configuredToolkitCredit,
+      requiredQuickScanSelections,
+      requiredToolkitSelections,
+    }) => ({
+      // UX 15/07 — gói CÓ lượt nhưng user đã sở hữu hết pool → required 0; UI hiện khối
+      // info "đã sở hữu toàn bộ" thay vì ẩn section không lý do.
+      quickScanPoolFullyOwned: computed(
+        () =>
+          configuredQuickScanCredit() > 0 &&
+          poolQuickScanIds().length > 0 &&
+          pickableQuickScanIds().length === 0,
+      ),
+      toolkitPoolFullyOwned: computed(
+        () =>
+          configuredToolkitCredit() > 0 &&
+          poolToolkitIds().length > 0 &&
+          pickableToolkitIds().length === 0,
+      ),
+      // UX 15/07 — không còn lựa chọn thực (số bài còn lại = số lượt) → chọn sẵn toàn bộ,
+      // UI khoá thao tác thay vì bắt user click cho đủ.
+      quickScanForced: computed(
+        () =>
+          requiredQuickScanSelections() > 0 &&
+          pickableQuickScanIds().length === requiredQuickScanSelections(),
+      ),
+      toolkitForced: computed(
+        () =>
+          requiredToolkitSelections() > 0 &&
+          pickableToolkitIds().length === requiredToolkitSelections(),
       ),
     }),
   ),
@@ -229,317 +295,380 @@ export const CheckoutStore = signalStore(
       ),
     }),
   ),
-  withMethods((store, paymentService = inject(PaymentService)) => ({
-    selectPackage(pkg: Package) {
-      patchState(store, {
-        selectedPackage: pkg,
-        originalPrice: Number(pkg.price),
-        couponApplied: false,
-        appliedCode: '',
-        couponError: false,
-        couponErrorMsg: '',
-        couponValidating: false,
-        couponInfo: null,
-        step: 1,
-        // CR-004/CR-006 — đổi gói → làm lại lựa chọn khoá + toolkit (pool/số lượt theo gói)
-        selectedCourseIds: [],
-        selectedToolkitIds: [],
-      });
-    },
-
-    // ── CR-004: chọn khoá tại checkout ─────────────────────────────────────────
-    /** Click chọn/bỏ chọn 1 khoá (mọi loại gói — mỗi khoá tối đa 1 lần, tối đa N khoá). */
-    toggleCourse(courseId: number) {
-      const ids = store.selectedCourseIds();
-      if (ids.includes(courseId)) {
-        patchState(store, { selectedCourseIds: ids.filter((id) => id !== courseId) });
-      } else if (ids.length < store.requiredCourseSelections()) {
-        patchState(store, { selectedCourseIds: [...ids, courseId] });
-      }
-    },
-
-    // ── CR-004/CR-006 amendment: nạp ngữ cảnh "đã sở hữu" để pool/số lượt khớp BE ──
-    /** Set khoá user đã enroll; đồng thời gỡ khỏi lựa chọn hiện tại nếu lỡ chọn trước đó. */
-    setEnrolledCourseIds(ids: number[]) {
-      const enrolled = new Set(ids);
-      patchState(store, {
-        enrolledCourseIds: ids,
-        selectedCourseIds: store.selectedCourseIds().filter((id) => !enrolled.has(id)),
-      });
-    },
-
-    /** Set toolkit user đã sở hữu; đồng thời gỡ khỏi lựa chọn hiện tại nếu lỡ chọn trước đó. */
-    setOwnedToolkitIds(ids: string[]) {
-      const owned = new Set(ids);
-      patchState(store, {
-        ownedToolkitIds: ids,
-        selectedToolkitIds: store.selectedToolkitIds().filter((id) => !owned.has(id)),
-      });
-    },
-
-    // ── CR-006: chọn Quick Scan / Toolkit tại checkout ──────────────────────────
-    /** Click chọn/bỏ chọn 1 mục — giới hạn theo credit của TỪNG nhóm (Quick Scan / Toolkit). */
-    toggleToolkit(toolkitId: string) {
-      const ids = store.selectedToolkitIds();
-      if (ids.includes(toolkitId)) {
-        patchState(store, { selectedToolkitIds: ids.filter((id) => id !== toolkitId) });
-        return;
-      }
-      const capacity = isQuickScanId(toolkitId)
-        ? store.requiredQuickScanSelections() - store.selectedQuickScanCount()
-        : store.requiredToolkitSelections() - store.selectedToolkitCount();
-      if (capacity > 0) {
-        patchState(store, { selectedToolkitIds: [...ids, toolkitId] });
-      }
-    },
-
-    setStep(step: number) {
-      // Quay lại bước Order → bỏ giao dịch CK đã tạo, vì coupon/số tiền có thể đổi
-      // và lần chọn "Bank Transfer" sau sẽ tạo lại giao dịch mới với số tiền đúng.
-      patchState(store, {
-        step,
-        paymentError: false,
-        bankTransferSubmitted: false,
-        ...(step === 1 ? { bankTransfer: null, bankCreating: false, bankCreateError: false } : {}),
-      });
-    },
-
-    selectPaymentMethod(method: PaymentMethod) {
-      patchState(store, { paymentMethod: method, paymentError: false });
-    },
-
-    /**
-     * CR-001 5.3b: giữ ref booking mentor từ query param `?bookingId=` (link trong mail).
-     * Luôn set theo query hiện tại — vào checkout không có bookingId thì xoá ref cũ
-     * để không gắn nhầm booking vào giao dịch khác.
-     */
-    setBookingRef(bookingId: string | null) {
-      // Đổi lượt checkout → xoá notice chặn thanh toán của booking trước (nếu có)
-      patchState(store, { bookingRef: bookingId, paymentBlockedMsg: null });
-    },
-
-    async applyCoupon(code: string) {
-      const cleanCode = code.trim().toUpperCase();
-      if (!cleanCode || store.couponValidating()) return;
-
-      const pkg = store.selectedPackage();
-      if (!pkg) {
-        patchState(store, {
-          couponApplied: false,
-          couponInfo: null,
-          couponError: true,
-          couponErrorMsg: '',
-        });
-        return;
-      }
-
-      patchState(store, { couponValidating: true, couponError: false, couponErrorMsg: '' });
-
-      try {
-        // SDK 0.10.0: validate coupon theo packageId (trước đây là course-based). Mọi gói đều
-        // validate trước được, kể cả org/mentor không gắn course. Gọi ngay khi bấm "Áp dụng"
-        // để báo lỗi / hiển thị mức giảm sớm. Số tiền thực thu vẫn do server chốt lại khi tạo
-        // thanh toán/chuyển khoản (FE luôn gửi giá gốc + couponCode); đây chỉ là bản xem trước.
-        const info = await paymentService.validateCoupon({
-          packageId: pkg.id as PackageId,
-          couponCode: cleanCode,
-        });
-        patchState(store, {
-          couponApplied: true,
-          appliedCode: cleanCode,
-          couponInfo: info,
-          couponValidating: false,
-          couponError: false,
-          couponErrorMsg: '',
-        });
-      } catch (err) {
-        console.error('Failed to validate coupon', err);
-        patchState(store, {
-          couponApplied: false,
-          appliedCode: '',
-          couponInfo: null,
-          couponValidating: false,
-          couponError: true,
-          // Hiển thị đúng thông báo từ server (vd "Mã giảm giá không tồn tại.")
-          couponErrorMsg: err instanceof ApiError ? err.message : '',
-        });
-      }
-    },
-
-    removeCoupon() {
-      patchState(store, {
-        couponApplied: false,
-        appliedCode: '',
-        couponError: false,
-        couponErrorMsg: '',
-        couponValidating: false,
-        couponInfo: null,
-      });
-    },
-
-    setPaymentParams(
-      resultCode: string | null,
-      orderId: string | null,
-      transId: string | null,
-      amount: number,
-    ) {
-      patchState(store, {
-        resultCode,
-        orderId,
-        transId,
-        amount,
-      });
-    },
-
-    async confirmPayment() {
-      const pkg = store.selectedPackage();
-      if (!pkg) {
-        patchState(store, { paymentError: true });
-        return;
-      }
-
-      patchState(store, { isLoading: true, paymentError: false, paymentErrorMsg: null });
-
-      try {
-        const response = await paymentService.createPayment({
-          packageId: pkg.id as PackageId,
-          // Luôn gửi giá gốc; server tự tính giảm theo couponCode (SDK 0.6.8).
-          amount: Number(store.originalPrice()),
-          couponCode: store.couponApplied() ? store.appliedCode() : undefined,
-          // CR-001 5.3b — booking mentor chờ thanh toán (nếu đến từ link mail)
-          bookingId: store.bookingRef() ?? undefined,
-          // CR-004 — khoá chọn tại checkout (gói có credit course_selection)
-          courseIds: store.requiredCourseSelections() > 0 ? store.selectedCourseIds() : undefined,
-          // CR-006 — Quick Scan/Toolkit chọn tại checkout
-          toolkitIds:
-            store.requiredQuickScanSelections() + store.requiredToolkitSelections() > 0
-              ? store.selectedToolkitIds()
-              : undefined,
-        });
-
-        if (response && response.payUrl) {
-          // Chuyển hướng người dùng sang trang thanh toán MoMo
-          window.location.href = response.payUrl;
-        } else {
-          throw new Error('No payUrl returned from server');
+  withMethods(
+    (
+      store,
+      paymentService = inject(PaymentService),
+      toolkitAccess = inject(ToolkitAccessService),
+    ) => {
+      /** UX 15/07 — không còn lựa chọn thực → chọn sẵn toàn bộ mục còn lại (UI khoá thao tác). */
+      const autoSelectForcedToolkits = () => {
+        const picks = new Set(store.selectedToolkitIds());
+        if (store.quickScanForced()) store.pickableQuickScanIds().forEach((id) => picks.add(id));
+        if (store.toolkitForced()) store.pickableToolkitIds().forEach((id) => picks.add(id));
+        if (picks.size !== store.selectedToolkitIds().length) {
+          patchState(store, { selectedToolkitIds: [...picks] });
         }
-      } catch (err) {
-        console.error('Failed to create MoMo payment', err);
-        // 400 từ guard booking (đã thanh toán / chờ duyệt / bị từ chối) → notice, không phải lỗi đỏ
-        const blockedMsg = toBookingBlockedMessage(err, !!store.bookingRef());
+      };
+
+      /**
+       * UX 15/07 — 400 validate có thể do quyền sở hữu đổi giữa chừng (admin duyệt/backfill
+       * sau khi trang đã load): refetch selections/me, gỡ mục đã sở hữu khỏi lựa chọn rồi
+       * chọn sẵn lại nếu hết lựa chọn thực. Trả true nếu lựa chọn/số lượt giảm (khi đó UI
+       * hiện message hành động được thay vì 400 nguyên văn của BE).
+       */
+      const reconcileOwnedToolkits = async (): Promise<boolean> => {
+        const beforeSelected = store.selectedToolkitIds();
+        const beforeRequired =
+          store.requiredQuickScanSelections() + store.requiredToolkitSelections();
+        toolkitAccess.invalidateSelections();
+        await toolkitAccess.ensureSelections(); // lỗi mạng đã nuốt bên trong → set rỗng
+        const owned = [...toolkitAccess.allowedToolkitIds()];
+        // Set rỗng trong khi store đang có dữ liệu nhiều khả năng là fetch lỗi (quyền đã cấp
+        // không bị thu hồi trong luồng thường) → giữ nguyên, BE vẫn là chốt chặn cuối.
+        if (owned.length === 0 && store.ownedToolkitIds().length > 0) return false;
+        const ownedSet = new Set(owned);
         patchState(store, {
-          isLoading: false,
-          paymentError: !blockedMsg,
-          paymentBlockedMsg: blockedMsg ?? store.paymentBlockedMsg(),
-          // CR-004/CR-006 — 400 validate (vd bộ chọn không khớp) hiện nguyên văn để user sửa
-          paymentErrorMsg: blockedMsg ? null : toApiErrorMessage(err),
+          ownedToolkitIds: owned,
+          selectedToolkitIds: beforeSelected.filter((id) => !ownedSet.has(id)),
         });
-      }
+        autoSelectForcedToolkits();
+        const afterRequired =
+          store.requiredQuickScanSelections() + store.requiredToolkitSelections();
+        return afterRequired < beforeRequired || beforeSelected.some((id) => ownedSet.has(id));
+      };
+
+      return {
+        selectPackage(pkg: Package) {
+          patchState(store, {
+            selectedPackage: pkg,
+            originalPrice: Number(pkg.price),
+            couponApplied: false,
+            appliedCode: '',
+            couponError: false,
+            couponErrorMsg: '',
+            couponValidating: false,
+            couponInfo: null,
+            step: 1,
+            // CR-004/CR-006 — đổi gói → làm lại lựa chọn khoá + toolkit (pool/số lượt theo gói)
+            selectedCourseIds: [],
+            selectedToolkitIds: [],
+          });
+          // UX 15/07 — pool mới không còn lựa chọn thực → chọn sẵn luôn
+          autoSelectForcedToolkits();
+        },
+
+        // ── CR-004: chọn khoá tại checkout ─────────────────────────────────────────
+        /** Click chọn/bỏ chọn 1 khoá (mọi loại gói — mỗi khoá tối đa 1 lần, tối đa N khoá). */
+        toggleCourse(courseId: number) {
+          const ids = store.selectedCourseIds();
+          if (ids.includes(courseId)) {
+            patchState(store, { selectedCourseIds: ids.filter((id) => id !== courseId) });
+          } else if (ids.length < store.requiredCourseSelections()) {
+            patchState(store, { selectedCourseIds: [...ids, courseId] });
+          }
+        },
+
+        // ── CR-004/CR-006 amendment: nạp ngữ cảnh "đã sở hữu" để pool/số lượt khớp BE ──
+        /** Set khoá user đã enroll; đồng thời gỡ khỏi lựa chọn hiện tại nếu lỡ chọn trước đó. */
+        setEnrolledCourseIds(ids: number[]) {
+          const enrolled = new Set(ids);
+          patchState(store, {
+            enrolledCourseIds: ids,
+            selectedCourseIds: store.selectedCourseIds().filter((id) => !enrolled.has(id)),
+          });
+        },
+
+        /** Set toolkit user đã sở hữu; đồng thời gỡ khỏi lựa chọn hiện tại nếu lỡ chọn trước đó. */
+        setOwnedToolkitIds(ids: string[]) {
+          const owned = new Set(ids);
+          patchState(store, {
+            ownedToolkitIds: ids,
+            selectedToolkitIds: store.selectedToolkitIds().filter((id) => !owned.has(id)),
+          });
+          // UX 15/07 — sau khi loại mục sở hữu, nếu hết lựa chọn thực → chọn sẵn phần còn lại
+          autoSelectForcedToolkits();
+        },
+
+        // ── CR-006: chọn Quick Scan / Toolkit tại checkout ──────────────────────────
+        /** Click chọn/bỏ chọn 1 mục — giới hạn theo credit của TỪNG nhóm (Quick Scan / Toolkit). */
+        toggleToolkit(toolkitId: string) {
+          const ids = store.selectedToolkitIds();
+          if (ids.includes(toolkitId)) {
+            patchState(store, { selectedToolkitIds: ids.filter((id) => id !== toolkitId) });
+            return;
+          }
+          const capacity = isQuickScanId(toolkitId)
+            ? store.requiredQuickScanSelections() - store.selectedQuickScanCount()
+            : store.requiredToolkitSelections() - store.selectedToolkitCount();
+          if (capacity > 0) {
+            patchState(store, { selectedToolkitIds: [...ids, toolkitId] });
+          }
+        },
+
+        setStep(step: number) {
+          // Quay lại bước Order → bỏ giao dịch CK đã tạo, vì coupon/số tiền có thể đổi
+          // và lần chọn "Bank Transfer" sau sẽ tạo lại giao dịch mới với số tiền đúng.
+          patchState(store, {
+            step,
+            paymentError: false,
+            bankTransferSubmitted: false,
+            ...(step === 1
+              ? { bankTransfer: null, bankCreating: false, bankCreateError: false }
+              : {}),
+          });
+        },
+
+        selectPaymentMethod(method: PaymentMethod) {
+          patchState(store, { paymentMethod: method, paymentError: false });
+        },
+
+        /**
+         * CR-001 5.3b: giữ ref booking mentor từ query param `?bookingId=` (link trong mail).
+         * Luôn set theo query hiện tại — vào checkout không có bookingId thì xoá ref cũ
+         * để không gắn nhầm booking vào giao dịch khác.
+         */
+        setBookingRef(bookingId: string | null) {
+          // Đổi lượt checkout → xoá notice chặn thanh toán của booking trước (nếu có)
+          patchState(store, { bookingRef: bookingId, paymentBlockedMsg: null });
+        },
+
+        async applyCoupon(code: string) {
+          const cleanCode = code.trim().toUpperCase();
+          if (!cleanCode || store.couponValidating()) return;
+
+          const pkg = store.selectedPackage();
+          if (!pkg) {
+            patchState(store, {
+              couponApplied: false,
+              couponInfo: null,
+              couponError: true,
+              couponErrorMsg: '',
+            });
+            return;
+          }
+
+          patchState(store, { couponValidating: true, couponError: false, couponErrorMsg: '' });
+
+          try {
+            // SDK 0.10.0: validate coupon theo packageId (trước đây là course-based). Mọi gói đều
+            // validate trước được, kể cả org/mentor không gắn course. Gọi ngay khi bấm "Áp dụng"
+            // để báo lỗi / hiển thị mức giảm sớm. Số tiền thực thu vẫn do server chốt lại khi tạo
+            // thanh toán/chuyển khoản (FE luôn gửi giá gốc + couponCode); đây chỉ là bản xem trước.
+            const info = await paymentService.validateCoupon({
+              packageId: pkg.id as PackageId,
+              couponCode: cleanCode,
+            });
+            patchState(store, {
+              couponApplied: true,
+              appliedCode: cleanCode,
+              couponInfo: info,
+              couponValidating: false,
+              couponError: false,
+              couponErrorMsg: '',
+            });
+          } catch (err) {
+            console.error('Failed to validate coupon', err);
+            patchState(store, {
+              couponApplied: false,
+              appliedCode: '',
+              couponInfo: null,
+              couponValidating: false,
+              couponError: true,
+              // Hiển thị đúng thông báo từ server (vd "Mã giảm giá không tồn tại.")
+              couponErrorMsg: err instanceof ApiError ? err.message : '',
+            });
+          }
+        },
+
+        removeCoupon() {
+          patchState(store, {
+            couponApplied: false,
+            appliedCode: '',
+            couponError: false,
+            couponErrorMsg: '',
+            couponValidating: false,
+            couponInfo: null,
+          });
+        },
+
+        setPaymentParams(
+          resultCode: string | null,
+          orderId: string | null,
+          transId: string | null,
+          amount: number,
+        ) {
+          patchState(store, {
+            resultCode,
+            orderId,
+            transId,
+            amount,
+          });
+        },
+
+        async confirmPayment() {
+          const pkg = store.selectedPackage();
+          if (!pkg) {
+            patchState(store, { paymentError: true });
+            return;
+          }
+
+          patchState(store, { isLoading: true, paymentError: false, paymentErrorMsg: null });
+
+          try {
+            const response = await paymentService.createPayment({
+              packageId: pkg.id as PackageId,
+              // Luôn gửi giá gốc; server tự tính giảm theo couponCode (SDK 0.6.8).
+              amount: Number(store.originalPrice()),
+              couponCode: store.couponApplied() ? store.appliedCode() : undefined,
+              // CR-001 5.3b — booking mentor chờ thanh toán (nếu đến từ link mail)
+              bookingId: store.bookingRef() ?? undefined,
+              // CR-004 — khoá chọn tại checkout (gói có credit course_selection)
+              courseIds:
+                store.requiredCourseSelections() > 0 ? store.selectedCourseIds() : undefined,
+              // CR-006 — Quick Scan/Toolkit chọn tại checkout
+              toolkitIds:
+                store.requiredQuickScanSelections() + store.requiredToolkitSelections() > 0
+                  ? store.selectedToolkitIds()
+                  : undefined,
+            });
+
+            if (response && response.payUrl) {
+              // Chuyển hướng người dùng sang trang thanh toán MoMo
+              window.location.href = response.payUrl;
+            } else {
+              throw new Error('No payUrl returned from server');
+            }
+          } catch (err) {
+            console.error('Failed to create MoMo payment', err);
+            // 400 từ guard booking (đã thanh toán / chờ duyệt / bị từ chối) → notice, không phải lỗi đỏ
+            const blockedMsg = toBookingBlockedMessage(err, !!store.bookingRef());
+            // CR-004/CR-006 — 400 validate (vd bộ chọn không khớp) hiện nguyên văn để user sửa;
+            // UX 15/07: nếu do quyền sở hữu vừa đổi thì tự đồng bộ lại và hiện message hành động được
+            let errorMsg = blockedMsg ? null : toApiErrorMessage(err);
+            if (errorMsg && (await reconcileOwnedToolkits())) errorMsg = OWNED_RECONCILED_MSG;
+            patchState(store, {
+              isLoading: false,
+              paymentError: !blockedMsg,
+              paymentBlockedMsg: blockedMsg ?? store.paymentBlockedMsg(),
+              paymentErrorMsg: errorMsg,
+            });
+          }
+        },
+
+        /**
+         * Lấy thông tin chuyển khoản (POST /bank/create) — tài khoản nhận, qrUrl và
+         * nội dung chuyển khoản (= orderId). SDK 0.7.0: bước này KHÔNG còn ghi DB
+         * (không tạo record `pending`); giao dịch chỉ được tạo ở bank/confirm.
+         * Idempotent: chỉ gọi 1 lần cho mỗi lượt checkout.
+         * Gọi khi người dùng chọn phương thức "Bank Transfer".
+         */
+        async prepareBankTransfer() {
+          const pkg = store.selectedPackage();
+          if (!pkg) {
+            patchState(store, { bankCreateError: true });
+            return;
+          }
+          // Đã có giao dịch hoặc đang tạo → không tạo trùng
+          if (store.bankTransfer() || store.bankCreating()) return;
+
+          patchState(store, { bankCreating: true, bankCreateError: false, paymentErrorMsg: null });
+
+          try {
+            const response = await paymentService.createBankTransfer({
+              packageId: pkg.id as PackageId,
+              // Luôn gửi giá gốc; server tự tính giảm theo couponCode (SDK 0.6.8).
+              amount: Number(store.originalPrice()),
+              couponCode: store.couponApplied() ? store.appliedCode() : undefined,
+              // CR-004/CR-006 — validate sớm bộ khoá + toolkit đã chọn ngay từ bước lấy QR
+              courseIds:
+                store.requiredCourseSelections() > 0 ? store.selectedCourseIds() : undefined,
+              toolkitIds:
+                store.requiredQuickScanSelections() + store.requiredToolkitSelections() > 0
+                  ? store.selectedToolkitIds()
+                  : undefined,
+            });
+
+            patchState(store, { bankTransfer: response, bankCreating: false });
+          } catch (err) {
+            // BE có thể trả 400 nếu số tiền không khớp giá gói / coupon không hợp lệ.
+            console.error('Failed to create bank transfer', err);
+            // 400 từ guard booking → notice chặn thanh toán, KHÔNG hiện khối "Thử lại"
+            const blockedMsg = toBookingBlockedMessage(err, !!store.bookingRef());
+            // CR-004/CR-006 — 400 validate hiện nguyên văn để user sửa lựa chọn;
+            // UX 15/07: nếu do quyền sở hữu vừa đổi thì tự đồng bộ lại và hiện message hành động được
+            let errorMsg = blockedMsg ? null : toApiErrorMessage(err);
+            if (errorMsg && (await reconcileOwnedToolkits())) errorMsg = OWNED_RECONCILED_MSG;
+            patchState(store, {
+              bankCreating: false,
+              bankCreateError: !blockedMsg,
+              paymentBlockedMsg: blockedMsg ?? store.paymentBlockedMsg(),
+              paymentErrorMsg: errorMsg,
+            });
+          }
+        },
+
+        /**
+         * Xác nhận đã chuyển khoản ngân hàng (POST /bank/confirm).
+         * SDK 0.7.0: đây là bước TẠO giao dịch (status `awaiting_confirmation`) — không
+         * còn record `pending` rác từ bank/create. Người dùng tự chuyển khoản theo
+         * thông tin/QR hiển thị, sau đó bấm nút này → giao dịch vào hàng đợi chờ admin
+         * đối soát/duyệt thủ công.
+         */
+        async confirmBankTransfer() {
+          const bankTransfer = store.bankTransfer();
+          const pkg = store.selectedPackage();
+          if (!bankTransfer || !pkg) {
+            // Chưa tạo được giao dịch → thử tạo lại
+            patchState(store, { paymentError: true });
+            return;
+          }
+
+          patchState(store, { isLoading: true, paymentError: false, paymentErrorMsg: null });
+
+          try {
+            // SDK 0.7.0: bank/confirm mới là bước TẠO giao dịch (status awaiting_confirmation),
+            // nên ConfirmBankTransferDto kế thừa CreateBankTransferDto — phải gửi đầy đủ
+            // packageId + giá gốc + couponCode (cùng dữ liệu đã dùng ở createBankTransfer).
+            const response = await paymentService.confirmBankTransfer({
+              orderId: bankTransfer.orderId,
+              packageId: pkg.id as PackageId,
+              amount: Number(store.originalPrice()),
+              couponCode: store.couponApplied() ? store.appliedCode() : undefined,
+              // CR-001 5.3b — booking mentor chờ thanh toán (nếu đến từ link mail)
+              bookingId: store.bookingRef() ?? undefined,
+              // CR-004/CR-006 — bước này persist bộ khoá + toolkit vào giao dịch (nguồn chân lý fulfillment)
+              courseIds:
+                store.requiredCourseSelections() > 0 ? store.selectedCourseIds() : undefined,
+              toolkitIds:
+                store.requiredQuickScanSelections() + store.requiredToolkitSelections() > 0
+                  ? store.selectedToolkitIds()
+                  : undefined,
+            });
+
+            if (response.status === 'awaiting_confirmation' || response.status === 'success') {
+              patchState(store, { isLoading: false, bankTransferSubmitted: true });
+            } else {
+              throw new Error(`Unexpected bank transfer status: ${response.status}`);
+            }
+          } catch (err) {
+            console.error('Failed to confirm bank transfer', err);
+            // 400 từ guard booking (orderId MỚI cho booking đã có giao dịch) → notice;
+            // confirm lại CÙNG orderId vẫn idempotent thành công phía BE nên không vào đây.
+            const blockedMsg = toBookingBlockedMessage(err, !!store.bookingRef());
+            // CR-004/CR-006 — 400 validate (vd bộ chọn không khớp) hiện nguyên văn để user sửa;
+            // UX 15/07: nếu do quyền sở hữu vừa đổi thì tự đồng bộ lại và hiện message hành động được
+            let errorMsg = blockedMsg ? null : toApiErrorMessage(err);
+            if (errorMsg && (await reconcileOwnedToolkits())) errorMsg = OWNED_RECONCILED_MSG;
+            patchState(store, {
+              isLoading: false,
+              paymentError: !blockedMsg,
+              paymentBlockedMsg: blockedMsg ?? store.paymentBlockedMsg(),
+              paymentErrorMsg: errorMsg,
+            });
+          }
+        },
+      };
     },
-
-    /**
-     * Lấy thông tin chuyển khoản (POST /bank/create) — tài khoản nhận, qrUrl và
-     * nội dung chuyển khoản (= orderId). SDK 0.7.0: bước này KHÔNG còn ghi DB
-     * (không tạo record `pending`); giao dịch chỉ được tạo ở bank/confirm.
-     * Idempotent: chỉ gọi 1 lần cho mỗi lượt checkout.
-     * Gọi khi người dùng chọn phương thức "Bank Transfer".
-     */
-    async prepareBankTransfer() {
-      const pkg = store.selectedPackage();
-      if (!pkg) {
-        patchState(store, { bankCreateError: true });
-        return;
-      }
-      // Đã có giao dịch hoặc đang tạo → không tạo trùng
-      if (store.bankTransfer() || store.bankCreating()) return;
-
-      patchState(store, { bankCreating: true, bankCreateError: false, paymentErrorMsg: null });
-
-      try {
-        const response = await paymentService.createBankTransfer({
-          packageId: pkg.id as PackageId,
-          // Luôn gửi giá gốc; server tự tính giảm theo couponCode (SDK 0.6.8).
-          amount: Number(store.originalPrice()),
-          couponCode: store.couponApplied() ? store.appliedCode() : undefined,
-          // CR-004/CR-006 — validate sớm bộ khoá + toolkit đã chọn ngay từ bước lấy QR
-          courseIds: store.requiredCourseSelections() > 0 ? store.selectedCourseIds() : undefined,
-          toolkitIds:
-            store.requiredQuickScanSelections() + store.requiredToolkitSelections() > 0
-              ? store.selectedToolkitIds()
-              : undefined,
-        });
-
-        patchState(store, { bankTransfer: response, bankCreating: false });
-      } catch (err) {
-        // BE có thể trả 400 nếu số tiền không khớp giá gói / coupon không hợp lệ.
-        console.error('Failed to create bank transfer', err);
-        // 400 từ guard booking → notice chặn thanh toán, KHÔNG hiện khối "Thử lại"
-        const blockedMsg = toBookingBlockedMessage(err, !!store.bookingRef());
-        patchState(store, {
-          bankCreating: false,
-          bankCreateError: !blockedMsg,
-          paymentBlockedMsg: blockedMsg ?? store.paymentBlockedMsg(),
-          // CR-004/CR-006 — 400 validate hiện nguyên văn để user sửa lựa chọn
-          paymentErrorMsg: blockedMsg ? null : toApiErrorMessage(err),
-        });
-      }
-    },
-
-    /**
-     * Xác nhận đã chuyển khoản ngân hàng (POST /bank/confirm).
-     * SDK 0.7.0: đây là bước TẠO giao dịch (status `awaiting_confirmation`) — không
-     * còn record `pending` rác từ bank/create. Người dùng tự chuyển khoản theo
-     * thông tin/QR hiển thị, sau đó bấm nút này → giao dịch vào hàng đợi chờ admin
-     * đối soát/duyệt thủ công.
-     */
-    async confirmBankTransfer() {
-      const bankTransfer = store.bankTransfer();
-      const pkg = store.selectedPackage();
-      if (!bankTransfer || !pkg) {
-        // Chưa tạo được giao dịch → thử tạo lại
-        patchState(store, { paymentError: true });
-        return;
-      }
-
-      patchState(store, { isLoading: true, paymentError: false, paymentErrorMsg: null });
-
-      try {
-        // SDK 0.7.0: bank/confirm mới là bước TẠO giao dịch (status awaiting_confirmation),
-        // nên ConfirmBankTransferDto kế thừa CreateBankTransferDto — phải gửi đầy đủ
-        // packageId + giá gốc + couponCode (cùng dữ liệu đã dùng ở createBankTransfer).
-        const response = await paymentService.confirmBankTransfer({
-          orderId: bankTransfer.orderId,
-          packageId: pkg.id as PackageId,
-          amount: Number(store.originalPrice()),
-          couponCode: store.couponApplied() ? store.appliedCode() : undefined,
-          // CR-001 5.3b — booking mentor chờ thanh toán (nếu đến từ link mail)
-          bookingId: store.bookingRef() ?? undefined,
-          // CR-004/CR-006 — bước này persist bộ khoá + toolkit vào giao dịch (nguồn chân lý fulfillment)
-          courseIds: store.requiredCourseSelections() > 0 ? store.selectedCourseIds() : undefined,
-          toolkitIds:
-            store.requiredQuickScanSelections() + store.requiredToolkitSelections() > 0
-              ? store.selectedToolkitIds()
-              : undefined,
-        });
-
-        if (response.status === 'awaiting_confirmation' || response.status === 'success') {
-          patchState(store, { isLoading: false, bankTransferSubmitted: true });
-        } else {
-          throw new Error(`Unexpected bank transfer status: ${response.status}`);
-        }
-      } catch (err) {
-        console.error('Failed to confirm bank transfer', err);
-        // 400 từ guard booking (orderId MỚI cho booking đã có giao dịch) → notice;
-        // confirm lại CÙNG orderId vẫn idempotent thành công phía BE nên không vào đây.
-        const blockedMsg = toBookingBlockedMessage(err, !!store.bookingRef());
-        patchState(store, {
-          isLoading: false,
-          paymentError: !blockedMsg,
-          paymentBlockedMsg: blockedMsg ?? store.paymentBlockedMsg(),
-          // CR-004/CR-006 — 400 validate (vd bộ chọn không khớp) hiện nguyên văn để user sửa
-          paymentErrorMsg: blockedMsg ? null : toApiErrorMessage(err),
-        });
-      }
-    },
-  })),
+  ),
 );

@@ -45,7 +45,13 @@ export class ToolkitAccessService {
    * CR-006 — fetch quyền toolkit của user hiện tại; đổi user (login lại) → fetch lại.
    * Lỗi mạng → set rỗng (fail-closed) và thử lại ở lần gọi sau.
    */
-  ensureSelections(): Promise<void> {
+  async ensureSelections(): Promise<void> {
+    // UX 15/07 — checkout vào thẳng bằng token đã lưu (không qua toolkitAccessGuard) nên
+    // AuthStore có thể chưa load user; tự load trước (no-op nếu không có token) để không
+    // âm thầm coi user là anonymous → pool sở hữu/badge "Đã sở hữu" sai.
+    if (!this.authStore.user()) {
+      await this.authStore.loadCurrentUser();
+    }
     const userId = this.authStore.user()?.id ?? null;
     if (!userId) {
       this.selections.set(new Set());

@@ -1,0 +1,44 @@
+<section class="page-section">
+  <div class="page-inner">
+    <app-logo style="margin-bottom: 24px"></app-logo>
+
+    <div class="result-icon success">
+      <svg
+        lucideCircleCheck
+        [size]="40"
+        strokeWidth="2"
+        style="color: var(--color-accent-green)"
+      ></svg>
+    </div>
+
+    <h1 class="result-title">DOC đã nhận thông tin của bạn</h1>
+
+    <p class="result-desc">
+      Cảm ơn bạn! DOC đã nhận thông tin phản hồi của bạn về việc đã thanh toán. Chúng tôi sẽ kiểm
+      tra tính hợp lệ của giao dịch và xác nhận qua email của bạn trong vòng 72 giờ. Sau khi xác
+      nhận thành công, dịch vụ sẽ được kích hoạt tự động và bạn có thể truy cập ngay tại trang cá
+      nhân.
+    </p>
+    <p class="result-desc">
+      Vui lòng gửi chứng từ thanh toán (ảnh chụp màn hình / biên lai chuyển khoản) qua email
+      <a class="result-email" href="mailto:hello@dearourcommunity.com"
+        >hello&#64;dearourcommunity.com</a
+      >
+      để được xác nhận hoàn tất việc thanh toán.
+    </p>
+
+    <span class="order-id-chip">Mã đơn hàng: {{ orderId }}</span>
+
+    <!-- CR-007 amendment 08/07 — yêu cầu xuất hoá đơn VAT sau khi xác nhận chuyển khoản -->
+    <div class="confirmation-invoice-request">
+      <app-invoice-request-form [orderId]="orderId" />
+    </div>
+
+    <div class="action-row">
+      <a routerLink="/profile/dashboard" class="btn btn-primary">
+        Về trang cá nhân
+        <svg lucideArrowRight [size]="20" strokeWidth="2"></svg>
+      </a>
+    </div>
+  </div>
+</section>

@@ -160,85 +160,145 @@
               </div>
             }
 
-            <!-- CR-006: gói có lượt Quick Scan → BẮT BUỘC chọn đúng N bài từ pool của gói -->
-            @if (requiredQuickScans() > 0 && !store.bookingRef()) {
+            <!-- CR-006: gói có lượt Quick Scan → BẮT BUỘC chọn đúng N bài từ pool của gói.
+                 UX 15/07 — mục đã sở hữu hiện disabled + badge; sở hữu hết pool → khối info;
+                 hết lựa chọn thực → store chọn sẵn, card khoá thao tác. -->
+            @if ((requiredQuickScans() > 0 || quickScanFullyOwned()) && !store.bookingRef()) {
               <div class="dashed-divider"></div>
               <div style="display: flex; flex-direction: column; gap: 8px">
                 <span class="section-label">
                   Chọn Quick Scan
-                  <span
-                    class="course-select-counter"
-                    [class.complete]="quickScanSelectionComplete()"
-                  >
-                    {{ selectedQuickScanCount() }}/{{ requiredQuickScans() }}
-                  </span>
+                  @if (requiredQuickScans() > 0) {
+                    <span
+                      class="course-select-counter"
+                      [class.complete]="quickScanSelectionComplete()"
+                    >
+                      {{ selectedQuickScanCount() }}/{{ requiredQuickScans() }}
+                    </span>
+                  }
                 </span>
-                <p class="course-select-hint">
-                  Gói của bạn gồm {{ requiredQuickScans() }} bài đánh giá nhanh ESG tự chọn — sau
-                  khi thanh toán được xác nhận, bạn dùng được ngay các bài đã chọn.
-                </p>
+                @if (quickScanFullyOwned()) {
+                  <div class="pool-owned-note">
+                    <svg lucideCircleCheck [size]="18" strokeWidth="2"></svg>
+                    <span>
+                      Bạn đã sở hữu toàn bộ bài Quick Scan trong gói này nên không cần chọn thêm —
+                      lượt Quick Scan của gói vẫn được cộng vào tài khoản của bạn.
+                    </span>
+                  </div>
+                } @else {
+                  <p class="course-select-hint">
+                    Gói của bạn gồm {{ requiredQuickScans() }} bài đánh giá nhanh ESG tự chọn — sau
+                    khi thanh toán được xác nhận, bạn dùng được ngay các bài đã chọn.
+                    @if (quickScanForced()) {
+                      Không còn lựa chọn khác nên các bài còn lại đã được chọn sẵn cho bạn.
+                    }
+                  </p>
+                }
                 <div class="course-select-grid">
                   @for (item of quickScanPool(); track item.id) {
                     <button
                       type="button"
                       class="course-card-mini"
                       [class.selected]="isToolkitSelected(item.id)"
-                      [disabled]="!isToolkitSelected(item.id) && quickScanSelectionComplete()"
+                      [class.owned]="item.owned"
+                      [disabled]="
+                        item.owned ||
+                        quickScanForced() ||
+                        (!isToolkitSelected(item.id) && quickScanSelectionComplete())
+                      "
                       (click)="toggleToolkit(item.id)"
                     >
                       <span class="course-card-mini__thumb tone-1">
                         <svg lucideZap [size]="18" strokeWidth="2"></svg>
                       </span>
                       <span class="course-card-mini__title">{{ item.title }}</span>
-                      <span
-                        class="course-card-mini__check"
-                        [class.checked]="isToolkitSelected(item.id)"
-                      >
-                        @if (isToolkitSelected(item.id)) {
-                          <svg lucideCheck [size]="12" strokeWidth="3"></svg>
-                        }
-                      </span>
+                      @if (item.owned) {
+                        <span class="course-card-mini__owned-badge">
+                          <svg lucideCircleCheck [size]="12" strokeWidth="2.5"></svg>
+                          Đã sở hữu
+                        </span>
+                      } @else {
+                        <span
+                          class="course-card-mini__check"
+                          [class.checked]="isToolkitSelected(item.id)"
+                        >
+                          @if (isToolkitSelected(item.id)) {
+                            <svg lucideCheck [size]="12" strokeWidth="3"></svg>
+                          }
+                        </span>
+                      }
                     </button>
                   }
                 </div>
               </div>
             }
 
-            <!-- CR-006: gói có lượt Toolkit chuyên đề → BẮT BUỘC chọn đúng N bộ từ pool của gói -->
-            @if (requiredToolkits() > 0 && !store.bookingRef()) {
+            <!-- CR-006: gói có lượt Toolkit chuyên đề → BẮT BUỘC chọn đúng N bộ từ pool của gói.
+                 UX 15/07 — cùng quy tắc hiển thị với Quick Scan ở trên. -->
+            @if ((requiredToolkits() > 0 || toolkitFullyOwned()) && !store.bookingRef()) {
               <div class="dashed-divider"></div>
               <div style="display: flex; flex-direction: column; gap: 8px">
                 <span class="section-label">
                   Chọn Toolkit
-                  <span class="course-select-counter" [class.complete]="toolkitSelectionComplete()">
-                    {{ selectedToolkitCount() }}/{{ requiredToolkits() }}
-                  </span>
+                  @if (requiredToolkits() > 0) {
+                    <span
+                      class="course-select-counter"
+                      [class.complete]="toolkitSelectionComplete()"
+                    >
+                      {{ selectedToolkitCount() }}/{{ requiredToolkits() }}
+                    </span>
+                  }
                 </span>
-                <p class="course-select-hint">
-                  Gói của bạn gồm {{ requiredToolkits() }} bộ công cụ ESG tự chọn — sau khi thanh
-                  toán được xác nhận, bạn dùng được ngay các bộ đã chọn.
-                </p>
+                @if (toolkitFullyOwned()) {
+                  <div class="pool-owned-note">
+                    <svg lucideCircleCheck [size]="18" strokeWidth="2"></svg>
+                    <span>
+                      Bạn đã sở hữu toàn bộ bộ công cụ trong gói này nên không cần chọn thêm — lượt
+                      Toolkit của gói vẫn được cộng vào tài khoản của bạn.
+                    </span>
+                  </div>
+                } @else {
+                  <p class="course-select-hint">
+                    Gói của bạn gồm {{ requiredToolkits() }} bộ công cụ ESG tự chọn — sau khi thanh
+                    toán được xác nhận, bạn dùng được ngay các bộ đã chọn.
+                    @if (toolkitForced()) {
+                      Không còn lựa chọn khác nên các bộ còn lại đã được chọn sẵn cho bạn.
+                    }
+                  </p>
+                }
                 <div class="course-select-grid">
                   @for (item of toolkitPool(); track item.id) {
                     <button
                       type="button"
                       class="course-card-mini"
                       [class.selected]="isToolkitSelected(item.id)"
-                      [disabled]="!isToolkitSelected(item.id) && toolkitSelectionComplete()"
+                      [class.owned]="item.owned"
+                      [disabled]="
+                        item.owned ||
+                        toolkitForced() ||
+                        (!isToolkitSelected(item.id) && toolkitSelectionComplete())
+                      "
                       (click)="toggleToolkit(item.id)"
                     >
                       <span class="course-card-mini__thumb tone-2">
                         <svg lucideWrench [size]="18" strokeWidth="2"></svg>
                       </span>
                       <span class="course-card-mini__title">{{ item.title }}</span>
-                      <span
-                        class="course-card-mini__check"
-                        [class.checked]="isToolkitSelected(item.id)"
-                      >
-                        @if (isToolkitSelected(item.id)) {
-                          <svg lucideCheck [size]="12" strokeWidth="3"></svg>
-                        }
-                      </span>
+                      @if (item.owned) {
+                        <span class="course-card-mini__owned-badge">
+                          <svg lucideCircleCheck [size]="12" strokeWidth="2.5"></svg>
+                          Đã sở hữu
+                        </span>
+                      } @else {
+                        <span
+                          class="course-card-mini__check"
+                          [class.checked]="isToolkitSelected(item.id)"
+                        >
+                          @if (isToolkitSelected(item.id)) {
+                            <svg lucideCheck [size]="12" strokeWidth="3"></svg>
+                          }
+                        </span>
+                      }
                     </button>
                   }
                 </div>
@@ -448,24 +508,20 @@
             @if (paymentMethod() === 'bank' && !bookingBlocked() && !paymentBlockedMsg()) {
               <div class="bank-panel">
                 @if (bankTransferSubmitted()) {
-                  <div class="bank-submitted">
-                    <div class="bank-submitted-icon">
-                      <svg lucideCircleCheck [size]="40" strokeWidth="1.5"></svg>
-                    </div>
-                    <h3 class="bank-submitted-title">DOC đã nhận thông tin của bạn</h3>
-                    <p class="bank-submitted-desc">
-                      Cảm ơn bạn! DOC đã nhận thông tin phản hồi của bạn về việc đã thanh toán.
-                      Chúng tôi sẽ kiểm tra tính hợp lệ của giao dịch và xác nhận qua email của bạn
-                      trong vòng 72 giờ. Sau khi xác nhận thành công, dịch vụ sẽ được kích hoạt tự
-                      động và bạn có thể truy cập ngay tại trang cá nhân.
-                    </p>
+                  <!-- UX 15/07 — màn xác nhận (thông báo 72h + chứng từ + form hoá đơn) đã tách
+                       sang /checkout/bank-confirmation; nhánh này chỉ còn cho back-nav -->
+                  <div class="booking-notice booking-notice--success">
+                    <svg lucideCircleCheck [size]="20" strokeWidth="2"></svg>
+                    <span>
+                      Bạn đã xác nhận chuyển khoản cho đơn này —
+                      <a
+                        class="bank-submitted-link"
+                        [routerLink]="['/checkout/bank-confirmation']"
+                        [queryParams]="{ orderId: bankTransfer()?.orderId }"
+                        >xem hướng dẫn tiếp theo &amp; yêu cầu hoá đơn</a
+                      >.
+                    </span>
                   </div>
-                  <!-- CR-007 amendment 08/07 — yêu cầu xuất hoá đơn VAT SAU khi xác nhận chuyển khoản -->
-                  @if (bankTransfer(); as bank) {
-                    <div class="bank-invoice-request">
-                      <app-invoice-request-form [orderId]="bank.orderId" />
-                    </div>
-                  }
                 } @else if (bankCreating()) {
                   <div class="bank-loading">
                     <div class="spinner-sm"></div>

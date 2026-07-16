@@ -696,30 +696,12 @@
   letter-spacing: 0.14px;
   margin: 0;
 }
-.bank-submitted {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 10px;
-  padding: 12px 0;
-}
-.bank-submitted-icon {
-  color: #22c55e;
-}
-.bank-submitted-title {
-  font-size: 18px;
+/* UX 15/07 — màn xác nhận CK tách sang /checkout/bank-confirmation; ở billing chỉ còn
+   notice back-nav với link sang trang đó */
+.bank-submitted-link {
+  color: inherit;
   font-weight: 600;
-  color: var(--color-dark, #1c1c1c);
-  margin: 0;
-}
-.bank-submitted-desc {
-  font-size: 14px;
-  line-height: 20px;
-  color: rgba(28, 28, 28, 0.6);
-  letter-spacing: 0.14px;
-  margin: 0;
-  max-width: 320px;
+  text-decoration: underline;
 }
 
 .spinner-sm {
@@ -876,6 +858,49 @@
   opacity: 0.45;
   cursor: not-allowed;
 }
+/* UX 15/07 — card chọn sẵn (hết lựa chọn thực): disabled nhưng vẫn hiện rõ là đã chọn */
+.course-card-mini.selected:disabled {
+  opacity: 1;
+  cursor: default;
+}
+/* UX 15/07 — mục user đã sở hữu: không mờ như disabled thường, tint xanh + badge */
+.course-card-mini.owned:disabled {
+  opacity: 1;
+  cursor: default;
+  background: rgba(0, 134, 0, 0.04);
+  border-color: rgba(0, 134, 0, 0.25);
+}
+.course-card-mini__owned-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-accent-green, #008600);
+  background: rgba(0, 134, 0, 0.1);
+  border-radius: 999px;
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+/* UX 15/07 — khối info khi user đã sở hữu toàn bộ pool Quick Scan/Toolkit của gói */
+.pool-owned-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(0, 134, 0, 0.07);
+  color: var(--color-accent-green, #008600);
+  font-size: 13px;
+  line-height: 18px;
+}
+.pool-owned-note svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
 
 .course-card-mini__thumb {
   display: flex;
@@ -949,13 +974,4 @@
   font-size: 13px;
   color: rgba(28, 28, 28, 0.6);
   margin: 8px 0 0;
-}
-
-/* CR-007 amendment 08/07 — form yêu cầu HĐ nằm trong <app-invoice-request-form>
-   (component riêng, style tự chứa); billing chỉ giữ wrapper ở màn xác nhận CK. */
-.bank-invoice-request {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px dashed rgba(28, 28, 28, 0.1);
-  text-align: left;
 }
