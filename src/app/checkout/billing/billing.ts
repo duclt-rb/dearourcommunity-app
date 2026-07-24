@@ -28,24 +28,12 @@ import LogoComponent from '../../shared/logo/logo';
 import BookingSummaryComponent from '../booking-summary/booking-summary';
 import { environment } from '../../../environments/environment';
 
-/** Khoá trong pool checkout sau khi map từ `Package.courses` (kèm xuất xứ CR-010). */
-interface PackageCourseUI {
-  id: number;
-  title: string;
-  thumbnailUrl: string | null;
-  sourcePackageId: string | null;
-  sourcePackageName: string | null;
-  sourcePackageLabel: string | null;
-  sourcePackageTier: number | null;
-}
-
 /**
- * CR-010 — nhãn nhóm ngắn gọn: `label` của gói là "Youth A" / "Organization C+" nên lấy phần
- * cuối ("A", "C+") để tiêu đề đọc là "Từ gói A". Gói không có label → dùng tên đầy đủ.
+ * CR-010 — `label` của gói là "Youth A" / "Organization C+" nên lấy phần cuối ("A", "C+") để
+ * badge đọc là "Gói A". Gói không có label → không hiện badge (tên đầy đủ quá dài cho badge).
  */
-function toShortPackageLabel(label: string | null, name: string | null): string {
-  const suffix = label?.trim().split(/\s+/).pop();
-  return suffix || (name ?? '');
+function toShortPackageLabel(label: string | null | undefined): string | null {
+  return label?.trim().split(/\s+/).pop() || null;
 }
 
 @Component({
@@ -200,46 +188,10 @@ export default class BillingComponent implements OnInit {
         title: pc.course?.postTitle ?? `Khoá học #${pc.wpCourseId}`,
         // Ảnh đại diện khoá (SDK 0.18.0) — null/undefined → card fallback icon sách
         thumbnailUrl: pc.course?.thumbnailUrl ?? null,
-        // CR-010 — gói xuất xứ (SDK 0.24.0): gói tier thấp nhất cùng ladder có khoá này
-        sourcePackageId: pc.sourcePackageId ?? null,
-        sourcePackageName: pc.sourcePackageName ?? null,
-        sourcePackageLabel: pc.sourcePackageLabel ?? null,
-        sourcePackageTier: pc.sourcePackageTier ?? null,
+        // CR-010 — badge gói xuất xứ (SDK 0.24.1): gói tier thấp nhất cùng ladder có khoá này
+        sourceLabel: toShortPackageLabel(pc.sourcePackageLabel),
       }))
       .filter((c) => pickable.has(c.id));
-  });
-
-  /**
-   * CR-010 — pool khoá chia theo GÓI XUẤT XỨ để user thấy "gói A gồm khoá này, lên gói B có
-   * thêm khoá này". Nhóm sắp theo tier tăng dần; khoá không có xuất xứ (gói ngoài ladder) gom
-   * vào nhóm cuối không tiêu đề. Chỉ 1 nhóm → template render như cũ (không hiện tiêu đề).
-   */
-  readonly courseGroups = computed(() => {
-    const groups = new Map<
-      string,
-      {
-        packageId: string | null;
-        packageName: string | null;
-        tier: number;
-        courses: PackageCourseUI[];
-      }
-    >();
-
-    for (const course of this.packageCourses()) {
-      const key = course.sourcePackageId ?? '__unknown__';
-      const group = groups.get(key) ?? {
-        packageId: course.sourcePackageId,
-        // Hiển thị "Gói A" thay vì tên gói dài
-        packageName: toShortPackageLabel(course.sourcePackageLabel, course.sourcePackageName),
-        // Không rõ xuất xứ → xếp cuối
-        tier: course.sourcePackageTier ?? Number.MAX_SAFE_INTEGER,
-        courses: [] as PackageCourseUI[],
-      };
-      group.courses.push(course);
-      groups.set(key, group);
-    }
-
-    return [...groups.values()].sort((a, b) => a.tier - b.tier);
   });
 
   isCourseSelected(courseId: number): boolean {
