@@ -406,12 +406,14 @@ export const CheckoutStore = signalStore(
       const loadUpgradeQuote = async (packageId: string): Promise<void> => {
         patchState(store, { quoteLoading: true, quoteError: false });
         try {
-          // CR-011 — lấy luôn kế hoạch checkout (số mục phải chọn theo từng bucket) trong cùng
-          // nhịp với báo giá: hai thứ này luôn phải khớp nhau.
-          const [quote, plan] = await Promise.all([
-            packagesService.getUpgradeQuote(packageId),
-            paymentService.getCheckoutPlan(packageId),
-          ]);
+          // CR-011 — kế hoạch checkout (số mục phải chọn theo từng bucket) đi kèm báo giá.
+          // GIÁ là fail-closed (sai số tiền thì không cho thanh toán), còn PLAN chỉ ảnh hưởng
+          // số lượt hiển thị nên lỗi thì rơi về công thức cũ — BE vẫn validate lại khi submit.
+          const quote = await packagesService.getUpgradeQuote(packageId);
+          const plan = await paymentService.getCheckoutPlan(packageId).catch((err) => {
+            console.error('Failed to load checkout plan', err);
+            return null;
+          });
           if (store.selectedPackage()?.id !== packageId) {
             // Đổi gói giữa chừng: bỏ kết quả cũ nhưng phải hạ cờ loading, tránh kẹt nút
             patchState(store, { quoteLoading: false });
