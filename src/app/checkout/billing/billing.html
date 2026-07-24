@@ -125,40 +125,47 @@
                     được xác nhận, các khoá này sẽ tự động được ghi danh cho bạn.
                   }
                 </p>
-                <div class="course-select-grid">
-                  <!-- Mini card: click chọn/bỏ chọn, mỗi khoá tối đa 1 lần (amendment 06/07) -->
-                  @for (course of packageCourses(); track course.id; let i = $index) {
-                    <button
-                      type="button"
-                      class="course-card-mini"
-                      [class.selected]="isCourseSelected(course.id)"
-                      [disabled]="!isCourseSelected(course.id) && courseSelectionComplete()"
-                      (click)="toggleCourse(course.id)"
-                    >
-                      <span class="course-card-mini__thumb tone-{{ i % 4 }}">
-                        @if (course.thumbnailUrl) {
-                          <img
-                            class="course-card-mini__img"
-                            [src]="course.thumbnailUrl"
-                            alt=""
-                            loading="lazy"
-                          />
-                        } @else {
-                          <svg lucideBookOpen [size]="18" strokeWidth="2"></svg>
-                        }
-                      </span>
-                      <span class="course-card-mini__title">{{ course.title }}</span>
-                      <span
-                        class="course-card-mini__check"
-                        [class.checked]="isCourseSelected(course.id)"
-                      >
-                        @if (isCourseSelected(course.id)) {
-                          <svg lucideCheck [size]="12" strokeWidth="3"></svg>
-                        }
-                      </span>
-                    </button>
+                <!-- CR-010 — chia theo GÓI XUẤT XỨ: "Từ gói A" / "Từ gói B" để user thấy gói
+                     cao hơn thêm khoá gì. Chỉ 1 nhóm → không hiện tiêu đề (như trước đây). -->
+                @for (group of courseGroups(); track group.packageId ?? 'unknown') {
+                  @if (courseGroups().length > 1 && group.packageName) {
+                    <span class="course-group-label">Từ gói {{ group.packageName }}</span>
                   }
-                </div>
+                  <div class="course-select-grid">
+                    <!-- Mini card: click chọn/bỏ chọn, mỗi khoá tối đa 1 lần (amendment 06/07) -->
+                    @for (course of group.courses; track course.id; let i = $index) {
+                      <button
+                        type="button"
+                        class="course-card-mini"
+                        [class.selected]="isCourseSelected(course.id)"
+                        [disabled]="!isCourseSelected(course.id) && courseSelectionComplete()"
+                        (click)="toggleCourse(course.id)"
+                      >
+                        <span class="course-card-mini__thumb tone-{{ i % 4 }}">
+                          @if (course.thumbnailUrl) {
+                            <img
+                              class="course-card-mini__img"
+                              [src]="course.thumbnailUrl"
+                              alt=""
+                              loading="lazy"
+                            />
+                          } @else {
+                            <svg lucideBookOpen [size]="18" strokeWidth="2"></svg>
+                          }
+                        </span>
+                        <span class="course-card-mini__title">{{ course.title }}</span>
+                        <span
+                          class="course-card-mini__check"
+                          [class.checked]="isCourseSelected(course.id)"
+                        >
+                          @if (isCourseSelected(course.id)) {
+                            <svg lucideCheck [size]="12" strokeWidth="3"></svg>
+                          }
+                        </span>
+                      </button>
+                    }
+                  </div>
+                }
               </div>
             }
 

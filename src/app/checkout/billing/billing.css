@@ -825,6 +825,15 @@
   gap: 10px;
 }
 
+/* CR-010 — nhãn nhóm khoá theo gói xuất xứ (chỉ hiện khi có ≥2 nhóm) */
+.course-group-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(28, 28, 28, 0.5);
+  margin-top: 4px;
+}
+
 .course-card-mini {
   position: relative;
   display: flex;

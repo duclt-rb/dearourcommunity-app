@@ -28,6 +28,16 @@ import LogoComponent from '../../shared/logo/logo';
 import BookingSummaryComponent from '../booking-summary/booking-summary';
 import { environment } from '../../../environments/environment';
 
+/** Khoá trong pool checkout sau khi map từ `Package.courses` (kèm xuất xứ CR-010). */
+interface PackageCourseUI {
+  id: number;
+  title: string;
+  thumbnailUrl: string | null;
+  sourcePackageId: string | null;
+  sourcePackageName: string | null;
+  sourcePackageTier: number | null;
+}
+
 @Component({
   selector: 'app-billing',
   standalone: true,
@@ -178,8 +188,44 @@ export default class BillingComponent implements OnInit {
         title: pc.course?.postTitle ?? `Khoá học #${pc.wpCourseId}`,
         // Ảnh đại diện khoá (SDK 0.18.0) — null/undefined → card fallback icon sách
         thumbnailUrl: pc.course?.thumbnailUrl ?? null,
+        // CR-010 — gói xuất xứ (SDK 0.23.0): gói tier thấp nhất cùng ladder có khoá này
+        sourcePackageId: pc.sourcePackageId ?? null,
+        sourcePackageName: pc.sourcePackageName ?? null,
+        sourcePackageTier: pc.sourcePackageTier ?? null,
       }))
       .filter((c) => pickable.has(c.id));
+  });
+
+  /**
+   * CR-010 — pool khoá chia theo GÓI XUẤT XỨ để user thấy "gói A gồm khoá này, lên gói B có
+   * thêm khoá này". Nhóm sắp theo tier tăng dần; khoá không có xuất xứ (gói ngoài ladder) gom
+   * vào nhóm cuối không tiêu đề. Chỉ 1 nhóm → template render như cũ (không hiện tiêu đề).
+   */
+  readonly courseGroups = computed(() => {
+    const groups = new Map<
+      string,
+      {
+        packageId: string | null;
+        packageName: string | null;
+        tier: number;
+        courses: PackageCourseUI[];
+      }
+    >();
+
+    for (const course of this.packageCourses()) {
+      const key = course.sourcePackageId ?? '__unknown__';
+      const group = groups.get(key) ?? {
+        packageId: course.sourcePackageId,
+        packageName: course.sourcePackageName,
+        // Không rõ xuất xứ → xếp cuối
+        tier: course.sourcePackageTier ?? Number.MAX_SAFE_INTEGER,
+        courses: [] as PackageCourseUI[],
+      };
+      group.courses.push(course);
+      groups.set(key, group);
+    }
+
+    return [...groups.values()].sort((a, b) => a.tier - b.tier);
   });
 
   isCourseSelected(courseId: number): boolean {
