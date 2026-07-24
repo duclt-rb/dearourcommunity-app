@@ -115,19 +115,6 @@
                     {{ selectedCourseCount() }}/{{ requiredSelections() }}
                   </span>
                 </span>
-                <!-- CR-011 — lượt của gói nào chỉ tiêu được trong pool gói đó, nên đếm theo bucket -->
-                @if (courseBuckets().length > 1) {
-                  <span class="course-bucket-counters">
-                    @for (bucket of courseBuckets(); track bucket.packageId) {
-                      <span
-                        class="course-bucket-counter"
-                        [class.complete]="bucket.selected >= bucket.capacity"
-                      >
-                        Gói {{ bucket.label }} {{ bucket.selected }}/{{ bucket.capacity }}
-                      </span>
-                    }
-                  </span>
-                }
                 <p class="course-select-hint">
                   @if (isOrgPackage()) {
                     Gói của bạn có {{ requiredSelections() }} suất khoá học cho thành viên — mỗi
@@ -138,47 +125,67 @@
                     được xác nhận, các khoá này sẽ tự động được ghi danh cho bạn.
                   }
                 </p>
-                <div class="course-select-grid">
-                  <!-- Mini card: click chọn/bỏ chọn, mỗi khoá tối đa 1 lần (amendment 06/07).
-                       CR-010 — badge "Gói A"/"Gói B" cho biết khoá vốn thuộc gói nào, danh sách
-                       vẫn để phẳng chứ không tách section. -->
-                  @for (course of packageCourses(); track course.id; let i = $index) {
-                    <button
-                      type="button"
-                      class="course-card-mini"
-                      [class.selected]="isCourseSelected(course.id)"
-                      [disabled]="!isCourseSelected(course.id) && courseSelectionComplete()"
-                      (click)="toggleCourse(course.id)"
-                    >
-                      <span class="course-card-mini__thumb tone-{{ i % 4 }}">
-                        @if (course.thumbnailUrl) {
-                          <img
-                            class="course-card-mini__img"
-                            [src]="course.thumbnailUrl"
-                            alt=""
-                            loading="lazy"
-                          />
-                        } @else {
-                          <svg lucideBookOpen [size]="18" strokeWidth="2"></svg>
-                        }
-                      </span>
-                      <span class="course-card-mini__title">{{ course.title }}</span>
-                      @if (course.sourceLabel) {
-                        <span class="course-card-mini__pkg-badge"
-                          >Gói {{ course.sourceLabel }}</span
-                        >
-                      }
+                <!-- CR-011 — mỗi gói là một "túi lượt" riêng nên chia SECTION theo gói, mỗi
+                     section có bộ đếm riêng và tự khoá khi đã chọn đủ lượt của gói đó. -->
+                @for (section of courseSections(); track section.packageId ?? 'all') {
+                  @if (section.label) {
+                    <span class="course-section-head">
+                      Gói {{ section.label }}
                       <span
-                        class="course-card-mini__check"
-                        [class.checked]="isCourseSelected(course.id)"
+                        class="course-select-counter"
+                        [class.complete]="section.selected >= section.capacity"
                       >
-                        @if (isCourseSelected(course.id)) {
-                          <svg lucideCheck [size]="12" strokeWidth="3"></svg>
-                        }
+                        {{ section.selected }}/{{ section.capacity }}
                       </span>
-                    </button>
+                    </span>
                   }
-                </div>
+                  <div class="course-select-grid">
+                    <!-- Mini card: click chọn/bỏ chọn, mỗi khoá tối đa 1 lần (amendment 06/07) -->
+                    @for (course of section.courses; track course.id; let i = $index) {
+                      <button
+                        type="button"
+                        class="course-card-mini"
+                        [class.selected]="isCourseSelected(course.id)"
+                        [disabled]="
+                          !isCourseSelected(course.id) &&
+                          (section.label
+                            ? section.selected >= section.capacity
+                            : courseSelectionComplete())
+                        "
+                        (click)="toggleCourse(course.id)"
+                      >
+                        <span class="course-card-mini__thumb tone-{{ i % 4 }}">
+                          @if (course.thumbnailUrl) {
+                            <img
+                              class="course-card-mini__img"
+                              [src]="course.thumbnailUrl"
+                              alt=""
+                              loading="lazy"
+                            />
+                          } @else {
+                            <svg lucideBookOpen [size]="18" strokeWidth="2"></svg>
+                          }
+                        </span>
+                        <span class="course-card-mini__title">{{ course.title }}</span>
+                        <!-- Tiêu đề section đã nêu tên gói → badge chỉ dùng khi không chia được
+                             section (chưa nạp được kế hoạch checkout) -->
+                        @if (!section.label && course.sourceLabel) {
+                          <span class="course-card-mini__pkg-badge"
+                            >Gói {{ course.sourceLabel }}</span
+                          >
+                        }
+                        <span
+                          class="course-card-mini__check"
+                          [class.checked]="isCourseSelected(course.id)"
+                        >
+                          @if (isCourseSelected(course.id)) {
+                            <svg lucideCheck [size]="12" strokeWidth="3"></svg>
+                          }
+                        </span>
+                      </button>
+                    }
+                  </div>
+                }
               </div>
             }
 

@@ -170,6 +170,8 @@ export const CheckoutStore = signalStore(
           label: bucket.packageLabel?.trim().split(/\s+/).pop() ?? bucket.packageId,
           capacity: bucket.capacity,
           selected: selectedCourseIds().filter((id) => bucket.itemIds.includes(id)).length,
+          // Pool riêng của gói này — dùng để chia section khoá theo gói ở checkout
+          itemIds: bucket.itemIds,
         })),
       ),
       // CR-009 — số credit THỰC được cấp cho lượt này: nâng cấp = phần chênh (creditDeltas

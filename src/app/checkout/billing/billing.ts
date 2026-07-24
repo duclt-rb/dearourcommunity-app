@@ -130,8 +130,30 @@ export default class BillingComponent implements OnInit {
 
   // ── CR-004: chọn khoá tại checkout ──
   requiredSelections = this.store.requiredCourseSelections;
-  /** CR-011 — bộ đếm theo từng gói ("Gói A 1/1 · Gói B 0/2"); lượt gói nào tiêu ở pool gói đó. */
+  /** CR-011 — bộ đếm theo từng gói ("Gói A 1/1"); lượt gói nào chỉ tiêu ở pool gói đó. */
   courseBuckets = this.store.courseBuckets;
+
+  /**
+   * CR-011 — khoá chia thành SECTION theo gói (mỗi gói một bucket lượt riêng nên phải có tiêu
+   * đề + bộ đếm riêng). Chưa nạp được kế hoạch checkout → gộp về một section không tiêu đề,
+   * card tự hiện badge gói như trước.
+   */
+  readonly courseSections = computed(() => {
+    const courses = this.packageCourses();
+    const buckets = this.courseBuckets();
+    if (buckets.length === 0) {
+      return [{ packageId: null, label: null, capacity: 0, selected: 0, courses }];
+    }
+    return buckets
+      .map((bucket) => ({
+        packageId: bucket.packageId,
+        label: bucket.label,
+        capacity: bucket.capacity,
+        selected: bucket.selected,
+        courses: courses.filter((course) => bucket.itemIds.includes(course.id)),
+      }))
+      .filter((section) => section.courses.length > 0);
+  });
   selectedCourseCount = this.store.selectedCourseCount;
   courseSelectionComplete = this.store.courseSelectionComplete;
   isOrgPackage = this.store.isOrgPackage;
