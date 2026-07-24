@@ -180,7 +180,8 @@ export default class BillingComponent implements OnInit {
     const pkg = this.store.selectedPackage();
     if (!pkg?.courses) return [];
     const pickable = new Set(this.store.pickableCourseIds());
-    return [...pkg.courses]
+    // CR-011 — khoá kế thừa từ gói con xếp TRƯỚC (gói cơ bản trước), rồi tới khoá riêng của gói
+    return [...(pkg.inheritedCourses ?? []), ...pkg.courses]
       .sort((a, b) => a.orderIndex - b.orderIndex)
       .map((pc) => ({
         // wp_course_id là bigint — BE serialize thành string, phải ép số để courseIds gửi lên đúng kiểu

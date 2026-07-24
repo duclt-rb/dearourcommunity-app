@@ -308,6 +308,33 @@
               }
             </div>
 
+            <!-- Gói con được bao gồm (CR-011) -->
+            @if (includeCandidates().length > 0) {
+              <div class="credits-config-section">
+                <h4 class="credits-config-title">Gói này bao gồm</h4>
+                <p class="credits-config-desc">
+                  Người mua gói này hưởng luôn quyền lợi của các gói được tick (đệ quy). Dùng để
+                  tính giá nâng cấp, nhãn "Gói A/B" của khoá học và chặn mua lại gói đã bao gồm. Chỉ
+                  chọn được gói cùng loại và không được tạo vòng lặp.
+                </p>
+                <div class="toolkit-grid">
+                  @for (candidate of includeCandidates(); track candidate.id) {
+                    <label class="field__checkbox toolkit-option">
+                      <input
+                        type="checkbox"
+                        [checked]="isIncluded(candidate.id)"
+                        (change)="toggleInclude(candidate.id)"
+                      />
+                      <span>
+                        {{ candidate.name }}
+                        <em class="toolkit-option__sector">({{ candidate.id }})</em>
+                      </span>
+                    </label>
+                  }
+                </div>
+              </div>
+            }
+
             <!-- Submit Row -->
             <div class="form-actions">
               <button type="submit" class="btn primary" [disabled]="isSaving()">

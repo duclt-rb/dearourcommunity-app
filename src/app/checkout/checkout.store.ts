@@ -184,7 +184,10 @@ export const CheckoutStore = signalStore(
       // gói org giữ nguyên — member chưa tồn tại lúc mua). Khớp tập pickable của BE.
       pickableCourseIds: computed(() => {
         const pkg = selectedPackage();
-        const poolIds = (pkg?.courses ?? []).map((pc) => Number(pc.wpCourseId));
+        // CR-011 — pool người mua được chọn = khoá RIÊNG của gói + khoá KẾ THỪA từ gói con
+        const poolIds = [...(pkg?.courses ?? []), ...(pkg?.inheritedCourses ?? [])].map((pc) =>
+          Number(pc.wpCourseId),
+        );
         if (pkg?.packageType === 'organization') return poolIds;
         const enrolled = new Set(enrolledCourseIds());
         return poolIds.filter((id) => !enrolled.has(id));

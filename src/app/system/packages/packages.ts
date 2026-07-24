@@ -127,6 +127,35 @@ export default class PackagesComponent {
     },
   });
 
+  /**
+   * CR-011 — draft danh sách gói con mà gói đang chọn BAO GỒM (replace-all khi lưu).
+   * Người mua gói cha hưởng luôn quyền lợi của các gói này, nên pool khoá hiển thị ở checkout
+   * là `courses` + `inheritedCourses`.
+   */
+  draftIncludeIds = linkedSignal({
+    source: this.selectedPackage,
+    computation: (pkg) => (pkg?.includes ?? []).map((i) => i.id),
+  });
+
+  /** Gói có thể chọn làm gói con: cùng packageType, không phải chính nó. */
+  includeCandidates = computed(() => {
+    const pkg = this.selectedPackage();
+    if (!pkg) return [];
+    return (this.packagesResource.value() ?? [])
+      .filter((p) => p.id !== pkg.id && p.packageType === pkg.packageType)
+      .sort((a, b) => a.tier - b.tier);
+  });
+
+  isIncluded(packageId: string): boolean {
+    return this.draftIncludeIds().includes(packageId);
+  }
+
+  toggleInclude(packageId: string) {
+    this.draftIncludeIds.update((ids) =>
+      ids.includes(packageId) ? ids.filter((id) => id !== packageId) : [...ids, packageId],
+    );
+  }
+
   // 5b. CR-002: catalog toolkit theo group + draft các toolkit đã gán cho gói đang chọn.
   // Quick Scan tách section riêng khỏi các toolkit chuyên đề (cùng chung 1 draft/flag).
   quickScanToolkits: Toolkit[] = TOOLKITS.filter((t) => !t.comingSoon && t.group === 'quick-scan');
@@ -303,6 +332,8 @@ export default class PackagesComponent {
         slots: Number(model.slots),
         credits,
         features,
+        // CR-011 — replace-all gói con; BE validate cùng packageType + không tạo chu trình
+        includes: this.draftIncludeIds(),
       });
 
       this.saveSuccess.set(true);
