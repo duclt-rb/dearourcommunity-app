@@ -142,17 +142,29 @@ export default class BillingComponent implements OnInit {
     const courses = this.packageCourses();
     const buckets = this.courseBuckets();
     if (buckets.length === 0) {
-      return [{ packageId: null, label: null, capacity: 0, selected: 0, courses }];
+      return [{ packageId: null, label: null, capacity: 0, selected: 0, tier: 0, courses }];
     }
+    // Tier của từng gói suy từ khoá trong pool (`sourcePackageTier` — CR-010) để sắp xếp
+    // section theo thứ tự gói CƠ BẢN trước: Gói A → B → C. Thứ tự server trả là "gói mua
+    // trước, rồi tới gói con" nên nếu để nguyên sẽ thành B → A.
+    const tierByPackage = new Map<string, number>();
+    for (const course of courses) {
+      if (course.sourcePackageId && course.sourcePackageTier !== null) {
+        tierByPackage.set(course.sourcePackageId, course.sourcePackageTier);
+      }
+    }
+
     return buckets
       .map((bucket) => ({
         packageId: bucket.packageId,
         label: bucket.label,
         capacity: bucket.capacity,
         selected: bucket.selected,
+        tier: tierByPackage.get(bucket.packageId) ?? Number.MAX_SAFE_INTEGER,
         courses: courses.filter((course) => bucket.itemIds.includes(course.id)),
       }))
-      .filter((section) => section.courses.length > 0);
+      .filter((section) => section.courses.length > 0)
+      .sort((a, b) => a.tier - b.tier);
   });
   selectedCourseCount = this.store.selectedCourseCount;
   courseSelectionComplete = this.store.courseSelectionComplete;
@@ -213,8 +225,10 @@ export default class BillingComponent implements OnInit {
         title: pc.course?.postTitle ?? `Khoá học #${pc.wpCourseId}`,
         // Ảnh đại diện khoá (SDK 0.18.0) — null/undefined → card fallback icon sách
         thumbnailUrl: pc.course?.thumbnailUrl ?? null,
-        // CR-010 — badge gói xuất xứ (SDK 0.24.1): gói tier thấp nhất cùng ladder có khoá này
+        // CR-010/CR-011 — gói xuất xứ: badge (khi không chia được section) + sắp xếp section
         sourceLabel: toShortPackageLabel(pc.sourcePackageLabel),
+        sourcePackageId: pc.sourcePackageId ?? null,
+        sourcePackageTier: pc.sourcePackageTier ?? null,
       }))
       .filter((c) => pickable.has(c.id));
   });

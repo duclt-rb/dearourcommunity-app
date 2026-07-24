@@ -104,9 +104,23 @@
               />
             }
 
+            <!-- CR-011 — đang hỏi server số lượt/giá thì hiện skeleton: số mục phải chọn có
+                 thể đổi sau khi có kế hoạch checkout, render sớm sẽ nhảy layout. -->
+            @if (quoteLoading() && !store.bookingRef()) {
+              <div class="dashed-divider"></div>
+              <div class="checkout-skeleton">
+                <span class="skeleton-line skeleton-line--label"></span>
+                <span class="skeleton-line skeleton-line--hint"></span>
+                <div class="course-select-grid">
+                  <span class="skeleton-card"></span>
+                  <span class="skeleton-card"></span>
+                </div>
+              </div>
+            }
+
             <!-- CR-004: gói có lượt chọn khoá → BẮT BUỘC chọn đúng N khoá tại checkout.
                  Tiền về: gói cá nhân auto-enroll; gói org giữ chỗ suất để gán member sau. -->
-            @if (requiredSelections() > 0 && !store.bookingRef()) {
+            @if (!quoteLoading() && requiredSelections() > 0 && !store.bookingRef()) {
               <div class="dashed-divider"></div>
               <div style="display: flex; flex-direction: column; gap: 8px">
                 <span class="section-label">
@@ -192,7 +206,11 @@
             <!-- CR-006: gói có lượt Quick Scan → BẮT BUỘC chọn đúng N bài từ pool của gói.
                  UX 15/07 — mục đã sở hữu hiện disabled + badge; sở hữu hết pool → khối info;
                  hết lựa chọn thực → store chọn sẵn, card khoá thao tác. -->
-            @if ((requiredQuickScans() > 0 || quickScanFullyOwned()) && !store.bookingRef()) {
+            @if (
+              !quoteLoading() &&
+              (requiredQuickScans() > 0 || quickScanFullyOwned()) &&
+              !store.bookingRef()
+            ) {
               <div class="dashed-divider"></div>
               <div style="display: flex; flex-direction: column; gap: 8px">
                 <span class="section-label">
@@ -264,7 +282,11 @@
 
             <!-- CR-006: gói có lượt Toolkit chuyên đề → BẮT BUỘC chọn đúng N bộ từ pool của gói.
                  UX 15/07 — cùng quy tắc hiển thị với Quick Scan ở trên. -->
-            @if ((requiredToolkits() > 0 || toolkitFullyOwned()) && !store.bookingRef()) {
+            @if (
+              !quoteLoading() &&
+              (requiredToolkits() > 0 || toolkitFullyOwned()) &&
+              !store.bookingRef()
+            ) {
               <div class="dashed-divider"></div>
               <div style="display: flex; flex-direction: column; gap: 8px">
                 <span class="section-label">
@@ -431,7 +453,11 @@
               }
               <div class="total-row final">
                 <span class="total-label">Tổng cộng</span>
-                <span class="total-value">₫ {{ couponFinalPrice() | number: '1.0-0' }}</span>
+                @if (quoteLoading()) {
+                  <span class="skeleton-line skeleton-line--price"></span>
+                } @else {
+                  <span class="total-value">₫ {{ couponFinalPrice() | number: '1.0-0' }}</span>
+                }
               </div>
               <p class="vat-note">(Đã bao gồm VAT)</p>
             </div>

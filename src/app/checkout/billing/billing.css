@@ -838,6 +838,51 @@
   cursor: pointer;
 }
 
+/* CR-011 — skeleton trong lúc hỏi server giá + số lượt theo từng gói */
+.checkout-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.skeleton-line,
+.skeleton-card {
+  display: block;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    rgba(28, 28, 28, 0.06) 25%,
+    rgba(28, 28, 28, 0.12) 37%,
+    rgba(28, 28, 28, 0.06) 63%
+  );
+  background-size: 400% 100%;
+  animation: checkout-skeleton-shimmer 1.4s ease infinite;
+}
+.skeleton-line--label {
+  width: 160px;
+  height: 20px;
+}
+.skeleton-line--hint {
+  width: 100%;
+  max-width: 420px;
+  height: 16px;
+}
+.skeleton-line--price {
+  width: 120px;
+  height: 24px;
+}
+.skeleton-card {
+  height: 108px;
+  border-radius: 14px;
+}
+@keyframes checkout-skeleton-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
 /* CR-011 — tiêu đề section theo gói (mỗi gói một túi lượt riêng) */
 .course-section-head {
   display: flex;
