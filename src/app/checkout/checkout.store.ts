@@ -5,8 +5,10 @@ import type {
   CreateBankTransferResponse,
   Package,
   PackageId,
+  UpgradeQuote,
   ValidateCouponResponse,
 } from '@dearourcommunity/client';
+import { PackagesService } from '../core/services/packages.service';
 import { PaymentService } from '../core/services/payment.service';
 import { ToolkitAccessService } from '../toolkit/toolkit-access.service';
 
@@ -90,6 +92,12 @@ export interface CheckoutState {
   enrolledCourseIds: number[];
   // Message 400 từ validate BE (vd bộ chọn không khớp) — hiện nguyên văn thay vì lỗi đỏ chung.
   paymentErrorMsg: string | null;
+  // CR-009 — báo giá nâng cấp do server tính (GET /packages/:id/upgrade-quote). Khi user đã
+  // sở hữu gói thấp hơn cùng ladder thì `originalPrice` = payableAmount (phần chênh), và số
+  // credit thực nhận = `creditDeltas` (không phải nguyên config gói).
+  upgradeQuote: UpgradeQuote | null;
+  // Đang lấy báo giá → khoá nút thanh toán để không gửi nhầm giá niêm yết (BE sẽ 400).
+  quoteLoading: boolean;
 }
 
 const initialState: CheckoutState = {
@@ -120,6 +128,8 @@ const initialState: CheckoutState = {
   ownedToolkitIds: [],
   enrolledCourseIds: [],
   paymentErrorMsg: null,
+  upgradeQuote: null,
+  quoteLoading: false,
 };
 
 export const CheckoutStore = signalStore(
@@ -135,7 +145,21 @@ export const CheckoutStore = signalStore(
       selectedCourseIds,
       selectedToolkitIds,
       enrolledCourseIds,
+      upgradeQuote,
     }) => ({
+      // CR-009 — số credit THỰC được cấp cho lượt này: nâng cấp = phần chênh (creditDeltas
+      // trong quote), mua mới = nguyên config gói. Số khoá/Quick Scan/Toolkit phải chọn ở
+      // checkout tính theo số này, khớp validate BE.
+      grantedCredits: computed(() => {
+        const deltas = upgradeQuote()?.creditDeltas;
+        const source = deltas?.length ? deltas : (selectedPackage()?.credits ?? []);
+        return new Map(source.map((c) => [c.creditType, Number(c.amount)]));
+      }),
+      // Giá niêm yết của gói (khác `originalPrice` = số thực phải trả khi nâng cấp)
+      listPrice: computed(() => Number(selectedPackage()?.price ?? 0)),
+      isUpgrade: computed(() => upgradeQuote()?.isUpgrade ?? false),
+      upgradeCreditAmount: computed(() => Number(upgradeQuote()?.creditAmount ?? 0)),
+      upgradeFromName: computed(() => upgradeQuote()?.fromPackageName ?? null),
       // Coupon do server tính (changelog SDK 0.6.8): FE gửi giá gốc + couponCode, số tiền
       // sau giảm lấy từ response createBankTransfer (bankTransfer.amount) — không tự trừ ở client.
       paymentSuccess: computed(() => resultCode() === '0'),
@@ -174,20 +198,17 @@ export const CheckoutStore = signalStore(
           .map(([key]) => key.slice('toolkit:'.length))
           .filter((id) => !isQuickScanId(id)),
       ),
-      // Credit cấu hình theo nhóm — để phân biệt "gói không có lượt" vs "đã sở hữu hết pool"
-      configuredQuickScanCredit: computed(
-        () => selectedPackage()?.credits?.find((c) => c.creditType === 'quick_scan')?.amount ?? 0,
-      ),
-      configuredToolkitCredit: computed(
-        () => selectedPackage()?.credits?.find((c) => c.creditType === 'toolkit')?.amount ?? 0,
-      ),
       selectedQuickScanCount: computed(() => selectedToolkitIds().filter(isQuickScanId).length),
       selectedToolkitCount: computed(
         () => selectedToolkitIds().filter((id) => !isQuickScanId(id)).length,
       ),
     }),
   ),
-  withComputed(({ poolQuickScanIds, poolToolkitIds, ownedToolkitIds }) => ({
+  withComputed(({ poolQuickScanIds, poolToolkitIds, ownedToolkitIds, grantedCredits }) => ({
+    // Credit thực nhận theo nhóm — để phân biệt "gói không có lượt" vs "đã sở hữu hết pool"
+    // (CR-009: lượt nâng cấp là phần chênh, không phải nguyên config gói)
+    configuredQuickScanCredit: computed(() => grantedCredits().get('quick_scan') ?? 0),
+    configuredToolkitCredit: computed(() => grantedCredits().get('toolkit') ?? 0),
     // CR-006 amendment — pool còn chọn được (loại mục đã sở hữu) — khớp tập pickable của BE
     pickableQuickScanIds: computed(() => {
       const owned = new Set(ownedToolkitIds());
@@ -200,20 +221,18 @@ export const CheckoutStore = signalStore(
   })),
   withComputed(
     ({
-      selectedPackage,
+      grantedCredits,
       pickableCourseIds,
       pickableQuickScanIds,
       pickableToolkitIds,
       configuredQuickScanCredit,
       configuredToolkitCredit,
     }) => ({
-      // Số mục BẮT BUỘC chọn = min(credit cấu hình, pool còn chọn được) — khớp validate BE
-      // (amendment 06/07: tránh khoá cứng khi user đã sở hữu hết pool / credit vượt pool)
+      // Số mục BẮT BUỘC chọn = min(credit thực nhận, pool còn chọn được) — khớp validate BE
+      // (amendment 06/07: tránh khoá cứng khi user đã sở hữu hết pool / credit vượt pool;
+      // CR-009: credit thực nhận của lượt nâng cấp là phần chênh)
       requiredCourseSelections: computed(() =>
-        Math.min(
-          selectedPackage()?.credits?.find((c) => c.creditType === 'course_selection')?.amount ?? 0,
-          pickableCourseIds().length,
-        ),
+        Math.min(grantedCredits().get('course_selection') ?? 0, pickableCourseIds().length),
       ),
       requiredQuickScanSelections: computed(() =>
         Math.min(configuredQuickScanCredit(), pickableQuickScanIds().length),
@@ -299,6 +318,7 @@ export const CheckoutStore = signalStore(
     (
       store,
       paymentService = inject(PaymentService),
+      packagesService = inject(PackagesService),
       toolkitAccess = inject(ToolkitAccessService),
     ) => {
       /** UX 15/07 — không còn lựa chọn thực → chọn sẵn toàn bộ mục còn lại (UI khoá thao tác). */
@@ -338,11 +358,38 @@ export const CheckoutStore = signalStore(
         return afterRequired < beforeRequired || beforeSelected.some((id) => ownedSet.has(id));
       };
 
+      /**
+       * CR-009 — lấy báo giá nâng cấp cho gói đang chọn. Server là nguồn chân lý: user đang
+       * giữ gói thấp hơn cùng ladder thì `originalPrice` (số gửi đi khi thanh toán) chuyển
+       * thành phần chênh. Best-effort: chưa đăng nhập/lỗi mạng → giữ giá niêm yết (BE vẫn
+       * chặn bằng anti-tamper nếu thực sự phải trả số khác).
+       */
+      const loadUpgradeQuote = async (packageId: string): Promise<void> => {
+        patchState(store, { quoteLoading: true });
+        try {
+          const quote = await packagesService.getUpgradeQuote(packageId);
+          if (store.selectedPackage()?.id !== packageId) return; // đổi gói giữa chừng
+          patchState(store, {
+            upgradeQuote: quote,
+            originalPrice: Number(quote.payableAmount),
+            quoteLoading: false,
+          });
+          // Số lượt có thể đã co lại (nâng cấp = phần chênh) → chọn sẵn nếu hết lựa chọn thực
+          autoSelectForcedToolkits();
+        } catch (err) {
+          console.error('Failed to load upgrade quote', err);
+          patchState(store, { upgradeQuote: null, quoteLoading: false });
+        }
+      };
+
       return {
+        loadUpgradeQuote,
+
         selectPackage(pkg: Package) {
           patchState(store, {
             selectedPackage: pkg,
             originalPrice: Number(pkg.price),
+            upgradeQuote: null,
             couponApplied: false,
             appliedCode: '',
             couponError: false,
@@ -356,6 +403,8 @@ export const CheckoutStore = signalStore(
           });
           // UX 15/07 — pool mới không còn lựa chọn thực → chọn sẵn luôn
           autoSelectForcedToolkits();
+          // CR-009 — hỏi server số thực phải trả cho gói này (nâng cấp = phần chênh)
+          void loadUpgradeQuote(pkg.id);
         },
 
         // ── CR-004: chọn khoá tại checkout ─────────────────────────────────────────

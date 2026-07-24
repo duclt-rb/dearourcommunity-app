@@ -88,7 +88,9 @@
                       {{ store.selectedPackage()?.description }}
                     </span>
                   </span>
-                  <span class="course-price">₫ {{ originalPrice | number: '1.0-0' }}</span>
+                  <!-- CR-009 — cạnh tên gói luôn là GIÁ NIÊM YẾT; phần chênh phải trả nằm ở
+                       khối tổng cộng bên dưới để user thấy rõ đã được trừ bao nhiêu. -->
+                  <span class="course-price">₫ {{ listPrice() | number: '1.0-0' }}</span>
                 </div>
               </div>
             }
@@ -375,6 +377,19 @@
 
             <!-- Total -->
             <div class="total-section">
+              <!-- CR-009 — nâng cấp gói: hiện rõ giá gói và phần đã trừ của gói đang sở hữu -->
+              @if (isUpgrade()) {
+                <div class="total-row">
+                  <span class="total-label">Giá gói</span>
+                  <span class="total-value">₫ {{ listPrice() | number: '1.0-0' }}</span>
+                </div>
+                <div class="total-row">
+                  <span class="total-label">Đã sở hữu {{ upgradeFromName() }}</span>
+                  <span class="total-value bank-field-discount"
+                    >− ₫ {{ upgradeCreditAmount() | number: '1.0-0' }}</span
+                  >
+                </div>
+              }
               @if (couponDiscount() > 0) {
                 <div class="total-row">
                   <span class="total-label">Tạm tính</span>
@@ -408,7 +423,12 @@
             <span>Lịch hẹn đã bị từ chối — liên hệ hỗ trợ nếu cần.</span>
           </div>
         } @else {
-          <button class="btn-checkout" [disabled]="!selectionComplete()" (click)="goToPayment()">
+          <!-- CR-009 — chờ báo giá nâng cấp xong mới cho thanh toán (tránh gửi giá niêm yết) -->
+          <button
+            class="btn-checkout"
+            [disabled]="!selectionComplete() || quoteLoading()"
+            (click)="goToPayment()"
+          >
             Tiến hành thanh toán
             <svg lucideSend [size]="20" strokeWidth="2"></svg>
           </button>

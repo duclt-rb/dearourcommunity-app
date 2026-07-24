@@ -109,6 +109,15 @@ export default class BillingComponent implements OnInit {
   // CR-004/CR-006 — message 400 validate từ BE (hiện nguyên văn để user sửa lựa chọn)
   paymentErrorMsg = this.store.paymentErrorMsg;
 
+  // ── CR-009: nâng cấp gói chỉ trả phần chênh ──
+  /** Đang hỏi server số phải trả → khoá nút để không gửi nhầm giá niêm yết. */
+  quoteLoading = this.store.quoteLoading;
+  isUpgrade = this.store.isUpgrade;
+  /** Giá niêm yết của gói (khác số phải trả khi nâng cấp). */
+  listPrice = this.store.listPrice;
+  upgradeCreditAmount = this.store.upgradeCreditAmount;
+  upgradeFromName = this.store.upgradeFromName;
+
   // ── CR-004: chọn khoá tại checkout ──
   requiredSelections = this.store.requiredCourseSelections;
   selectedCourseCount = this.store.selectedCourseCount;

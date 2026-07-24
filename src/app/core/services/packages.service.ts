@@ -14,6 +14,11 @@ export class PackagesService {
     return this.clientService.packages.findById(id);
   }
 
+  /** CR-009 — báo giá nâng cấp (cần đăng nhập): số thực phải trả sau khi trừ gói đang sở hữu. */
+  getUpgradeQuote(id: string) {
+    return this.clientService.packages.getUpgradeQuote(id);
+  }
+
   update(id: string, dto: UpdatePackageDto) {
     return this.clientService.packages.update(id, dto);
   }
