@@ -32,6 +32,9 @@ const initialState = {
 
   // Form điều chỉnh (POST /credits/adjust)
   adjustCreditType: 'mentoring_session' as CreditType,
+  // CR-011 — bucket cần điều chỉnh; BẮT BUỘC với loại có pool (course_selection/quick_scan/
+  // toolkit) vì lượt không gắn gói sẽ không tiêu được.
+  adjustPackageId: '',
   adjustAmount: '',
   adjustNote: '',
   isAdjusting: false,
@@ -121,6 +124,9 @@ export const CreditsAdminStore = signalStore(
       setAdjustCreditType(value: CreditType) {
         patchState(store, { adjustCreditType: value });
       },
+      setAdjustPackageId(value: string) {
+        patchState(store, { adjustPackageId: value });
+      },
       setAdjustAmount(value: string) {
         patchState(store, { adjustAmount: value });
       },
@@ -144,6 +150,7 @@ export const CreditsAdminStore = signalStore(
           await creditsService.adjust({
             ...(orgId ? { organizationId: orgId } : { userId }),
             creditType: store.adjustCreditType(),
+            packageId: store.adjustPackageId().trim() || undefined,
             amount,
             note: store.adjustNote().trim(),
           });

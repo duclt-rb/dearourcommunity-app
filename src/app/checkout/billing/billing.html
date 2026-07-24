@@ -115,6 +115,19 @@
                     {{ selectedCourseCount() }}/{{ requiredSelections() }}
                   </span>
                 </span>
+                <!-- CR-011 — lượt của gói nào chỉ tiêu được trong pool gói đó, nên đếm theo bucket -->
+                @if (courseBuckets().length > 1) {
+                  <span class="course-bucket-counters">
+                    @for (bucket of courseBuckets(); track bucket.packageId) {
+                      <span
+                        class="course-bucket-counter"
+                        [class.complete]="bucket.selected >= bucket.capacity"
+                      >
+                        Gói {{ bucket.label }} {{ bucket.selected }}/{{ bucket.capacity }}
+                      </span>
+                    }
+                  </span>
+                }
                 <p class="course-select-hint">
                   @if (isOrgPackage()) {
                     Gói của bạn có {{ requiredSelections() }} suất khoá học cho thành viên — mỗi

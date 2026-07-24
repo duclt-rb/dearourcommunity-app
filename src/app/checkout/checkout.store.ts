@@ -2,6 +2,7 @@ import { inject, computed } from '@angular/core';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { ApiError } from '@dearourcommunity/client';
 import type {
+  CheckoutPlan,
   CreateBankTransferResponse,
   Package,
   PackageId,
@@ -98,6 +99,9 @@ export interface CheckoutState {
   upgradeQuote: UpgradeQuote | null;
   // Đang lấy báo giá → khoá nút thanh toán để không gửi nhầm giá niêm yết (BE sẽ 400).
   quoteLoading: boolean;
+  // CR-011 — số mục phải chọn theo TỪNG GÓI (bucket) do server tính; `null` = chưa nạp.
+  // Lượt của gói nào chỉ tiêu được trong pool của gói đó nên FE phải đếm theo bucket.
+  checkoutPlan: CheckoutPlan | null;
   // Lấy báo giá THẤT BẠI. Checkout luôn nằm sau authGuard nên đây là lỗi thật (không phải
   // "khách vãng lai") → fail-closed: khoá nút thanh toán + cho user thử lại, thay vì âm thầm
   // dùng giá niêm yết & số lượt của config gói (sai với lượt nâng cấp, submit sẽ ăn 400).
@@ -135,6 +139,7 @@ const initialState: CheckoutState = {
   upgradeQuote: null,
   quoteLoading: false,
   quoteError: false,
+  checkoutPlan: null,
 };
 
 export const CheckoutStore = signalStore(
@@ -151,7 +156,22 @@ export const CheckoutStore = signalStore(
       selectedToolkitIds,
       enrolledCourseIds,
       upgradeQuote,
+      checkoutPlan,
     }) => ({
+      // CR-011 — số mục phải chọn do SERVER tính theo từng bucket (gói). FE chỉ hiển thị và
+      // gate; BE validate lại bằng đúng hàm này nên không thể lệch.
+      planCourseRequired: computed(() => checkoutPlan()?.courses.required ?? 0),
+      planQuickScanRequired: computed(() => checkoutPlan()?.quickScan.required ?? 0),
+      planToolkitRequired: computed(() => checkoutPlan()?.toolkit.required ?? 0),
+      /** Dãy đếm theo gói để hiện "Gói A 1/1 · Gói B 0/2". */
+      courseBuckets: computed(() =>
+        (checkoutPlan()?.courses.buckets ?? []).map((bucket) => ({
+          packageId: bucket.packageId,
+          label: bucket.packageLabel?.trim().split(/\s+/).pop() ?? bucket.packageId,
+          capacity: bucket.capacity,
+          selected: selectedCourseIds().filter((id) => bucket.itemIds.includes(id)).length,
+        })),
+      ),
       // CR-009 — số credit THỰC được cấp cho lượt này: nâng cấp = phần chênh (creditDeltas
       // trong quote), mua mới = nguyên config gói. Số khoá/Quick Scan/Toolkit phải chọn ở
       // checkout tính theo số này, khớp validate BE.
@@ -235,18 +255,29 @@ export const CheckoutStore = signalStore(
       pickableToolkitIds,
       configuredQuickScanCredit,
       configuredToolkitCredit,
+      planCourseRequired,
+      planQuickScanRequired,
+      planToolkitRequired,
     }) => ({
       // Số mục BẮT BUỘC chọn = min(credit thực nhận, pool còn chọn được) — khớp validate BE
       // (amendment 06/07: tránh khoá cứng khi user đã sở hữu hết pool / credit vượt pool;
       // CR-009: credit thực nhận của lượt nâng cấp là phần chênh)
+      // CR-011 — tổng số khoá phải chọn = tổng capacity các bucket (server tính); fallback về
+      // công thức cũ khi chưa nạp được plan (BE vẫn là chốt chặn cuối).
       requiredCourseSelections: computed(() =>
-        Math.min(grantedCredits().get('course_selection') ?? 0, pickableCourseIds().length),
+        planCourseRequired() > 0
+          ? planCourseRequired()
+          : Math.min(grantedCredits().get('course_selection') ?? 0, pickableCourseIds().length),
       ),
       requiredQuickScanSelections: computed(() =>
-        Math.min(configuredQuickScanCredit(), pickableQuickScanIds().length),
+        planQuickScanRequired() > 0
+          ? planQuickScanRequired()
+          : Math.min(configuredQuickScanCredit(), pickableQuickScanIds().length),
       ),
       requiredToolkitSelections: computed(() =>
-        Math.min(configuredToolkitCredit(), pickableToolkitIds().length),
+        planToolkitRequired() > 0
+          ? planToolkitRequired()
+          : Math.min(configuredToolkitCredit(), pickableToolkitIds().length),
       ),
     }),
   ),
@@ -375,7 +406,12 @@ export const CheckoutStore = signalStore(
       const loadUpgradeQuote = async (packageId: string): Promise<void> => {
         patchState(store, { quoteLoading: true, quoteError: false });
         try {
-          const quote = await packagesService.getUpgradeQuote(packageId);
+          // CR-011 — lấy luôn kế hoạch checkout (số mục phải chọn theo từng bucket) trong cùng
+          // nhịp với báo giá: hai thứ này luôn phải khớp nhau.
+          const [quote, plan] = await Promise.all([
+            packagesService.getUpgradeQuote(packageId),
+            paymentService.getCheckoutPlan(packageId),
+          ]);
           if (store.selectedPackage()?.id !== packageId) {
             // Đổi gói giữa chừng: bỏ kết quả cũ nhưng phải hạ cờ loading, tránh kẹt nút
             patchState(store, { quoteLoading: false });
@@ -383,6 +419,7 @@ export const CheckoutStore = signalStore(
           }
           patchState(store, {
             upgradeQuote: quote,
+            checkoutPlan: plan,
             originalPrice: Number(quote.payableAmount),
             quoteLoading: false,
             quoteError: false,
@@ -393,7 +430,12 @@ export const CheckoutStore = signalStore(
           // Fail-closed: KHÔNG rơi về giá niêm yết/config gói vì với lượt nâng cấp cả số tiền
           // lẫn số lượt chọn đều sai → user thao tác xong mới bị BE từ chối.
           console.error('Failed to load upgrade quote', err);
-          patchState(store, { upgradeQuote: null, quoteLoading: false, quoteError: true });
+          patchState(store, {
+            upgradeQuote: null,
+            checkoutPlan: null,
+            quoteLoading: false,
+            quoteError: true,
+          });
         }
       };
 
@@ -405,6 +447,7 @@ export const CheckoutStore = signalStore(
             selectedPackage: pkg,
             originalPrice: Number(pkg.price),
             upgradeQuote: null,
+            checkoutPlan: null,
             couponApplied: false,
             appliedCode: '',
             couponError: false,

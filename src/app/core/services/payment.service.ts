@@ -53,6 +53,11 @@ export class PaymentService {
    * Kiểm tra mã giảm giá
    * POST /api/v1/payment/coupons/validate
    */
+  /** CR-011 — số mục phải chọn theo từng gói (bucket) cho lượt mua này. */
+  getCheckoutPlan(packageId: string) {
+    return this.clientService.payment.getCheckoutPlan(packageId);
+  }
+
   validateCoupon(dto: ValidateCouponDto) {
     return this.clientService.payment.validateCoupon(dto);
   }

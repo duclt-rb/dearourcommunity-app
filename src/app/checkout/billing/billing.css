@@ -838,6 +838,25 @@
   cursor: pointer;
 }
 
+/* CR-011 — dãy đếm theo từng gói (bucket) khi gói mua bao gồm nhiều gói con */
+.course-bucket-counters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.course-bucket-counter {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(28, 28, 28, 0.06);
+  color: rgba(28, 28, 28, 0.6);
+}
+.course-bucket-counter.complete {
+  background: rgba(0, 134, 0, 0.1);
+  color: var(--color-accent-green, #008600);
+}
+
 /* CR-010 — badge gói xuất xứ trên từng card khoá ("Gói A"), danh sách vẫn để phẳng.
    Là flex-child bình thường (nằm dưới tiêu đề) để không đè lên thumbnail hay ô check. */
 .course-card-mini__pkg-badge {

@@ -130,6 +130,8 @@ export default class BillingComponent implements OnInit {
 
   // ── CR-004: chọn khoá tại checkout ──
   requiredSelections = this.store.requiredCourseSelections;
+  /** CR-011 — bộ đếm theo từng gói ("Gói A 1/1 · Gói B 0/2"); lượt gói nào tiêu ở pool gói đó. */
+  courseBuckets = this.store.courseBuckets;
   selectedCourseCount = this.store.selectedCourseCount;
   courseSelectionComplete = this.store.courseSelectionComplete;
   isOrgPackage = this.store.isOrgPackage;

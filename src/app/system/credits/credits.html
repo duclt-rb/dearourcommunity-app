@@ -80,6 +80,22 @@
         <span class="balance-label">Lượt Toolkit</span>
         <span class="balance-value">{{ balanceOf(ov.balances, 'toolkit') }}</span>
       </div>
+      <!-- CR-011 — số dư chi tiết theo từng gói (bucket): lượt của gói nào chỉ tiêu được
+           trong pool gói đó, nên con số tổng ở trên không đủ để CSKH đối soát. -->
+      @if (ov.buckets?.length) {
+        <div class="balance-card balance-card--buckets">
+          <span class="balance-label">Chi tiết theo gói</span>
+          <ul class="bucket-list">
+            @for (bucket of ov.buckets ?? []; track bucket.creditType + (bucket.packageId ?? '-')) {
+              <li class="bucket-item">
+                <code>{{ bucket.packageId ?? 'túi chung' }}</code>
+                <span class="bucket-type">{{ bucket.creditType }}</span>
+                <strong>{{ bucket.balance }}</strong>
+              </li>
+            }
+          </ul>
+        </div>
+      }
       <div class="balance-target">
         <span class="target-label">Đang xem</span>
         <code class="target-id">{{ activeUserId() }}</code>
@@ -150,6 +166,18 @@
               Lượt Toolkit
             </option>
           </select>
+        </div>
+        <!-- CR-011 — bucket: bắt buộc với loại có pool, để trống cho mentoring -->
+        <div class="field field--narrow">
+          <label for="adjust-package" class="field__label">Gói (bucket)</label>
+          <input
+            id="adjust-package"
+            type="text"
+            class="form-input"
+            placeholder="VD: youth-a (bắt buộc với khoá/Quick Scan/Toolkit)"
+            [value]="adjustPackageId()"
+            (input)="setAdjustPackageId($any($event.target).value)"
+          />
         </div>
         <div class="field field--narrow">
           <label for="adjust-amount" class="field__label">

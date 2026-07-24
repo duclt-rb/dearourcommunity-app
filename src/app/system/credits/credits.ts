@@ -43,6 +43,8 @@ export default class SystemCreditsComponent {
   readonly isLoading = this.store.isLoading;
   readonly lookupError = this.store.lookupError;
   readonly adjustCreditType = this.store.adjustCreditType;
+  /** CR-011 — bucket cần điều chỉnh (bắt buộc với loại credit có pool). */
+  readonly adjustPackageId = this.store.adjustPackageId;
   readonly adjustAmount = this.store.adjustAmount;
   readonly adjustNote = this.store.adjustNote;
   readonly isAdjusting = this.store.isAdjusting;
@@ -62,6 +64,7 @@ export default class SystemCreditsComponent {
   readonly lookup = this.store.lookup;
   readonly goToHistoryPage = this.store.goToHistoryPage;
   readonly setAdjustCreditType = this.store.setAdjustCreditType;
+  readonly setAdjustPackageId = this.store.setAdjustPackageId;
   readonly setAdjustAmount = this.store.setAdjustAmount;
   readonly setAdjustNote = this.store.setAdjustNote;
   readonly submitAdjust = this.store.submitAdjust;
