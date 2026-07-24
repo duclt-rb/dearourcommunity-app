@@ -98,6 +98,10 @@ export interface CheckoutState {
   upgradeQuote: UpgradeQuote | null;
   // Đang lấy báo giá → khoá nút thanh toán để không gửi nhầm giá niêm yết (BE sẽ 400).
   quoteLoading: boolean;
+  // Lấy báo giá THẤT BẠI. Checkout luôn nằm sau authGuard nên đây là lỗi thật (không phải
+  // "khách vãng lai") → fail-closed: khoá nút thanh toán + cho user thử lại, thay vì âm thầm
+  // dùng giá niêm yết & số lượt của config gói (sai với lượt nâng cấp, submit sẽ ăn 400).
+  quoteError: boolean;
 }
 
 const initialState: CheckoutState = {
@@ -130,6 +134,7 @@ const initialState: CheckoutState = {
   paymentErrorMsg: null,
   upgradeQuote: null,
   quoteLoading: false,
+  quoteError: false,
 };
 
 export const CheckoutStore = signalStore(
@@ -365,20 +370,27 @@ export const CheckoutStore = signalStore(
        * chặn bằng anti-tamper nếu thực sự phải trả số khác).
        */
       const loadUpgradeQuote = async (packageId: string): Promise<void> => {
-        patchState(store, { quoteLoading: true });
+        patchState(store, { quoteLoading: true, quoteError: false });
         try {
           const quote = await packagesService.getUpgradeQuote(packageId);
-          if (store.selectedPackage()?.id !== packageId) return; // đổi gói giữa chừng
+          if (store.selectedPackage()?.id !== packageId) {
+            // Đổi gói giữa chừng: bỏ kết quả cũ nhưng phải hạ cờ loading, tránh kẹt nút
+            patchState(store, { quoteLoading: false });
+            return;
+          }
           patchState(store, {
             upgradeQuote: quote,
             originalPrice: Number(quote.payableAmount),
             quoteLoading: false,
+            quoteError: false,
           });
           // Số lượt có thể đã co lại (nâng cấp = phần chênh) → chọn sẵn nếu hết lựa chọn thực
           autoSelectForcedToolkits();
         } catch (err) {
+          // Fail-closed: KHÔNG rơi về giá niêm yết/config gói vì với lượt nâng cấp cả số tiền
+          // lẫn số lượt chọn đều sai → user thao tác xong mới bị BE từ chối.
           console.error('Failed to load upgrade quote', err);
-          patchState(store, { upgradeQuote: null, quoteLoading: false });
+          patchState(store, { upgradeQuote: null, quoteLoading: false, quoteError: true });
         }
       };
 

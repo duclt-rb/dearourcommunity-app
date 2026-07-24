@@ -122,6 +122,8 @@ export default class BillingComponent implements OnInit {
   // ── CR-009: nâng cấp gói chỉ trả phần chênh ──
   /** Đang hỏi server số phải trả → khoá nút để không gửi nhầm giá niêm yết. */
   quoteLoading = this.store.quoteLoading;
+  /** Lấy báo giá lỗi → fail-closed: khoá nút thanh toán, hiện notice + nút thử lại. */
+  quoteError = this.store.quoteError;
   isUpgrade = this.store.isUpgrade;
   /** Giá niêm yết của gói (khác số phải trả khi nâng cấp). */
   listPrice = this.store.listPrice;
@@ -234,6 +236,12 @@ export default class BillingComponent implements OnInit {
 
   toggleCourse(courseId: number) {
     this.store.toggleCourse(courseId);
+  }
+
+  /** Thử lấy lại báo giá sau khi lỗi mạng (CR-009 fail-closed). */
+  retryQuote() {
+    const pkg = this.store.selectedPackage();
+    if (pkg) void this.store.loadUpgradeQuote(pkg.id);
   }
 
   readonly copiedField = signal<string | null>(null);

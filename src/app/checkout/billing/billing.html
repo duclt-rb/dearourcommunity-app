@@ -430,10 +430,21 @@
             <span>Lịch hẹn đã bị từ chối — liên hệ hỗ trợ nếu cần.</span>
           </div>
         } @else {
+          <!-- CR-009 — không lấy được báo giá thì KHÔNG cho thanh toán (số tiền và số lượt chọn
+               của lượt nâng cấp đều sai nếu đoán từ config gói) -->
+          @if (quoteError()) {
+            <div class="booking-notice booking-notice--error">
+              <svg lucideCircleX [size]="20" strokeWidth="2"></svg>
+              <span>
+                Không lấy được giá của gói này. Vui lòng kiểm tra kết nối và thử lại.
+                <button type="button" class="quote-retry" (click)="retryQuote()">Thử lại</button>
+              </span>
+            </div>
+          }
           <!-- CR-009 — chờ báo giá nâng cấp xong mới cho thanh toán (tránh gửi giá niêm yết) -->
           <button
             class="btn-checkout"
-            [disabled]="!selectionComplete() || quoteLoading()"
+            [disabled]="!selectionComplete() || quoteLoading() || quoteError()"
             (click)="goToPayment()"
           >
             Tiến hành thanh toán

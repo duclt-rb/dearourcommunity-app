@@ -825,6 +825,19 @@
   gap: 10px;
 }
 
+/* CR-009 — nút thử lại trong notice khi không lấy được báo giá */
+.quote-retry {
+  margin-left: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 /* CR-010 — nhãn nhóm khoá theo gói xuất xứ (chỉ hiện khi có ≥2 nhóm) */
 .course-group-label {
   font-size: 12px;
