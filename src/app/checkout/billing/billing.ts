@@ -35,7 +35,17 @@ interface PackageCourseUI {
   thumbnailUrl: string | null;
   sourcePackageId: string | null;
   sourcePackageName: string | null;
+  sourcePackageLabel: string | null;
   sourcePackageTier: number | null;
+}
+
+/**
+ * CR-010 — nhãn nhóm ngắn gọn: `label` của gói là "Youth A" / "Organization C+" nên lấy phần
+ * cuối ("A", "C+") để tiêu đề đọc là "Từ gói A". Gói không có label → dùng tên đầy đủ.
+ */
+function toShortPackageLabel(label: string | null, name: string | null): string {
+  const suffix = label?.trim().split(/\s+/).pop();
+  return suffix || (name ?? '');
 }
 
 @Component({
@@ -190,9 +200,10 @@ export default class BillingComponent implements OnInit {
         title: pc.course?.postTitle ?? `Khoá học #${pc.wpCourseId}`,
         // Ảnh đại diện khoá (SDK 0.18.0) — null/undefined → card fallback icon sách
         thumbnailUrl: pc.course?.thumbnailUrl ?? null,
-        // CR-010 — gói xuất xứ (SDK 0.23.0): gói tier thấp nhất cùng ladder có khoá này
+        // CR-010 — gói xuất xứ (SDK 0.24.0): gói tier thấp nhất cùng ladder có khoá này
         sourcePackageId: pc.sourcePackageId ?? null,
         sourcePackageName: pc.sourcePackageName ?? null,
+        sourcePackageLabel: pc.sourcePackageLabel ?? null,
         sourcePackageTier: pc.sourcePackageTier ?? null,
       }))
       .filter((c) => pickable.has(c.id));
@@ -218,7 +229,8 @@ export default class BillingComponent implements OnInit {
       const key = course.sourcePackageId ?? '__unknown__';
       const group = groups.get(key) ?? {
         packageId: course.sourcePackageId,
-        packageName: course.sourcePackageName,
+        // Hiển thị "Gói A" thay vì tên gói dài
+        packageName: toShortPackageLabel(course.sourcePackageLabel, course.sourcePackageName),
         // Không rõ xuất xứ → xếp cuối
         tier: course.sourcePackageTier ?? Number.MAX_SAFE_INTEGER,
         courses: [] as PackageCourseUI[],
