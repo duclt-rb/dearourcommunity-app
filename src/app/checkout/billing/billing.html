@@ -356,6 +356,61 @@
               </div>
             }
 
+            <!-- CR-012 — MUA LẺ: chỉ hiện món khách đã chọn từ trang gói (deep-link `?addons=`);
+                 checkout KHÔNG upsell lại. Bỏ hết món → mục tự ẩn. -->
+            @if (!quoteLoading() && selectedAddonItems().length > 0 && !store.bookingRef()) {
+              <div class="dashed-divider"></div>
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <span class="section-label">
+                  Mua thêm
+                  <span class="course-select-counter complete">{{ selectedAddonCount() }}</span>
+                </span>
+                <p class="course-select-hint">
+                  Các mục dưới đây KHÔNG nằm trong gói bạn đang mua — bạn đã chọn mua lẻ, tiền được
+                  cộng vào đơn và thanh toán một lần cùng gói.
+                </p>
+                <div class="course-select-grid">
+                  @for (
+                    item of selectedAddonItems();
+                    track item.type + ':' + item.refId;
+                    let i = $index
+                  ) {
+                    <div class="course-card-mini course-card-mini--addon selected">
+                      <span class="course-card-mini__thumb tone-{{ i % 4 }}">
+                        @if (item.thumbnailUrl) {
+                          <img
+                            class="course-card-mini__img"
+                            [src]="item.thumbnailUrl"
+                            alt=""
+                            loading="lazy"
+                          />
+                        } @else if (item.type === 'extra_course') {
+                          <svg lucideBookOpen [size]="18" strokeWidth="2"></svg>
+                        } @else {
+                          <svg lucideWrench [size]="18" strokeWidth="2"></svg>
+                        }
+                      </span>
+                      <span class="course-card-mini__title">{{ item.title }}</span>
+                      @if (item.packageLabel) {
+                        <span class="course-card-mini__pkg-badge">Gói {{ item.packageLabel }}</span>
+                      }
+                      <span class="course-card-mini__addon-price">
+                        + ₫ {{ item.price | number: '1.0-0' }}
+                      </span>
+                      <button
+                        type="button"
+                        class="course-card-mini__remove"
+                        aria-label="Bỏ mục mua thêm"
+                        (click)="removeAddon(item)"
+                      >
+                        <svg lucideX [size]="12" strokeWidth="3"></svg>
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
             <div class="dashed-divider"></div>
 
             <!-- Promo Code -->
@@ -451,12 +506,19 @@
                   >
                 </div>
               }
+              <!-- CR-012 — phần mua lẻ nằm ngoài giá gói và KHÔNG được coupon giảm (D6) -->
+              @if (addonAmount() > 0) {
+                <div class="total-row">
+                  <span class="total-label">Mua thêm ({{ selectedAddonCount() }} mục)</span>
+                  <span class="total-value">+ ₫ {{ addonAmount() | number: '1.0-0' }}</span>
+                </div>
+              }
               <div class="total-row final">
                 <span class="total-label">Tổng cộng</span>
                 @if (quoteLoading()) {
                   <span class="skeleton-line skeleton-line--price"></span>
                 } @else {
-                  <span class="total-value">₫ {{ couponFinalPrice() | number: '1.0-0' }}</span>
+                  <span class="total-value">₫ {{ finalTotal() | number: '1.0-0' }}</span>
                 }
               </div>
               <p class="vat-note">(Đã bao gồm VAT)</p>

@@ -65,6 +65,11 @@ export class ClientService {
     return this.client.invoices;
   }
 
+  /** CR-012 — giá bán lẻ khoá / Quick Scan / Toolkit. */
+  get addons() {
+    return this.client.addons;
+  }
+
   get token(): string | null {
     return this.client.token;
   }

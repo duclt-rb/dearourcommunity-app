@@ -1,0 +1,125 @@
+/* CR-012 — màn admin giá bán lẻ. Dùng lại vốn dĩ style panel/field của màn credits. */
+.addon-prices-module {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  background: #fff;
+  border: 1px solid var(--color-border-light, #ececf2);
+  border-radius: 16px;
+}
+
+.panel-header {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.panel-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  color: var(--color-primary, #8f50e2);
+  background: rgba(143, 80, 226, 0.1);
+}
+
+.panel-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-dark, #1c1c1c);
+}
+
+.panel-desc {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: #7a7a8e;
+}
+
+.price-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-dark, #1c1c1c);
+}
+
+.field__hint {
+  font-size: 12px;
+  color: #7a7a8e;
+}
+
+.form-input {
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--color-dark, #1c1c1c);
+  background: #fff;
+  border: 1px solid var(--color-border-light, #ececf2);
+  border-radius: 10px;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--color-primary, #8f50e2);
+  box-shadow: 0 0 0 3px rgba(143, 80, 226, 0.12);
+}
+
+.alert {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
+  font-size: 13px;
+  border-radius: 10px;
+}
+
+.alert.error {
+  color: #b42318;
+  background: #fef3f2;
+}
+
+.alert.success {
+  color: #067647;
+  background: #ecfdf3;
+}
+
+.btn {
+  align-self: flex-start;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.btn.primary {
+  color: #fff;
+  background: var(--color-primary, #8f50e2);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

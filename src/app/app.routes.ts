@@ -105,6 +105,12 @@ export const routes: Routes = [
         title: 'Điều chỉnh credit',
         loadComponent: () => import('./system/credits/credits'),
       },
+      {
+        // CR-012 — giá bán lẻ khoá / Quick Scan / Toolkit tại checkout
+        path: 'addon-prices',
+        title: 'Giá bán lẻ',
+        loadComponent: () => import('./system/addon-prices/addon-prices'),
+      },
     ],
   },
   {

@@ -14,14 +14,20 @@ export const checkoutGuard: CanActivateFn = async (route) => {
   // tại: không có bookingId thì xoá ref cũ, tránh gắn nhầm vào lượt checkout khác.
   store.setBookingRef(route.queryParams['bookingId'] ?? null);
 
+  // CR-012 D8 — Frontpage bấm "+" ở trang gói dẫn sang đây kèm
+  // `?addons=extra_course:9890` (nhiều món cách nhau bằng dấu phẩy). Chỉ là GỢI Ý:
+  // store lọc lại theo danh sách bán được do server trả về trong checkout-plan.
+  store.setPendingAddons(route.queryParams['addons'] ?? null);
+
   // Focus solely on selected package validation.
   // Assumes authentication check is already handled by authGuard.
-  if (store.selectedPackage()) {
+  // CR-012 — `?packageId=` THẮNG state cũ: khách đang xem dở gói A rồi bấm "+" ở trang gói B
+  // phải vào checkout gói B (nếu không, món mua lẻ của B bị loại vì không thuộc gói A).
+  const packageId = route.queryParams['packageId'];
+  if (store.selectedPackage() && (!packageId || store.selectedPackage()?.id === packageId)) {
     return true;
   }
 
-  // Check if query parameter has packageId
-  const packageId = route.queryParams['packageId'];
   if (packageId) {
     try {
       const pkg = await packagesService.findById(packageId);

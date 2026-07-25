@@ -896,6 +896,44 @@
 
 /* CR-010 — badge gói xuất xứ trên từng card khoá ("Gói A"), danh sách vẫn để phẳng.
    Là flex-child bình thường (nằm dưới tiêu đề) để không đè lên thumbnail hay ô check. */
+/* CR-012 — card MUA LẺ: viền nét đứt để phân biệt rõ "không nằm trong gói" */
+.course-card-mini--addon {
+  border-style: dashed;
+  cursor: default;
+}
+
+.course-card-mini--addon.selected {
+  border-style: solid;
+}
+
+.course-card-mini__addon-price {
+  margin-top: -2px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-primary, #8f50e2);
+  white-space: nowrap;
+}
+
+.course-card-mini__remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: #fff;
+  background: rgba(28, 28, 28, 0.55);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.course-card-mini__remove:hover {
+  background: rgba(28, 28, 28, 0.8);
+}
+
 .course-card-mini__pkg-badge {
   margin-top: -4px;
   font-size: 10px;

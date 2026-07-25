@@ -2,6 +2,8 @@ import { inject, computed } from '@angular/core';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { ApiError } from '@dearourcommunity/client';
 import type {
+  AddonCandidate,
+  CheckoutAddon,
   CheckoutPlan,
   CreateBankTransferResponse,
   Package,
@@ -102,6 +104,12 @@ export interface CheckoutState {
   // CR-011 — số mục phải chọn theo TỪNG GÓI (bucket) do server tính; `null` = chưa nạp.
   // Lượt của gói nào chỉ tiêu được trong pool của gói đó nên FE phải đếm theo bucket.
   checkoutPlan: CheckoutPlan | null;
+  // CR-012 — món MUA LẺ đã bấm "+" (khoá của gói cao hơn / Quick Scan / Toolkit). Giá do server
+  // quyết; FE chỉ gửi (type, refId). Luôn được lọc lại theo `checkoutPlan.addonCandidates`.
+  selectedAddons: CheckoutAddon[];
+  // CR-012 — món đến từ deep-link `?addons=extra_course:9890` của Frontpage, giữ lại tới khi nạp
+  // xong kế hoạch checkout rồi mới đối chiếu với danh sách bán được (không tin query param).
+  pendingAddonRefs: CheckoutAddon[];
   // Lấy báo giá THẤT BẠI. Checkout luôn nằm sau authGuard nên đây là lỗi thật (không phải
   // "khách vãng lai") → fail-closed: khoá nút thanh toán + cho user thử lại, thay vì âm thầm
   // dùng giá niêm yết & số lượt của config gói (sai với lượt nâng cấp, submit sẽ ăn 400).
@@ -140,7 +148,12 @@ const initialState: CheckoutState = {
   quoteLoading: false,
   quoteError: false,
   checkoutPlan: null,
+  selectedAddons: [],
+  pendingAddonRefs: [],
 };
+
+/** Khoá định danh một món mua lẻ (loại + id) — dùng để so khớp/dedupe. */
+const addonKey = (addon: CheckoutAddon) => `${addon.type}:${addon.refId}`;
 
 export const CheckoutStore = signalStore(
   { providedIn: 'root' }, // Registered globally so the checkout flow can read the package selected via ?packageId= (from the main app's /packages page)
@@ -157,7 +170,22 @@ export const CheckoutStore = signalStore(
       enrolledCourseIds,
       upgradeQuote,
       checkoutPlan,
+      selectedAddons,
     }) => ({
+      // ── CR-012: mua lẻ tại checkout ──────────────────────────────────────────
+      /** Món bán được cho gói này (server tính: đã loại món miễn phí trong gói / đã sở hữu). */
+      addonCandidates: computed<AddonCandidate[]>(() => checkoutPlan()?.addonCandidates ?? []),
+      /** Tổng tiền món thêm — chỉ để HIỂN THỊ; số thực thu do server cộng lại khi tạo đơn. */
+      addonAmount: computed(() => {
+        const priceByKey = new Map(
+          (checkoutPlan()?.addonCandidates ?? []).map((c) => [addonKey(c), c.price]),
+        );
+        return selectedAddons().reduce(
+          (sum, addon) => sum + (priceByKey.get(addonKey(addon)) ?? 0),
+          0,
+        );
+      }),
+      selectedAddonCount: computed(() => selectedAddons().length),
       // CR-011 — số mục phải chọn do SERVER tính theo từng bucket (gói). FE chỉ hiển thị và
       // gate; BE validate lại bằng đúng hàm này nên không thể lệch.
       planCourseRequired: computed(() => checkoutPlan()?.courses.required ?? 0),
@@ -430,6 +458,8 @@ export const CheckoutStore = signalStore(
           });
           // Số lượt có thể đã co lại (nâng cấp = phần chênh) → chọn sẵn nếu hết lựa chọn thực
           autoSelectForcedToolkits();
+          // CR-012 — đã có danh sách món bán được → chốt lại lựa chọn (kể cả món từ deep-link)
+          reconcileAddons();
         } catch (err) {
           // Fail-closed: KHÔNG rơi về giá niêm yết/config gói vì với lượt nâng cấp cả số tiền
           // lẫn số lượt chọn đều sai → user thao tác xong mới bị BE từ chối.
@@ -441,6 +471,22 @@ export const CheckoutStore = signalStore(
             quoteError: true,
           });
         }
+      };
+
+      /**
+       * CR-012 — chỉ giữ lại món thực sự BÁN ĐƯỢC cho gói này (gộp cả món deep-link từ
+       * Frontpage). Query param là dữ liệu ngoài nên phải đối chiếu với danh sách server trả
+       * về, nếu không user có thể tự thêm món rồi ăn 400 lúc submit.
+       */
+      const reconcileAddons = () => {
+        const sellable = new Set(
+          (store.checkoutPlan()?.addonCandidates ?? []).map((candidate) => addonKey(candidate)),
+        );
+        const merged = new Map<string, CheckoutAddon>();
+        for (const addon of [...store.selectedAddons(), ...store.pendingAddonRefs()]) {
+          if (sellable.has(addonKey(addon))) merged.set(addonKey(addon), addon);
+        }
+        patchState(store, { selectedAddons: [...merged.values()], pendingAddonRefs: [] });
       };
 
       return {
@@ -462,6 +508,8 @@ export const CheckoutStore = signalStore(
             // CR-004/CR-006 — đổi gói → làm lại lựa chọn khoá + toolkit (pool/số lượt theo gói)
             selectedCourseIds: [],
             selectedToolkitIds: [],
+            // CR-012 — đổi gói → bỏ món mua lẻ cũ (danh sách bán được theo từng gói)
+            selectedAddons: [],
           });
           // UX 15/07 — pool mới không còn lựa chọn thực → chọn sẵn luôn
           autoSelectForcedToolkits();
@@ -478,6 +526,52 @@ export const CheckoutStore = signalStore(
           } else if (ids.length < store.requiredCourseSelections()) {
             patchState(store, { selectedCourseIds: [...ids, courseId] });
           }
+        },
+
+        // ── CR-012: mua lẻ tại checkout ────────────────────────────────────────────
+        /** Bỏ một món mua lẻ khỏi đơn (UI chỉ hiện món đã chọn nên đây là nút ×). */
+        toggleAddon(addon: CheckoutAddon) {
+          const key = addonKey(addon);
+          const current = store.selectedAddons();
+          if (current.some((item) => addonKey(item) === key)) {
+            patchState(store, { selectedAddons: current.filter((item) => addonKey(item) !== key) });
+            return;
+          }
+          const sellable = store.addonCandidates().some((candidate) => addonKey(candidate) === key);
+          if (sellable) {
+            patchState(store, {
+              selectedAddons: [...current, { type: addon.type, refId: addon.refId }],
+            });
+          }
+        },
+
+        /**
+         * CR-012 D8 — món chọn sẵn từ Frontpage qua `?addons=extra_course:9890`.
+         * Giữ tạm rồi lọc qua `addonCandidates` khi kế hoạch checkout về (reconcileAddons).
+         */
+        setPendingAddons(raw: string | null) {
+          const parsed = (raw ?? '')
+            .split(',')
+            .map((chunk) => chunk.trim())
+            .filter(Boolean)
+            .map((chunk) => {
+              const [type, ...rest] = chunk.split(':');
+              return { type, refId: rest.join(':') };
+            })
+            .filter(
+              (item): item is CheckoutAddon =>
+                !!item.refId &&
+                (item.type === 'extra_course' ||
+                  item.type === 'quick_scan' ||
+                  item.type === 'toolkit'),
+            );
+          patchState(store, { pendingAddonRefs: parsed });
+          // Chỉ chốt ngay khi ĐÃ có plan ĐÚNG gói đang chọn (vào lại /billing mà store còn plan).
+          // Tải trang MỚI thì cả plan lẫn gói đều null — PHẢI giữ nguyên pending (đừng để
+          // `undefined === undefined` chạy reconcile khi addonCandidates còn rỗng → xoá mất
+          // pending); `loadUpgradeQuote` sẽ chốt sau khi nạp plan.
+          const plan = store.checkoutPlan();
+          if (plan && plan.packageId === store.selectedPackage()?.id) reconcileAddons();
         },
 
         // ── CR-004/CR-006 amendment: nạp ngữ cảnh "đã sở hữu" để pool/số lượt khớp BE ──
@@ -642,6 +736,8 @@ export const CheckoutStore = signalStore(
                 store.requiredQuickScanSelections() + store.requiredToolkitSelections() > 0
                   ? store.selectedToolkitIds()
                   : undefined,
+              // CR-012 — món mua lẻ (server tự cộng tiền theo bảng giá)
+              addons: store.selectedAddons().length ? store.selectedAddons() : undefined,
             });
 
             if (response && response.payUrl) {
@@ -698,6 +794,8 @@ export const CheckoutStore = signalStore(
                 store.requiredQuickScanSelections() + store.requiredToolkitSelections() > 0
                   ? store.selectedToolkitIds()
                   : undefined,
+              // CR-012 — món mua lẻ: số tiền trên QR phải là TỔNG THU (gói + món thêm)
+              addons: store.selectedAddons().length ? store.selectedAddons() : undefined,
             });
 
             patchState(store, { bankTransfer: response, bankCreating: false });
@@ -755,6 +853,8 @@ export const CheckoutStore = signalStore(
                 store.requiredQuickScanSelections() + store.requiredToolkitSelections() > 0
                   ? store.selectedToolkitIds()
                   : undefined,
+              // CR-012 — bước này persist món mua lẻ vào giao dịch (nguồn chân lý fulfillment)
+              addons: store.selectedAddons().length ? store.selectedAddons() : undefined,
             });
 
             if (response.status === 'awaiting_confirmation' || response.status === 'success') {

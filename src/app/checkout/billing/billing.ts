@@ -170,6 +170,42 @@ export default class BillingComponent implements OnInit {
   courseSelectionComplete = this.store.courseSelectionComplete;
   isOrgPackage = this.store.isOrgPackage;
 
+  // ── CR-012: mua lẻ ──
+  addonAmount = this.store.addonAmount;
+  selectedAddonCount = this.store.selectedAddonCount;
+
+  /**
+   * Chỉ hiện món khách ĐÃ CHỌN (mang sang từ Frontpage qua `?addons=`) — checkout không upsell
+   * lại. Bỏ hết món thì cả mục tự ẩn. Tên toolkit lấy từ catalog app, khoá lấy tiêu đề server trả.
+   */
+  readonly selectedAddonItems = computed(() => {
+    const selected = new Set(
+      this.store.selectedAddons().map((addon) => `${addon.type}:${addon.refId}`),
+    );
+    return this.store
+      .addonCandidates()
+      .filter((candidate) => selected.has(`${candidate.type}:${candidate.refId}`))
+      .map((candidate) => ({
+        type: candidate.type,
+        refId: candidate.refId,
+        title:
+          candidate.type === 'extra_course'
+            ? candidate.label
+            : (findToolkit(candidate.refId)?.name ?? candidate.label),
+        price: candidate.price,
+        thumbnailUrl: candidate.thumbnailUrl ?? null,
+        packageLabel: toShortPackageLabel(candidate.sourcePackageLabel),
+      }));
+  });
+
+  /** Bỏ một món khỏi đơn. */
+  removeAddon(item: { type: string; refId: string }) {
+    this.store.toggleAddon({
+      type: item.type as 'extra_course' | 'quick_scan' | 'toolkit',
+      refId: item.refId,
+    });
+  }
+
   // ── CR-006: chọn Quick Scan / Toolkit tại checkout ──
   requiredQuickScans = this.store.requiredQuickScanSelections;
   requiredToolkits = this.store.requiredToolkitSelections;
@@ -282,8 +318,12 @@ export default class BillingComponent implements OnInit {
   readonly displayTotal = computed<number>(() => {
     const bank = this.bankTransfer();
     if (this.paymentMethod() === 'bank' && bank) return bank.amount;
-    return this.store.originalPrice();
+    // CR-012 — món mua lẻ nằm ngoài giá gói: cộng vào số hiển thị (server chốt lại khi tạo đơn)
+    return this.store.originalPrice() + this.addonAmount();
   });
+
+  /** Tổng cuối ở bước Order: phần gói (sau coupon) + món mua lẻ (coupon không giảm — D6). */
+  readonly finalTotal = computed(() => this.couponFinalPrice() + this.addonAmount());
 
   get originalPrice(): number {
     return this.store.originalPrice();

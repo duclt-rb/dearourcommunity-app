@@ -1,0 +1,75 @@
+<div class="addon-prices-module">
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-icon"><svg lucideTag [size]="18" strokeWidth="2"></svg></span>
+      <div>
+        <h2 class="panel-title">Giá bán lẻ tại checkout</h2>
+        <p class="panel-desc">
+          Khách mua gói có thể trả thêm để lấy khoá của gói cao hơn (gói cá nhân) hoặc Quick
+          Scan/Toolkit ngoài phần miễn phí (gói tổ chức). Giá mới chỉ áp cho đơn tạo sau khi lưu —
+          đơn chuyển khoản đang chờ duyệt giữ giá đã chốt lúc tạo đơn.
+        </p>
+      </div>
+    </div>
+
+    @if (loadError(); as err) {
+      <div class="alert error">
+        <svg lucideAlertCircle [size]="16" strokeWidth="2"></svg>
+        <span>{{ err }}</span>
+      </div>
+    }
+    @if (isLoading()) {
+      <p class="panel-desc">Đang tải bảng giá…</p>
+    } @else {
+      <div class="price-fields">
+        @for (item of items(); track item.addonType) {
+          <div class="field">
+            <label class="field__label" [for]="'addon-price-' + item.addonType">
+              {{ item.label }}
+            </label>
+            <input
+              [id]="'addon-price-' + item.addonType"
+              type="number"
+              min="0"
+              step="1000"
+              class="form-input"
+              [value]="draft()[item.addonType]"
+              (input)="setDraft(item.addonType, $any($event.target).value)"
+            />
+            <span class="field__hint">
+              Hiện tại: ₫ {{ item.price | number: '1.0-0' }}
+              @if (item.updatedAt) {
+                · sửa {{ item.updatedAt | date: 'dd/MM/yyyy HH:mm' }}
+              }
+              @if (item.updatedBy) {
+                bởi {{ item.updatedBy }}
+              }
+            </span>
+          </div>
+        }
+      </div>
+
+      @if (saveError(); as err) {
+        <div class="alert error">
+          <svg lucideAlertCircle [size]="16" strokeWidth="2"></svg>
+          <span>{{ err }}</span>
+        </div>
+      }
+      @if (saveSuccess()) {
+        <div class="alert success">
+          <svg lucideCheck [size]="16" strokeWidth="2"></svg>
+          <span>Đã lưu giá bán lẻ.</span>
+        </div>
+      }
+
+      <button
+        type="button"
+        class="btn primary"
+        [disabled]="!changed() || !draftValid() || isSaving()"
+        (click)="save()"
+      >
+        {{ isSaving() ? 'Đang lưu...' : 'Lưu giá' }}
+      </button>
+    }
+  </div>
+</div>
