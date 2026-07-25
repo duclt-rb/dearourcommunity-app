@@ -88,11 +88,19 @@ export class ToolkitAccessService {
 
   isAuthenticated = computed(() => this.authStore.isAuthenticated());
 
+  /**
+   * Admin (`isAdmin` từ `auth.me()`) vào được MỌI Quick Scan/Toolkit, không cần selection —
+   * để vận hành/CSKH kiểm tra nội dung. Bypass CHỈ ở tầng quyền vào trang: admin KHÔNG được
+   * coi là "đã sở hữu" (`allowedToolkitIds` giữ nguyên selection thật), nếu không checkout sẽ
+   * lệch với validate của BE (BE đọc `app_toolkit_selections` — xem CR-006 3.3).
+   */
+  isAdmin = computed(() => this.authStore.user()?.isAdmin === true);
+
   /** CR-006 — quyền = danh sách selection của user (không còn union flag gói). */
   allowedToolkitIds = computed<Set<string>>(() => this.selections());
 
   canAccess(toolkitId: string): boolean {
-    return this.allowedToolkitIds().has(toolkitId);
+    return this.isAdmin() || this.allowedToolkitIds().has(toolkitId);
   }
 
   /** Các gói bán được (youth/org) có chứa toolkit này — cho CTA "mua gói để dùng". */

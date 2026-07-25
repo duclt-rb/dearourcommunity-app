@@ -20,6 +20,9 @@ export const toolkitCatalogRedirectGuard: CanActivateFn = () => {
  * - Chưa đăng nhập → hard-redirect /auth/login?redirect=… (pattern authGuard).
  * - id lạ / coming-soon / gói không có flag `toolkit:<id>` → trang khóa
  *   `/toolkit/locked?toolkit=<id>` (thông báo + CTA mua gói).
+ *
+ * CR-006 — quyền đọc từ selections của user; admin (`isAdmin`) mở hết mọi Quick Scan/Toolkit
+ * (xem `ToolkitAccessService.isAdmin`).
  */
 export const toolkitAccessGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
