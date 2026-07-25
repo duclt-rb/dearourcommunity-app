@@ -59,35 +59,64 @@
           </div>
         </div>
 
-        <!-- Invitation Panel (Owner Only, styled like System Form Cards) -->
+        <!-- Công cụ của chủ sở hữu: mời thành viên + gán khoá (2 panel gọn, cùng một khối) -->
         @if (isOwner()) {
-          <form class="form-card" (submit)="onInviteSubmit($event)" novalidate>
-            <div class="form-card-header">
-              <h3 class="form-card-title">Mời Thành viên Mới</h3>
-              <p class="field-help">
-                Nhập email của người bạn muốn cấp quyền học để gửi lời mời tham gia doanh nghiệp.
-              </p>
-            </div>
+          <div class="owner-tools">
+            <!-- Mời thành viên -->
+            <section class="tool-panel">
+              <div class="tool-panel__head">
+                <span class="tool-panel__icon" aria-hidden="true">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M19 8v6M22 11h-6" />
+                  </svg>
+                </span>
+                <div class="tool-panel__titles">
+                  <h3 class="tool-panel__title">Mời thành viên</h3>
+                  <p class="tool-panel__hint">Gửi lời mời qua email để cấp quyền học trong gói.</p>
+                </div>
+                <span
+                  class="tool-chip"
+                  [class.tool-chip--alert]="packageDetails() !== null && slotsUsed() >= maxSlots()"
+                >
+                  <strong>{{ slotsUsed() }}/{{ packageDetails() ? maxSlots() : '--' }}</strong>
+                  chỗ
+                </span>
+              </div>
 
-            <div class="form-group">
-              <label class="form-label" for="inviteEmail">Địa chỉ email học viên</label>
-              <div class="input-with-button">
-                <input
-                  id="inviteEmail"
-                  type="email"
-                  class="form-input"
-                  placeholder="Ví dụ: email.nhanvien@congty.com"
-                  [ngModel]="inviteEmail()"
-                  (ngModelChange)="inviteEmail.set($event ? $event.trim() : '')"
-                  name="inviteEmail"
-                  required
-                  [disabled]="
-                    actionLoading() || (packageDetails() !== null && slotsUsed() >= maxSlots())
-                  "
-                />
+              <form class="tool-panel__form" (submit)="onInviteSubmit($event)" novalidate>
+                <div class="tool-field">
+                  <label class="tool-label" for="inviteEmail">Email học viên</label>
+                  <input
+                    id="inviteEmail"
+                    type="email"
+                    class="tool-control"
+                    placeholder="email.nhanvien@congty.com"
+                    [ngModel]="inviteEmail()"
+                    (ngModelChange)="inviteEmail.set($event ? $event.trim() : '')"
+                    name="inviteEmail"
+                    required
+                    [disabled]="
+                      actionLoading() || (packageDetails() !== null && slotsUsed() >= maxSlots())
+                    "
+                  />
+                  <!-- Helper text ngay dưới ô nhập: nhắc định dạng, không phải báo lỗi -->
+                  @if (inviteEmail().trim() && !isEmailValid()) {
+                    <p class="tool-help">Định dạng email cần dạng ten&#64;congty.com</p>
+                  }
+                </div>
                 <button
                   type="submit"
-                  class="btn-primary"
+                  class="tool-submit"
                   [disabled]="
                     actionLoading() ||
                     (packageDetails() !== null && slotsUsed() >= maxSlots()) ||
@@ -96,143 +125,150 @@
                 >
                   {{ actionLoading() ? 'Đang gửi...' : 'Gửi lời mời' }}
                 </button>
-              </div>
-              @if (inviteEmail().trim() && !isEmailValid()) {
-                <span class="field-help danger-text" style="display: block; margin-top: 6px">
-                  * Địa chỉ email không hợp lệ. Vui lòng nhập đúng định dạng (ví dụ:
-                  email@congty.com).
-                </span>
-              }
-              @if (packageDetails() !== null && slotsUsed() >= maxSlots()) {
-                <span class="field-help danger-text">
-                  * Đã hết chỗ trống trong gói hiện tại. Vui lòng nâng cấp gói hoặc gỡ bỏ thành viên
-                  để mời thêm.
-                </span>
-              }
-            </div>
-          </form>
-        }
+              </form>
 
-        <!-- Gán khoá cho thành viên (CR-001 — org-credit course_selection, Owner Only) -->
-        @if (isOwner()) {
-          <div class="form-card assign-course-card">
-            <div class="form-card-header">
-              <div class="assign-header-row">
-                <div>
-                  <h3 class="form-card-title">Gán khoá cho thành viên</h3>
-                  <p class="field-help">
-                    Dùng suất chọn khoá của doanh nghiệp để ghi danh thành viên vào một khoá học
-                    trong gói đã mua. Mỗi lượt gán trừ 1 suất.
+              @if (packageDetails() !== null && slotsUsed() >= maxSlots()) {
+                <p class="tool-note">
+                  Gói đã dùng hết chỗ — nâng cấp gói hoặc gỡ thành viên để mời thêm.
+                </p>
+              }
+            </section>
+
+            <!-- Gán khoá cho thành viên (CR-001 — org-credit course_selection) -->
+            <section class="tool-panel">
+              <div class="tool-panel__head">
+                <span class="tool-panel__icon" aria-hidden="true">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M22 10 12 5 2 10l10 5 10-5Z" />
+                    <path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5" />
+                  </svg>
+                </span>
+                <div class="tool-panel__titles">
+                  <h3 class="tool-panel__title">Gán khoá cho thành viên</h3>
+                  <p class="tool-panel__hint">
+                    Ghi danh thành viên vào khoá đã chọn khi mua gói — mỗi lượt trừ 1 suất.
                   </p>
                 </div>
-                <div class="credit-balance-chip" [class.depleted]="courseSelectionBalance() === 0">
-                  <span class="credit-balance-value">{{ courseSelectionBalance() }}</span>
-                  <span class="credit-balance-label">suất còn lại</span>
-                </div>
+                <span class="tool-chip" [class.tool-chip--alert]="courseSelectionBalance() === 0">
+                  <strong>{{ courseSelectionBalance() }}</strong> suất
+                </span>
+              </div>
+
+              @if (!coursePool().length) {
+                <p class="tool-note">
+                  Chưa có khoá học nào trong pool của gói doanh nghiệp — vui lòng kiểm tra gói đã
+                  mua.
+                </p>
+              } @else {
+                <form class="tool-panel__form" (submit)="onAssignSubmit($event)" novalidate>
+                  <div class="tool-field">
+                    <label class="tool-label" for="assignMember">Thành viên</label>
+                    <select
+                      id="assignMember"
+                      class="tool-control tool-control--select"
+                      [ngModel]="assignMemberUserId()"
+                      (ngModelChange)="assignMemberUserId.set($event)"
+                      name="assignMember"
+                      [disabled]="assignLoading()"
+                    >
+                      <option value="">Chọn thành viên</option>
+                      @for (member of assignableMembers(); track member.id) {
+                        <option [value]="member.userId">
+                          {{ getMemberDisplayName(member) }} — {{ getMemberEmail(member) }}
+                        </option>
+                      }
+                    </select>
+                  </div>
+
+                  <div class="tool-field">
+                    <label class="tool-label" for="assignCourse">Khoá học</label>
+                    <select
+                      id="assignCourse"
+                      class="tool-control tool-control--select"
+                      [ngModel]="assignCourseId()"
+                      (ngModelChange)="assignCourseId.set($event)"
+                      name="assignCourse"
+                      [disabled]="assignLoading()"
+                    >
+                      <option value="">Chọn khoá học</option>
+                      <!-- CR-004: org có suất giữ chỗ → chỉ hiện khoá còn suất (kèm số suất) -->
+                      @for (course of assignableCourses(); track course.courseId) {
+                        <option [value]="course.courseId">
+                          {{ course.title
+                          }}{{ course.remaining !== null ? ' · còn ' + course.remaining : '' }}
+                        </option>
+                      }
+                    </select>
+                  </div>
+
+                  <button type="submit" class="tool-submit" [disabled]="!canAssign()">
+                    {{ assignLoading() ? 'Đang gán...' : 'Gán khoá' }}
+                  </button>
+                </form>
+
+                @if (courseSelectionBalance() === 0) {
+                  <p class="tool-note">
+                    Doanh nghiệp đã dùng hết suất chọn khoá — liên hệ Dear Our Community nếu cần
+                    thêm.
+                  </p>
+                } @else if (allSlotsAssigned()) {
+                  <!-- CR-004: hết suất giữ chỗ (dù credit tồn từ gói cũ) -->
+                  <p class="tool-note">
+                    Mọi suất khoá đã chọn khi mua gói đều đã được gán — liên hệ Dear Our Community
+                    nếu cần thêm.
+                  </p>
+                }
+              }
+            </section>
+          </div>
+
+          <!-- Khoá đã gán -->
+          <div class="assigned-block">
+            <div class="list-section-header">
+              <div class="list-section-title-wrapper">
+                <h3 class="section-title-small">
+                  Khoá đã gán ({{ courseSelections()?.length || 0 }})
+                </h3>
+                <p class="field-help">Thành viên đã được ghi danh bằng suất của doanh nghiệp.</p>
               </div>
             </div>
 
-            @if (!coursePool().length) {
-              <p class="field-help">
-                Chưa có khoá học nào trong pool của gói doanh nghiệp — vui lòng kiểm tra gói đã mua.
-              </p>
+            @if ((courseSelections()?.length ?? 0) === 0) {
+              <div class="empty-state" style="padding: 32px; border-radius: var(--radius-card)">
+                <p>Chưa có khoá nào được gán cho thành viên.</p>
+              </div>
             } @else {
-              <form class="assign-form" (submit)="onAssignSubmit($event)" novalidate>
-                <div class="form-group assign-field">
-                  <label class="form-label" for="assignMember">Thành viên</label>
-                  <select
-                    id="assignMember"
-                    class="form-input"
-                    [ngModel]="assignMemberUserId()"
-                    (ngModelChange)="assignMemberUserId.set($event)"
-                    name="assignMember"
-                    [disabled]="assignLoading()"
-                  >
-                    <option value="">— Chọn thành viên —</option>
-                    @for (member of assignableMembers(); track member.id) {
-                      <option [value]="member.userId">
-                        {{ getMemberDisplayName(member) }} ({{ getMemberEmail(member) }})
-                      </option>
-                    }
-                  </select>
-                </div>
-
-                <div class="form-group assign-field">
-                  <label class="form-label" for="assignCourse">Khoá học</label>
-                  <select
-                    id="assignCourse"
-                    class="form-input"
-                    [ngModel]="assignCourseId()"
-                    (ngModelChange)="assignCourseId.set($event)"
-                    name="assignCourse"
-                    [disabled]="assignLoading()"
-                  >
-                    <option value="">— Chọn khoá học —</option>
-                    <!-- CR-004: org có suất giữ chỗ → chỉ hiện khoá còn suất (kèm số suất) -->
-                    @for (course of assignableCourses(); track course.courseId) {
-                      <option [value]="course.courseId">
-                        {{ course.title
-                        }}{{
-                          course.remaining !== null
-                            ? ' (còn ' +
-                              course.remaining +
-                              '
-              suất)'
-                            : ''
-                        }}
-                      </option>
-                    }
-                  </select>
-                </div>
-
-                <button type="submit" class="btn-primary assign-submit" [disabled]="!canAssign()">
-                  {{ assignLoading() ? 'Đang gán...' : 'Gán khoá' }}
-                </button>
-              </form>
-              @if (courseSelectionBalance() === 0) {
-                <span class="field-help danger-text">
-                  * Doanh nghiệp đã hết suất chọn khoá. Vui lòng liên hệ Dear Our Community nếu cần
-                  thêm.
-                </span>
-              } @else if (allSlotsAssigned()) {
-                <!-- CR-004: hết suất giữ chỗ (dù credit tồn từ gói cũ) -->
-                <span class="field-help danger-text">
-                  * Các suất khoá học đã chọn khi mua gói đều đã được gán. Vui lòng liên hệ Dear Our
-                  Community nếu cần thêm.
-                </span>
-              }
-            }
-
-            <!-- Danh sách đã gán -->
-            <div class="assigned-list">
-              <h4 class="section-title-small">Đã gán ({{ courseSelections()?.length || 0 }})</h4>
-              @if ((courseSelections()?.length ?? 0) === 0) {
-                <p class="field-help">Chưa có khoá nào được gán cho thành viên.</p>
-              } @else {
-                <div class="table-container">
-                  <table class="system-style-table">
-                    <thead>
-                      <tr>
-                        <th>Thành viên</th>
-                        <th>Khoá học</th>
-                        <th>Ngày gán</th>
+              <div class="table-container">
+                <table class="system-style-table">
+                  <thead>
+                    <tr>
+                      <th>Thành viên</th>
+                      <th>Khoá học</th>
+                      <th>Ngày gán</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (selection of courseSelections() ?? []; track selection.id) {
+                      <tr class="table-row">
+                        <td>{{ getSelectionMemberName(selection.userId) }}</td>
+                        <td>{{ getSelectionCourseTitle(selection.wpCourseId) }}</td>
+                        <td class="join-date">
+                          {{ selection.enrolledAt || selection.createdAt | date: 'dd/MM/yyyy' }}
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      @for (selection of courseSelections() ?? []; track selection.id) {
-                        <tr class="table-row">
-                          <td>{{ getSelectionMemberName(selection.userId) }}</td>
-                          <td>{{ getSelectionCourseTitle(selection.wpCourseId) }}</td>
-                          <td class="join-date">
-                            {{ selection.enrolledAt || selection.createdAt | date: 'dd/MM/yyyy' }}
-                          </td>
-                        </tr>
-                      }
-                    </tbody>
-                  </table>
-                </div>
-              }
-            </div>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
           </div>
         }
 

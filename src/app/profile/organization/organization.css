@@ -151,59 +151,6 @@
   color: rgba(28, 28, 28, 0.7);
 }
 
-/* Invitation Form Card */
-.form-card {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  border-radius: var(--radius-card-lg);
-  background: rgba(28, 28, 28, 0.03);
-  padding: 32px 24px;
-  border: 1px solid rgba(28, 28, 28, 0.05);
-}
-
-@media (min-width: 640px) {
-  .form-card {
-    padding: 36px 40px;
-  }
-}
-
-.form-card-header {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.form-card-title {
-  font-size: 20px;
-  font-weight: 500;
-  line-height: 28px;
-  letter-spacing: 0.2px;
-  color: var(--color-dark);
-  margin: 0;
-}
-
-.input-with-button {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
-}
-
-@media (min-width: 640px) {
-  .input-with-button {
-    flex-direction: row;
-    align-items: center;
-  }
-  .input-with-button .form-input {
-    flex: 1;
-  }
-}
-
-.danger-text {
-  color: #ef4444 !important;
-}
-
 /* Members List Section */
 .members-list-container {
   display: flex;
@@ -408,35 +355,6 @@
 }
 
 /* Form Styles and Button Outlines mapped to edit-profile.css */
-.form-input {
-  width: 100%;
-  border-radius: var(--radius-input);
-  border: 1px solid rgba(28, 28, 28, 0.1);
-  background: #fff;
-  padding: 16px;
-  font-size: 16px;
-  line-height: 24px;
-  letter-spacing: 0.16px;
-  color: var(--color-dark);
-  outline: none;
-  transition: border-color 0.2s;
-  box-sizing: border-box;
-}
-
-.form-input:focus {
-  border-color: var(--color-primary);
-}
-
-.form-input::placeholder {
-  color: rgba(28, 28, 28, 0.6);
-}
-
-.form-input:disabled {
-  background: rgba(28, 28, 28, 0.05);
-  color: rgba(28, 28, 28, 0.6);
-  cursor: not-allowed;
-}
-
 .btn-outline {
   display: flex;
   align-items: center;
@@ -475,31 +393,6 @@
   border-color: #ef4444;
 }
 
-.btn-primary {
-  border-radius: var(--radius-pill);
-  background: var(--color-primary);
-  padding: 16px 28px;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 24px;
-  letter-spacing: 0.16px;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  transition: background 0.2s;
-  box-sizing: border-box;
-  white-space: nowrap;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: var(--color-primary-hover);
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 /* Alert Messages */
 .msg-success {
   border-radius: var(--radius-input);
@@ -522,82 +415,263 @@
 }
 
 /* ============================================================
-   Gán khoá cho thành viên (CR-001 — org-credit course_selection)
+   Công cụ chủ sở hữu — mời thành viên + gán khoá (CR-001/CR-004)
+   Hai panel cùng một khối: header 1 dòng (icon · tiêu đề · chip số liệu)
+   rồi tới hàng field nằm ngang, để chiều cao gọn hơn form-card cũ.
    ============================================================ */
 
-.assign-course-card {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.assign-header-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.credit-balance-chip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 10px 18px;
-  border-radius: 12px;
-  background: var(--color-primary-50, #f5f0fd);
-  border: 1px solid var(--color-primary-100, #e9defb);
-  min-width: 110px;
-}
-
-.credit-balance-chip.depleted {
-  background: var(--color-error-50, #fef2f2);
-  border-color: var(--color-error-200, #fecaca);
-}
-
-.credit-balance-value {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--color-primary-700, #6d28d9);
-  line-height: 1.2;
-}
-
-.credit-balance-chip.depleted .credit-balance-value {
-  color: var(--color-error-600, #dc2626);
-}
-
-.credit-balance-label {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
-  font-weight: 600;
-}
-
-.assign-form {
-  display: flex;
+.owner-tools {
+  display: grid;
   gap: 12px;
-  align-items: flex-end;
-  flex-wrap: wrap;
 }
 
-.assign-field {
+.tool-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  border-radius: var(--radius-card-md);
+  border: 1px solid rgba(28, 28, 28, 0.08);
+  background: #fff;
+  transition: border-color 0.2s ease;
+}
+
+.tool-panel:hover {
+  border-color: rgba(28, 28, 28, 0.14);
+}
+
+@media (min-width: 640px) {
+  .tool-panel {
+    padding: 22px 24px;
+  }
+}
+
+.tool-panel__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tool-panel__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--color-primary-50);
+  color: var(--color-primary);
+}
+
+.tool-panel__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.tool-panel__titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
   flex: 1;
-  min-width: 220px;
-  margin-bottom: 0;
 }
 
-.assign-form select.form-input {
-  width: 100%;
-  height: 48px;
-  cursor: pointer;
+.tool-panel__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 22px;
+  letter-spacing: 0.16px;
+  color: var(--color-dark);
 }
 
-.assign-submit {
+.tool-panel__hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: rgba(28, 28, 28, 0.55);
+}
+
+/* Chip số liệu (chỗ trống / suất còn lại) — thay khối credit-balance to đùng */
+.tool-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-50);
+  border: 1px solid var(--color-primary-100, #e9defb);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  color: var(--color-primary);
   white-space: nowrap;
 }
 
-.assigned-list {
+.tool-chip strong {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.tool-chip--alert {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #dc2626;
+}
+
+/* Hàng field: xếp dọc trên mobile, nằm ngang + nút cuối hàng từ 640px */
+.tool-panel__form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding-top: 4px;
+  gap: 12px;
+}
+
+.tool-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .tool-panel__form {
+    flex-direction: row;
+    /* Canh theo ĐỈNH control (label 16px + gap 6px = 22px) chứ không theo đáy field:
+       field nào có helper text ở dưới cũng không kéo nút lệch khỏi hàng input. */
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .tool-submit {
+    margin-top: 22px;
+  }
+
+  /* Chỉ chia ngang khi form đã là hàng — để ở ngoài thì flex-basis thành CHIỀU CAO
+     lúc xếp dọc và panel hở ra một khoảng trắng lớn giữa field với nút. */
+  .tool-field {
+    flex: 1 1 220px;
+  }
+}
+
+.tool-label {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+  color: rgba(28, 28, 28, 0.5);
+}
+
+.tool-control {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: var(--radius-input);
+  border: 1px solid var(--color-border-input);
+  background: #fff;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--color-dark);
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.tool-control::placeholder {
+  color: rgba(28, 28, 28, 0.4);
+}
+
+.tool-control:hover:not(:disabled) {
+  border-color: var(--color-border-input-hover);
+}
+
+.tool-control:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(143, 80, 226, 0.12);
+}
+
+.tool-control:disabled {
+  background: rgba(28, 28, 28, 0.04);
+  color: rgba(28, 28, 28, 0.45);
+  cursor: not-allowed;
+}
+
+/* Select: bỏ mũi tên mặc định, vẽ caret bằng background để đồng bộ với input */
+.tool-control--select {
+  cursor: pointer;
+  appearance: none;
+  padding-right: 38px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231c1c1c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' opacity='.55'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+  text-overflow: ellipsis;
+}
+
+.tool-submit {
+  height: 44px;
+  padding: 0 22px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 22px;
+  color: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.tool-submit:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.tool-submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Ghi chú trạng thái của panel (hết chỗ / hết suất): helper text, KHÔNG phải báo lỗi —
+   tín hiệu "hết" đã nằm ở chip số liệu, chữ đỏ ở đây chỉ gây cảm giác thao tác sai. */
+.tool-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: rgba(28, 28, 28, 0.55);
+}
+
+.tool-note::before {
+  content: '';
+  flex-shrink: 0;
+  width: 4px;
+  height: 4px;
+  margin-top: 7px;
+  border-radius: 50%;
+  background: rgba(28, 28, 28, 0.3);
+}
+
+/* Helper text bám ngay dưới control */
+.tool-help {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: rgba(28, 28, 28, 0.5);
+}
+
+.assigned-block {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
