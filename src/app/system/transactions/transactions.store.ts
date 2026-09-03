@@ -7,6 +7,7 @@ import {
   withMethods,
   withState,
 } from '@ngrx/signals';
+import { TranslocoService } from '@jsverse/transloco';
 import {
   ApiError,
   type PaymentMethod,
@@ -19,19 +20,19 @@ import { PaymentService } from '../../core/services/payment.service';
 // Số item/trang — phân trang server-side (server giới hạn limit ≤ 100).
 const PAGE_SIZE = 50;
 
-function toErrorMessage(err: unknown): string {
+function toErrorMessage(err: unknown, transloco: TranslocoService): string {
   if (err instanceof ApiError) {
     // 409: giao dịch đã được xử lý trước đó; 404: không tìm thấy; 400: dữ liệu không hợp lệ
     if (err.code === 409) {
-      return 'Giao dịch đã được xử lý trước đó. Vui lòng làm mới danh sách.';
+      return transloco.translate('system.transactions.errors.alreadyProcessed');
     }
     if (err.code === 404) {
-      return 'Không tìm thấy giao dịch.';
+      return transloco.translate('system.transactions.errors.notFound');
     }
-    return err.message || 'Thao tác thất bại. Vui lòng thử lại.';
+    return err.message || transloco.translate('system.transactions.errors.actionFailed');
   }
   console.error('Transaction action failed', err);
-  return 'Thao tác thất bại. Vui lòng thử lại.';
+  return transloco.translate('system.transactions.errors.actionFailed');
 }
 
 const initialState = {
@@ -153,6 +154,8 @@ export const TransactionsStore = signalStore(
     };
   }),
   withMethods((store, paymentService = inject(PaymentService)) => {
+    const transloco = inject(TranslocoService);
+
     // Tải TRANG hiện tại từ server (kèm bộ lọc trạng thái/phương thức).
     async function load() {
       patchState(store, { isLoading: true, loadError: null });
@@ -174,7 +177,7 @@ export const TransactionsStore = signalStore(
           totalPages: Math.max(1, res.meta.totalPages),
         });
       } catch (err) {
-        patchState(store, { loadError: toErrorMessage(err) });
+        patchState(store, { loadError: toErrorMessage(err, transloco) });
       } finally {
         patchState(store, { isLoading: false });
       }
@@ -276,7 +279,7 @@ export const TransactionsStore = signalStore(
           });
           await load();
         } catch (err) {
-          patchState(store, { actionError: toErrorMessage(err) });
+          patchState(store, { actionError: toErrorMessage(err, transloco) });
         } finally {
           patchState(store, { actionLoadingId: null });
         }
@@ -286,7 +289,9 @@ export const TransactionsStore = signalStore(
       async confirmReject(t: Transaction) {
         const reason = store.rejectReason().trim();
         if (!reason) {
-          patchState(store, { actionError: 'Vui lòng nhập lý do từ chối.' });
+          patchState(store, {
+            actionError: transloco.translate('system.transactions.errors.rejectReasonRequired'),
+          });
           return;
         }
 
@@ -301,7 +306,7 @@ export const TransactionsStore = signalStore(
           });
           await load();
         } catch (err) {
-          patchState(store, { actionError: toErrorMessage(err) });
+          patchState(store, { actionError: toErrorMessage(err, transloco) });
         } finally {
           patchState(store, { actionLoadingId: null });
         }

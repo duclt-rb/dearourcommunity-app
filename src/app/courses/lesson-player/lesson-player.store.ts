@@ -1,5 +1,6 @@
-import { computed } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
+import { TranslocoService } from '@jsverse/transloco';
 
 export interface Topic {
   id: string;
@@ -49,115 +50,164 @@ export interface LessonPlayerState {
   reportMessage: string;
 }
 
-const initialState: LessonPlayerState = {
-  courseId: '',
-  lessonId: '',
-  sidebarCollapsed: false,
-  expandedChapters: { '2': true },
-  chapters: [
-    {
-      id: '1',
-      title: 'Chương 1: Tổng Quan Về ESG',
-      isActive: false,
-      completed: true,
-      topicCount: 0,
-      progressOffset: 0,
-      topics: [],
-    },
-    {
-      id: '2',
-      title: 'Chương 2: Môi Trường (E)',
-      isActive: true,
-      completed: false,
-      topicCount: 3,
-      progressOffset: 31.42,
-      topics: [
-        {
-          id: 'topic-2-1',
-          title: 'Biến Đổi Khí Hậu & Phát Thải Carbon',
-          isActive: false,
-          completed: true,
-        },
-        { id: 'topic-2-2', title: 'Giới Thiệu Về ESG', isActive: true, completed: false },
-        {
-          id: 'topic-2-3',
-          title: 'Quản Lý Tài Nguyên & Chất Thải',
-          isActive: false,
-          completed: false,
-        },
-      ],
-    },
-    {
-      id: '3',
-      title: 'Chương 3: Xã Hội (S)',
-      isActive: false,
-      completed: false,
-      topicCount: 4,
-      progressOffset: 62.83,
-      topics: [
-        {
-          id: 'topic-3-1',
-          title: 'Quyền Con Người Trong Chuỗi Cung Ứng',
-          isActive: false,
-          completed: false,
-        },
-        { id: 'topic-3-2', title: 'Đa Dạng & Hòa Nhập', isActive: false, completed: false },
-        {
-          id: 'topic-3-3',
-          title: 'An Toàn & Sức Khỏe Nghề Nghiệp',
-          isActive: false,
-          completed: false,
-        },
-        { id: 'topic-3-4', title: 'Quan Hệ Cộng Đồng', isActive: false, completed: false },
-      ],
-    },
-    {
-      id: '4',
-      title: 'Chương 4: Quản Trị (G)',
-      isActive: false,
-      completed: false,
-      topicCount: 3,
-      progressOffset: 62.83,
-      topics: [
-        { id: 'topic-4-1', title: 'Cấu Trúc Hội Đồng Quản Trị', isActive: false, completed: false },
-        { id: 'topic-4-2', title: 'Đạo Đức Kinh Doanh', isActive: false, completed: false },
-        {
-          id: 'topic-4-3',
-          title: 'Minh Bạch & Công Bố Thông Tin',
-          isActive: false,
-          completed: false,
-        },
-      ],
-    },
-  ],
-  steps: [
-    { id: 'step-1', title: 'Tổng Quan Về ESG', isActive: false, completed: true },
-    {
-      id: 'step-2',
-      title: 'Biến Đổi Khí Hậu & Phát Thải Carbon',
-      isActive: false,
-      completed: true,
-    },
-    { id: 'step-3', title: 'Giới Thiệu Về ESG', isActive: true, completed: false },
-    { id: 'step-4', title: 'Quản Lý Tài Nguyên & Chất Thải', isActive: false, completed: false },
-    { id: 'step-5', title: 'Bài Tập Cuối Chương', isActive: false, completed: false },
-  ],
-  completedSteps: 2,
-  totalSteps: 5,
-  isPlaying: false,
-  videoLoading: false,
-  playbackSpeed: 1,
-  volume: 1,
-  currentTime: 0,
-  duration: 0,
-  showVolume: false,
-  showQuality: false,
-  selectedQuality: 'auto',
-  mobileDrawerOpen: false,
-  reportDialogOpen: false,
-  reportType: '',
-  reportMessage: '',
-};
+// Mock content dịch tại thời điểm tạo store (translate() sync vì file dịch đã preload;
+// đổi ngôn ngữ = reload app nên không cần re-translate).
+function createInitialState(t: TranslocoService): LessonPlayerState {
+  return {
+    courseId: '',
+    lessonId: '',
+    sidebarCollapsed: false,
+    expandedChapters: { '2': true },
+    chapters: [
+      {
+        id: '1',
+        title: t.translate('lesson.content.chapter1'),
+        isActive: false,
+        completed: true,
+        topicCount: 0,
+        progressOffset: 0,
+        topics: [],
+      },
+      {
+        id: '2',
+        title: t.translate('lesson.content.chapter2'),
+        isActive: true,
+        completed: false,
+        topicCount: 3,
+        progressOffset: 31.42,
+        topics: [
+          {
+            id: 'topic-2-1',
+            title: t.translate('lesson.content.topicClimate'),
+            isActive: false,
+            completed: true,
+          },
+          {
+            id: 'topic-2-2',
+            title: t.translate('lesson.content.topicIntroEsg'),
+            isActive: true,
+            completed: false,
+          },
+          {
+            id: 'topic-2-3',
+            title: t.translate('lesson.content.topicResources'),
+            isActive: false,
+            completed: false,
+          },
+        ],
+      },
+      {
+        id: '3',
+        title: t.translate('lesson.content.chapter3'),
+        isActive: false,
+        completed: false,
+        topicCount: 4,
+        progressOffset: 62.83,
+        topics: [
+          {
+            id: 'topic-3-1',
+            title: t.translate('lesson.content.topicHumanRights'),
+            isActive: false,
+            completed: false,
+          },
+          {
+            id: 'topic-3-2',
+            title: t.translate('lesson.content.topicDiversity'),
+            isActive: false,
+            completed: false,
+          },
+          {
+            id: 'topic-3-3',
+            title: t.translate('lesson.content.topicSafety'),
+            isActive: false,
+            completed: false,
+          },
+          {
+            id: 'topic-3-4',
+            title: t.translate('lesson.content.topicCommunity'),
+            isActive: false,
+            completed: false,
+          },
+        ],
+      },
+      {
+        id: '4',
+        title: t.translate('lesson.content.chapter4'),
+        isActive: false,
+        completed: false,
+        topicCount: 3,
+        progressOffset: 62.83,
+        topics: [
+          {
+            id: 'topic-4-1',
+            title: t.translate('lesson.content.topicBoard'),
+            isActive: false,
+            completed: false,
+          },
+          {
+            id: 'topic-4-2',
+            title: t.translate('lesson.content.topicEthics'),
+            isActive: false,
+            completed: false,
+          },
+          {
+            id: 'topic-4-3',
+            title: t.translate('lesson.content.topicTransparency'),
+            isActive: false,
+            completed: false,
+          },
+        ],
+      },
+    ],
+    steps: [
+      {
+        id: 'step-1',
+        title: t.translate('lesson.content.stepOverview'),
+        isActive: false,
+        completed: true,
+      },
+      {
+        id: 'step-2',
+        title: t.translate('lesson.content.topicClimate'),
+        isActive: false,
+        completed: true,
+      },
+      {
+        id: 'step-3',
+        title: t.translate('lesson.content.topicIntroEsg'),
+        isActive: true,
+        completed: false,
+      },
+      {
+        id: 'step-4',
+        title: t.translate('lesson.content.topicResources'),
+        isActive: false,
+        completed: false,
+      },
+      {
+        id: 'step-5',
+        title: t.translate('lesson.content.stepFinalQuiz'),
+        isActive: false,
+        completed: false,
+      },
+    ],
+    completedSteps: 2,
+    totalSteps: 5,
+    isPlaying: false,
+    videoLoading: false,
+    playbackSpeed: 1,
+    volume: 1,
+    currentTime: 0,
+    duration: 0,
+    showVolume: false,
+    showQuality: false,
+    selectedQuality: 'auto',
+    mobileDrawerOpen: false,
+    reportDialogOpen: false,
+    reportType: '',
+    reportMessage: '',
+  };
+}
 
 function formatSeconds(timeInSeconds: number): string {
   const mins = Math.floor(timeInSeconds / 60);
@@ -166,27 +216,32 @@ function formatSeconds(timeInSeconds: number): string {
 }
 
 export const LessonPlayerStore = signalStore(
-  withState(initialState),
-  withComputed(({ completedSteps, totalSteps, currentTime, duration, chapters }) => ({
-    progressPct: computed(() => {
-      if (totalSteps() === 0) return 0;
-      return Math.round((completedSteps() / totalSteps()) * 100);
+  withState(() => createInitialState(inject(TranslocoService))),
+  withComputed(
+    (
+      { completedSteps, totalSteps, currentTime, duration, chapters },
+      transloco = inject(TranslocoService),
+    ) => ({
+      progressPct: computed(() => {
+        if (totalSteps() === 0) return 0;
+        return Math.round((completedSteps() / totalSteps()) * 100);
+      }),
+      lessonCompleted: computed(() => completedSteps() >= totalSteps()),
+      currentTimeFormatted: computed(() => formatSeconds(currentTime())),
+      durationFormatted: computed(() => formatSeconds(duration())),
+      videoProgressPct: computed(() => {
+        if (duration() === 0) return 0;
+        return (currentTime() / duration()) * 100;
+      }),
+      activeTopicTitle: computed(() => {
+        for (const chapter of chapters()) {
+          const activeTopic = chapter.topics.find((t) => t.isActive);
+          if (activeTopic) return activeTopic.title;
+        }
+        return transloco.translate('lesson.content.topicIntroEsg');
+      }),
     }),
-    lessonCompleted: computed(() => completedSteps() >= totalSteps()),
-    currentTimeFormatted: computed(() => formatSeconds(currentTime())),
-    durationFormatted: computed(() => formatSeconds(duration())),
-    videoProgressPct: computed(() => {
-      if (duration() === 0) return 0;
-      return (currentTime() / duration()) * 100;
-    }),
-    activeTopicTitle: computed(() => {
-      for (const chapter of chapters()) {
-        const activeTopic = chapter.topics.find((t) => t.isActive);
-        if (activeTopic) return activeTopic.title;
-      }
-      return 'Giới Thiệu Về ESG';
-    }),
-  })),
+  ),
   withMethods((store) => ({
     setRouteParams(courseId: string, lessonId: string) {
       patchState(store, { courseId, lessonId });

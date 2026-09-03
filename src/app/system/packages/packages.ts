@@ -1,5 +1,6 @@
 import { Component, inject, signal, computed, resource, linkedSignal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { form, FormField, required, disabled } from '@angular/forms/signals';
 import {
   LucidePackage,
@@ -23,11 +24,12 @@ import type { Package, UpdatePackageDto } from '@dearourcommunity/client';
 // Bỏ chọn = xóa key (không ghi false). Catalog hardcode mirror toolkit.data.ts — sẽ chuyển DB sau.
 const TOOLKIT_FLAG_PREFIX = 'toolkit:';
 
+// Nhãn nhóm là translation key — dịch tại nơi render (template `| transloco`).
 const TOOLKIT_GROUP_LABELS: Record<ToolkitGroup, string> = {
-  'quick-scan': 'Đánh giá nhanh ESG (Quick Scan)',
-  waste: 'Bộ công cụ Chất thải',
-  datagov: 'Quản trị Dữ liệu & PDPL',
-  energy: 'Hiệu quả Năng lượng',
+  'quick-scan': 'system.packages.toolkitGroups.quickScan',
+  waste: 'system.packages.toolkitGroups.waste',
+  datagov: 'system.packages.toolkitGroups.datagov',
+  energy: 'system.packages.toolkitGroups.energy',
 };
 
 @Component({
@@ -35,6 +37,7 @@ const TOOLKIT_GROUP_LABELS: Record<ToolkitGroup, string> = {
   standalone: true,
   imports: [
     DecimalPipe,
+    TranslocoPipe,
     FormField,
     InputText,
     LucidePackage,
@@ -54,6 +57,7 @@ const TOOLKIT_GROUP_LABELS: Record<ToolkitGroup, string> = {
 export default class PackagesComponent {
   private packagesService = inject(PackagesService);
   private courseService = inject(CourseService);
+  private transloco = inject(TranslocoService);
 
   // Search input state for courses list
   searchQuery = signal('');
@@ -107,9 +111,15 @@ export default class PackagesComponent {
   });
 
   packageForm = form(this.packageModel, (p) => {
-    required(p.name, { message: 'Tên gói học là bắt buộc' });
-    required(p.price, { message: 'Giá gói học là bắt buộc' });
-    required(p.slots, { message: 'Số lượng slot tối đa là bắt buộc' });
+    required(p.name, {
+      message: this.transloco.translate('system.packages.validation.nameRequired'),
+    });
+    required(p.price, {
+      message: this.transloco.translate('system.packages.validation.priceRequired'),
+    });
+    required(p.slots, {
+      message: this.transloco.translate('system.packages.validation.slotsRequired'),
+    });
     // "Liên hệ" (giá thỏa thuận) → khóa ô giá, giá sẽ được gửi lên -1 khi lưu.
     disabled(p.price, ({ valueOf }) => valueOf(p.isContactPrice));
   });
@@ -217,7 +227,10 @@ export default class PackagesComponent {
         const joined = joinedCourses.find((o) => Number(o.wpCourseId) === Number(pc.wpCourseId));
         return {
           ...pc,
-          title: detail?.postTitle ?? joined?.course?.postTitle ?? `Khóa học #${pc.wpCourseId}`,
+          title:
+            detail?.postTitle ??
+            joined?.course?.postTitle ??
+            this.transloco.translate('system.packages.courseFallback', { id: pc.wpCourseId }),
         };
       })
       .sort((a, b) => a.orderIndex - b.orderIndex);
@@ -341,7 +354,10 @@ export default class PackagesComponent {
       setTimeout(() => this.saveSuccess.set(false), 3000);
     } catch (err) {
       console.error(err);
-      const errMsg = err instanceof Error ? err.message : 'Có lỗi xảy ra khi cập nhật gói học.';
+      const errMsg =
+        err instanceof Error
+          ? err.message
+          : this.transloco.translate('system.packages.errors.updateFailed');
       this.saveError.set(errMsg);
     } finally {
       this.isSaving.set(false);
@@ -421,7 +437,9 @@ export default class PackagesComponent {
     } catch (err) {
       console.error(err);
       const errMsg =
-        err instanceof Error ? err.message : 'Có lỗi xảy ra khi lưu danh sách khóa học.';
+        err instanceof Error
+          ? err.message
+          : this.transloco.translate('system.packages.errors.saveCoursesFailed');
       this.coursesSaveError.set(errMsg);
     } finally {
       this.isSavingCourses.set(false);

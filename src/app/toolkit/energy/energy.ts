@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { LucideRotateCcw, LucideTriangleAlert } from '@lucide/angular';
+import { intlLocale, localePick } from '../../core/i18n/locale';
 import LogoComponent from '../../shared/logo/logo';
 import { DateFieldComponent } from '../shared/date-field/date-field';
 import { MeterComponent } from '../shared/meter/meter';
@@ -28,6 +30,7 @@ interface Step {
   standalone: true,
   imports: [
     CommonModule,
+    TranslocoPipe,
     LogoComponent,
     LucideTriangleAlert,
     LucideRotateCcw,
@@ -47,6 +50,7 @@ interface Step {
 })
 export default class EnergyToolkitComponent implements OnInit {
   readonly store = inject(EnergyStore);
+  private readonly transloco = inject(TranslocoService);
   @Input({ required: true }) config!: EnergyToolkitConfig;
 
   ngOnInit(): void {
@@ -57,36 +61,51 @@ export default class EnergyToolkitComponent implements OnInit {
   readonly actionStatusOptions = ACTION_STATUS_OPTIONS;
   readonly priorityOptions = PRIORITY_OPTIONS;
 
-  readonly monthFullLabels = [
-    'Tháng 1',
-    'Tháng 2',
-    'Tháng 3',
-    'Tháng 4',
-    'Tháng 5',
-    'Tháng 6',
-    'Tháng 7',
-    'Tháng 8',
-    'Tháng 9',
-    'Tháng 10',
-    'Tháng 11',
-    'Tháng 12',
-  ];
+  readonly monthFullLabels = localePick({
+    vi: [
+      'Tháng 1',
+      'Tháng 2',
+      'Tháng 3',
+      'Tháng 4',
+      'Tháng 5',
+      'Tháng 6',
+      'Tháng 7',
+      'Tháng 8',
+      'Tháng 9',
+      'Tháng 10',
+      'Tháng 11',
+      'Tháng 12',
+    ],
+    en: [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ],
+  });
   readonly months = Array.from({ length: 12 }, (_, i) => i);
 
-  readonly priorityLabels: Record<string, string> = {
-    critical: 'Quan trọng',
-    important: 'Cần làm',
-    quickwin: 'Làm ngay',
-  };
+  readonly priorityLabels: Record<string, string> = localePick({
+    vi: { critical: 'Quan trọng', important: 'Cần làm', quickwin: 'Làm ngay' },
+    en: { critical: 'Critical', important: 'Important', quickwin: 'Quick win' },
+  });
 
   steps: Step[] = [
-    { kind: 'map', label: 'Bản đồ NL' },
-    { kind: 'assessment', label: 'Đánh giá' },
-    { kind: 'savings', label: 'Cơ hội' },
-    { kind: 'equipment', label: 'Kiểm kê' },
-    { kind: 'tracking', label: 'Theo dõi' },
-    { kind: 'plan', label: 'Kế hoạch 90 ngày' },
-    { kind: 'results', label: 'Kết quả' },
+    { kind: 'map', label: this.transloco.translate('toolkit.energy.steps.map') },
+    { kind: 'assessment', label: this.transloco.translate('toolkit.common.stepAssessment') },
+    { kind: 'savings', label: this.transloco.translate('toolkit.energy.steps.savings') },
+    { kind: 'equipment', label: this.transloco.translate('toolkit.energy.steps.equipment') },
+    { kind: 'tracking', label: this.transloco.translate('toolkit.energy.steps.tracking') },
+    { kind: 'plan', label: this.transloco.translate('toolkit.common.stepPlan90') },
+    { kind: 'results', label: this.transloco.translate('toolkit.steps.results') },
   ];
 
   /** Light pastel color per assessment section. */
@@ -132,18 +151,18 @@ export default class EnergyToolkitComponent implements OnInit {
 
   resetScan(): void {
     if (typeof window !== 'undefined') {
-      const ok = window.confirm('Làm lại từ đầu? Toàn bộ dữ liệu bạn đã nhập sẽ bị xóa.');
+      const ok = window.confirm(this.transloco.translate('toolkit.common.confirmReset'));
       if (!ok) return;
     }
     this.store.reset();
   }
 
-  /** Format a number with VN thousands separators. */
+  /** Format a number with locale-aware thousands separators. */
   vnd(value: number): string {
-    return Math.round(value).toLocaleString('vi-VN');
+    return Math.round(value).toLocaleString(intlLocale());
   }
   num(value: number, digits = 1): string {
-    return Number(value.toFixed(digits)).toLocaleString('vi-VN');
+    return Number(value.toFixed(digits)).toLocaleString(intlLocale());
   }
 
   /** Parse a raw text input to number | null. */

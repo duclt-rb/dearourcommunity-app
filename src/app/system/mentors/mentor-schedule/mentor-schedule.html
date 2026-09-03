@@ -7,8 +7,8 @@
       <div class="schedule-title-row">
         <svg lucideCalendarClock class="schedule-icon" [size]="24" strokeWidth="1.5"></svg>
         <div>
-          <h2 class="schedule-title">Quản lý lịch khả dụng</h2>
-          <p class="schedule-subtitle">Khung giờ cụ thể học viên có thể đặt lịch (giờ Việt Nam).</p>
+          <h2 class="schedule-title">{{ 'system.mentorSchedule.title' | transloco }}</h2>
+          <p class="schedule-subtitle">{{ 'system.mentorSchedule.subtitle' | transloco }}</p>
         </div>
       </div>
 
@@ -20,7 +20,7 @@
             class="month-nav-btn"
             (click)="changeMonth(-1)"
             [disabled]="isLoadingSlots()"
-            aria-label="Tháng trước"
+            [attr.aria-label]="'system.mentorSchedule.prevMonth' | transloco"
           >
             <svg lucideChevronLeft [size]="16" strokeWidth="2"></svg>
           </button>
@@ -30,7 +30,7 @@
             class="month-nav-btn"
             (click)="changeMonth(1)"
             [disabled]="isLoadingSlots()"
-            aria-label="Tháng sau"
+            [attr.aria-label]="'system.mentorSchedule.nextMonth' | transloco"
           >
             <svg lucideChevronRight [size]="16" strokeWidth="2"></svg>
           </button>
@@ -41,7 +41,7 @@
           (click)="goToCurrentMonth()"
           [disabled]="isCurrentMonth() || isLoadingSlots()"
         >
-          Hôm nay
+          {{ 'system.mentorSchedule.today' | transloco }}
         </button>
       </div>
     </div>
@@ -76,7 +76,7 @@
           [attr.aria-expanded]="composeOpen()"
         >
           <svg lucidePlus [size]="16" strokeWidth="2.5"></svg>
-          <span>Thêm nhiều khung giờ</span>
+          <span>{{ 'system.mentorSchedule.compose.toggle' | transloco }}</span>
           <svg
             lucideChevronDown
             class="compose__chevron"
@@ -89,7 +89,9 @@
           <div class="compose__body">
             <!-- Chọn THỨ trong tuần (pattern, không gắn với tháng đang xem) -->
             <div class="field">
-              <span class="field__label">Thứ trong tuần</span>
+              <span class="field__label">{{
+                'system.mentorSchedule.compose.weekdaysLabel' | transloco
+              }}</span>
               <div class="compose__days">
                 @for (label of composeWeekdayOptions; track label; let i = $index) {
                   <button
@@ -98,7 +100,7 @@
                     [class.is-selected]="composeWeekdays().includes(i)"
                     (click)="toggleComposeWeekday(i)"
                   >
-                    <span class="compose__day-name">{{ label }}</span>
+                    <span class="compose__day-name">{{ label | transloco }}</span>
                   </button>
                 }
               </div>
@@ -106,7 +108,9 @@
 
             <!-- Danh sách giờ -->
             <div class="field">
-              <label for="compose-time" class="field__label">Giờ bắt đầu</label>
+              <label for="compose-time" class="field__label">{{
+                'system.mentorSchedule.compose.startTime' | transloco
+              }}</label>
               <div class="compose__time-row">
                 <p-datepicker
                   inputId="compose-time"
@@ -128,7 +132,7 @@
                   (click)="addComposeTime()"
                 >
                   <svg lucidePlus [size]="14" strokeWidth="2.5"></svg>
-                  Thêm giờ
+                  {{ 'system.mentorSchedule.compose.addTime' | transloco }}
                 </button>
               </div>
               @if (composeTimes().length) {
@@ -140,7 +144,9 @@
                         type="button"
                         class="time-chip__remove"
                         (click)="removeComposeTime(t)"
-                        aria-label="Xoá giờ"
+                        [attr.aria-label]="
+                          'system.mentorSchedule.compose.removeTimeAria' | transloco
+                        "
                       >
                         <svg lucideX [size]="11" strokeWidth="2.5"></svg>
                       </button>
@@ -152,30 +158,38 @@
 
             <!-- Áp dụng trong N tuần tới (kể từ hôm nay) -->
             <div class="field">
-              <label for="compose-weeks" class="field__label">Áp dụng trong</label>
+              <label for="compose-weeks" class="field__label">{{
+                'system.mentorSchedule.compose.applyIn' | transloco
+              }}</label>
               <select
                 id="compose-weeks"
                 class="form-input compose__repeat"
                 (change)="setComposeWeeksAhead(+$any($event.target).value)"
               >
-                @for (opt of weeksAheadOptions; track opt.value) {
-                  <option [value]="opt.value" [selected]="opt.value === composeWeeksAhead()">
-                    {{ opt.label }}
+                @for (opt of weeksAheadOptions; track opt) {
+                  <option [value]="opt" [selected]="opt === composeWeeksAhead()">
+                    {{ 'system.mentorSchedule.compose.weeksOption' | transloco: { n: opt } }}
                   </option>
                 }
               </select>
-              <span class="field__hint">Tính từ hôm nay — giờ đã qua sẽ tự bị bỏ.</span>
+              <span class="field__hint">{{
+                'system.mentorSchedule.compose.applyHint' | transloco
+              }}</span>
             </div>
 
             <div class="compose__footer">
               @if (composePreviewCount() > 0) {
                 <span class="compose__preview">
-                  Sẽ tạo tối đa <strong>{{ composePreviewCount() }}</strong> khung giờ trong
-                  {{ composeWeeksAhead() }} tuần tới — khung trùng với khung đã có sẽ tự bị bỏ qua.
+                  {{ 'system.mentorSchedule.compose.previewPrefix' | transloco }}
+                  <strong>{{ composePreviewCount() }}</strong>
+                  {{
+                    'system.mentorSchedule.compose.previewSuffix'
+                      | transloco: { weeks: composeWeeksAhead() }
+                  }}
                 </span>
               } @else {
                 <span class="compose__preview compose__preview--muted">
-                  Chọn ít nhất 1 thứ và 1 giờ để tạo khung.
+                  {{ 'system.mentorSchedule.compose.previewEmpty' | transloco }}
                 </span>
               }
               <div class="compose__actions">
@@ -187,7 +201,7 @@
                   "
                   (click)="clearCompose()"
                 >
-                  Xoá chọn
+                  {{ 'system.mentorSchedule.compose.clearSelection' | transloco }}
                 </button>
                 <button
                   type="button"
@@ -196,10 +210,11 @@
                   (click)="submitCompose()"
                 >
                   @if (isCreatingSlots()) {
-                    <span class="spinner-small"></span> Đang tạo...
+                    <span class="spinner-small"></span>
+                    {{ 'system.mentorSchedule.compose.creating' | transloco }}
                   } @else {
                     <svg lucidePlus [size]="16" strokeWidth="2.5"></svg>
-                    Tạo khung giờ
+                    {{ 'system.mentorSchedule.compose.createSlots' | transloco }}
                   }
                 </button>
               </div>
@@ -211,28 +226,30 @@
       <!-- Chú giải màu chip -->
       <div class="slot-legend">
         <span class="slot-legend__item">
-          <span class="slot-legend__dot slot-legend__dot--available"></span>Trống
+          <span class="slot-legend__dot slot-legend__dot--available"></span
+          >{{ 'system.mentorSchedule.statusShort.available' | transloco }}
         </span>
         <span class="slot-legend__item">
-          <span class="slot-legend__dot slot-legend__dot--booked"></span>Đã đặt
+          <span class="slot-legend__dot slot-legend__dot--booked"></span
+          >{{ 'system.mentorSchedule.statusShort.booked' | transloco }}
         </span>
         <span class="slot-legend__item">
-          <span class="slot-legend__dot slot-legend__dot--inactive"></span>Đã tắt
+          <span class="slot-legend__dot slot-legend__dot--inactive"></span
+          >{{ 'system.mentorSchedule.statusShort.inactive' | transloco }}
         </span>
         <span class="slot-legend__item">
-          <span class="slot-legend__dot slot-legend__dot--past"></span>Đã qua
+          <span class="slot-legend__dot slot-legend__dot--past"></span
+          >{{ 'system.mentorSchedule.statusShort.past' | transloco }}
         </span>
       </div>
 
-      <p class="month-hint">
-        Bấm vào một ngày trong lịch để xem và chỉnh sửa toàn bộ khung giờ của ngày đó.
-      </p>
+      <p class="month-hint">{{ 'system.mentorSchedule.monthHint' | transloco }}</p>
 
       <!-- Lịch tháng dạng calendar grid 7 cột × 5-6 hàng (chip read-only, click ngày mở panel) -->
       <div class="month-grid-wrap">
         <div class="month-grid">
           @for (w of monthWeekdayHeaders; track w) {
-            <div class="month-grid__weekday">{{ w }}</div>
+            <div class="month-grid__weekday">{{ w | transloco }}</div>
           }
           @for (day of monthDays(); track day.date) {
             <div
@@ -242,7 +259,7 @@
               [class.is-past]="isPastDay(day.date)"
               [class.is-selected]="selectedDate() === day.date"
               (click)="openDay(day.date)"
-              [title]="'Xem chi tiết ngày ' + dayNum(day.date)"
+              [title]="'system.mentorSchedule.viewDayTitle' | transloco: { date: dayNum(day.date) }"
             >
               <div class="month-grid__cell-head">
                 <span class="month-grid__daynum">{{ dayOfMonth(day.date) }}</span>
@@ -251,8 +268,8 @@
                     type="button"
                     class="month-grid__add"
                     (click)="openDayAndFocusAdd(day.date); $event.stopPropagation()"
-                    title="Thêm khung giờ cho ngày này"
-                    aria-label="Thêm khung giờ cho ngày này"
+                    [title]="'system.mentorSchedule.addSlotForDay' | transloco"
+                    [attr.aria-label]="'system.mentorSchedule.addSlotForDay' | transloco"
                   >
                     <svg lucidePlus [size]="11" strokeWidth="2.5"></svg>
                   </button>
@@ -280,7 +297,9 @@
                   </span>
                 }
                 @if (hiddenMonthCount(day) > 0) {
-                  <span class="month-grid__more">+{{ hiddenMonthCount(day) }} nữa</span>
+                  <span class="month-grid__more">{{
+                    'system.mentorSchedule.moreCount' | transloco: { n: hiddenMonthCount(day) }
+                  }}</span>
                 }
               }
             </div>
@@ -297,15 +316,15 @@
               type="button"
               class="day-panel__close"
               (click)="closeDay()"
-              title="Đóng"
-              aria-label="Đóng panel ngày"
+              [title]="'common.close' | transloco"
+              [attr.aria-label]="'system.mentorSchedule.dayPanel.closeAria' | transloco"
             >
               <svg lucideX [size]="16" strokeWidth="2"></svg>
             </button>
           </div>
 
           @if (!selectedDaySlots().length) {
-            <p class="day-panel__empty">Chưa có khung giờ nào trong ngày này.</p>
+            <p class="day-panel__empty">{{ 'system.mentorSchedule.dayPanel.empty' | transloco }}</p>
           } @else {
             <div class="day-panel__list">
               @for (slot of selectedDaySlots(); track slot.id) {
@@ -332,7 +351,7 @@
                   } @else if (slotStatus(slot) === 'booked') {
                     <span
                       class="day-slot__locked"
-                      title="Đã có booking được duyệt — không thể chỉnh sửa"
+                      [title]="'system.mentorSchedule.dayPanel.lockedTitle' | transloco"
                     >
                       <svg lucideLock [size]="14" strokeWidth="2"></svg>
                     </span>
@@ -344,8 +363,18 @@
                           class="day-slot__action"
                           (click)="toggleSlot(slot)"
                           [disabled]="isCreatingSlots()"
-                          [title]="slot.isActive ? 'Tắt khung giờ' : 'Bật khung giờ'"
-                          [attr.aria-label]="slot.isActive ? 'Tắt khung giờ' : 'Bật khung giờ'"
+                          [title]="
+                            (slot.isActive
+                              ? 'system.mentorSchedule.dayPanel.disableSlot'
+                              : 'system.mentorSchedule.dayPanel.enableSlot'
+                            ) | transloco
+                          "
+                          [attr.aria-label]="
+                            (slot.isActive
+                              ? 'system.mentorSchedule.dayPanel.disableSlot'
+                              : 'system.mentorSchedule.dayPanel.enableSlot'
+                            ) | transloco
+                          "
                         >
                           <svg lucidePower [size]="14" strokeWidth="2.5"></svg>
                         </button>
@@ -355,8 +384,8 @@
                         class="day-slot__action day-slot__action--danger"
                         (click)="requestDeleteSlot(slot.id)"
                         [disabled]="isCreatingSlots()"
-                        title="Xoá khung giờ"
-                        aria-label="Xoá khung giờ"
+                        [title]="'system.mentorSchedule.dayPanel.deleteSlot' | transloco"
+                        [attr.aria-label]="'system.mentorSchedule.dayPanel.deleteSlot' | transloco"
                       >
                         <svg lucideTrash2 [size]="14" strokeWidth="2"></svg>
                       </button>
@@ -394,11 +423,13 @@
                 } @else {
                   <svg lucidePlus [size]="14" strokeWidth="2.5"></svg>
                 }
-                Thêm giờ
+                {{ 'system.mentorSchedule.compose.addTime' | transloco }}
               </button>
             </div>
           } @else {
-            <p class="day-panel__past-hint">Ngày đã qua — chỉ có thể xoá khung giờ cũ.</p>
+            <p class="day-panel__past-hint">
+              {{ 'system.mentorSchedule.dayPanel.pastDayHint' | transloco }}
+            </p>
           }
         </div>
       }
@@ -412,11 +443,8 @@
         <div class="modal-icon-wrap danger">
           <svg lucideTrash2 [size]="24" strokeWidth="1.5"></svg>
         </div>
-        <h3 class="modal-title">Xác nhận xóa khung giờ</h3>
-        <p class="modal-desc">
-          Khung giờ sẽ bị xóa khỏi lịch khả dụng của mentor và học viên không thể đặt nữa. Hành động
-          này không thể hoàn tác.
-        </p>
+        <h3 class="modal-title">{{ 'system.mentorSchedule.deleteModal.title' | transloco }}</h3>
+        <p class="modal-desc">{{ 'system.mentorSchedule.deleteModal.desc' | transloco }}</p>
 
         <div class="modal-actions">
           <button
@@ -425,7 +453,7 @@
             (click)="cancelDeleteSlot()"
             [disabled]="slotActionId() !== null"
           >
-            Hủy bỏ
+            {{ 'system.mentorSchedule.deleteModal.cancel' | transloco }}
           </button>
           <button
             type="button"
@@ -434,9 +462,10 @@
             [disabled]="slotActionId() !== null"
           >
             @if (slotActionId() !== null) {
-              <span class="spinner-small"></span> Đang xóa...
+              <span class="spinner-small"></span>
+              {{ 'system.mentorSchedule.deleteModal.deleting' | transloco }}
             } @else {
-              Xác nhận xóa
+              {{ 'system.mentorSchedule.deleteModal.confirm' | transloco }}
             }
           </button>
         </div>

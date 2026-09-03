@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, input, ViewEncapsulation } from '@angular/core';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   LucideLandmark,
   LucideLeaf,
@@ -13,10 +14,11 @@ import { DateFieldComponent } from '../shared/date-field/date-field';
 import { MeterComponent } from '../shared/meter/meter';
 import { PriorityBadgeComponent } from '../shared/priority-badge/priority-badge';
 import { PieSlice, ScorePieComponent } from '../shared/score-pie/score-pie';
-import { SCORE_SCALE_OPTIONS, ScoreScaleComponent } from '../shared/score-scale/score-scale';
+import { defaultScoreOptions, ScoreScaleComponent } from '../shared/score-scale/score-scale';
 import { TextFieldComponent } from '../shared/text-field/text-field';
 import { QuickScanStore, Step } from './quick-scan.store';
 import { ActionPlanField, PillarKey, QuickScanConfig } from './quick-scan.types';
+import { localePick } from '../../core/i18n/locale';
 
 /** A distinct, lighter hue per pillar (E = green, S = blue, G = brand purple). */
 const PILLAR_COLORS: Record<PillarKey, string> = {
@@ -25,11 +27,27 @@ const PILLAR_COLORS: Record<PillarKey, string> = {
   governance: 'var(--color-warning-300)',
 };
 
+/**
+ * Action-plan status choices. `value` giữ nguyên chuỗi TIẾNG VIỆT vì đó là giá trị
+ * đã persist trong localStorage của người dùng cũ — chỉ `label` được dịch theo locale.
+ */
+const PLAN_STATUS_VALUES = ['Chưa bắt đầu', 'Đang làm', 'Hoàn thành'] as const;
+const PLAN_STATUS_OPTIONS: { value: string; label: string }[] = PLAN_STATUS_VALUES.map(
+  (value, i) => ({
+    value,
+    label: localePick<readonly string[]>({
+      vi: PLAN_STATUS_VALUES,
+      en: ['Not started', 'In progress', 'Done'],
+    })[i],
+  }),
+);
+
 @Component({
   selector: 'app-quick-scan',
   standalone: true,
   imports: [
     CommonModule,
+    TranslocoPipe,
     LucideLeaf,
     LucideUsers,
     LucideLandmark,
@@ -53,10 +71,11 @@ export class QuickScanComponent {
   config = input.required<QuickScanConfig>();
 
   readonly store = inject(QuickScanStore);
-  readonly scaleOptions = SCORE_SCALE_OPTIONS;
+  private readonly transloco = inject(TranslocoService);
+  readonly scaleOptions = defaultScoreOptions(this.transloco);
 
-  /** Status choices for the action-plan rows. */
-  readonly statusOptions = ['Chưa bắt đầu', 'Đang làm', 'Hoàn thành'];
+  /** Status choices for the action-plan rows (values stay stable, labels localized). */
+  readonly statusOptions = PLAN_STATUS_OPTIONS;
 
   /** Persist an action-plan cell edit from a native input/select event. */
   onPlanInput(area: string, field: ActionPlanField, event: Event): void {
@@ -94,7 +113,7 @@ export class QuickScanComponent {
   /** Clear all answers and progress after confirmation. */
   resetScan(): void {
     if (typeof window !== 'undefined') {
-      const ok = window.confirm('Làm lại bài test? Toàn bộ câu trả lời và tiến độ sẽ bị xóa.');
+      const ok = window.confirm(this.transloco.translate('toolkit.quickScan.confirmReset'));
       if (!ok) return;
     }
     this.store.reset();

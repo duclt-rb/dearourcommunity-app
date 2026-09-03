@@ -1,9 +1,9 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import type { Package } from '@dearourcommunity/client';
-import { environment } from '../../environments/environment';
 import { ClientService } from '../core/services/client.service';
 import { PackagesService } from '../core/services/packages.service';
 import { AuthStore } from '../core/stores/auth.store';
+import { frontpageUrl } from '../core/i18n/locale';
 
 // CR-006: quyền vào toolkit = user có SELECTION trong app_toolkit_selections (chọn ở checkout
 // bằng credit / backfill grandfather / admin cấp) — KHÔNG còn là union flag gói (CR-003 cũ).
@@ -114,6 +114,6 @@ export class ToolkitAccessService {
 
   /** Link sang trang package detail trên Frontpage (resolve được cả raw packageId). */
   packageDetailUrl(packageId: string): string {
-    return `${environment.appUrl}/vi/what-we-offer/${packageId}`;
+    return frontpageUrl(`/what-we-offer/${packageId}`);
   }
 }

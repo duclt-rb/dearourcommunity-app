@@ -1,14 +1,16 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AuthService } from '../../core/services/auth.service';
-import { environment } from '../../../environments/environment';
 import LogoComponent from '../../shared/logo/logo';
 import { ProfileStore } from '../profile.store';
+import { frontpageUrl } from '../../core/i18n/locale';
+import { LanguageSwitcher } from '../../shared/language-switcher/language-switcher';
 
 @Component({
   selector: 'app-profile-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, LogoComponent],
+  imports: [LanguageSwitcher, RouterLink, RouterLinkActive, LogoComponent, TranslocoPipe],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
 })
@@ -18,7 +20,7 @@ export class SidebarComponent {
   private router = inject(Router);
 
   onUpgrade() {
-    window.location.href = `${environment.appUrl}/packages`;
+    window.location.href = frontpageUrl('/packages');
   }
 
   onLogout() {

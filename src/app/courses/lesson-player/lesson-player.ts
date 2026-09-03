@@ -9,6 +9,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { LessonPlayerStore } from './lesson-player.store';
 import {
   LucideBadgeCheck,
@@ -55,6 +56,7 @@ import LogoComponent from '../../shared/logo/logo';
     LucideList,
     LucideX,
     LogoComponent,
+    TranslocoPipe,
   ],
   providers: [LessonPlayerStore], // Provide the store at component level
   templateUrl: './lesson-player.html',
@@ -63,6 +65,7 @@ import LogoComponent from '../../shared/logo/logo';
 export default class LessonPlayerComponent implements OnInit, AfterViewInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private transloco = inject(TranslocoService);
   readonly store = inject(LessonPlayerStore);
 
   @ViewChild('videoPlayer') videoElement!: ElementRef<HTMLVideoElement>;
@@ -145,11 +148,11 @@ export default class LessonPlayerComponent implements OnInit, AfterViewInit, OnD
   }
 
   prevLesson() {
-    alert('Chuyển tới bài học trước');
+    alert(this.transloco.translate('lesson.alerts.prevLesson'));
   }
 
   nextLesson() {
-    alert('Chuyển tới bài học tiếp theo');
+    alert(this.transloco.translate('lesson.alerts.nextLesson'));
   }
 
   markComplete() {
@@ -251,7 +254,10 @@ export default class LessonPlayerComponent implements OnInit, AfterViewInit, OnD
   submitReport() {
     if (!this.store.reportType() || !this.store.reportMessage()) return;
     alert(
-      `Báo cáo sự cố gửi thành công!\nLoại: ${this.store.reportType()}\nNội dung chi tiết: ${this.store.reportMessage()}`,
+      this.transloco.translate('lesson.alerts.reportSuccess', {
+        type: this.transloco.translate(`lesson.report.types.${this.store.reportType()}`),
+        message: this.store.reportMessage(),
+      }),
     );
     this.store.toggleReportDialog(false);
   }

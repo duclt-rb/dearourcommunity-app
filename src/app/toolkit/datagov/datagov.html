@@ -3,23 +3,25 @@
   <header class="datagov__bar">
     <div class="datagov__bar-inner">
       <app-logo height="72px" class="datagov__logo" />
-      <span class="datagov__bar-progress">{{ progressPercent() }}% hoàn thành</span>
+      <span class="datagov__bar-progress">
+        {{ 'toolkit.common.percentComplete' | transloco: { percent: progressPercent() } }}
+      </span>
     </div>
     <div class="datagov__stepper">
       @for (step of steps; track step.kind; let i = $index) {
-        <button
-          type="button"
-          class="datagov__step"
-          [class.is-active]="i === store.currentStep()"
-          [class.is-done]="i < store.currentStep()"
-          (click)="goToStep(i)"
-        >
-          <span
-            class="datagov__step-bar"
-            [style.background]="i <= store.currentStep() ? 'var(--color-primary)' : null"
-          ></span>
-          <span class="datagov__step-label">{{ step.label }}</span>
-        </button>
+      <button
+        type="button"
+        class="datagov__step"
+        [class.is-active]="i === store.currentStep()"
+        [class.is-done]="i < store.currentStep()"
+        (click)="goToStep(i)"
+      >
+        <span
+          class="datagov__step-bar"
+          [style.background]="i <= store.currentStep() ? 'var(--color-primary)' : null"
+        ></span>
+        <span class="datagov__step-label">{{ step.label }}</span>
+      </button>
       }
     </div>
   </header>
@@ -27,405 +29,387 @@
   <main class="datagov__main">
     <!-- Intro for first step only -->
     @if (store.currentStep() === 0) {
-      <div class="datagov__intro">
-        <p class="datagov__sector">{{ config.sector }}</p>
-        <h1 class="datagov__title">{{ config.name }}</h1>
-        <p class="datagov__lead">{{ config.introLead }}</p>
+    <div class="datagov__intro">
+      <p class="datagov__sector">{{ config.sector }}</p>
+      <h1 class="datagov__title">{{ config.name }}</h1>
+      <p class="datagov__lead">{{ config.introLead }}</p>
+    </div>
+    } @switch (currentStepData().kind) {
+    <!-- ════ STEP: DATA MAP ════ -->
+    @case ('datamap') {
+    <section class="datagov__section">
+      <h2 class="datagov__section-title">{{ 'toolkit.datagov.datamapTitle' | transloco }}</h2>
+      <p class="datagov__section-note">{{ 'toolkit.datagov.datamapNote' | transloco }}</p>
+
+      <div class="datagov__table-scroll">
+        <table class="datagov__table">
+          <thead>
+            <tr>
+              <th class="datagov__table-head-cell">
+                {{ 'toolkit.datagov.dataTypeHeader' | transloco }}
+              </th>
+              @for (col of config.dataMapColumns; track col.key) {
+              <th>{{ col.label }}</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of config.dataMapRows; track row.id) {
+            <tr>
+              <td class="datagov__table-head-cell">{{ row.label }}</td>
+              @for (col of config.dataMapColumns; track col.key) {
+              <td>
+                @if (col.key === 'sensitive') {
+                <app-select-field
+                  class="datagov__cell-select"
+                  [options]="sensitiveOptions"
+                  [value]="
+                              store.dataMapOf(row.id, col.key) || (row.sensitive ? 'yes' : '')
+                            "
+                  (valueChange)="store.setDataMap(row.id, col.key, $event)"
+                />
+                } @else if (col.key === 'legal-basis') {
+                <app-select-field
+                  class="datagov__cell-select"
+                  [options]="legalBasisOptions"
+                  [value]="store.dataMapOf(row.id, col.key)"
+                  (valueChange)="store.setDataMap(row.id, col.key, $event)"
+                />
+                } @else if (col.key === 'transfer') {
+                <app-select-field
+                  class="datagov__cell-select"
+                  [options]="transferOptions"
+                  [value]="store.dataMapOf(row.id, col.key)"
+                  (valueChange)="store.setDataMap(row.id, col.key, $event)"
+                />
+                } @else {
+                <input
+                  class="datagov__cell datagov__cell-text"
+                  type="text"
+                  [value]="store.dataMapOf(row.id, col.key)"
+                  (input)="store.setDataMap(row.id, col.key, $any($event.target).value)"
+                />
+                }
+              </td>
+              }
+            </tr>
+            }
+          </tbody>
+        </table>
       </div>
+
+      <p class="datagov__insight">{{ config.dataMapNote }}</p>
+    </section>
     }
-    @switch (currentStepData().kind) {
-      <!-- ════ STEP: DATA MAP ════ -->
-      @case ('datamap') {
-        <section class="datagov__section">
-          <h2 class="datagov__section-title">Bản đồ Dữ liệu Cá nhân</h2>
-          <p class="datagov__section-note">
-            Ghi lại MỌI loại dữ liệu cá nhân doanh nghiệp đang thu thập. Đây là nền tảng của mọi
-            nghĩa vụ tuân thủ — không biết mình giữ dữ liệu gì thì không thể bảo vệ.
-          </p>
 
-          <div class="datagov__table-scroll">
-            <table class="datagov__table">
-              <thead>
-                <tr>
-                  <th class="datagov__table-head-cell">Loại dữ liệu cá nhân</th>
-                  @for (col of config.dataMapColumns; track col) {
-                    <th>{{ col }}</th>
-                  }
-                </tr>
-              </thead>
-              <tbody>
-                @for (row of config.dataMapRows; track row.id) {
-                  <tr>
-                    <td class="datagov__table-head-cell">{{ row.label }}</td>
-                    @for (col of config.dataMapColumns; track col) {
-                      <td>
-                        @if (col === 'Nhạy cảm?') {
-                          <app-select-field
-                            class="datagov__cell-select"
-                            [options]="sensitiveOptions"
-                            placeholder="— Chọn —"
-                            [value]="store.dataMapOf(row.id, col) || (row.sensitive ? 'yes' : '')"
-                            (valueChange)="store.setDataMap(row.id, col, $event)"
-                          />
-                        } @else if (col === 'Cơ sở pháp lý') {
-                          <app-select-field
-                            class="datagov__cell-select"
-                            [options]="legalBasisOptions"
-                            placeholder="— Chọn —"
-                            [value]="store.dataMapOf(row.id, col)"
-                            (valueChange)="store.setDataMap(row.id, col, $event)"
-                          />
-                        } @else if (col === 'Chuyển ra nước ngoài?') {
-                          <app-select-field
-                            class="datagov__cell-select"
-                            [options]="transferOptions"
-                            placeholder="— Chọn —"
-                            [value]="store.dataMapOf(row.id, col)"
-                            (valueChange)="store.setDataMap(row.id, col, $event)"
-                          />
-                        } @else {
-                          <input
-                            class="datagov__cell datagov__cell-text"
-                            type="text"
-                            [value]="store.dataMapOf(row.id, col)"
-                            (input)="store.setDataMap(row.id, col, $any($event.target).value)"
-                          />
-                        }
-                      </td>
-                    }
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
+    <!-- ════ STEP: COMPLIANCE ASSESSMENT ════ -->
+    @case ('assessment') {
+    <section class="datagov__section">
+      <h2 class="datagov__section-title">{{ 'toolkit.datagov.assessmentTitle' | transloco }}</h2>
+      <p class="datagov__section-note">{{ 'toolkit.datagov.assessmentNote' | transloco }}</p>
 
-          <p class="datagov__insight">{{ config.dataMapNote }}</p>
-        </section>
-      }
-
-      <!-- ════ STEP: COMPLIANCE ASSESSMENT ════ -->
-      @case ('assessment') {
-        <section class="datagov__section">
-          <h2 class="datagov__section-title">Đánh giá Tuân thủ Bảo vệ Dữ liệu</h2>
-          <p class="datagov__section-note">
-            40 câu hỏi · 6 nhóm. Chấm trung thực: Đầy đủ · Một phần · Chưa có · N/A. Đối chiếu PDPL
-            2025 & Nghị định 356/2025.
-          </p>
-
-          @for (group of config.assessmentGroups; track group.id; let gi = $index) {
-            <div class="datagov__qgroup">
-              <div class="datagov__qgroup-head">
-                <h3 class="datagov__group-title">{{ group.topic }}</h3>
-                <span class="datagov__qgroup-score">
-                  <span
-                    class="datagov__dot"
-                    [class]="'is-' + store.assessmentResults()[gi].band.tone"
-                  ></span>
-                  {{ store.assessmentResults()[gi].percent }}%
-                </span>
-              </div>
-              <ul class="datagov__questions">
-                @for (q of group.questions; track q.id) {
-                  <li class="datagov__question">
-                    <div class="datagov__question-body">
-                      <p class="datagov__question-text">{{ q.text }}</p>
-                      <p class="datagov__question-risk">
-                        <svg lucideTriangleAlert [size]="13" strokeWidth="1.8"></svg>
-                        <span>{{ q.risk }}</span>
-                      </p>
-                      @if (q.ref) {
-                        <p class="datagov__question-ref">{{ q.ref }}</p>
-                      }
-                    </div>
-                    <app-segmented-field
-                      class="datagov__question-scale"
-                      [options]="assessmentOptions"
-                      [ariaLabel]="q.text"
-                      [value]="store.assessmentOf(q.id)"
-                      (valueChange)="store.setAssessment(q.id, $event)"
-                    />
-                  </li>
-                }
-              </ul>
+      @for (group of config.assessmentGroups; track group.id; let gi = $index) {
+      <div class="datagov__qgroup">
+        <div class="datagov__qgroup-head">
+          <h3 class="datagov__group-title">{{ group.topic }}</h3>
+          <span class="datagov__qgroup-score">
+            <span
+              class="datagov__dot"
+              [class]="'is-' + store.assessmentResults()[gi].band.tone"
+            ></span>
+            {{ store.assessmentResults()[gi].percent }}%
+          </span>
+        </div>
+        <ul class="datagov__questions">
+          @for (q of group.questions; track q.id) {
+          <li class="datagov__question">
+            <div class="datagov__question-body">
+              <p class="datagov__question-text">{{ q.text }}</p>
+              <p class="datagov__question-risk">
+                <svg lucideTriangleAlert [size]="13" strokeWidth="1.8"></svg>
+                <span>{{ q.risk }}</span>
+              </p>
+              @if (q.ref) {
+              <p class="datagov__question-ref">{{ q.ref }}</p>
+              }
             </div>
+            <app-segmented-field
+              class="datagov__question-scale"
+              [options]="assessmentOptions"
+              [ariaLabel]="q.text"
+              [value]="store.assessmentOf(q.id)"
+              (valueChange)="store.setAssessment(q.id, $event)"
+            />
+          </li>
           }
-
-          <div class="datagov__callout">
-            <span>Điểm tuân thủ dữ liệu (%)</span>
-            <strong>
-              <span
-                class="datagov__dot"
-                [class]="'is-' + store.assessmentOverallBand().tone"
-              ></span>
-              {{ store.assessmentOverall() }}% · {{ store.assessmentOverallBand().label }}
-            </strong>
-          </div>
-        </section>
+        </ul>
+      </div>
       }
 
-      <!-- ════ STEP: INCIDENT RESPONSE ════ -->
-      @case ('incident') {
-        <section class="datagov__section">
-          <h2 class="datagov__section-title">Ứng phó Sự cố Dữ liệu Cá nhân</h2>
-          <p class="datagov__section-note">
-            Quy trình 8 bước. THÔNG BÁO TRONG 72 GIỜ kể từ khi PHÁT HIỆN sự cố (nếu có thể gây hại)
-            — theo Luật BVDLCN 2025.
-          </p>
+      <div class="datagov__callout">
+        <span>{{ 'toolkit.datagov.complianceScore' | transloco }}</span>
+        <strong>
+          <span class="datagov__dot" [class]="'is-' + store.assessmentOverallBand().tone"></span>
+          {{ store.assessmentOverall() }}% · {{ store.assessmentOverallBand().label }}
+        </strong>
+      </div>
+    </section>
+    }
 
-          <ul class="datagov__checks">
-            @for (s of config.incidentSteps; track s.id) {
-              <li>
-                <label class="datagov__check">
-                  <input
-                    type="checkbox"
-                    class="datagov__check-box"
-                    [checked]="store.incidentCheckOf(s.id)"
-                    (change)="store.toggleIncidentCheck(s.id, $any($event.target).checked)"
-                  />
-                  <span class="datagov__check-body">
-                    <span class="datagov__check-title">{{ s.title }}</span>
-                    <span class="datagov__check-text">{{ s.desc }}</span>
-                  </span>
-                </label>
-              </li>
-            }
-          </ul>
+    <!-- ════ STEP: INCIDENT RESPONSE ════ -->
+    @case ('incident') {
+    <section class="datagov__section">
+      <h2 class="datagov__section-title">{{ 'toolkit.datagov.incidentTitle' | transloco }}</h2>
+      <p class="datagov__section-note">{{ 'toolkit.datagov.incidentNote' | transloco }}</p>
 
-          <h3 class="datagov__group-title datagov__group-title--spaced">Nhật ký sự cố dữ liệu</h3>
-          <p class="datagov__section-note">
-            Ghi lại từng sự cố để phục vụ thanh tra & chứng minh tuân thủ.
-          </p>
-          <div class="datagov__log">
-            @for (row of store.incidentLog(); track $index; let i = $index) {
-              <div class="datagov__log-row">
-                <div class="datagov__log-top">
-                  <app-date-field
-                    label="Ngày"
-                    [value]="row.date"
-                    (valueChange)="store.setIncidentRow(i, 'date', $event)"
-                  />
-                  <div class="datagov__field">
-                    <span class="datagov__field-label">Mức độ</span>
-                    <app-segmented-field
-                      [options]="severityOptions"
-                      [value]="row.severity"
-                      (valueChange)="store.setIncidentRow(i, 'severity', $event)"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    class="datagov__log-del"
-                    aria-label="Xóa dòng"
-                    (click)="store.removeIncidentRow(i)"
-                  >
-                    <svg lucideTrash2 [size]="16" strokeWidth="1.8"></svg>
-                  </button>
-                </div>
-                <app-textarea-field
-                  label="Mô tả sự cố"
-                  placeholder="Diễn biến, hệ thống/dữ liệu bị ảnh hưởng, cách xử lý…"
-                  [rows]="2"
-                  [value]="row.desc"
-                  (valueChange)="store.setIncidentRow(i, 'desc', $event)"
-                />
-              </div>
-            }
-          </div>
-          <button type="button" class="datagov__add" (click)="store.addIncidentRow()">
-            <svg lucidePlus [size]="16" strokeWidth="2"></svg>
-            Thêm sự cố
-          </button>
-        </section>
-      }
+      <ul class="datagov__checks">
+        @for (s of config.incidentSteps; track s.id) {
+        <li>
+          <label class="datagov__check">
+            <input
+              type="checkbox"
+              class="datagov__check-box"
+              [checked]="store.incidentCheckOf(s.id)"
+              (change)="store.toggleIncidentCheck(s.id, $any($event.target).checked)"
+            />
+            <span class="datagov__check-body">
+              <span class="datagov__check-title">{{ s.title }}</span>
+              <span class="datagov__check-text">{{ s.desc }}</span>
+            </span>
+          </label>
+        </li>
+        }
+      </ul>
 
-      <!-- ════ STEP: LEGAL TRACKER ════ -->
-      @case ('legal') {
-        <section class="datagov__section">
-          <h2 class="datagov__section-title">Theo dõi Nghĩa vụ Pháp lý & Dữ liệu</h2>
-          <p class="datagov__section-note">
-            Lịch cuốn chiếu các nghĩa vụ tuân thủ: ngày rà soát, gia hạn, người phụ trách. Đặt nhắc
-            lịch để không bỏ lỡ.
-          </p>
-
-          <div class="datagov__table-scroll">
-            <table class="datagov__table">
-              <thead>
-                <tr>
-                  <th class="datagov__table-head-cell">Hạng mục</th>
-                  <th>Tần suất / hạn</th>
-                  <th>Lần gần nhất</th>
-                  <th>Hạn tiếp theo</th>
-                  <th>Người phụ trách</th>
-                  <th class="datagov__col-status">Trạng thái</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (item of config.legalItems; track item.id) {
-                  <tr>
-                    <td class="datagov__table-head-cell">{{ item.label }}</td>
-                    <td class="datagov__freq">{{ item.frequency }}</td>
-                    <td class="datagov__cell-date">
-                      <app-date-field
-                        label=""
-                        [value]="store.legalOf(item.id, 'last')"
-                        (valueChange)="store.setLegal(item.id, 'last', $event)"
-                      />
-                    </td>
-                    <td class="datagov__cell-date">
-                      <app-date-field
-                        label=""
-                        [value]="store.legalOf(item.id, 'next')"
-                        (valueChange)="store.setLegal(item.id, 'next', $event)"
-                      />
-                    </td>
-                    <td class="datagov__cell-owner">
-                      <input
-                        class="datagov__cell datagov__cell-text"
-                        type="text"
-                        [value]="store.legalOf(item.id, 'owner')"
-                        (input)="store.setLegal(item.id, 'owner', $any($event.target).value)"
-                      />
-                    </td>
-                    <td class="datagov__col-status">
-                      <app-select-field
-                        class="datagov__cell-select"
-                        [options]="statusOptions"
-                        placeholder="— Chọn —"
-                        [value]="store.legalOf(item.id, 'status')"
-                        (valueChange)="store.setLegal(item.id, 'status', $event)"
-                      />
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </section>
-      }
-
-      <!-- ════ STEP: 90-DAY ACTION PLAN ════ -->
-      @case ('plan') {
-        <section class="datagov__section">
-          <h2 class="datagov__section-title">Kế hoạch Hành động 90 ngày</h2>
-          <p class="datagov__section-note">
-            9 hành động khởi đầu đã gợi ý sẵn. Chuyên gia Data Protectify rà soát cùng bạn theo mốc
-            30/60/90 ngày.
-          </p>
-
-          <div class="datagov__actions">
-            @for (a of config.actions; track a.id; let i = $index) {
-              <div class="datagov__action">
-                <div class="datagov__action-head">
-                  <span class="datagov__action-num">{{ i + 1 }}</span>
-                  <span class="datagov__action-prio" [class]="'is-' + a.priority">
-                    {{ priorityLabels[a.priority] }}
-                  </span>
-                  <span class="datagov__action-area">{{ a.area }}</span>
-                  <span class="datagov__action-target">{{ a.deadline }}</span>
-                </div>
-                <p class="datagov__action-text">{{ a.action }}</p>
-                <p class="datagov__action-measure">Tiêu chí hoàn thành: {{ a.measure }}</p>
-                <div class="datagov__action-fields">
-                  <app-text-field
-                    label="Người phụ trách"
-                    [value]="store.actionOf(a.id, 'owner')"
-                    (valueChange)="store.setAction(a.id, 'owner', $event)"
-                  />
-                  <div class="datagov__field">
-                    <span class="datagov__field-label">Trạng thái</span>
-                    <app-segmented-field
-                      [options]="statusOptions"
-                      [value]="store.actionOf(a.id, 'status')"
-                      (valueChange)="store.setAction(a.id, 'status', $event)"
-                    />
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-
-          <h3 class="datagov__group-title datagov__group-title--spaced">
-            Mốc rà soát cùng chuyên gia
-          </h3>
-          <div class="datagov__milestones">
-            @for (m of config.milestones; track m.id) {
-              <div class="datagov__milestone">
-                <div class="datagov__milestone-head">
-                  <span class="datagov__milestone-title">{{ m.title }}</span>
-                </div>
-                <p class="datagov__milestone-check">Trọng tâm: {{ m.focus }}</p>
-                <div class="datagov__milestone-field">
-                  <app-date-field
-                    label="Ngày họp"
-                    [value]="store.milestoneOf(m.id, 'meetDate')"
-                    (valueChange)="store.setMilestone(m.id, 'meetDate', $event)"
-                  />
-                </div>
-                <app-textarea-field
-                  label="Ghi chú của chuyên gia"
-                  placeholder="Ghi chú từ buổi rà soát cùng chuyên gia Data Protectify"
-                  [rows]="2"
-                  [value]="store.milestoneOf(m.id, 'note')"
-                  (valueChange)="store.setMilestone(m.id, 'note', $event)"
-                />
-              </div>
-            }
-          </div>
-        </section>
-      }
-
-      <!-- ════ STEP: RISK TABLE & RESULTS ════ -->
-      @case ('results') {
-        <section class="datagov__section">
-          <h2 class="datagov__section-title">Bảng Rủi ro & Kết quả</h2>
-          <p class="datagov__section-note">
-            Tổng hợp tự động từ trang Đánh giá — điểm & mức rủi ro theo từng nhóm. Đèn đỏ = cần hành
-            động ngay.
-          </p>
-
-          <div class="datagov__overall">
-            <div>
-              <p class="datagov__overall-label">Mức độ sẵn sàng tuân thủ PDPL</p>
-              <p class="datagov__overall-score">{{ store.assessmentOverall() }}%</p>
+      <h3 class="datagov__group-title datagov__group-title--spaced">
+        {{ 'toolkit.datagov.incidentLogTitle' | transloco }}
+      </h3>
+      <p class="datagov__section-note">{{ 'toolkit.datagov.incidentLogNote' | transloco }}</p>
+      <div class="datagov__log">
+        @for (row of store.incidentLog(); track $index; let i = $index) {
+        <div class="datagov__log-row">
+          <div class="datagov__log-top">
+            <app-date-field
+              [label]="'toolkit.datagov.dateLabel' | transloco"
+              [value]="row.date"
+              (valueChange)="store.setIncidentRow(i, 'date', $event)"
+            />
+            <div class="datagov__field">
+              <span class="datagov__field-label">
+                {{ 'toolkit.datagov.severityLabel' | transloco }}
+              </span>
+              <app-segmented-field
+                [options]="severityOptions"
+                [value]="row.severity"
+                (valueChange)="store.setIncidentRow(i, 'severity', $event)"
+              />
             </div>
-            <p class="datagov__overall-band">
-              <span
-                class="datagov__dot"
-                [class]="'is-' + store.assessmentOverallBand().tone"
-              ></span>
-              {{ store.assessmentOverallBand().label }}
-            </p>
+            <button
+              type="button"
+              class="datagov__log-del"
+              [attr.aria-label]="'toolkit.datagov.removeRowAria' | transloco"
+              (click)="store.removeIncidentRow(i)"
+            >
+              <svg lucideTrash2 [size]="16" strokeWidth="1.8"></svg>
+            </button>
           </div>
+          <app-textarea-field
+            [label]="'toolkit.datagov.incidentDescLabel' | transloco"
+            [placeholder]="'toolkit.datagov.incidentDescPlaceholder' | transloco"
+            [rows]="2"
+            [value]="row.desc"
+            (valueChange)="store.setIncidentRow(i, 'desc', $event)"
+          />
+        </div>
+        }
+      </div>
+      <button type="button" class="datagov__add" (click)="store.addIncidentRow()">
+        <svg lucidePlus [size]="16" strokeWidth="2"></svg>
+        {{ 'toolkit.datagov.addIncident' | transloco }}
+      </button>
+    </section>
+    }
 
-          <div class="datagov__chart">
-            <h3 class="datagov__group-title">Điểm theo nhóm</h3>
-            <app-score-pie
-              [slices]="pieSlices()"
-              [centerLabel]="store.assessmentOverall() + '%'"
-              centerSub="Sẵn sàng"
+    <!-- ════ STEP: LEGAL TRACKER ════ -->
+    @case ('legal') {
+    <section class="datagov__section">
+      <h2 class="datagov__section-title">{{ 'toolkit.datagov.legalTitle' | transloco }}</h2>
+      <p class="datagov__section-note">{{ 'toolkit.datagov.legalNote' | transloco }}</p>
+
+      <div class="datagov__table-scroll">
+        <table class="datagov__table">
+          <thead>
+            <tr>
+              <th class="datagov__table-head-cell">
+                {{ 'toolkit.datagov.itemHeader' | transloco }}
+              </th>
+              <th>{{ 'toolkit.datagov.frequencyHeader' | transloco }}</th>
+              <th>{{ 'toolkit.datagov.lastHeader' | transloco }}</th>
+              <th>{{ 'toolkit.datagov.nextHeader' | transloco }}</th>
+              <th>{{ 'toolkit.common.owner' | transloco }}</th>
+              <th class="datagov__col-status">{{ 'toolkit.common.status' | transloco }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of config.legalItems; track item.id) {
+            <tr>
+              <td class="datagov__table-head-cell">{{ item.label }}</td>
+              <td class="datagov__freq">{{ item.frequency }}</td>
+              <td class="datagov__cell-date">
+                <app-date-field
+                  label=""
+                  [value]="store.legalOf(item.id, 'last')"
+                  (valueChange)="store.setLegal(item.id, 'last', $event)"
+                />
+              </td>
+              <td class="datagov__cell-date">
+                <app-date-field
+                  label=""
+                  [value]="store.legalOf(item.id, 'next')"
+                  (valueChange)="store.setLegal(item.id, 'next', $event)"
+                />
+              </td>
+              <td class="datagov__cell-owner">
+                <input
+                  class="datagov__cell datagov__cell-text"
+                  type="text"
+                  [value]="store.legalOf(item.id, 'owner')"
+                  (input)="store.setLegal(item.id, 'owner', $any($event.target).value)"
+                />
+              </td>
+              <td class="datagov__col-status">
+                <app-select-field
+                  class="datagov__cell-select"
+                  [options]="statusOptions"
+                  [value]="store.legalOf(item.id, 'status')"
+                  (valueChange)="store.setLegal(item.id, 'status', $event)"
+                />
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+    }
+
+    <!-- ════ STEP: 90-DAY ACTION PLAN ════ -->
+    @case ('plan') {
+    <section class="datagov__section">
+      <h2 class="datagov__section-title">{{ 'toolkit.datagov.planTitle' | transloco }}</h2>
+      <p class="datagov__section-note">{{ 'toolkit.datagov.planNote' | transloco }}</p>
+
+      <div class="datagov__actions">
+        @for (a of config.actions; track a.id; let i = $index) {
+        <div class="datagov__action">
+          <div class="datagov__action-head">
+            <span class="datagov__action-num">{{ i + 1 }}</span>
+            <span class="datagov__action-prio" [class]="'is-' + a.priority">
+              {{ priorityLabels[a.priority] }}
+            </span>
+            <span class="datagov__action-area">{{ a.area }}</span>
+            <span class="datagov__action-target">{{ a.deadline }}</span>
+          </div>
+          <p class="datagov__action-text">{{ a.action }}</p>
+          <p class="datagov__action-measure">
+            {{ 'toolkit.common.measurePrefix' | transloco }} {{ a.measure }}
+          </p>
+          <div class="datagov__action-fields">
+            <app-text-field
+              [label]="'toolkit.common.owner' | transloco"
+              [value]="store.actionOf(a.id, 'owner')"
+              (valueChange)="store.setAction(a.id, 'owner', $event)"
+            />
+            <div class="datagov__field">
+              <span class="datagov__field-label"> {{ 'toolkit.common.status' | transloco }} </span>
+              <app-segmented-field
+                [options]="statusOptions"
+                [value]="store.actionOf(a.id, 'status')"
+                (valueChange)="store.setAction(a.id, 'status', $event)"
+              />
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+
+      <h3 class="datagov__group-title datagov__group-title--spaced">
+        {{ 'toolkit.common.expertMilestones' | transloco }}
+      </h3>
+      <div class="datagov__milestones">
+        @for (m of config.milestones; track m.id) {
+        <div class="datagov__milestone">
+          <div class="datagov__milestone-head">
+            <span class="datagov__milestone-title">{{ m.title }}</span>
+          </div>
+          <p class="datagov__milestone-check">
+            {{ 'toolkit.common.focusPrefix' | transloco }} {{ m.focus }}
+          </p>
+          <div class="datagov__milestone-field">
+            <app-date-field
+              [label]="'toolkit.common.meetingDate' | transloco"
+              [value]="store.milestoneOf(m.id, 'meetDate')"
+              (valueChange)="store.setMilestone(m.id, 'meetDate', $event)"
             />
           </div>
-
-          <div class="datagov__summary">
-            @for (r of store.riskRows(); track r.id) {
-              <div class="datagov__summary-row">
-                <div class="datagov__summary-top">
-                  <span class="datagov__summary-label">{{ r.topic }}</span>
-                  <span class="datagov__summary-score">
-                    <span class="datagov__dot" [class]="'is-' + r.band.tone"></span>
-                    {{ r.percent }}% · {{ r.band.label }}
-                  </span>
-                </div>
-                <app-meter [percent]="r.percent" [color]="sectionColors[r.id]" />
-                <p class="datagov__summary-suggest">{{ r.suggestion }}</p>
-              </div>
-            }
-          </div>
-
-          <p class="datagov__insight">{{ config.riskNote }}</p>
-        </section>
-      }
+          <app-textarea-field
+            [label]="'toolkit.common.expertNotes' | transloco"
+            [placeholder]="'toolkit.datagov.milestoneNotePlaceholder' | transloco"
+            [rows]="2"
+            [value]="store.milestoneOf(m.id, 'note')"
+            (valueChange)="store.setMilestone(m.id, 'note', $event)"
+          />
+        </div>
+        }
+      </div>
+    </section>
     }
+
+    <!-- ════ STEP: RISK TABLE & RESULTS ════ -->
+    @case ('results') {
+    <section class="datagov__section">
+      <h2 class="datagov__section-title">{{ 'toolkit.datagov.resultsTitle' | transloco }}</h2>
+      <p class="datagov__section-note">{{ 'toolkit.datagov.resultsNote' | transloco }}</p>
+
+      <div class="datagov__overall">
+        <div>
+          <p class="datagov__overall-label">{{ 'toolkit.datagov.overallLabel' | transloco }}</p>
+          <p class="datagov__overall-score">{{ store.assessmentOverall() }}%</p>
+        </div>
+        <p class="datagov__overall-band">
+          <span class="datagov__dot" [class]="'is-' + store.assessmentOverallBand().tone"></span>
+          {{ store.assessmentOverallBand().label }}
+        </p>
+      </div>
+
+      <div class="datagov__chart">
+        <h3 class="datagov__group-title">{{ 'toolkit.fields.scorePieAria' | transloco }}</h3>
+        <app-score-pie
+          [slices]="pieSlices()"
+          [centerLabel]="store.assessmentOverall() + '%'"
+          [centerSub]="'toolkit.common.readiness' | transloco"
+        />
+      </div>
+
+      <div class="datagov__summary">
+        @for (r of store.riskRows(); track r.id) {
+        <div class="datagov__summary-row">
+          <div class="datagov__summary-top">
+            <span class="datagov__summary-label">{{ r.topic }}</span>
+            <span class="datagov__summary-score">
+              <span class="datagov__dot" [class]="'is-' + r.band.tone"></span>
+              {{ r.percent }}% · {{ r.band.label }}
+            </span>
+          </div>
+          <app-meter [percent]="r.percent" [color]="sectionColors[r.id]" />
+          <p class="datagov__summary-suggest">{{ r.suggestion }}</p>
+        </div>
+        }
+      </div>
+
+      <p class="datagov__insight">{{ config.riskNote }}</p>
+    </section>
+    } }
 
     <!-- Step navigation -->
     <nav class="datagov__nav">
@@ -435,22 +419,22 @@
         [disabled]="isFirstStep()"
         (click)="prevStep()"
       >
-        Quay lại
+        {{ 'common.back' | transloco }}
       </button>
 
       @if (currentStepData().kind === 'results') {
-        <button
-          type="button"
-          class="datagov__nav-btn datagov__nav-btn--ghost"
-          (click)="resetScan()"
-        >
-          <svg lucideRotateCcw [size]="16" strokeWidth="2"></svg>
-          Làm lại
-        </button>
+      <button type="button" class="datagov__nav-btn datagov__nav-btn--ghost" (click)="resetScan()">
+        <svg lucideRotateCcw [size]="16" strokeWidth="2"></svg>
+        {{ 'toolkit.common.restart' | transloco }}
+      </button>
       } @else if (store.currentStep() === totalSteps - 2) {
-        <button type="button" class="datagov__nav-btn" (click)="nextStep()">Hoàn tất</button>
+      <button type="button" class="datagov__nav-btn" (click)="nextStep()">
+        {{ 'toolkit.common.finish' | transloco }}
+      </button>
       } @else {
-        <button type="button" class="datagov__nav-btn" (click)="nextStep()">Tiếp tục</button>
+      <button type="button" class="datagov__nav-btn" (click)="nextStep()">
+        {{ 'toolkit.common.continue' | transloco }}
+      </button>
       }
     </nav>
   </main>

@@ -1,16 +1,18 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { form, FormField, required } from '@angular/forms/signals';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ProfileStore } from '../profile.store';
 
 @Component({
   selector: 'app-profile-edit',
   standalone: true,
-  imports: [FormField],
+  imports: [FormField, TranslocoPipe],
   templateUrl: './edit-profile.html',
   styleUrl: './edit-profile.css',
 })
 export default class EditProfileComponent implements OnInit {
   store = inject(ProfileStore);
+  private readonly transloco = inject(TranslocoService);
 
   profileModel = signal({
     lastName: '',
@@ -19,9 +21,13 @@ export default class EditProfileComponent implements OnInit {
   });
 
   profileForm = form(this.profileModel, (p) => {
-    required(p.lastName, { message: 'Họ là bắt buộc' });
-    required(p.firstName, { message: 'Tên là bắt buộc' });
-    required(p.phone, { message: 'Số điện thoại là bắt buộc' });
+    required(p.lastName, {
+      message: this.transloco.translate('profile.editProfile.lastNameRequired'),
+    });
+    required(p.firstName, {
+      message: this.transloco.translate('profile.editProfile.firstNameRequired'),
+    });
+    required(p.phone, { message: this.transloco.translate('profile.editProfile.phoneRequired') });
   });
 
   // Avatar được điều khiển bằng nút bấm nên giữ riêng ngoài form.
@@ -67,9 +73,9 @@ export default class EditProfileComponent implements OnInit {
     try {
       const { firstName, lastName, phone } = this.profileModel();
       await this.store.updateProfile(firstName, lastName, phone, this.tempAvatarUrl());
-      this.successMessage.set('Đã cập nhật thông tin hồ sơ thành công!');
+      this.successMessage.set(this.transloco.translate('profile.editProfile.saveSuccess'));
     } catch {
-      this.errorMessage.set('Có lỗi xảy ra khi lưu thông tin. Vui lòng thử lại!');
+      this.errorMessage.set(this.transloco.translate('profile.editProfile.saveError'));
     } finally {
       this.loading.set(false);
     }

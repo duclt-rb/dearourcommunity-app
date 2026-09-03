@@ -1,6 +1,7 @@
 import { Component, inject, signal, ViewEncapsulation } from '@angular/core';
 import { email, form, FormField, required } from '@angular/forms/signals';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { LucideEye, LucideEyeOff, LucideLock, LucideMail } from '@lucide/angular';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
@@ -22,6 +23,7 @@ import LogoComponent from '../../shared/logo/logo';
     LucideEyeOff,
     InputText,
     Button,
+    TranslocoPipe,
   ],
   templateUrl: './login.html',
   styleUrl: './login.css',
@@ -29,14 +31,15 @@ import LogoComponent from '../../shared/logo/logo';
 })
 export default class LoginPage {
   private route = inject(ActivatedRoute);
+  private readonly transloco = inject(TranslocoService);
   store = inject(AuthStore);
 
   loginModel = signal({ email: '', password: '' });
 
   loginForm = form(this.loginModel, (p) => {
-    required(p.email, { message: 'Vui lòng nhập email' });
-    email(p.email, { message: 'Email không hợp lệ' });
-    required(p.password, { message: 'Vui lòng nhập mật khẩu' });
+    required(p.email, { message: this.transloco.translate('auth.login.emailRequired') });
+    email(p.email, { message: this.transloco.translate('validation.email') });
+    required(p.password, { message: this.transloco.translate('auth.login.passwordRequired') });
   });
 
   // PrimeNG PassThrough — design token values applied directly to DOM

@@ -1,4 +1,5 @@
 import { computed, inject } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { ApiError, type CreditOverview, type CreditType } from '@dearourcommunity/client';
 import { CreditsService } from '../../core/services/credits.service';
@@ -70,105 +71,117 @@ export const CreditsAdminStore = signalStore(
 
     return { hasResult, historyTotalPages, adjustAmountValid, adjustNoteValid, canAdjust };
   }),
-  withMethods((store, creditsService = inject(CreditsService)) => {
-    /** Tải số dư + lịch sử của target (đã trim) — dùng chung cho tra cứu / phân trang / refresh. */
-    async function fetchOverview(userId: string, orgId: string | null, page: number) {
-      patchState(store, { isLoading: true, lookupError: null });
-      try {
-        const overview = await creditsService.getOfUser(userId, {
-          organizationId: orgId ?? undefined,
-          page,
-          limit: HISTORY_PAGE_SIZE,
-        });
-        patchState(store, {
-          overview,
-          activeUserId: userId,
-          activeOrgId: orgId,
-          historyPage: page,
-        });
-      } catch (err) {
-        patchState(store, {
-          lookupError: toErrorMessage(err, 'Không thể tra cứu credit. Vui lòng thử lại.'),
-        });
-      } finally {
-        patchState(store, { isLoading: false });
-      }
-    }
-
-    return {
-      setLookupUserId(value: string) {
-        patchState(store, { lookupUserId: value });
-      },
-      setLookupOrgId(value: string) {
-        patchState(store, { lookupOrgId: value });
-      },
-
-      /** Tra cứu số dư + lịch sử theo userId (+ organizationId cho org-scope). */
-      async lookup() {
-        const userId = store.lookupUserId().trim();
-        if (!userId) {
-          patchState(store, { lookupError: 'Vui lòng nhập User ID cần tra cứu.' });
-          return;
-        }
-        const orgId = store.lookupOrgId().trim() || null;
-        patchState(store, { adjustSuccess: null, adjustError: null });
-        await fetchOverview(userId, orgId, 1);
-      },
-
-      async goToHistoryPage(page: number) {
-        const userId = store.activeUserId();
-        if (!userId || page < 1 || page > store.historyTotalPages()) return;
-        await fetchOverview(userId, store.activeOrgId(), page);
-      },
-
-      setAdjustCreditType(value: CreditType) {
-        patchState(store, { adjustCreditType: value });
-      },
-      setAdjustPackageId(value: string) {
-        patchState(store, { adjustPackageId: value });
-      },
-      setAdjustAmount(value: string) {
-        patchState(store, { adjustAmount: value });
-      },
-      setAdjustNote(value: string) {
-        patchState(store, { adjustNote: value });
-      },
-
-      /**
-       * Điều chỉnh tay (CSKH): amount âm = trừ, note bắt buộc.
-       * Target đúng MỘT trong userId | organizationId — nếu tra cứu theo org-scope
-       * thì điều chỉnh vào pool của org, ngược lại vào credit cá nhân của user.
-       */
-      async submitAdjust() {
-        const userId = store.activeUserId();
-        if (!userId || !store.canAdjust()) return;
-        const orgId = store.activeOrgId();
-        const amount = Number(store.adjustAmount().trim());
-
-        patchState(store, { isAdjusting: true, adjustError: null, adjustSuccess: null });
+  withMethods(
+    (store, creditsService = inject(CreditsService), transloco = inject(TranslocoService)) => {
+      /** Tải số dư + lịch sử của target (đã trim) — dùng chung cho tra cứu / phân trang / refresh. */
+      async function fetchOverview(userId: string, orgId: string | null, page: number) {
+        patchState(store, { isLoading: true, lookupError: null });
         try {
-          await creditsService.adjust({
-            ...(orgId ? { organizationId: orgId } : { userId }),
-            creditType: store.adjustCreditType(),
-            packageId: store.adjustPackageId().trim() || undefined,
-            amount,
-            note: store.adjustNote().trim(),
+          const overview = await creditsService.getOfUser(userId, {
+            organizationId: orgId ?? undefined,
+            page,
+            limit: HISTORY_PAGE_SIZE,
           });
           patchState(store, {
-            adjustAmount: '',
-            adjustNote: '',
-            adjustSuccess: `Đã điều chỉnh ${amount > 0 ? '+' : ''}${amount} credit thành công.`,
+            overview,
+            activeUserId: userId,
+            activeOrgId: orgId,
+            historyPage: page,
           });
-          // Refresh số dư + lịch sử sau khi điều chỉnh
-          await fetchOverview(userId, orgId, 1);
         } catch (err) {
           patchState(store, {
-            adjustError: toErrorMessage(err, 'Điều chỉnh credit thất bại. Vui lòng thử lại.'),
+            lookupError: toErrorMessage(
+              err,
+              transloco.translate('system.credits.errors.lookupFailed'),
+            ),
           });
         } finally {
-          patchState(store, { isAdjusting: false });
+          patchState(store, { isLoading: false });
         }
-      },
-    };
-  }),
+      }
+
+      return {
+        setLookupUserId(value: string) {
+          patchState(store, { lookupUserId: value });
+        },
+        setLookupOrgId(value: string) {
+          patchState(store, { lookupOrgId: value });
+        },
+
+        /** Tra cứu số dư + lịch sử theo userId (+ organizationId cho org-scope). */
+        async lookup() {
+          const userId = store.lookupUserId().trim();
+          if (!userId) {
+            patchState(store, {
+              lookupError: transloco.translate('system.credits.errors.userIdRequired'),
+            });
+            return;
+          }
+          const orgId = store.lookupOrgId().trim() || null;
+          patchState(store, { adjustSuccess: null, adjustError: null });
+          await fetchOverview(userId, orgId, 1);
+        },
+
+        async goToHistoryPage(page: number) {
+          const userId = store.activeUserId();
+          if (!userId || page < 1 || page > store.historyTotalPages()) return;
+          await fetchOverview(userId, store.activeOrgId(), page);
+        },
+
+        setAdjustCreditType(value: CreditType) {
+          patchState(store, { adjustCreditType: value });
+        },
+        setAdjustPackageId(value: string) {
+          patchState(store, { adjustPackageId: value });
+        },
+        setAdjustAmount(value: string) {
+          patchState(store, { adjustAmount: value });
+        },
+        setAdjustNote(value: string) {
+          patchState(store, { adjustNote: value });
+        },
+
+        /**
+         * Điều chỉnh tay (CSKH): amount âm = trừ, note bắt buộc.
+         * Target đúng MỘT trong userId | organizationId — nếu tra cứu theo org-scope
+         * thì điều chỉnh vào pool của org, ngược lại vào credit cá nhân của user.
+         */
+        async submitAdjust() {
+          const userId = store.activeUserId();
+          if (!userId || !store.canAdjust()) return;
+          const orgId = store.activeOrgId();
+          const amount = Number(store.adjustAmount().trim());
+
+          patchState(store, { isAdjusting: true, adjustError: null, adjustSuccess: null });
+          try {
+            await creditsService.adjust({
+              ...(orgId ? { organizationId: orgId } : { userId }),
+              creditType: store.adjustCreditType(),
+              packageId: store.adjustPackageId().trim() || undefined,
+              amount,
+              note: store.adjustNote().trim(),
+            });
+            patchState(store, {
+              adjustAmount: '',
+              adjustNote: '',
+              adjustSuccess: transloco.translate('system.credits.adjustSuccessMsg', {
+                amount: `${amount > 0 ? '+' : ''}${amount}`,
+              }),
+            });
+            // Refresh số dư + lịch sử sau khi điều chỉnh
+            await fetchOverview(userId, orgId, 1);
+          } catch (err) {
+            patchState(store, {
+              adjustError: toErrorMessage(
+                err,
+                transloco.translate('system.credits.errors.adjustFailed'),
+              ),
+            });
+          } finally {
+            patchState(store, { isAdjusting: false });
+          }
+        },
+      };
+    },
+  ),
 );

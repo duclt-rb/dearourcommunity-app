@@ -1,16 +1,16 @@
 <div class="tab-content active">
   <div class="profile-page-header">
-    <h1 class="profile-page-title">Chứng chỉ của tôi</h1>
-    <p class="profile-page-subtitle">
-      Xem và tải xuống các chứng chỉ hoàn thành khóa học của bạn tại đây.
-    </p>
+    <h1 class="profile-page-title">{{ 'profile.certificates.title' | transloco }}</h1>
+    <p class="profile-page-subtitle">{{ 'profile.certificates.subtitle' | transloco }}</p>
   </div>
 
   @if (store.certificates().length === 0) {
     <div class="empty-state">
       <div class="icon">🏆</div>
-      <p>Bạn chưa hoàn thành khóa học nào để nhận chứng chỉ. Hãy tiếp tục cố gắng nhé!</p>
-      <button class="btn-primary mt-4" routerLink="../courses">Học tiếp ngay</button>
+      <p>{{ 'profile.certificates.empty' | transloco }}</p>
+      <button class="btn-primary mt-4" routerLink="../courses">
+        {{ 'profile.certificates.continueLearning' | transloco }}
+      </button>
     </div>
   } @else {
     <div class="cert-grid">
@@ -19,7 +19,9 @@
           <div class="cert-visual-preview">
             <div class="cert-badge-icon">🎓</div>
             <span class="cert-brand">DEAR OUR COMMUNITY</span>
-            <span class="cert-subtitle">CHỨNG NHẬN HOÀN THÀNH</span>
+            <span class="cert-subtitle">{{
+              'profile.certificates.completionLabel' | transloco
+            }}</span>
           </div>
 
           <div class="cert-card-content">
@@ -27,17 +29,17 @@
 
             <div class="cert-metadata">
               <div class="meta-item">
-                <span class="meta-label">Ngày cấp:</span>
+                <span class="meta-label">{{ 'profile.certificates.issueDate' | transloco }}</span>
                 <span class="meta-value">{{ cert.issueDate }}</span>
               </div>
               <div class="meta-item">
-                <span class="meta-label">Mã số:</span>
+                <span class="meta-label">{{ 'profile.certificates.code' | transloco }}</span>
                 <span class="meta-value code">{{ cert.code }}</span>
               </div>
             </div>
 
             <button class="btn-outline w-full justify-center" (click)="downloadCertificate(cert)">
-              Tải xuống chứng chỉ (PDF)
+              {{ 'profile.certificates.download' | transloco }}
             </button>
           </div>
         </div>

@@ -1,4 +1,5 @@
-import { Component, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-priority-badge',
@@ -7,5 +8,5 @@ import { Component, input } from '@angular/core';
   styleUrl: './priority-badge.css',
 })
 export class PriorityBadgeComponent {
-  label = input<string>('Ưu tiên');
+  label = input<string>(inject(TranslocoService).translate('toolkit.fields.priority'));
 }

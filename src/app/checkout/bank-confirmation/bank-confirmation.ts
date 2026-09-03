@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { LucideArrowRight, LucideCircleCheck } from '@lucide/angular';
 import LogoComponent from '../../shared/logo/logo';
 import InvoiceRequestFormComponent from '../invoice-request-form/invoice-request-form';
@@ -15,6 +16,7 @@ import InvoiceRequestFormComponent from '../invoice-request-form/invoice-request
   standalone: true,
   imports: [
     RouterLink,
+    TranslocoPipe,
     LucideArrowRight,
     LucideCircleCheck,
     LogoComponent,

@@ -1,6 +1,8 @@
 export type MaturityTone = 'error' | 'warning' | 'success';
 
 export interface FieldDef {
+  /** Khoá persist ổn định (không đổi khi dịch nhãn). */
+  id: string;
   label: string;
   hint?: string;
   type?: 'text' | 'date';
@@ -107,18 +109,28 @@ export interface WasteToolkitConfig {
   reviewMilestones: ReviewMilestone[];
 }
 
+import { localePick } from '../../core/i18n/locale';
+
 export interface SegmentOptionLite {
   value: string;
   label: string;
 }
 
 /** Practice assessment scale; scored full=1, partial=0.5, none=0, N/A excluded. */
-export const ASSESSMENT_OPTIONS: SegmentOptionLite[] = [
-  { value: 'full', label: 'Đầy đủ' },
-  { value: 'partial', label: 'Một phần' },
-  { value: 'none', label: 'Chưa có' },
-  { value: 'na', label: 'N/A' },
-];
+export const ASSESSMENT_OPTIONS: SegmentOptionLite[] = localePick({
+  vi: [
+    { value: 'full', label: 'Đầy đủ' },
+    { value: 'partial', label: 'Một phần' },
+    { value: 'none', label: 'Chưa có' },
+    { value: 'na', label: 'N/A' },
+  ],
+  en: [
+    { value: 'full', label: 'In place' },
+    { value: 'partial', label: 'Partial' },
+    { value: 'none', label: 'Not yet' },
+    { value: 'na', label: 'N/A' },
+  ],
+});
 
 export const ASSESSMENT_WEIGHTS: Record<string, number> = {
   full: 1,
@@ -126,31 +138,60 @@ export const ASSESSMENT_WEIGHTS: Record<string, number> = {
   none: 0,
 };
 
-export const YES_NO_OPTIONS: SegmentOptionLite[] = [
-  { value: 'yes', label: 'Có' },
-  { value: 'no', label: 'Không' },
-];
+export const YES_NO_OPTIONS: SegmentOptionLite[] = localePick({
+  vi: [
+    { value: 'yes', label: 'Có' },
+    { value: 'no', label: 'Không' },
+  ],
+  en: [
+    { value: 'yes', label: 'Yes' },
+    { value: 'no', label: 'No' },
+  ],
+});
 
 /** Current disposal method for a waste stream. */
-export const DISPOSAL_OPTIONS: SegmentOptionLite[] = [
-  { value: 'licensed', label: 'Nhà thầu được cấp phép' },
-  { value: 'self', label: 'Tự xử lý' },
-  { value: 'municipality', label: 'Đơn vị thu gom địa phương' },
-  { value: 'mixed', label: 'Trộn lẫn / không rõ' },
-  { value: 'none', label: 'Không xử lý' },
-];
+export const DISPOSAL_OPTIONS: SegmentOptionLite[] = localePick({
+  vi: [
+    { value: 'licensed', label: 'Nhà thầu được cấp phép' },
+    { value: 'self', label: 'Tự xử lý' },
+    { value: 'municipality', label: 'Đơn vị thu gom địa phương' },
+    { value: 'mixed', label: 'Trộn lẫn / không rõ' },
+    { value: 'none', label: 'Không xử lý' },
+  ],
+  en: [
+    { value: 'licensed', label: 'Licensed contractor' },
+    { value: 'self', label: 'Self-processed' },
+    { value: 'municipality', label: 'Local collection service' },
+    { value: 'mixed', label: 'Mixed / unclear' },
+    { value: 'none', label: 'Not processed' },
+  ],
+});
 
-export const COMPLIANT_OPTIONS: SegmentOptionLite[] = [
-  { value: 'yes', label: 'Có' },
-  { value: 'no', label: 'Không' },
-  { value: 'unsure', label: 'Không rõ' },
-];
+export const COMPLIANT_OPTIONS: SegmentOptionLite[] = localePick({
+  vi: [
+    { value: 'yes', label: 'Có' },
+    { value: 'no', label: 'Không' },
+    { value: 'unsure', label: 'Không rõ' },
+  ],
+  en: [
+    { value: 'yes', label: 'Yes' },
+    { value: 'no', label: 'No' },
+    { value: 'unsure', label: 'Unsure' },
+  ],
+});
 
-export const ACTION_STATUS_OPTIONS: SegmentOptionLite[] = [
-  { value: 'todo', label: 'Chưa bắt đầu' },
-  { value: 'doing', label: 'Đang làm' },
-  { value: 'done', label: 'Hoàn thành' },
-];
+export const ACTION_STATUS_OPTIONS: SegmentOptionLite[] = localePick({
+  vi: [
+    { value: 'todo', label: 'Chưa bắt đầu' },
+    { value: 'doing', label: 'Đang làm' },
+    { value: 'done', label: 'Hoàn thành' },
+  ],
+  en: [
+    { value: 'todo', label: 'Not started' },
+    { value: 'doing', label: 'In progress' },
+    { value: 'done', label: 'Done' },
+  ],
+});
 
 export const PRIORITY_OPTIONS: SegmentOptionLite[] = [
   { value: 'critical', label: 'Critical' },
@@ -173,11 +214,18 @@ export interface MaturityBand {
 }
 
 /** Shared readiness scale (percentage based). */
-export const READINESS_BANDS: MaturityBand[] = [
-  { label: 'Tốt', min: 70, tone: 'success' },
-  { label: 'Cần cải thiện', min: 40, tone: 'warning' },
-  { label: 'Giai đoạn đầu', min: 0, tone: 'error' },
-];
+export const READINESS_BANDS: MaturityBand[] = localePick({
+  vi: [
+    { label: 'Tốt', min: 70, tone: 'success' },
+    { label: 'Cần cải thiện', min: 40, tone: 'warning' },
+    { label: 'Giai đoạn đầu', min: 0, tone: 'error' },
+  ],
+  en: [
+    { label: 'Good', min: 70, tone: 'success' },
+    { label: 'Needs improvement', min: 40, tone: 'warning' },
+    { label: 'Early stage', min: 0, tone: 'error' },
+  ],
+});
 
 export function readinessFor(percent: number): MaturityBand {
   return (
@@ -187,7 +235,11 @@ export function readinessFor(percent: number): MaturityBand {
 
 /** Contractor verdict from a 0–100 weighted score (Giữ lại / Có điều kiện / Thay thế). */
 export function contractorVerdict(score: number): MaturityBand {
-  if (score >= 80) return { label: 'Giữ lại', min: 80, tone: 'success' };
-  if (score >= 50) return { label: 'Có điều kiện', min: 50, tone: 'warning' };
-  return { label: 'Thay thế', min: 0, tone: 'error' };
+  const labels = localePick({
+    vi: { keep: 'Giữ lại', conditional: 'Có điều kiện', replace: 'Thay thế' },
+    en: { keep: 'Keep', conditional: 'Conditional', replace: 'Replace' },
+  });
+  if (score >= 80) return { label: labels.keep, min: 80, tone: 'success' };
+  if (score >= 50) return { label: labels.conditional, min: 50, tone: 'warning' };
+  return { label: labels.replace, min: 0, tone: 'error' };
 }

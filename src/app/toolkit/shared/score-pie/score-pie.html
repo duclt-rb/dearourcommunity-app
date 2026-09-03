@@ -1,5 +1,10 @@
 <div class="score-pie">
-  <svg class="score-pie__svg" viewBox="0 0 100 100" role="img" aria-label="Điểm theo nhóm">
+  <svg
+    class="score-pie__svg"
+    viewBox="0 0 100 100"
+    role="img"
+    [attr.aria-label]="'toolkit.fields.scorePieAria' | transloco"
+  >
     <circle class="score-pie__track" cx="50" cy="50" [attr.r]="radius" />
     @if (total() > 0) {
       @for (seg of segments(); track seg.label) {

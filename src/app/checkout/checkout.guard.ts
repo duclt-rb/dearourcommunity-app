@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { CanActivateFn } from '@angular/router';
 import { CheckoutStore } from './checkout.store';
 import { PackagesService } from '../core/services/packages.service';
-import { environment } from '../../environments/environment';
+import { frontpageUrl } from '../core/i18n/locale';
 
 export const checkoutGuard: CanActivateFn = async (route) => {
   const store = inject(CheckoutStore);
@@ -41,6 +41,6 @@ export const checkoutGuard: CanActivateFn = async (route) => {
   }
 
   // Redirect back to package selection (app chính) if no package has been selected
-  window.location.href = `${environment.appUrl}/packages`;
+  window.location.href = frontpageUrl('/packages');
   return false;
 };

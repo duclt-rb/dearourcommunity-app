@@ -7,7 +7,7 @@
         <svg lucideTrendingUp [size]="20" strokeWidth="2"></svg>
       </div>
       <div class="stat-details">
-        <span class="stat-label">Tổng doanh thu</span>
+        <span class="stat-label">{{ 'system.transactions.stats.totalRevenue' | transloco }}</span>
         <h3 class="stat-value">{{ stats().totalRevenue | number }}đ</h3>
       </div>
       <div class="stat-glow"></div>
@@ -19,7 +19,7 @@
         <svg lucideCheckCircle [size]="20" strokeWidth="2"></svg>
       </div>
       <div class="stat-details">
-        <span class="stat-label">Thành công</span>
+        <span class="stat-label">{{ 'system.transactions.stats.success' | transloco }}</span>
         <h3 class="stat-value">{{ stats().successCount }}</h3>
       </div>
       <div class="stat-glow"></div>
@@ -31,10 +31,12 @@
         <svg lucideClock [size]="20" strokeWidth="2"></svg>
       </div>
       <div class="stat-details">
-        <span class="stat-label">Chờ xử lý / duyệt</span>
+        <span class="stat-label">{{ 'system.transactions.stats.pendingReview' | transloco }}</span>
         <h3 class="stat-value">{{ stats().pendingCount + stats().awaitingCount }}</h3>
         @if (stats().awaitingCount) {
-          <span class="stat-sub">{{ stats().awaitingCount }} chờ duyệt CK</span>
+          <span class="stat-sub">
+            {{ 'system.transactions.stats.awaitingSub' | transloco: { n: stats().awaitingCount } }}
+          </span>
         }
       </div>
       <div class="stat-glow"></div>
@@ -46,7 +48,7 @@
         <svg lucideXCircle [size]="20" strokeWidth="2"></svg>
       </div>
       <div class="stat-details">
-        <span class="stat-label">Thất bại / Hoàn tiền</span>
+        <span class="stat-label">{{ 'system.transactions.stats.failedRefunded' | transloco }}</span>
         <h3 class="stat-value">{{ stats().failedCount + stats().refundedCount }}</h3>
       </div>
       <div class="stat-glow"></div>
@@ -59,7 +61,7 @@
       <svg lucideSearch class="search-icon" [size]="16" strokeWidth="2"></svg>
       <input
         type="text"
-        placeholder="Tìm kiếm theo email, mã đơn hàng, tên gói..."
+        [placeholder]="'system.transactions.searchPlaceholder' | transloco"
         [value]="searchQuery()"
         (input)="setSearch($any($event.target).value)"
         class="form-input-search"
@@ -78,12 +80,14 @@
           (change)="setStatusFilter($any($event.target).value)"
           class="form-select"
         >
-          <option value="all">Tất cả trạng thái</option>
-          <option value="success">Thành công</option>
-          <option value="awaiting_confirmation">Chờ duyệt</option>
-          <option value="pending">Chờ xử lý</option>
-          <option value="failed">Thất bại</option>
-          <option value="refunded">Đã hoàn tiền</option>
+          <option value="all">{{ 'system.transactions.filters.allStatuses' | transloco }}</option>
+          <option value="success">{{ 'system.transactions.status.success' | transloco }}</option>
+          <option value="awaiting_confirmation">
+            {{ 'system.transactions.status.awaiting_confirmation' | transloco }}
+          </option>
+          <option value="pending">{{ 'system.transactions.status.pending' | transloco }}</option>
+          <option value="failed">{{ 'system.transactions.status.failed' | transloco }}</option>
+          <option value="refunded">{{ 'system.transactions.status.refunded' | transloco }}</option>
         </select>
       </div>
 
@@ -95,9 +99,11 @@
           (change)="setMethodFilter($any($event.target).value)"
           class="form-select"
         >
-          <option value="all">Tất cả phương thức</option>
-          <option value="momo">MoMo</option>
-          <option value="bank_transfer">Chuyển khoản</option>
+          <option value="all">{{ 'system.transactions.filters.allMethods' | transloco }}</option>
+          <option value="momo">{{ 'system.transactions.method.momo' | transloco }}</option>
+          <option value="bank_transfer">
+            {{ 'system.transactions.method.bank_transfer' | transloco }}
+          </option>
         </select>
       </div>
 
@@ -107,7 +113,7 @@
         class="btn-refresh"
         [disabled]="isLoading()"
         (click)="refresh()"
-        title="Làm mới dữ liệu"
+        [title]="'system.transactions.refreshTitle' | transloco"
       >
         <svg lucideRefreshCw [class.spinning]="isLoading()" [size]="16" strokeWidth="2"></svg>
       </button>
@@ -132,26 +138,23 @@
             <div class="empty-icon-wrap">
               <svg lucideSearch [size]="32" strokeWidth="1.75"></svg>
             </div>
-            <h3 class="empty-title">Không tìm thấy giao dịch phù hợp</h3>
+            <h3 class="empty-title">{{ 'system.transactions.emptyFiltered.title' | transloco }}</h3>
             <p class="empty-message">
-              Không có giao dịch nào khớp với từ khoá hoặc bộ lọc hiện tại. Thử điều chỉnh lại điều
-              kiện tìm kiếm.
+              {{ 'system.transactions.emptyFiltered.message' | transloco }}
             </p>
             <button type="button" class="empty-action" (click)="clearFilters()">
               <svg lucideX [size]="16" strokeWidth="2"></svg>
-              Xoá bộ lọc
+              {{ 'system.transactions.emptyFiltered.clear' | transloco }}
             </button>
           } @else {
             <div class="empty-icon-wrap">
               <svg lucideCreditCard [size]="32" strokeWidth="1.75"></svg>
             </div>
-            <h3 class="empty-title">Chưa có giao dịch nào</h3>
-            <p class="empty-message">
-              Khi học viên thanh toán hoặc gửi yêu cầu chuyển khoản, giao dịch sẽ xuất hiện ở đây.
-            </p>
+            <h3 class="empty-title">{{ 'system.transactions.empty.title' | transloco }}</h3>
+            <p class="empty-message">{{ 'system.transactions.empty.message' | transloco }}</p>
             <button type="button" class="empty-action" [disabled]="isLoading()" (click)="refresh()">
               <svg lucideRefreshCw [class.spinning]="isLoading()" [size]="16" strokeWidth="2"></svg>
-              Làm mới
+              {{ 'system.transactions.empty.refresh' | transloco }}
             </button>
           }
         </div>
@@ -159,29 +162,39 @@
         <table class="system-style-table">
           <thead>
             <tr>
-              <th class="col-order-id">Mã đơn hàng</th>
-              <th class="col-user">Học viên</th>
-              <th class="col-pkg">Gói học</th>
-              <th class="col-method text-center">Phương thức</th>
-              <th class="col-amount text-right">Số tiền / Giảm giá</th>
-              <th class="col-date">Ngày tạo</th>
-              <th class="col-status text-center">Trạng thái</th>
-              <th class="col-actions text-center">Chi tiết</th>
+              <th class="col-order-id">{{ 'system.transactions.table.orderId' | transloco }}</th>
+              <th class="col-user">{{ 'system.transactions.table.student' | transloco }}</th>
+              <th class="col-pkg">{{ 'system.transactions.table.package' | transloco }}</th>
+              <th class="col-method text-center">
+                {{ 'system.transactions.table.method' | transloco }}
+              </th>
+              <th class="col-amount text-right">
+                {{ 'system.transactions.table.amountDiscount' | transloco }}
+              </th>
+              <th class="col-date">{{ 'system.transactions.table.createdAt' | transloco }}</th>
+              <th class="col-status text-center">
+                {{ 'system.transactions.table.status' | transloco }}
+              </th>
+              <th class="col-actions text-center">
+                {{ 'system.transactions.table.details' | transloco }}
+              </th>
             </tr>
           </thead>
           <tbody>
             @for (t of pagedTransactions(); track t.id) {
               <tr class="table-row" (click)="viewDetails(t)">
                 <td class="col-order-id">
-                  <span class="order-id-badge">{{ t.orderId || 'Không có ID' }}</span>
+                  <span class="order-id-badge">{{
+                    t.orderId || ('system.transactions.noOrderId' | transloco)
+                  }}</span>
                 </td>
                 <td class="col-user">
                   <div class="user-cell">
                     <span class="user-display-name">{{
-                      t.user?.wpUser?.displayName || 'Khách vãng lai'
+                      t.user?.wpUser?.displayName || ('system.transactions.guest' | transloco)
                     }}</span>
                     <span class="user-email-text">{{
-                      t.user?.wpUser?.userEmail || 'Không có email'
+                      t.user?.wpUser?.userEmail || ('system.transactions.noEmail' | transloco)
                     }}</span>
                   </div>
                 </td>
@@ -190,11 +203,18 @@
                     <div class="pkg-cell">
                       <span class="pkg-name-text">{{ t.package.name }}</span>
                       <span class="pkg-type-tag" [class]="t.package.packageType">
-                        {{ t.package.packageType === 'youth' ? 'Cá nhân' : 'Doanh nghiệp' }}
+                        {{
+                          (t.package.packageType === 'youth'
+                            ? 'system.transactions.packageType.youth'
+                            : 'system.transactions.packageType.organization'
+                          ) | transloco
+                        }}
                       </span>
                     </div>
                   } @else {
-                    <span class="text-muted">Không xác định</span>
+                    <span class="text-muted">{{
+                      'system.transactions.packageType.unknown' | transloco
+                    }}</span>
                   }
                 </td>
                 <td class="col-method text-center">
@@ -224,8 +244,10 @@
                     {{ getStatusLabel(t.status) }}
                   </span>
                   @if (hasPendingInvoice(t)) {
-                    <span class="invoice-chip" title="Có yêu cầu xuất hoá đơn VAT chưa xử lý"
-                      >HĐ</span
+                    <span
+                      class="invoice-chip"
+                      [title]="'system.transactions.invoiceChipTitle' | transloco"
+                      >{{ 'system.transactions.invoiceChip' | transloco }}</span
                     >
                   }
                 </td>
@@ -234,7 +256,7 @@
                     <button
                       type="button"
                       class="btn-action-approve"
-                      title="Duyệt giao dịch"
+                      [title]="'system.transactions.approveTitle' | transloco"
                       [disabled]="actionLoadingId() === t.id"
                       (click)="approve(t)"
                     >
@@ -257,10 +279,12 @@
   <div class="table-footer">
     <span class="footer-count">
       @if (pageRange().total) {
-        Hiển thị {{ pageRange().from }}–{{ pageRange().to }} trên tổng số
-        {{ pageRange().total }} giao dịch
+        {{
+          'system.transactions.footer.showingRange'
+            | transloco: { from: pageRange().from, to: pageRange().to, total: pageRange().total }
+        }}
       } @else {
-        Không có giao dịch
+        {{ 'system.transactions.footer.empty' | transloco }}
       }
     </span>
 
@@ -271,17 +295,22 @@
           class="page-btn"
           [disabled]="clampedPage() <= 1"
           (click)="prevPage()"
-          title="Trang trước"
+          [title]="'system.transactions.pagination.prev' | transloco"
         >
           <svg lucideChevronLeft [size]="16" strokeWidth="2"></svg>
         </button>
-        <span class="page-indicator">Trang {{ clampedPage() }} / {{ totalPages() }}</span>
+        <span class="page-indicator">
+          {{
+            'system.transactions.pagination.indicator'
+              | transloco: { page: clampedPage(), total: totalPages() }
+          }}
+        </span>
         <button
           type="button"
           class="page-btn"
           [disabled]="clampedPage() >= totalPages()"
           (click)="nextPage()"
-          title="Trang sau"
+          [title]="'system.transactions.pagination.next' | transloco"
         >
           <svg lucideChevronRight [size]="16" strokeWidth="2"></svg>
         </button>
@@ -298,8 +327,10 @@
           <div class="modal-title-group">
             <svg lucideCreditCard class="modal-icon" [size]="20" strokeWidth="2"></svg>
             <div>
-              <h3 class="modal-title">Chi tiết giao dịch</h3>
-              <p class="modal-subtitle">Giao dịch #{{ t.id }}</p>
+              <h3 class="modal-title">{{ 'system.transactions.modal.title' | transloco }}</h3>
+              <p class="modal-subtitle">
+                {{ 'system.transactions.modal.subtitle' | transloco: { id: t.id } }}
+              </p>
             </div>
           </div>
           <button type="button" class="btn-close-modal" (click)="closeDetails()">✕</button>
@@ -310,11 +341,20 @@
           <!-- Main details side by side -->
           <div class="detail-summary-box" [class]="t.status">
             <div class="summary-item">
-              <span class="summary-label">Số tiền giao dịch</span>
+              <span class="summary-label">{{
+                'system.transactions.modal.amount' | transloco
+              }}</span>
               <span class="summary-value">{{ t.amount | number }}đ</span>
               @if (t.discountAmount && t.discountAmount > 0) {
                 <span class="summary-sub">
-                  Giá gốc {{ t.originalAmount | number }}đ · giảm {{ t.discountAmount | number }}đ
+                  {{
+                    'system.transactions.modal.discountSub'
+                      | transloco
+                        : {
+                            original: (t.originalAmount | number),
+                            discount: (t.discountAmount | number),
+                          }
+                  }}
                   @if (t.couponCode) {
                     (<span class="font-mono">{{ t.couponCode }}</span
                     >)
@@ -333,63 +373,87 @@
           <div class="detail-grid">
             <!-- Order ID -->
             <div class="detail-field">
-              <span class="field-label">Mã đơn hàng (Order ID)</span>
+              <span class="field-label">{{
+                'system.transactions.fields.orderId' | transloco
+              }}</span>
               <span class="field-value font-mono highlight">{{ t.orderId }}</span>
             </div>
 
             <!-- Transaction Date -->
             <div class="detail-field">
-              <span class="field-label">Thời gian tạo</span>
+              <span class="field-label">{{
+                'system.transactions.fields.createdAt' | transloco
+              }}</span>
               <span class="field-value">{{ t.createdAt | date: 'dd/MM/yyyy, HH:mm:ss' }}</span>
             </div>
 
             <!-- User Name -->
             <div class="detail-field">
-              <span class="field-label">Họ và tên người mua</span>
-              <span class="field-value">{{ t.user?.wpUser?.displayName || 'Khách vãng lai' }}</span>
+              <span class="field-label">{{
+                'system.transactions.fields.buyerName' | transloco
+              }}</span>
+              <span class="field-value">{{
+                t.user?.wpUser?.displayName || ('system.transactions.guest' | transloco)
+              }}</span>
             </div>
 
             <!-- User Email -->
             <div class="detail-field">
-              <span class="field-label">Email tài khoản</span>
-              <span class="field-value">{{ t.user?.wpUser?.userEmail || 'Không có email' }}</span>
+              <span class="field-label">{{
+                'system.transactions.fields.accountEmail' | transloco
+              }}</span>
+              <span class="field-value">{{
+                t.user?.wpUser?.userEmail || ('system.transactions.noEmail' | transloco)
+              }}</span>
             </div>
 
             <!-- Package Name -->
             <div class="detail-field">
-              <span class="field-label">Gói học đăng ký</span>
-              <span class="field-value">{{ t.package?.name || 'Không xác định' }}</span>
+              <span class="field-label">{{
+                'system.transactions.fields.package' | transloco
+              }}</span>
+              <span class="field-value">{{
+                t.package?.name || ('system.transactions.packageType.unknown' | transloco)
+              }}</span>
             </div>
 
             <!-- CR-009 — lượt NÂNG CẤP: gói đã được trừ tiền + số tiền trừ (theo báo giá lúc
                  tạo đơn). Duyệt sẽ tính lại báo giá; lệch thì BE chặn kèm message. -->
             @if (t.extraData?.upgradeFromPackageId) {
               <div class="detail-field">
-                <span class="field-label">Nâng cấp từ gói</span>
+                <span class="field-label">{{
+                  'system.transactions.fields.upgradeFrom' | transloco
+                }}</span>
                 <span class="field-value">
                   {{ t.extraData?.upgradeFromPackageId }}
-                  <span class="text-muted"
-                    >(đã trừ ₫ {{ t.extraData?.upgradeCreditAmount | number: '1.0-0' }})</span
-                  >
+                  <span class="text-muted">{{
+                    'system.transactions.fields.upgradeDeducted'
+                      | transloco: { amount: (t.extraData?.upgradeCreditAmount | number: '1.0-0') }
+                  }}</span>
                 </span>
               </div>
             }
 
             <!-- Package Type -->
             <div class="detail-field">
-              <span class="field-label">Loại gói học</span>
+              <span class="field-label">{{
+                'system.transactions.fields.packageType' | transloco
+              }}</span>
               <span class="field-value capitalize">{{
-                t.package
+                (t.package
                   ? t.package.packageType === 'youth'
-                    ? 'Cá nhân'
-                    : 'Doanh nghiệp'
-                  : 'Không xác định'
+                    ? 'system.transactions.packageType.youth'
+                    : 'system.transactions.packageType.organization'
+                  : 'system.transactions.packageType.unknown'
+                ) | transloco
               }}</span>
             </div>
 
             <!-- Payment Method -->
             <div class="detail-field">
-              <span class="field-label">Phương thức thanh toán</span>
+              <span class="field-label">{{
+                'system.transactions.fields.paymentMethod' | transloco
+              }}</span>
               <span class="field-value">
                 {{ getPaymentMethodLabel(t.paymentMethod) }}
                 @if (t.paymentMethod === 'momo') {
@@ -401,7 +465,9 @@
             <!-- Reviewer (bank transfer approved/rejected by admin) -->
             @if (t.confirmedByUser || t.confirmedAt) {
               <div class="detail-field">
-                <span class="field-label">Người duyệt</span>
+                <span class="field-label">{{
+                  'system.transactions.fields.reviewer' | transloco
+                }}</span>
                 <span class="field-value">
                   {{ t.confirmedByUser?.wpUser?.displayName || 'Admin' }}
                   @if (t.confirmedAt) {
@@ -419,11 +485,14 @@
           @if (t.extraData?.courseIds?.length) {
             <div class="detail-message-box">
               <span class="message-label">
-                Khoá học đã chọn ({{ t.extraData?.courseIds?.length }})
+                {{
+                  'system.transactions.selectedCourses.title'
+                    | transloco: { n: t.extraData?.courseIds?.length }
+                }}
                 @if (t.package?.packageType === 'organization') {
-                  — duyệt sẽ giữ chỗ suất cho tổ chức
+                  {{ 'system.transactions.selectedCourses.orgSuffix' | transloco }}
                 } @else {
-                  — duyệt sẽ tự động ghi danh cho học viên
+                  {{ 'system.transactions.selectedCourses.enrollSuffix' | transloco }}
                 }
               </span>
               <ul class="selected-course-list">
@@ -433,7 +502,7 @@
                   }
                 } @else {
                   @for (id of t.extraData?.courseIds ?? []; track $index) {
-                    <li>Khóa học #{{ id }}</li>
+                    <li>{{ 'system.transactions.courseFallback' | transloco: { id: id } }}</li>
                   }
                 }
               </ul>
@@ -444,8 +513,10 @@
           @if (t.extraData?.toolkitIds?.length) {
             <div class="detail-message-box">
               <span class="message-label">
-                Quick Scan / Toolkit đã chọn ({{ t.extraData?.toolkitIds?.length }}) — duyệt sẽ cấp
-                quyền cho người mua
+                {{
+                  'system.transactions.toolkits.title'
+                    | transloco: { n: t.extraData?.toolkitIds?.length }
+                }}
               </span>
               <ul class="selected-course-list">
                 @for (name of selectedToolkitNames(t); track $index) {
@@ -459,49 +530,73 @@
           @if (invoiceRequestFor(t); as inv) {
             <div class="detail-message-box">
               <span class="message-label">
-                Hoá đơn VAT
+                {{ 'system.transactions.invoice.title' | transloco }}
                 @if (inv.status === 'issued') {
-                  — đã xuất
+                  {{ 'system.transactions.invoice.issuedSuffix' | transloco }}
                 } @else {
-                  — chờ xuất
+                  {{ 'system.transactions.invoice.pendingSuffix' | transloco }}
                 }
               </span>
               <ul class="selected-course-list">
                 @if (inv.buyerType === 'company') {
-                  <li>Công ty (theo GCNĐKKD): {{ inv.companyName }}</li>
-                  <li>MST: {{ inv.taxCode }}</li>
-                  <li>Người liên hệ nhận HĐ: {{ inv.buyerName }}</li>
+                  <li>
+                    {{ 'system.transactions.invoice.company' | transloco }}: {{ inv.companyName }}
+                  </li>
+                  <li>
+                    {{ 'system.transactions.invoice.taxCode' | transloco }}: {{ inv.taxCode }}
+                  </li>
+                  <li>
+                    {{ 'system.transactions.invoice.contactPerson' | transloco }}:
+                    {{ inv.buyerName }}
+                  </li>
                 } @else {
-                  <li>Người mua (theo CCCD): {{ inv.buyerName }}</li>
-                  <li>Số CCCD/CMND: {{ inv.idNumber }}</li>
+                  <li>
+                    {{ 'system.transactions.invoice.buyer' | transloco }}: {{ inv.buyerName }}
+                  </li>
+                  <li>
+                    {{ 'system.transactions.invoice.idNumber' | transloco }}: {{ inv.idNumber }}
+                  </li>
                   @if (inv.taxCode) {
-                    <li>MST cá nhân: {{ inv.taxCode }}</li>
+                    <li>
+                      {{ 'system.transactions.invoice.personalTaxCode' | transloco }}:
+                      {{ inv.taxCode }}
+                    </li>
                   }
                 }
-                <li>Địa chỉ: {{ inv.address }}</li>
-                <li>Email nhận HĐ: {{ inv.email }}</li>
+                <li>{{ 'system.transactions.invoice.address' | transloco }}: {{ inv.address }}</li>
+                <li>{{ 'system.transactions.invoice.email' | transloco }}: {{ inv.email }}</li>
                 @if (inv.phone) {
-                  <li>SĐT liên hệ: {{ inv.phone }}</li>
+                  <li>{{ 'system.transactions.invoice.phone' | transloco }}: {{ inv.phone }}</li>
                 }
                 @if (inv.buyerNote) {
-                  <li>Ghi chú của khách: {{ inv.buyerNote }}</li>
+                  <li>
+                    {{ 'system.transactions.invoice.buyerNote' | transloco }}: {{ inv.buyerNote }}
+                  </li>
                 }
               </ul>
 
               @if (inv.status === 'issued') {
                 <p class="invoice-issued-line">
-                  Số hoá đơn <strong>{{ inv.invoiceNo }}</strong>
+                  {{ 'system.transactions.invoice.invoiceNoLabel' | transloco }}
+                  <strong>{{ inv.invoiceNo }}</strong>
                   @if (inv.invoiceSeries) {
-                    · ký hiệu {{ inv.invoiceSeries }}
+                    · {{ 'system.transactions.invoice.seriesLabel' | transloco }}
+                    {{ inv.invoiceSeries }}
                   }
                   @if (inv.issuedAt) {
-                    · {{ inv.issuedAt | date: 'dd/MM/yyyy HH:mm' }}
+                    ·
+                    {{
+                      inv.issuedAt
+                        | date
+                          : 'dd/MM/yyyy
+            HH:mm'
+                    }}
                   }
                   @if (inv.lookupUrl) {
                     ·
-                    <a [href]="inv.lookupUrl" target="_blank" rel="noopener noreferrer"
-                      >Tra cứu HĐĐT</a
-                    >
+                    <a [href]="inv.lookupUrl" target="_blank" rel="noopener noreferrer">{{
+                      'system.transactions.invoice.lookupLink' | transloco
+                    }}</a>
                   }
                 </p>
               } @else if (t.status === 'success') {
@@ -510,7 +605,7 @@
                     class="invoice-issue-input"
                     type="text"
                     maxlength="50"
-                    placeholder="Số hoá đơn *"
+                    [placeholder]="'system.transactions.invoice.invoiceNoPlaceholder' | transloco"
                     [value]="issueInvoiceNo()"
                     (input)="issueInvoiceNo.set($any($event.target).value)"
                   />
@@ -518,7 +613,7 @@
                     class="invoice-issue-input"
                     type="text"
                     maxlength="20"
-                    placeholder="Ký hiệu (vd 1C26TDO)"
+                    [placeholder]="'system.transactions.invoice.seriesPlaceholder' | transloco"
                     [value]="issueInvoiceSeries()"
                     (input)="issueInvoiceSeries.set($any($event.target).value)"
                   />
@@ -526,12 +621,14 @@
                     class="invoice-issue-input"
                     type="text"
                     maxlength="500"
-                    placeholder="Link tra cứu HĐĐT (tuỳ chọn)"
+                    [placeholder]="'system.transactions.invoice.lookupUrlPlaceholder' | transloco"
                     [value]="issueLookupUrl()"
                     (input)="issueLookupUrl.set($any($event.target).value)"
                   />
                   @if (issueLookupUrl().trim() && !issueLookupUrlValid()) {
-                    <p class="action-error-text">Link tra cứu phải là URL http/https hợp lệ.</p>
+                    <p class="action-error-text">
+                      {{ 'system.transactions.invoice.lookupUrlInvalid' | transloco }}
+                    </p>
                   }
                   <button
                     type="button"
@@ -541,7 +638,12 @@
                     "
                     (click)="markInvoiceIssued(t)"
                   >
-                    {{ issueLoading() ? 'Đang lưu...' : 'Đã xuất hoá đơn — gửi mail khách' }}
+                    {{
+                      (issueLoading()
+                        ? 'system.transactions.invoice.saving'
+                        : 'system.transactions.invoice.markIssued'
+                      ) | transloco
+                    }}
                   </button>
                   @if (issueError()) {
                     <p class="action-error-text">{{ issueError() }}</p>
@@ -549,12 +651,11 @@
                 </div>
               } @else if (t.status === 'pending' || t.status === 'awaiting_confirmation') {
                 <p class="invoice-pending-note">
-                  Duyệt giao dịch trước; sau khi kế toán phát hành hoá đơn ngoài hệ thống, quay lại
-                  đây nhập số hoá đơn để báo khách.
+                  {{ 'system.transactions.invoice.pendingNote' | transloco }}
                 </p>
               } @else {
                 <p class="invoice-pending-note">
-                  Giao dịch không thành công — yêu cầu hoá đơn này không cần xử lý.
+                  {{ 'system.transactions.invoice.notNeededNote' | transloco }}
                 </p>
               }
             </div>
@@ -563,7 +664,9 @@
           <!-- System Log Message -->
           @if (t.message) {
             <div class="detail-message-box">
-              <span class="message-label">Thông báo hệ thống</span>
+              <span class="message-label">{{
+                'system.transactions.systemMessage' | transloco
+              }}</span>
               <div class="message-content">
                 <svg lucideInfo [size]="16" strokeWidth="2" class="info-icon"></svg>
                 <p class="message-text">{{ t.message }}</p>
@@ -574,11 +677,13 @@
           <!-- Reject reason input -->
           @if (showRejectInput()) {
             <div class="detail-message-box">
-              <span class="message-label">Lý do từ chối</span>
+              <span class="message-label">{{
+                'system.transactions.reject.reasonLabel' | transloco
+              }}</span>
               <textarea
                 class="reject-reason-input"
                 rows="2"
-                placeholder="VD: Không nhận được tiền trong sao kê..."
+                [placeholder]="'system.transactions.reject.placeholder' | transloco"
                 [value]="rejectReason()"
                 (input)="setRejectReason($any($event.target).value)"
               ></textarea>
@@ -601,7 +706,7 @@
                 [disabled]="actionLoadingId() === t.id"
                 (click)="cancelReject()"
               >
-                Hủy
+                {{ 'common.cancel' | transloco }}
               </button>
               <button
                 type="button"
@@ -610,7 +715,7 @@
                 (click)="confirmReject(t)"
               >
                 <svg lucideX [size]="16" strokeWidth="2"></svg>
-                Xác nhận từ chối
+                {{ 'system.transactions.reject.confirm' | transloco }}
               </button>
             } @else {
               <button
@@ -619,7 +724,7 @@
                 [disabled]="actionLoadingId() === t.id"
                 (click)="startReject()"
               >
-                Từ chối
+                {{ 'system.transactions.reject.reject' | transloco }}
               </button>
               <button
                 type="button"
@@ -628,12 +733,12 @@
                 (click)="approve(t)"
               >
                 <svg lucideCheck [size]="16" strokeWidth="2"></svg>
-                Duyệt &amp; kích hoạt
+                {{ 'system.transactions.approveActivate' | transloco }}
               </button>
             }
           } @else {
             <button type="button" class="btn secondary" (click)="closeDetails()">
-              Đóng bảng chi tiết
+              {{ 'system.transactions.closeDetails' | transloco }}
             </button>
           }
         </div>

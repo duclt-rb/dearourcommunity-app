@@ -2,10 +2,8 @@
   <div class="organization-section">
     <!-- Header Section -->
     <div class="profile-page-header">
-      <h1 class="profile-page-title">Quản lý Doanh nghiệp</h1>
-      <p class="profile-page-subtitle">
-        Quản lý thành viên và theo dõi việc đăng ký học trong gói doanh nghiệp của bạn.
-      </p>
+      <h1 class="profile-page-title">{{ 'profile.organization.title' | transloco }}</h1>
+      <p class="profile-page-subtitle">{{ 'profile.organization.subtitle' | transloco }}</p>
     </div>
 
     <!-- Alert Messages (matching system form message styles) -->
@@ -20,42 +18,43 @@
     @if (loading()) {
       <div class="loading-state">
         <div class="spinner"></div>
-        <p>Đang tải thông tin doanh nghiệp...</p>
+        <p>{{ 'profile.organization.loading' | transloco }}</p>
       </div>
     } @else {
       <!-- Main Dashboard Content -->
       @if (!activeOrg()) {
         <div class="empty-state">
           <div class="icon">🏢</div>
-          <p>Không tìm thấy doanh nghiệp nào liên kết với tài khoản này.</p>
-          <p class="field-help mt-2">
-            Tài khoản của bạn đã được đăng ký gói doanh nghiệp nhưng chưa được thiết lập doanh
-            nghiệp trên hệ thống. Vui lòng liên hệ bộ phận hỗ trợ của Dear Our Community để kích
-            hoạt.
-          </p>
+          <p>{{ 'profile.organization.noOrgFound' | transloco }}</p>
+          <p class="field-help mt-2">{{ 'profile.organization.noOrgHelp' | transloco }}</p>
         </div>
       } @else {
         <!-- Stats Card (exactly matching System Dashboard stats layout) -->
         <div class="stats-card">
           <div class="stat-block">
             <span class="stat-value-text">{{ activeOrg()?.name }}</span>
-            <span class="stat-label">Doanh nghiệp</span>
+            <span class="stat-label">{{
+              'profile.organization.statOrganization' | transloco
+            }}</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-block">
             <span class="stat-value-text">
               <span class="status-badge" [ngClass]="isOwner() ? 'completed' : 'in_progress'">
-                {{ isOwner() ? 'Chủ sở hữu' : 'Thành viên' }}
+                {{
+                  (isOwner() ? 'profile.organization.roleOwner' : 'profile.organization.roleMember')
+                    | transloco
+                }}
               </span>
             </span>
-            <span class="stat-label">Vai trò của bạn</span>
+            <span class="stat-label">{{ 'profile.organization.statYourRole' | transloco }}</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-block">
             <span class="stat-value-text"
               >{{ slotsUsed() }} / {{ packageDetails() ? maxSlots() : '--' }}</span
             >
-            <span class="stat-label">Học viên</span>
+            <span class="stat-label">{{ 'profile.organization.statLearners' | transloco }}</span>
           </div>
         </div>
 
@@ -81,26 +80,32 @@
                   </svg>
                 </span>
                 <div class="tool-panel__titles">
-                  <h3 class="tool-panel__title">Mời thành viên</h3>
-                  <p class="tool-panel__hint">Gửi lời mời qua email để cấp quyền học trong gói.</p>
+                  <h3 class="tool-panel__title">
+                    {{ 'profile.organization.inviteTitle' | transloco }}
+                  </h3>
+                  <p class="tool-panel__hint">
+                    {{ 'profile.organization.inviteHint' | transloco }}
+                  </p>
                 </div>
                 <span
                   class="tool-chip"
                   [class.tool-chip--alert]="packageDetails() !== null && slotsUsed() >= maxSlots()"
                 >
                   <strong>{{ slotsUsed() }}/{{ packageDetails() ? maxSlots() : '--' }}</strong>
-                  chỗ
+                  {{ 'profile.organization.seatsChipLabel' | transloco }}
                 </span>
               </div>
 
               <form class="tool-panel__form" (submit)="onInviteSubmit($event)" novalidate>
                 <div class="tool-field">
-                  <label class="tool-label" for="inviteEmail">Email học viên</label>
+                  <label class="tool-label" for="inviteEmail">{{
+                    'profile.organization.inviteEmailLabel' | transloco
+                  }}</label>
                   <input
                     id="inviteEmail"
                     type="email"
                     class="tool-control"
-                    placeholder="email.nhanvien@congty.com"
+                    [placeholder]="'profile.organization.inviteEmailPlaceholder' | transloco"
                     [ngModel]="inviteEmail()"
                     (ngModelChange)="inviteEmail.set($event ? $event.trim() : '')"
                     name="inviteEmail"
@@ -111,7 +116,9 @@
                   />
                   <!-- Helper text ngay dưới ô nhập: nhắc định dạng, không phải báo lỗi -->
                   @if (inviteEmail().trim() && !isEmailValid()) {
-                    <p class="tool-help">Định dạng email cần dạng ten&#64;congty.com</p>
+                    <p class="tool-help">
+                      {{ 'profile.organization.inviteEmailFormat' | transloco }}
+                    </p>
                   }
                 </div>
                 <button
@@ -123,14 +130,17 @@
                     !isEmailValid()
                   "
                 >
-                  {{ actionLoading() ? 'Đang gửi...' : 'Gửi lời mời' }}
+                  {{
+                    (actionLoading()
+                      ? 'profile.organization.inviteSending'
+                      : 'profile.organization.inviteSubmit'
+                    ) | transloco
+                  }}
                 </button>
               </form>
 
               @if (packageDetails() !== null && slotsUsed() >= maxSlots()) {
-                <p class="tool-note">
-                  Gói đã dùng hết chỗ — nâng cấp gói hoặc gỡ thành viên để mời thêm.
-                </p>
+                <p class="tool-note">{{ 'profile.organization.seatsFullNote' | transloco }}</p>
               }
             </section>
 
@@ -152,25 +162,27 @@
                   </svg>
                 </span>
                 <div class="tool-panel__titles">
-                  <h3 class="tool-panel__title">Gán khoá cho thành viên</h3>
+                  <h3 class="tool-panel__title">
+                    {{ 'profile.organization.assignTitle' | transloco }}
+                  </h3>
                   <p class="tool-panel__hint">
-                    Ghi danh thành viên vào khoá đã chọn khi mua gói — mỗi lượt trừ 1 suất.
+                    {{ 'profile.organization.assignHint' | transloco }}
                   </p>
                 </div>
                 <span class="tool-chip" [class.tool-chip--alert]="courseSelectionBalance() === 0">
-                  <strong>{{ courseSelectionBalance() }}</strong> suất
+                  <strong>{{ courseSelectionBalance() }}</strong>
+                  {{ 'profile.organization.assignChipLabel' | transloco }}
                 </span>
               </div>
 
               @if (!coursePool().length) {
-                <p class="tool-note">
-                  Chưa có khoá học nào trong pool của gói doanh nghiệp — vui lòng kiểm tra gói đã
-                  mua.
-                </p>
+                <p class="tool-note">{{ 'profile.organization.emptyPoolNote' | transloco }}</p>
               } @else {
                 <form class="tool-panel__form" (submit)="onAssignSubmit($event)" novalidate>
                   <div class="tool-field">
-                    <label class="tool-label" for="assignMember">Thành viên</label>
+                    <label class="tool-label" for="assignMember">{{
+                      'profile.organization.assignMemberLabel' | transloco
+                    }}</label>
                     <select
                       id="assignMember"
                       class="tool-control tool-control--select"
@@ -179,7 +191,9 @@
                       name="assignMember"
                       [disabled]="assignLoading()"
                     >
-                      <option value="">Chọn thành viên</option>
+                      <option value="">
+                        {{ 'profile.organization.assignMemberPlaceholder' | transloco }}
+                      </option>
                       @for (member of assignableMembers(); track member.id) {
                         <option [value]="member.userId">
                           {{ getMemberDisplayName(member) }} — {{ getMemberEmail(member) }}
@@ -189,7 +203,9 @@
                   </div>
 
                   <div class="tool-field">
-                    <label class="tool-label" for="assignCourse">Khoá học</label>
+                    <label class="tool-label" for="assignCourse">{{
+                      'profile.organization.assignCourseLabel' | transloco
+                    }}</label>
                     <select
                       id="assignCourse"
                       class="tool-control tool-control--select"
@@ -198,32 +214,41 @@
                       name="assignCourse"
                       [disabled]="assignLoading()"
                     >
-                      <option value="">Chọn khoá học</option>
+                      <option value="">
+                        {{ 'profile.organization.assignCoursePlaceholder' | transloco }}
+                      </option>
                       <!-- CR-004: org có suất giữ chỗ → chỉ hiện khoá còn suất (kèm số suất) -->
                       @for (course of assignableCourses(); track course.courseId) {
                         <option [value]="course.courseId">
                           {{ course.title
-                          }}{{ course.remaining !== null ? ' · còn ' + course.remaining : '' }}
+                          }}{{
+                            course.remaining !== null
+                              ? ' · ' +
+                                ('profile.organization.courseRemaining'
+                                  | transloco: { n: course.remaining })
+                              : ''
+                          }}
                         </option>
                       }
                     </select>
                   </div>
 
                   <button type="submit" class="tool-submit" [disabled]="!canAssign()">
-                    {{ assignLoading() ? 'Đang gán...' : 'Gán khoá' }}
+                    {{
+                      (assignLoading()
+                        ? 'profile.organization.assigning'
+                        : 'profile.organization.assignSubmit'
+                      ) | transloco
+                    }}
                   </button>
                 </form>
 
                 @if (courseSelectionBalance() === 0) {
-                  <p class="tool-note">
-                    Doanh nghiệp đã dùng hết suất chọn khoá — liên hệ Dear Our Community nếu cần
-                    thêm.
-                  </p>
+                  <p class="tool-note">{{ 'profile.organization.noBalanceNote' | transloco }}</p>
                 } @else if (allSlotsAssigned()) {
                   <!-- CR-004: hết suất giữ chỗ (dù credit tồn từ gói cũ) -->
                   <p class="tool-note">
-                    Mọi suất khoá đã chọn khi mua gói đều đã được gán — liên hệ Dear Our Community
-                    nếu cần thêm.
+                    {{ 'profile.organization.allSlotsAssignedNote' | transloco }}
                   </p>
                 }
               }
@@ -235,24 +260,27 @@
             <div class="list-section-header">
               <div class="list-section-title-wrapper">
                 <h3 class="section-title-small">
-                  Khoá đã gán ({{ courseSelections()?.length || 0 }})
+                  {{
+                    'profile.organization.assignedTitle'
+                      | transloco: { n: courseSelections()?.length || 0 }
+                  }}
                 </h3>
-                <p class="field-help">Thành viên đã được ghi danh bằng suất của doanh nghiệp.</p>
+                <p class="field-help">{{ 'profile.organization.assignedHint' | transloco }}</p>
               </div>
             </div>
 
             @if ((courseSelections()?.length ?? 0) === 0) {
               <div class="empty-state" style="padding: 32px; border-radius: var(--radius-card)">
-                <p>Chưa có khoá nào được gán cho thành viên.</p>
+                <p>{{ 'profile.organization.assignedEmpty' | transloco }}</p>
               </div>
             } @else {
               <div class="table-container">
                 <table class="system-style-table">
                   <thead>
                     <tr>
-                      <th>Thành viên</th>
-                      <th>Khoá học</th>
-                      <th>Ngày gán</th>
+                      <th>{{ 'profile.organization.thMember' | transloco }}</th>
+                      <th>{{ 'profile.organization.thCourse' | transloco }}</th>
+                      <th>{{ 'profile.organization.thAssignedDate' | transloco }}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -277,9 +305,9 @@
           <div class="list-section-header">
             <div class="list-section-title-wrapper">
               <h3 class="section-title-small">
-                Danh sách thành viên ({{ members()?.length || 0 }})
+                {{ 'profile.organization.membersTitle' | transloco: { n: members()?.length || 0 } }}
               </h3>
-              <p class="field-help">Tất cả thành viên trực thuộc tài khoản doanh nghiệp của bạn.</p>
+              <p class="field-help">{{ 'profile.organization.membersHint' | transloco }}</p>
             </div>
 
             <button
@@ -303,26 +331,26 @@
                 <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
                 <path d="M16 16h5v5" />
               </svg>
-              Làm mới
+              {{ 'profile.organization.refresh' | transloco }}
             </button>
           </div>
 
           @if ((members()?.length ?? 0) === 0) {
             <div class="empty-state" style="padding: 40px; border-radius: var(--radius-card)">
-              <p>Chưa có thành viên nào trực thuộc doanh nghiệp này.</p>
+              <p>{{ 'profile.organization.membersEmpty' | transloco }}</p>
             </div>
           } @else {
             <div class="table-container">
               <table class="system-style-table">
                 <thead>
                   <tr>
-                    <th>Thành viên</th>
-                    <th>Email</th>
-                    <th>Vai trò</th>
-                    <th>Trạng thái</th>
-                    <th>Ngày tham gia</th>
+                    <th>{{ 'profile.organization.thMember' | transloco }}</th>
+                    <th>{{ 'profile.organization.thEmail' | transloco }}</th>
+                    <th>{{ 'profile.organization.thRole' | transloco }}</th>
+                    <th>{{ 'profile.organization.thStatus' | transloco }}</th>
+                    <th>{{ 'profile.organization.thJoinedDate' | transloco }}</th>
                     @if (isOwner()) {
-                      <th class="text-right">Thao tác</th>
+                      <th class="text-right">{{ 'profile.organization.thActions' | transloco }}</th>
                     }
                   </tr>
                 </thead>
@@ -347,7 +375,12 @@
                           class="status-badge"
                           [ngClass]="member.role === 'owner' ? 'completed' : 'role-member-badge'"
                         >
-                          {{ member.role === 'owner' ? 'Chủ sở hữu' : 'Học viên' }}
+                          {{
+                            (member.role === 'owner'
+                              ? 'profile.organization.roleOwner'
+                              : 'profile.organization.roleLearner'
+                            ) | transloco
+                          }}
                         </span>
                       </td>
                       <td>
@@ -358,7 +391,12 @@
                           "
                         >
                           <span class="status-dot"></span>
-                          {{ member.status === 'active' ? 'Hoạt động' : 'Chờ xác nhận' }}
+                          {{
+                            (member.status === 'active'
+                              ? 'profile.organization.statusActive'
+                              : 'profile.organization.statusPending'
+                            ) | transloco
+                          }}
                         </span>
                       </td>
                       <td class="join-date">{{ member.joinedAt | date: 'dd/MM/yyyy' }}</td>
@@ -370,7 +408,7 @@
                               (click)="onRemoveMember(member.id, getMemberEmail(member))"
                               [disabled]="actionLoading()"
                             >
-                              Xóa
+                              {{ 'profile.organization.remove' | transloco }}
                             </button>
                           } @else {
                             <span class="action-placeholder">-</span>

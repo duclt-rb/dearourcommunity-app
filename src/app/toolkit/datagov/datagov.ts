@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { LucidePlus, LucideRotateCcw, LucideTrash2, LucideTriangleAlert } from '@lucide/angular';
+import { localePick } from '../../core/i18n/locale';
 import LogoComponent from '../../shared/logo/logo';
 import { DateFieldComponent } from '../shared/date-field/date-field';
 import { MeterComponent } from '../shared/meter/meter';
@@ -30,6 +32,7 @@ interface Step {
   standalone: true,
   imports: [
     CommonModule,
+    TranslocoPipe,
     LogoComponent,
     LucideTriangleAlert,
     LucideRotateCcw,
@@ -50,6 +53,7 @@ interface Step {
 })
 export default class DataGovToolkitComponent implements OnInit {
   readonly store = inject(DataGovStore);
+  private readonly transloco = inject(TranslocoService);
   @Input({ required: true }) config!: DataGovToolkitConfig;
 
   ngOnInit(): void {
@@ -63,19 +67,18 @@ export default class DataGovToolkitComponent implements OnInit {
   readonly statusOptions = STATUS_OPTIONS;
   readonly severityOptions = SEVERITY_OPTIONS;
 
-  readonly priorityLabels: Record<string, string> = {
-    critical: 'Quan trọng',
-    important: 'Cần làm',
-    quickwin: 'Làm ngay',
-  };
+  readonly priorityLabels: Record<string, string> = localePick({
+    vi: { critical: 'Quan trọng', important: 'Cần làm', quickwin: 'Làm ngay' },
+    en: { critical: 'Critical', important: 'Important', quickwin: 'Quick win' },
+  });
 
   steps: Step[] = [
-    { kind: 'datamap', label: 'Bản đồ dữ liệu' },
-    { kind: 'assessment', label: 'Đánh giá tuân thủ' },
-    { kind: 'incident', label: 'Ứng phó sự cố' },
-    { kind: 'legal', label: 'Theo dõi pháp lý' },
-    { kind: 'plan', label: 'Kế hoạch 90 ngày' },
-    { kind: 'results', label: 'Bảng rủi ro' },
+    { kind: 'datamap', label: this.transloco.translate('toolkit.datagov.steps.datamap') },
+    { kind: 'assessment', label: this.transloco.translate('toolkit.datagov.steps.assessment') },
+    { kind: 'incident', label: this.transloco.translate('toolkit.datagov.steps.incident') },
+    { kind: 'legal', label: this.transloco.translate('toolkit.datagov.steps.legal') },
+    { kind: 'plan', label: this.transloco.translate('toolkit.common.stepPlan90') },
+    { kind: 'results', label: this.transloco.translate('toolkit.datagov.steps.results') },
   ];
 
   /** Light pastel color per assessment group. */
@@ -120,7 +123,7 @@ export default class DataGovToolkitComponent implements OnInit {
 
   resetScan(): void {
     if (typeof window !== 'undefined') {
-      const ok = window.confirm('Làm lại từ đầu? Toàn bộ dữ liệu bạn đã nhập sẽ bị xóa.');
+      const ok = window.confirm(this.transloco.translate('toolkit.common.confirmReset'));
       if (!ok) return;
     }
     this.store.reset();

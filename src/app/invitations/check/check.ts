@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   LucideAlertTriangle,
   LucideArrowRight,
@@ -45,6 +46,7 @@ interface InvitationDetails {
     LucideLogOut,
     LucideUsers,
     Button,
+    TranslocoPipe,
   ],
   templateUrl: './check.html',
   styleUrl: './check.css',
@@ -54,6 +56,7 @@ export default class CheckInvitationComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private orgService = inject(OrganizationService);
+  private readonly transloco = inject(TranslocoService);
   authStore = inject(AuthStore);
 
   // States
@@ -84,11 +87,17 @@ export default class CheckInvitationComponent implements OnInit {
 
   // Check display names
   inviterName = computed(() => {
-    return this.invitation()?.inviter?.displayName || 'Chủ sở hữu';
+    return (
+      this.invitation()?.inviter?.displayName ||
+      this.transloco.translate('invitations.check.ownerFallback')
+    );
   });
 
   orgName = computed(() => {
-    return this.invitation()?.organizationName || 'Doanh nghiệp';
+    return (
+      this.invitation()?.organizationName ||
+      this.transloco.translate('invitations.check.orgFallback')
+    );
   });
 
   async ngOnInit() {
@@ -103,7 +112,7 @@ export default class CheckInvitationComponent implements OnInit {
       this.token.set(tokenVal);
 
       if (!tokenVal) {
-        this.errorMessage.set('Mã lời mời không tồn tại hoặc đường dẫn không hợp lệ.');
+        this.errorMessage.set(this.transloco.translate('invitations.check.invalidLink'));
         this.loading.set(false);
         return;
       }
@@ -122,7 +131,9 @@ export default class CheckInvitationComponent implements OnInit {
     } catch (err: unknown) {
       console.error('Verify token failed:', err);
       const msg =
-        err instanceof Error ? err.message : 'Lời mời không hợp lệ hoặc đã hết hạn sử dụng.';
+        err instanceof Error
+          ? err.message
+          : this.transloco.translate('invitations.check.invalidOrExpired');
       this.errorMessage.set(msg);
     } finally {
       this.loading.set(false);
@@ -145,7 +156,9 @@ export default class CheckInvitationComponent implements OnInit {
     } catch (err: unknown) {
       console.error('Accept invitation failed:', err);
       const msg =
-        err instanceof Error ? err.message : 'Chấp nhận lời mời thất bại. Vui lòng thử lại sau.';
+        err instanceof Error
+          ? err.message
+          : this.transloco.translate('invitations.check.acceptFailed');
       this.errorMessage.set(msg);
     } finally {
       this.accepting.set(false);

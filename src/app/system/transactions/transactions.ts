@@ -16,6 +16,7 @@ import {
   LucideChevronLeft,
   LucideChevronRight,
 } from '@lucide/angular';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   ApiError,
   type InvoiceRequest,
@@ -34,6 +35,7 @@ import { findToolkit } from '../../toolkit/toolkit.data';
   imports: [
     DecimalPipe,
     DatePipe,
+    TranslocoPipe,
     LucideCreditCard,
     LucideSearch,
     LucideRefreshCw,
@@ -57,6 +59,7 @@ export default class TransactionsComponent {
   private store = inject(TransactionsStore);
   private packagesService = inject(PackagesService);
   private clientService = inject(ClientService);
+  private transloco = inject(TranslocoService);
 
   constructor() {
     // CR-007 — nạp danh sách yêu cầu xuất hoá đơn để gắn chip "HĐ" + section trong modal.
@@ -136,15 +139,19 @@ export default class TransactionsComponent {
       const titleById = new Map(
         pkg.courses.map((pc) => [
           Number(pc.wpCourseId),
-          pc.course?.postTitle ?? `Khóa học #${pc.wpCourseId}`,
+          pc.course?.postTitle ?? this.courseFallback(pc.wpCourseId),
         ]),
       );
       this.selectedCourseTitles.set(
-        courseIds.map((id) => titleById.get(Number(id)) ?? `Khóa học #${id}`),
+        courseIds.map((id) => titleById.get(Number(id)) ?? this.courseFallback(id)),
       );
     } catch {
-      this.selectedCourseTitles.set(courseIds.map((id) => `Khóa học #${id}`));
+      this.selectedCourseTitles.set(courseIds.map((id) => this.courseFallback(id)));
     }
+  }
+
+  private courseFallback(id: number | string): string {
+    return this.transloco.translate('system.transactions.courseFallback', { id });
   }
 
   /** CR-006 — tên Quick Scan/Toolkit user đã chọn ở checkout (map từ catalog client). */
@@ -222,7 +229,9 @@ export default class TransactionsComponent {
       if (this.selectedTransaction()?.id !== t.id) return;
       // 400 (giao dịch chưa success) / 409 (đã xuất) — hiện nguyên văn message BE
       this.issueError.set(
-        err instanceof ApiError && err.message ? err.message : 'Đánh dấu xuất hoá đơn thất bại.',
+        err instanceof ApiError && err.message
+          ? err.message
+          : this.transloco.translate('system.transactions.invoice.issueFailed'),
       );
     } finally {
       this.issueLoading.set(false);
@@ -241,21 +250,21 @@ export default class TransactionsComponent {
   getStatusLabel(status: PaymentStatus): string {
     switch (status) {
       case 'success':
-        return 'Thành công';
       case 'failed':
-        return 'Thất bại';
       case 'pending':
-        return 'Chờ xử lý';
       case 'awaiting_confirmation':
-        return 'Chờ duyệt';
       case 'refunded':
-        return 'Đã hoàn tiền';
+        return this.transloco.translate(`system.transactions.status.${status}`);
       default:
         return status;
     }
   }
 
   getPaymentMethodLabel(method: PaymentMethod): string {
-    return method === 'bank_transfer' ? 'Chuyển khoản' : 'MoMo';
+    return this.transloco.translate(
+      method === 'bank_transfer'
+        ? 'system.transactions.method.bank_transfer'
+        : 'system.transactions.method.momo',
+    );
   }
 }

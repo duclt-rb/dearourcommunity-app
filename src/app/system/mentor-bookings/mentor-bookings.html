@@ -9,7 +9,7 @@
         <svg lucideCalendarClock [size]="20" strokeWidth="2"></svg>
       </div>
       <div class="stat-details">
-        <span class="stat-label">Tổng yêu cầu</span>
+        <span class="stat-label">{{ 'system.mentorBookings.stats.total' | transloco }}</span>
         <h3 class="stat-value">{{ stats().totalCount }}</h3>
       </div>
       <div class="stat-glow"></div>
@@ -20,7 +20,9 @@
         <svg lucideClock [size]="20" strokeWidth="2"></svg>
       </div>
       <div class="stat-details">
-        <span class="stat-label">Chờ duyệt</span>
+        <span class="stat-label">{{
+          'system.mentorBookings.stats.pendingReview' | transloco
+        }}</span>
         <h3 class="stat-value">{{ stats().pendingCount }}</h3>
       </div>
       <div class="stat-glow"></div>
@@ -31,7 +33,7 @@
         <svg lucideUserCheck [size]="20" strokeWidth="2"></svg>
       </div>
       <div class="stat-details">
-        <span class="stat-label">Đã duyệt</span>
+        <span class="stat-label">{{ 'system.mentorBookings.status.approved' | transloco }}</span>
         <h3 class="stat-value">{{ stats().approvedCount }}</h3>
       </div>
       <div class="stat-glow"></div>
@@ -42,7 +44,7 @@
         <svg lucideUserX [size]="20" strokeWidth="2"></svg>
       </div>
       <div class="stat-details">
-        <span class="stat-label">Đã từ chối</span>
+        <span class="stat-label">{{ 'system.mentorBookings.status.rejected' | transloco }}</span>
         <h3 class="stat-value">{{ stats().rejectedCount }}</h3>
       </div>
       <div class="stat-glow"></div>
@@ -55,7 +57,7 @@
       <svg lucideSearch class="search-icon" [size]="16" strokeWidth="2"></svg>
       <input
         type="text"
-        placeholder="Tìm theo tên, email, SĐT, mentor..."
+        [placeholder]="'system.mentorBookings.searchPlaceholder' | transloco"
         [value]="searchQuery()"
         (input)="setSearch($any($event.target).value)"
         class="form-input-search"
@@ -73,10 +75,16 @@
           (change)="setStatusFilter($any($event.target).value)"
           class="form-select"
         >
-          <option value="all">Tất cả trạng thái</option>
-          <option value="pending">Chờ duyệt</option>
-          <option value="approved">Đã duyệt</option>
-          <option value="rejected">Đã từ chối</option>
+          <option value="all">{{ 'system.mentorBookings.filters.allStatuses' | transloco }}</option>
+          <option value="pending">
+            {{ 'system.mentorBookings.stats.pendingReview' | transloco }}
+          </option>
+          <option value="approved">
+            {{ 'system.mentorBookings.status.approved' | transloco }}
+          </option>
+          <option value="rejected">
+            {{ 'system.mentorBookings.status.rejected' | transloco }}
+          </option>
         </select>
       </div>
 
@@ -85,7 +93,7 @@
         class="btn-refresh"
         [disabled]="isLoading()"
         (click)="refresh()"
-        title="Làm mới dữ liệu"
+        [title]="'system.mentorBookings.refreshTitle' | transloco"
       >
         <svg lucideRefreshCw [class.spinning]="isLoading()" [size]="16" strokeWidth="2"></svg>
       </button>
@@ -109,27 +117,25 @@
             <div class="empty-icon-wrap">
               <svg lucideSearch [size]="32" strokeWidth="1.75"></svg>
             </div>
-            <h3 class="empty-title">Không tìm thấy yêu cầu phù hợp</h3>
+            <h3 class="empty-title">
+              {{ 'system.mentorBookings.emptyFiltered.title' | transloco }}
+            </h3>
             <p class="empty-message">
-              Không có yêu cầu nào khớp với từ khoá hoặc bộ lọc hiện tại. Thử điều chỉnh lại điều
-              kiện tìm kiếm.
+              {{ 'system.mentorBookings.emptyFiltered.message' | transloco }}
             </p>
             <button type="button" class="empty-action" (click)="clearFilters()">
               <svg lucideX [size]="16" strokeWidth="2"></svg>
-              Xoá bộ lọc
+              {{ 'system.mentorBookings.emptyFiltered.clear' | transloco }}
             </button>
           } @else {
             <div class="empty-icon-wrap">
               <svg lucideCalendarClock [size]="32" strokeWidth="1.75"></svg>
             </div>
-            <h3 class="empty-title">Chưa có yêu cầu đặt mentor nào</h3>
-            <p class="empty-message">
-              Khi học viên gửi yêu cầu đặt lịch tư vấn 1-1 với mentor, yêu cầu sẽ xuất hiện ở đây để
-              bạn duyệt.
-            </p>
+            <h3 class="empty-title">{{ 'system.mentorBookings.empty.title' | transloco }}</h3>
+            <p class="empty-message">{{ 'system.mentorBookings.empty.message' | transloco }}</p>
             <button type="button" class="empty-action" [disabled]="isLoading()" (click)="refresh()">
               <svg lucideRefreshCw [class.spinning]="isLoading()" [size]="16" strokeWidth="2"></svg>
-              Làm mới
+              {{ 'system.mentorBookings.empty.refresh' | transloco }}
             </button>
           }
         </div>
@@ -137,13 +143,17 @@
         <table class="system-style-table">
           <thead>
             <tr>
-              <th class="col-user">Người đăng ký</th>
-              <th class="col-contact">Liên hệ</th>
-              <th class="col-mentor">Mentor mong muốn</th>
-              <th class="col-package">Gói</th>
-              <th class="col-date">Ngày gửi</th>
-              <th class="col-status text-center">Trạng thái</th>
-              <th class="col-actions text-center">Thao tác</th>
+              <th class="col-user">{{ 'system.mentorBookings.table.registrant' | transloco }}</th>
+              <th class="col-contact">{{ 'system.mentorBookings.table.contact' | transloco }}</th>
+              <th class="col-mentor">{{ 'system.mentorBookings.table.mentor' | transloco }}</th>
+              <th class="col-package">{{ 'system.mentorBookings.table.package' | transloco }}</th>
+              <th class="col-date">{{ 'system.mentorBookings.table.sentDate' | transloco }}</th>
+              <th class="col-status text-center">
+                {{ 'system.mentorBookings.table.status' | transloco }}
+              </th>
+              <th class="col-actions text-center">
+                {{ 'system.mentorBookings.table.actions' | transloco }}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -165,7 +175,9 @@
                   @if (b.mentor) {
                     <span class="mentor-tag">{{ b.mentor.name }}</span>
                   } @else {
-                    <span class="text-muted">Admin điều phối</span>
+                    <span class="text-muted">{{
+                      'system.mentorBookings.adminCoordinated' | transloco
+                    }}</span>
                   }
                 </td>
                 <td class="col-package">
@@ -174,7 +186,7 @@
                       {{ getPackageTypeLabel(b.packageType) }}
                     </span>
                     @if (isPaid(b)) {
-                      <span class="paid-badge">Đã thanh toán</span>
+                      <span class="paid-badge">{{ 'system.mentorBookings.paid' | transloco }}</span>
                     }
                   </div>
                 </td>
@@ -224,9 +236,16 @@
   <div class="table-footer">
     <span class="footer-count">
       @if (filteredBookings().length) {
-        Hiển thị {{ filteredBookings().length }} / {{ stats().totalCount }} yêu cầu
+        {{
+          'system.mentorBookings.footer.showing'
+            | transloco
+              : {
+                  shown: filteredBookings().length,
+                  total: stats().totalCount,
+                }
+        }}
       } @else {
-        Không có yêu cầu
+        {{ 'system.mentorBookings.footer.empty' | transloco }}
       }
     </span>
   </div>
@@ -240,7 +259,7 @@
           <div class="modal-title-group">
             <svg lucideCalendarClock class="modal-icon" [size]="20" strokeWidth="2"></svg>
             <div>
-              <h3 class="modal-title">Chi tiết yêu cầu đặt mentor</h3>
+              <h3 class="modal-title">{{ 'system.mentorBookings.modal.title' | transloco }}</h3>
               <p class="modal-subtitle">{{ b.name }} · {{ b.createdAt | date: 'dd/MM/yyyy' }}</p>
             </div>
           </div>
@@ -252,7 +271,9 @@
           <!-- Summary -->
           <div class="detail-summary-box" [class]="b.status">
             <div class="summary-item">
-              <span class="summary-label">Người đăng ký</span>
+              <span class="summary-label">{{
+                'system.mentorBookings.table.registrant' | transloco
+              }}</span>
               <span class="summary-value-text">{{ b.name }}</span>
               <span class="summary-sub">
                 {{ getCareerStageLabel(b.careerStage) }} · {{ getPackageTypeLabel(b.packageType) }}
@@ -263,7 +284,7 @@
                 {{ getStatusBadgeLabel(b) }}
               </span>
               @if (isPaid(b)) {
-                <span class="paid-badge">Đã thanh toán</span>
+                <span class="paid-badge">{{ 'system.mentorBookings.paid' | transloco }}</span>
               }
             </div>
           </div>
@@ -283,17 +304,25 @@
           <!-- Metadata grid -->
           <div class="detail-grid">
             <div class="detail-field">
-              <span class="field-label">Mentor mong muốn</span>
-              <span class="field-value">{{ b.mentor?.name || 'Để admin tự điều phối' }}</span>
+              <span class="field-label">{{
+                'system.mentorBookings.table.mentor' | transloco
+              }}</span>
+              <span class="field-value">{{
+                b.mentor?.name || ('system.mentorBookings.fields.mentorFallback' | transloco)
+              }}</span>
             </div>
 
             <div class="detail-field">
-              <span class="field-label">Giai đoạn sự nghiệp</span>
+              <span class="field-label">{{
+                'system.mentorBookings.fields.careerStage' | transloco
+              }}</span>
               <span class="field-value">{{ getCareerStageLabel(b.careerStage) }}</span>
             </div>
 
             <div class="detail-field">
-              <span class="field-label">Gói đặt lịch</span>
+              <span class="field-label">{{
+                'system.mentorBookings.fields.bookingPackage' | transloco
+              }}</span>
               <span class="field-value">
                 <span class="package-type-badge" [class]="b.packageType">
                   {{ getPackageTypeLabel(b.packageType) }}
@@ -302,20 +331,24 @@
             </div>
 
             <div class="detail-field">
-              <span class="field-label">Thanh toán</span>
+              <span class="field-label">{{
+                'system.mentorBookings.fields.payment' | transloco
+              }}</span>
               <span class="field-value">
                 @if (isExistingBranch(b)) {
-                  Dùng lượt có sẵn — không cần thanh toán
+                  {{ 'system.mentorBookings.fields.paymentExisting' | transloco }}
                 } @else if (isPaid(b)) {
-                  <span class="paid-badge">Đã thanh toán</span>
+                  <span class="paid-badge">{{ 'system.mentorBookings.paid' | transloco }}</span>
                 } @else {
-                  Chưa thanh toán
+                  {{ 'system.mentorBookings.fields.notPaid' | transloco }}
                 }
               </span>
             </div>
 
             <div class="detail-field">
-              <span class="field-label">Khung giờ đề xuất</span>
+              <span class="field-label">{{
+                'system.mentorBookings.fields.proposedSlots' | transloco
+              }}</span>
               <span class="field-value">
                 @if (b.selectedTimeSlots?.length) {
                   <span class="slot-chips">
@@ -328,27 +361,29 @@
                         @if (isConfirmedSlot(b, slot.slotId)) {
                           <span class="slot-chip__confirmed-badge">
                             <svg lucideCheck [size]="11" strokeWidth="2.5"></svg>
-                            Đã chốt
+                            {{ 'system.mentorBookings.fields.confirmedBadge' | transloco }}
                           </span>
                         }
                       </span>
                     }
                   </span>
                 } @else {
-                  Chưa chọn
+                  {{ 'system.mentorBookings.fields.notSelected' | transloco }}
                 }
               </span>
             </div>
 
             <div class="detail-field">
-              <span class="field-label">Chủ đề muốn trao đổi</span>
+              <span class="field-label">{{
+                'system.mentorBookings.fields.topics' | transloco
+              }}</span>
               <span class="field-value">
                 @if (b.discussionTopics?.length) {
                   @for (t of b.discussionTopics; track t; let last = $last) {
                     {{ getTopicLabel(t) }}{{ last ? '' : ', ' }}
                   }
                 } @else {
-                  Chưa chọn
+                  {{ 'system.mentorBookings.fields.notSelected' | transloco }}
                 }
               </span>
             </div>
@@ -357,39 +392,49 @@
           <!-- Long-form fields -->
           @if (b.problemDescription) {
             <div class="detail-message-box">
-              <span class="message-label">Vấn đề đang gặp</span>
+              <span class="message-label">{{
+                'system.mentorBookings.longForm.problem' | transloco
+              }}</span>
               <p class="message-text">{{ b.problemDescription }}</p>
             </div>
           }
           @if (b.triedSolutions) {
             <div class="detail-message-box">
-              <span class="message-label">Đã thử những gì</span>
+              <span class="message-label">{{
+                'system.mentorBookings.longForm.tried' | transloco
+              }}</span>
               <p class="message-text">{{ b.triedSolutions }}</p>
             </div>
           }
           @if (b.desiredOutcome) {
             <div class="detail-message-box">
-              <span class="message-label">Kết quả mong muốn</span>
+              <span class="message-label">{{
+                'system.mentorBookings.longForm.desiredOutcome' | transloco
+              }}</span>
               <p class="message-text">{{ b.desiredOutcome }}</p>
             </div>
           }
           @if (b.notesForMentor) {
             <div class="detail-message-box">
-              <span class="message-label">Ghi chú cho mentor</span>
+              <span class="message-label">{{
+                'system.mentorBookings.longForm.notesForMentor' | transloco
+              }}</span>
               <p class="message-text">{{ b.notesForMentor }}</p>
             </div>
           }
 
           <!-- Consents -->
           <div class="consent-list">
-            <span class="field-label">Cam kết của người đăng ký</span>
+            <span class="field-label">{{
+              'system.mentorBookings.consents.title' | transloco
+            }}</span>
             <div class="consent-item" [class.ok]="b.consentAdvisory">
               @if (b.consentAdvisory) {
                 <svg lucideCheck [size]="14" strokeWidth="2.5"></svg>
               } @else {
                 <svg lucideX [size]="14" strokeWidth="2.5"></svg>
               }
-              Hiểu rằng mentoring mang tính tham vấn, không thay thế tư vấn chuyên môn
+              {{ 'system.mentorBookings.consents.advisory' | transloco }}
             </div>
             <div class="consent-item" [class.ok]="b.consentPunctuality">
               @if (b.consentPunctuality) {
@@ -397,7 +442,7 @@
               } @else {
                 <svg lucideX [size]="14" strokeWidth="2.5"></svg>
               }
-              Cam kết tham gia đúng giờ, báo trước nếu cần đổi lịch
+              {{ 'system.mentorBookings.consents.punctuality' | transloco }}
             </div>
             <div class="consent-item" [class.ok]="b.consentDataStorage">
               @if (b.consentDataStorage) {
@@ -405,7 +450,7 @@
               } @else {
                 <svg lucideX [size]="14" strokeWidth="2.5"></svg>
               }
-              Đồng ý cho lưu trữ thông tin để phục vụ buổi mentoring
+              {{ 'system.mentorBookings.consents.dataStorage' | transloco }}
             </div>
           </div>
 
@@ -419,11 +464,11 @@
           ) {
             <div class="slot-picker">
               <span class="slot-picker__label">
-                Khung giờ sẽ chốt khi duyệt <span class="slot-picker__required">*</span>
+                {{ 'system.mentorBookings.slotPicker.label' | transloco }}
+                <span class="slot-picker__required">*</span>
               </span>
               <p class="slot-picker__hint">
-                Bỏ tick khung giờ không muốn chốt — mỗi khung giờ chốt sẽ bị khoá trên lịch mentor.
-                Nút duyệt chỉ bật khi còn ít nhất 1 khung giờ được tick.
+                {{ 'system.mentorBookings.slotPicker.hint' | transloco }}
               </p>
               <div class="slot-picker__options">
                 @for (slot of b.selectedTimeSlots ?? []; track slot.slotId) {
@@ -458,15 +503,16 @@
               <div class="message-content">
                 <svg lucideInfo [size]="16" strokeWidth="2" class="info-icon"></svg>
                 <p class="message-text">
-                  Bạn chắc chắn muốn từ chối yêu cầu này? Học viên sẽ không nhận được mail thanh
-                  toán.
+                  {{ 'system.mentorBookings.rejectConfirm.question' | transloco }}
                 </p>
               </div>
-              <span class="message-label">Lý do từ chối (tuỳ chọn)</span>
+              <span class="message-label">{{
+                'system.mentorBookings.rejectConfirm.reasonOptional' | transloco
+              }}</span>
               <textarea
                 class="reject-reason-input"
                 rows="2"
-                placeholder="VD: Hiện chưa có mentor phù hợp với lĩnh vực bạn quan tâm..."
+                [placeholder]="'system.mentorBookings.rejectConfirm.placeholder' | transloco"
                 [value]="rejectReason()"
                 (input)="setRejectReason($any($event.target).value)"
               ></textarea>
@@ -481,11 +527,13 @@
         @if (canReview(b) && !isExistingBranch(b) && confirmRejectId() !== b.id) {
           <p class="approve-branch-note">
             @if (isAwaitingPayment(b)) {
-              Booking đã duyệt, đang chờ học viên thanh toán — bấm
-              <strong>Gửi lại link thanh toán</strong> nếu học viên chưa nhận được mail.
+              {{ 'system.mentorBookings.branchNote.awaitingPrefix' | transloco }}
+              <strong>{{ 'system.mentorBookings.approveLabels.resend' | transloco }}</strong>
+              {{ 'system.mentorBookings.branchNote.awaitingSuffix' | transloco }}
             } @else {
-              Duyệt sẽ gửi mail kèm link thanh toán — booking hiển thị
-              <strong>Đã duyệt · chờ thanh toán</strong> tới khi thanh toán xong.
+              {{ 'system.mentorBookings.branchNote.approvePrefix' | transloco }}
+              <strong>{{ 'system.mentorBookings.awaitingPayment' | transloco }}</strong>
+              {{ 'system.mentorBookings.branchNote.approveSuffix' | transloco }}
             }
           </p>
         }
@@ -498,7 +546,7 @@
                 [disabled]="actionLoadingId() === b.id"
                 (click)="cancelReject()"
               >
-                Hủy
+                {{ 'common.cancel' | transloco }}
               </button>
               <button
                 type="button"
@@ -508,10 +556,10 @@
               >
                 @if (actionLoadingId() === b.id) {
                   <svg lucideLoaderCircle class="icon-spinning" [size]="16" strokeWidth="2"></svg>
-                  Đang từ chối...
+                  {{ 'system.mentorBookings.buttons.rejecting' | transloco }}
                 } @else {
                   <svg lucideX [size]="16" strokeWidth="2"></svg>
-                  Xác nhận từ chối
+                  {{ 'system.mentorBookings.buttons.confirmReject' | transloco }}
                 }
               </button>
             } @else {
@@ -521,7 +569,7 @@
                 [disabled]="actionLoadingId() === b.id"
                 (click)="startReject(b.id)"
               >
-                Từ chối
+                {{ 'system.mentorBookings.buttons.reject' | transloco }}
               </button>
               <button
                 type="button"
@@ -532,14 +580,14 @@
                 "
                 [title]="
                   needsSlotChoice(b) && !isAwaitingPayment(b) && approveSlotIds().length === 0
-                    ? 'Tick ít nhất 1 khung giờ để chốt trước khi duyệt'
+                    ? ('system.mentorBookings.tooltips.tickAtLeastOne' | transloco)
                     : ''
                 "
                 (click)="approveSelected(b)"
               >
                 @if (actionLoadingId() === b.id) {
                   <svg lucideLoaderCircle class="icon-spinning" [size]="16" strokeWidth="2"></svg>
-                  Đang xử lý...
+                  {{ 'common.processing' | transloco }}
                 } @else {
                   <svg lucideCheck [size]="16" strokeWidth="2"></svg>
                   {{ getApproveLabel(b) }}
@@ -548,7 +596,7 @@
             }
           } @else {
             <button type="button" class="btn secondary" (click)="closeDetails()">
-              Đóng bảng chi tiết
+              {{ 'system.mentorBookings.buttons.closeDetails' | transloco }}
             </button>
           }
         </div>

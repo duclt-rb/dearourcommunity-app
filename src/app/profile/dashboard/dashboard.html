@@ -1,38 +1,40 @@
 <div class="tab-content active">
   <div class="profile-page-header">
-    <h1 class="profile-page-title">Tổng quan</h1>
-    <p class="profile-page-subtitle">
-      Chào mừng bạn quay trở lại. Hãy cùng theo dõi tiến trình và tiếp tục các bài học của bạn nhé!
-    </p>
+    <h1 class="profile-page-title">{{ 'profile.dashboard.title' | transloco }}</h1>
+    <p class="profile-page-subtitle">{{ 'profile.dashboard.subtitle' | transloco }}</p>
   </div>
 
   <div class="stats-card">
     <div class="stat-block">
       <span class="stat-value">{{ store.stats().completed }}</span>
-      <span class="stat-label">Hoàn thành</span>
+      <span class="stat-label">{{ 'profile.dashboard.statCompleted' | transloco }}</span>
     </div>
     <div class="stat-divider"></div>
     <div class="stat-block">
       <span class="stat-value">{{ store.stats().inProgress }}</span>
-      <span class="stat-label">Đang học</span>
+      <span class="stat-label">{{ 'profile.dashboard.statInProgress' | transloco }}</span>
     </div>
   </div>
 
   <div class="courses-section">
-    <h3 class="section-title">Tiếp tục học</h3>
+    <h3 class="section-title">{{ 'profile.dashboard.continueLearning' | transloco }}</h3>
 
     @if (inProgressCourses().length === 0) {
       <div class="empty-state">
         <div class="icon">🎓</div>
-        <p>Bạn không có khóa học nào đang học dở. Hãy bắt đầu khóa học mới!</p>
-        <button class="btn-primary mt-4" routerLink="../courses">Xem tất cả khóa học</button>
+        <p>{{ 'profile.dashboard.emptyInProgress' | transloco }}</p>
+        <button class="btn-primary mt-4" routerLink="../courses">
+          {{ 'profile.dashboard.viewAllCourses' | transloco }}
+        </button>
       </div>
     } @else {
       <div class="course-list">
         @for (course of inProgressCourses(); track course.id) {
           <a class="course-row" (click)="continueCourse(course)">
             <span class="course-title">{{ course.title }}</span>
-            <span class="status-badge in_progress">Đang học ({{ course.progress }}%)</span>
+            <span class="status-badge in_progress">{{
+              'profile.dashboard.inProgressBadge' | transloco: { pct: course.progress }
+            }}</span>
             <div class="continue-btn">
               <svg viewBox="0 0 24 24">
                 <path d="M8 5v14l11-7z" />

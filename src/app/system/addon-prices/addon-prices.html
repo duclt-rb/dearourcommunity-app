@@ -3,12 +3,8 @@
     <div class="panel-header">
       <span class="panel-icon"><svg lucideTag [size]="18" strokeWidth="2"></svg></span>
       <div>
-        <h2 class="panel-title">Giá bán lẻ tại checkout</h2>
-        <p class="panel-desc">
-          Khách mua gói có thể trả thêm để lấy khoá của gói cao hơn (gói cá nhân) hoặc Quick
-          Scan/Toolkit ngoài phần miễn phí (gói tổ chức). Giá mới chỉ áp cho đơn tạo sau khi lưu —
-          đơn chuyển khoản đang chờ duyệt giữ giá đã chốt lúc tạo đơn.
-        </p>
+        <h2 class="panel-title">{{ 'system.addonPrices.title' | transloco }}</h2>
+        <p class="panel-desc">{{ 'system.addonPrices.desc' | transloco }}</p>
       </div>
     </div>
 
@@ -19,7 +15,7 @@
       </div>
     }
     @if (isLoading()) {
-      <p class="panel-desc">Đang tải bảng giá…</p>
+      <p class="panel-desc">{{ 'system.addonPrices.loading' | transloco }}</p>
     } @else {
       <div class="price-fields">
         @for (item of items(); track item.addonType) {
@@ -37,12 +33,13 @@
               (input)="setDraft(item.addonType, $any($event.target).value)"
             />
             <span class="field__hint">
-              Hiện tại: ₫ {{ item.price | number: '1.0-0' }}
+              {{ 'system.addonPrices.current' | transloco }}: ₫ {{ item.price | number: '1.0-0' }}
               @if (item.updatedAt) {
-                · sửa {{ item.updatedAt | date: 'dd/MM/yyyy HH:mm' }}
+                · {{ 'system.addonPrices.edited' | transloco }}
+                {{ item.updatedAt | date: 'dd/MM/yyyy HH:mm' }}
               }
               @if (item.updatedBy) {
-                bởi {{ item.updatedBy }}
+                {{ 'system.addonPrices.by' | transloco }} {{ item.updatedBy }}
               }
             </span>
           </div>
@@ -58,7 +55,7 @@
       @if (saveSuccess()) {
         <div class="alert success">
           <svg lucideCheck [size]="16" strokeWidth="2"></svg>
-          <span>Đã lưu giá bán lẻ.</span>
+          <span>{{ 'system.addonPrices.saveSuccess' | transloco }}</span>
         </div>
       }
 
@@ -68,7 +65,7 @@
         [disabled]="!changed() || !draftValid() || isSaving()"
         (click)="save()"
       >
-        {{ isSaving() ? 'Đang lưu...' : 'Lưu giá' }}
+        {{ (isSaving() ? 'system.addonPrices.saving' : 'system.addonPrices.saveBtn') | transloco }}
       </button>
     }
   </div>

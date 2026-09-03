@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   LucideCoins,
   LucideSearch,
@@ -18,6 +19,7 @@ import { CreditsAdminStore } from './credits.store';
   standalone: true,
   imports: [
     DatePipe,
+    TranslocoPipe,
     LucideCoins,
     LucideSearch,
     LucideAlertCircle,
@@ -32,6 +34,7 @@ import { CreditsAdminStore } from './credits.store';
 })
 export default class SystemCreditsComponent {
   private store = inject(CreditsAdminStore);
+  private transloco = inject(TranslocoService);
 
   // State
   readonly lookupUserId = this.store.lookupUserId;
@@ -89,32 +92,25 @@ export default class SystemCreditsComponent {
   }
 
   getCreditTypeLabel(value: CreditType): string {
-    switch (value) {
-      case 'mentoring_session':
-        return 'Buổi mentoring 1-1 (cá nhân)';
-      // CR-008
-      case 'mentoring_session_org':
-        return 'Buổi mentoring 1-1 (doanh nghiệp)';
-      case 'course_selection':
-        return 'Suất chọn khoá';
-      // CR-005
-      case 'quick_scan':
-        return 'Lượt Quick Scan';
-      case 'toolkit':
-        return 'Lượt Toolkit';
-      default:
-        return value;
-    }
+    // Nhãn dịch tại render site; CR-008: mentoring_session_org · CR-005: quick_scan / toolkit
+    const known: CreditType[] = [
+      'mentoring_session',
+      'mentoring_session_org',
+      'course_selection',
+      'quick_scan',
+      'toolkit',
+    ];
+    return known.includes(value)
+      ? this.transloco.translate(`system.credits.creditTypes.${value}`)
+      : value;
   }
 
   getKindLabel(value: CreditKind): string {
     switch (value) {
       case 'grant':
-        return 'Cấp';
       case 'consume':
-        return 'Tiêu';
       case 'adjust':
-        return 'Điều chỉnh';
+        return this.transloco.translate(`system.credits.kinds.${value}`);
       default:
         return value;
     }
@@ -123,13 +119,10 @@ export default class SystemCreditsComponent {
   getRefTypeLabel(value: CreditRefType | null): string {
     switch (value) {
       case 'purchase':
-        return 'Mua gói';
       case 'booking':
-        return 'Đặt lịch mentor';
       case 'enrollment':
-        return 'Ghi danh khoá';
       case 'admin':
-        return 'Admin';
+        return this.transloco.translate(`system.credits.refTypes.${value}`);
       default:
         return '—';
     }

@@ -1,29 +1,27 @@
 <div class="tab-content active">
   <div class="profile-page-header">
-    <h1 class="profile-page-title">Khóa học của tôi</h1>
-    <p class="profile-page-subtitle">
-      Xem danh sách các khóa học đã đăng ký học tập và tiến trình học tập của bạn.
-    </p>
+    <h1 class="profile-page-title">{{ 'profile.courses.title' | transloco }}</h1>
+    <p class="profile-page-subtitle">{{ 'profile.courses.subtitle' | transloco }}</p>
   </div>
 
   <div class="courses-header">
     <div class="filter-tabs">
       <button class="filter-tab" [class.active]="filter() === 'all'" (click)="filter.set('all')">
-        Tất cả
+        {{ 'profile.courses.filterAll' | transloco }}
       </button>
       <button
         class="filter-tab"
         [class.active]="filter() === 'in_progress'"
         (click)="filter.set('in_progress')"
       >
-        Đang học
+        {{ 'profile.courses.filterInProgress' | transloco }}
       </button>
       <button
         class="filter-tab"
         [class.active]="filter() === 'completed'"
         (click)="filter.set('completed')"
       >
-        Hoàn thành
+        {{ 'profile.courses.filterCompleted' | transloco }}
       </button>
     </div>
   </div>
@@ -31,7 +29,7 @@
   @if (filteredCourses().length === 0) {
     <div class="empty-state">
       <div class="icon">📚</div>
-      <p>Không tìm thấy khóa học nào phù hợp với bộ lọc này.</p>
+      <p>{{ 'profile.courses.emptyFiltered' | transloco }}</p>
     </div>
   } @else {
     <div class="course-grid">
@@ -51,21 +49,34 @@
               </div>
               <div class="progress-info">
                 @if (course.progress === 100) {
-                  <span class="progress-text completed">Đã hoàn thành</span>
+                  <span class="progress-text completed">{{
+                    'profile.courses.progressCompleted' | transloco
+                  }}</span>
                 } @else if (course.progress > 0) {
-                  <span class="progress-text in-progress">Đang học {{ course.progress }}%</span>
+                  <span class="progress-text in-progress">{{
+                    'profile.courses.progressInProgress' | transloco: { pct: course.progress }
+                  }}</span>
                 } @else {
-                  <span class="progress-text">Chưa bắt đầu</span>
+                  <span class="progress-text">{{
+                    'profile.courses.progressNotStarted' | transloco
+                  }}</span>
                 }
                 <span class="progress-date">{{ course.lastActive }}</span>
               </div>
             </div>
 
             @if (course.progress === 100) {
-              <button class="cta-link primary w-full" (click)="onAction(course)">Học lại</button>
+              <button class="cta-link primary w-full" (click)="onAction(course)">
+                {{ 'profile.courses.actionRestart' | transloco }}
+              </button>
             } @else {
               <button class="cta-link primary w-full" (click)="onAction(course)">
-                {{ course.progress > 0 ? 'Học tiếp' : 'Bắt đầu học' }}
+                {{
+                  (course.progress > 0
+                    ? 'profile.courses.actionContinue'
+                    : 'profile.courses.actionStart'
+                  ) | transloco
+                }}
               </button>
             }
           </div>

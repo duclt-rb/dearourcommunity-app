@@ -7,17 +7,19 @@ import {
   required,
   validate,
 } from '@angular/forms/signals';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ProfileStore } from '../profile.store';
 
 @Component({
   selector: 'app-profile-password',
   standalone: true,
-  imports: [FormField],
+  imports: [FormField, TranslocoPipe],
   templateUrl: './password.html',
   styleUrl: './password.css',
 })
 export default class PasswordComponent {
   store = inject(ProfileStore);
+  private readonly transloco = inject(TranslocoService);
 
   passwordModel = signal({
     currentPassword: '',
@@ -26,19 +28,29 @@ export default class PasswordComponent {
   });
 
   passwordForm = form(this.passwordModel, (p) => {
-    required(p.currentPassword, { message: 'Mật khẩu hiện tại là bắt buộc' });
-    required(p.newPassword, { message: 'Mật khẩu mới là bắt buộc' });
-    minLength(p.newPassword, 8, { message: 'Mật khẩu mới phải tối thiểu 8 ký tự' });
+    required(p.currentPassword, {
+      message: this.transloco.translate('profile.password.currentRequired'),
+    });
+    required(p.newPassword, { message: this.transloco.translate('profile.password.newRequired') });
+    minLength(p.newPassword, 8, {
+      message: this.transloco.translate('profile.password.newMinLength'),
+    });
     validate(p.newPassword, (ctx) => {
       return ctx.value() && ctx.value() === this.passwordModel().currentPassword
-        ? patternError(/^$/, { message: 'Mật khẩu mới phải khác mật khẩu hiện tại' })
+        ? patternError(/^$/, {
+            message: this.transloco.translate('profile.password.newMustDiffer'),
+          })
         : undefined;
     });
-    required(p.confirmPassword, { message: 'Nhập lại mật khẩu là bắt buộc' });
+    required(p.confirmPassword, {
+      message: this.transloco.translate('profile.password.confirmRequired'),
+    });
     validate(p.confirmPassword, (ctx) => {
       return ctx.value() === this.passwordModel().newPassword
         ? undefined
-        : patternError(/^$/, { message: 'Mật khẩu nhập lại không khớp' });
+        : patternError(/^$/, {
+            message: this.transloco.translate('validation.passwordMismatch'),
+          });
     });
   });
 
@@ -63,13 +75,11 @@ export default class PasswordComponent {
     try {
       const { currentPassword, newPassword, confirmPassword } = this.passwordModel();
       await this.store.changePassword(currentPassword, newPassword, confirmPassword);
-      this.successMessage.set('Đã cập nhật mật khẩu mới thành công!');
+      this.successMessage.set(this.transloco.translate('profile.password.updateSuccess'));
       this.passwordModel.set({ currentPassword: '', newPassword: '', confirmPassword: '' });
       this.passwordForm().reset();
     } catch {
-      this.errorMessage.set(
-        'Có lỗi xảy ra khi cập nhật mật khẩu. Vui lòng kiểm tra lại mật khẩu hiện tại!',
-      );
+      this.errorMessage.set(this.transloco.translate('profile.password.updateError'));
     } finally {
       this.loading.set(false);
     }

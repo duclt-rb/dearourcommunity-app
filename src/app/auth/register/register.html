@@ -2,15 +2,17 @@
   <div class="auth-form">
     <div class="auth-form__header">
       <app-logo class="auth-form__logo"></app-logo>
-      <h2 class="auth-form__title">Tạo tài khoản</h2>
-      <p class="auth-form__subtitle">Tham gia cộng đồng Dear Our Community</p>
+      <h2 class="auth-form__title">{{ 'auth.register.title' | transloco }}</h2>
+      <p class="auth-form__subtitle">{{ 'auth.register.subtitle' | transloco }}</p>
     </div>
 
     <form class="auth-form__body" (submit)="onSubmit($event)">
       <!-- Name -->
       <div class="field-row">
         <div class="field">
-          <label for="firstName" class="field__label">Họ</label>
+          <label for="firstName" class="field__label">{{
+            'auth.register.familyNameLabel' | transloco
+          }}</label>
           <span class="p-input-icon-left field__input-wrapper">
             <svg lucideUser [size]="18" strokeWidth="1.5"></svg>
             <input
@@ -18,7 +20,7 @@
               type="text"
               pInputText
               [pt]="inputPt"
-              placeholder="Nguyễn"
+              [placeholder]="'auth.register.familyNamePlaceholder' | transloco"
               [formField]="registerForm.firstName"
               autocomplete="given-name"
             />
@@ -28,7 +30,9 @@
           }
         </div>
         <div class="field">
-          <label for="lastName" class="field__label">Tên</label>
+          <label for="lastName" class="field__label">{{
+            'auth.register.givenNameLabel' | transloco
+          }}</label>
           <span class="p-input-icon-left field__input-wrapper">
             <svg lucideUser [size]="18" strokeWidth="1.5"></svg>
             <input
@@ -36,7 +40,7 @@
               type="text"
               pInputText
               [pt]="inputPt"
-              placeholder="Văn A"
+              [placeholder]="'auth.register.givenNamePlaceholder' | transloco"
               [formField]="registerForm.lastName"
               autocomplete="family-name"
             />
@@ -49,7 +53,7 @@
 
       <!-- Email -->
       <div class="field">
-        <label for="email" class="field__label">Email</label>
+        <label for="email" class="field__label">{{ 'auth.register.emailLabel' | transloco }}</label>
         <span class="p-input-icon-left field__input-wrapper">
           <svg lucideMail [size]="18" strokeWidth="1.5"></svg>
           <input
@@ -69,7 +73,7 @@
 
       <!-- Phone -->
       <div class="field">
-        <label for="phone" class="field__label">Số điện thoại</label>
+        <label for="phone" class="field__label">{{ 'auth.register.phoneLabel' | transloco }}</label>
         <span class="p-input-icon-left field__input-wrapper">
           <svg lucidePhone [size]="18" strokeWidth="1.5"></svg>
           <input
@@ -89,7 +93,9 @@
 
       <!-- Password -->
       <div class="field">
-        <label for="password" class="field__label">Mật khẩu</label>
+        <label for="password" class="field__label">{{
+          'auth.register.passwordLabel' | transloco
+        }}</label>
         <span class="p-input-icon-left field__input-wrapper">
           <svg lucideLock [size]="18" strokeWidth="1.5"></svg>
           <input
@@ -97,7 +103,7 @@
             [type]="showPassword() ? 'text' : 'password'"
             pInputText
             [pt]="inputPt"
-            placeholder="Tối thiểu 8 ký tự"
+            [placeholder]="'auth.register.passwordPlaceholder' | transloco"
             [formField]="registerForm.password"
             autocomplete="new-password"
           />
@@ -105,7 +111,10 @@
             type="button"
             class="field__toggle"
             (click)="showPassword.set(!showPassword())"
-            [attr.aria-label]="showPassword() ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'"
+            [attr.aria-label]="
+              (showPassword() ? 'auth.register.hidePassword' : 'auth.register.showPassword')
+                | transloco
+            "
           >
             @if (showPassword()) {
               <svg lucideEyeOff [size]="18" strokeWidth="1.5"></svg>
@@ -121,7 +130,9 @@
 
       <!-- Repeat Password -->
       <div class="field">
-        <label for="repeatPassword" class="field__label">Nhập lại mật khẩu</label>
+        <label for="repeatPassword" class="field__label">{{
+          'auth.register.repeatPasswordLabel' | transloco
+        }}</label>
         <span class="p-input-icon-left field__input-wrapper">
           <svg lucideLock [size]="18" strokeWidth="1.5"></svg>
           <input
@@ -129,7 +140,7 @@
             [type]="showPassword() ? 'text' : 'password'"
             pInputText
             [pt]="inputPt"
-            placeholder="Nhập lại mật khẩu"
+            [placeholder]="'auth.register.repeatPasswordPlaceholder' | transloco"
             [formField]="registerForm.repeatPassword"
             autocomplete="new-password"
           />
@@ -137,7 +148,10 @@
             type="button"
             class="field__toggle"
             (click)="showPassword.set(!showPassword())"
-            [attr.aria-label]="showPassword() ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'"
+            [attr.aria-label]="
+              (showPassword() ? 'auth.register.hidePassword' : 'auth.register.showPassword')
+                | transloco
+            "
           >
             @if (showPassword()) {
               <svg lucideEyeOff [size]="18" strokeWidth="1.5"></svg>
@@ -155,23 +169,19 @@
       <label class="checkbox-field">
         <input type="checkbox" [formField]="registerForm.agreeToTerms" />
         <span class="checkbox-field__label">
-          Bằng cách đăng ký và/hoặc đăng nhập, sử dụng tài khoản của bạn, bạn đồng ý với
+          {{ 'auth.register.agreePrefix' | transloco }}
+          <a [href]="termsUrl" target="_blank" rel="noopener noreferrer" class="auth-form__link">{{
+            'auth.register.terms' | transloco
+          }}</a>
+          {{ 'auth.register.and' | transloco }}
           <a
-            href="https://dearourcommunity.asia/vi/policies/quyen-va-nghia-vu-cua-cac-ben"
+            [href]="privacyUrl"
             target="_blank"
             rel="noopener noreferrer"
             class="auth-form__link"
-            >Điều khoản sử dụng</a
+            >{{ 'auth.register.privacy' | transloco }}</a
           >
-          và
-          <a
-            href="https://dearourcommunity.asia/vi/policies/chinh-sach-bao-mat"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="auth-form__link"
-            >Chính sách bảo mật</a
-          >
-          của chúng tôi
+          {{ 'auth.register.agreeSuffix' | transloco }}
         </span>
       </label>
       @if (registerForm.agreeToTerms().touched() && registerForm.agreeToTerms().invalid()) {
@@ -184,7 +194,7 @@
       <!-- Submit -->
       <p-button
         type="submit"
-        label="Tạo tài khoản"
+        [label]="'auth.register.submit' | transloco"
         [pt]="submitPt"
         styleClass="auth-form__submit"
         [loading]="loading()"
@@ -194,10 +204,10 @@
 
     <!-- Login Link -->
     <p class="auth-form__footer">
-      Đã có tài khoản?
-      <a routerLink="/auth/login" queryParamsHandling="preserve" class="auth-form__link"
-        >Đăng nhập</a
-      >
+      {{ 'auth.register.haveAccount' | transloco }}
+      <a routerLink="/auth/login" queryParamsHandling="preserve" class="auth-form__link">{{
+        'auth.register.loginLink' | transloco
+      }}</a>
     </p>
   </div>
 </app-auth-layout>

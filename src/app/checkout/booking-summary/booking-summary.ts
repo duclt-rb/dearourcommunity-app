@@ -1,4 +1,5 @@
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import type { MentorBooking } from '@dearourcommunity/client';
 import { MentorBookingService } from '../../core/services/mentor-booking.service';
 
@@ -15,6 +16,7 @@ import { MentorBookingService } from '../../core/services/mentor-booking.service
 @Component({
   selector: 'app-booking-summary',
   standalone: true,
+  imports: [TranslocoPipe],
   templateUrl: './booking-summary.html',
   styleUrl: './booking-summary.css',
 })

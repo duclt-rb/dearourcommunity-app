@@ -7,8 +7,14 @@ import {
   withMethods,
   withState,
 } from '@ngrx/signals';
-import { getDataGov } from './datagov.data';
+import { getDataGov, DATAGOV_TOOLKITS_VI } from './datagov.data';
 import { DataGovToolkitConfig, MaturityBand, readinessFor } from './datagov.types';
+import {
+  mapValue,
+  needsMigration,
+  rekeyRecord,
+  TOOLKIT_PERSIST_VERSION,
+} from '../shared/persist-migration';
 
 const STORAGE_PREFIX = 'doc:datagov-toolkit:';
 /** Fallback config used before the component calls `init()`. */
@@ -43,7 +49,7 @@ interface DataGovState {
   config: DataGovToolkitConfig;
   /** localStorage key for the active toolkit; null until init. Not persisted. */
   storageKey: string | null;
-  /** Bản đồ dữ liệu: rowId -> (cột -> giá trị). */
+  /** Bản đồ dữ liệu: rowId -> (DataMapColumn.key -> giá trị). */
   dataMap: Record<string, Record<string, string>>;
   assessment: Record<string, string>;
   incidentChecks: Record<string, boolean>;
@@ -67,19 +73,75 @@ const initialState: DataGovState = {
   currentStep: 0,
 };
 
-function loadPersisted(key: string): Partial<DataGovState> | null {
+/** Persisted slice of the toolkit, keyed per toolkit id in localStorage. */
+interface PersistedDataGov extends Partial<Omit<DataGovState, 'config' | 'storageKey'>> {
+  /** V2: dataMap inner keys theo DataMapColumn.key; legal-basis/transfer values theo enum. */
+  version?: number;
+}
+
+/** V1 giá trị VN của cột "Cơ sở pháp lý" → enum ổn định. */
+const LEGAL_BASIS_V1_TO_V2: Record<string, string> = {
+  'Đồng ý': 'consent',
+  'Hợp đồng': 'contract',
+  'Nghĩa vụ pháp lý': 'legal_obligation',
+  'Lợi ích hợp pháp': 'legitimate_interest',
+  'Lợi ích sống còn': 'vital_interest',
+  Khác: 'other',
+};
+
+/** V1 giá trị VN của cột "Chuyển ra nước ngoài?" → enum ổn định. */
+const TRANSFER_V1_TO_V2: Record<string, string> = {
+  Có: 'yes',
+  Không: 'no',
+  'Không chắc': 'unsure',
+};
+
+/**
+ * V1 persist dataMap inner keys theo NHÃN cột VN và 2 cột dropdown theo GIÁ TRỊ VN
+ * (cột "Nhạy cảm?" đã dùng 'yes'/'no' từ đầu — không cần map). Map nhãn→key build
+ * từ chính config VI (không drift). Các phần còn lại (assessment/legal/actions/
+ * incidentLog/milestones) đã dùng id + enum ổn định từ v1 → giữ nguyên.
+ */
+export function migrateV1toV2(
+  raw: PersistedDataGov,
+  config: DataGovToolkitConfig,
+): PersistedDataGov {
+  const colMap = Object.fromEntries(config.dataMapColumns.map((c) => [c.label, c.key]));
+  const dataMap: Record<string, Record<string, string>> = {};
+  for (const [rowId, cells] of Object.entries(raw.dataMap ?? {})) {
+    const rekeyed = rekeyRecord(cells, colMap);
+    if (rekeyed['legal-basis'] !== undefined) {
+      rekeyed['legal-basis'] = mapValue(rekeyed['legal-basis'], LEGAL_BASIS_V1_TO_V2);
+    }
+    if (rekeyed['transfer'] !== undefined) {
+      rekeyed['transfer'] = mapValue(rekeyed['transfer'], TRANSFER_V1_TO_V2);
+    }
+    dataMap[rowId] = rekeyed;
+  }
+  return { ...raw, version: TOOLKIT_PERSIST_VERSION, dataMap };
+}
+
+function loadPersisted(config: DataGovToolkitConfig): PersistedDataGov | null {
   if (typeof localStorage === 'undefined') return null;
   try {
+    const key = STORAGE_PREFIX + config.id;
     const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as Partial<DataGovState>) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PersistedDataGov;
+    if (!needsMigration(parsed)) return parsed;
+    // Map nhãn→id build từ bản VI (v1 persist nhãn VN) — bất kể locale đang chạy
+    const migrated = migrateV1toV2(parsed, DATAGOV_TOOLKITS_VI[config.id] ?? config);
+    // Ghi lại ngay để lần sau không migrate nữa (idempotent nhờ version check)
+    savePersisted(key, migrated);
+    return migrated;
   } catch {
     return null;
   }
 }
-function savePersisted(key: string, state: Omit<DataGovState, 'config' | 'storageKey'>): void {
+function savePersisted(key: string, state: PersistedDataGov): void {
   if (typeof localStorage === 'undefined') return;
   try {
-    localStorage.setItem(key, JSON.stringify(state));
+    localStorage.setItem(key, JSON.stringify({ ...state, version: TOOLKIT_PERSIST_VERSION }));
   } catch {
     // ignore
   }
@@ -176,9 +238,9 @@ export const DataGovStore = signalStore(
   })),
 
   withMethods((store) => ({
-    setDataMap(rowId: string, col: string, value: string) {
+    setDataMap(rowId: string, colKey: string, value: string) {
       patchState(store, (s) => ({
-        dataMap: { ...s.dataMap, [rowId]: { ...(s.dataMap[rowId] ?? {}), [col]: value } },
+        dataMap: { ...s.dataMap, [rowId]: { ...(s.dataMap[rowId] ?? {}), [colKey]: value } },
       }));
     },
     setAssessment(id: string, value: string) {
@@ -220,7 +282,7 @@ export const DataGovStore = signalStore(
     },
 
     // ── getters ──
-    dataMapOf: (rowId: string, col: string) => store.dataMap()[rowId]?.[col] ?? '',
+    dataMapOf: (rowId: string, colKey: string) => store.dataMap()[rowId]?.[colKey] ?? '',
     assessmentOf: (id: string) => store.assessment()[id] ?? '',
     incidentCheckOf: (id: string) => store.incidentChecks()[id] ?? false,
     legalOf: (id: string, field: keyof LegalRow) => store.legal()[id]?.[field] ?? '',
@@ -240,8 +302,19 @@ export const DataGovStore = signalStore(
     init(config: DataGovToolkitConfig) {
       if (store.storageKey()) return; // already initialised
       const key = STORAGE_PREFIX + config.id;
-      const saved = loadPersisted(key);
-      patchState(store, { ...(saved ?? {}), config, storageKey: key });
+      const saved = loadPersisted(config);
+      patchState(store, {
+        config,
+        storageKey: key,
+        dataMap: saved?.dataMap ?? {},
+        assessment: saved?.assessment ?? {},
+        incidentChecks: saved?.incidentChecks ?? {},
+        incidentLog: saved?.incidentLog ?? [],
+        legal: saved?.legal ?? {},
+        actions: saved?.actions ?? {},
+        milestones: saved?.milestones ?? {},
+        currentStep: saved?.currentStep ?? 0,
+      });
     },
     reset() {
       const key = store.storageKey();

@@ -1,13 +1,15 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { LucideAlertCircle, LucideCheck, LucideTag } from '@lucide/angular';
 import { ApiError, type AddonPriceRow, type AddonType } from '@dearourcommunity/client';
 import { AddonsService } from '../../core/services/addons.service';
 
+// Nhãn loại addon là translation key — dịch tại nơi render (items() bên dưới).
 const LABELS: Record<AddonType, string> = {
-  extra_course: 'Khoá học mua lẻ',
-  quick_scan: 'Quick Scan mua lẻ',
-  toolkit: 'Toolkit mua lẻ',
+  extra_course: 'system.addonPrices.types.extraCourse',
+  quick_scan: 'system.addonPrices.types.quickScan',
+  toolkit: 'system.addonPrices.types.toolkit',
 };
 
 /**
@@ -17,12 +19,13 @@ const LABELS: Record<AddonType, string> = {
 @Component({
   selector: 'app-system-addon-prices',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, LucideAlertCircle, LucideCheck, LucideTag],
+  imports: [DatePipe, DecimalPipe, TranslocoPipe, LucideAlertCircle, LucideCheck, LucideTag],
   templateUrl: './addon-prices.html',
   styleUrl: './addon-prices.css',
 })
 export default class SystemAddonPricesComponent implements OnInit {
   private readonly addonsService = inject(AddonsService);
+  private readonly transloco = inject(TranslocoService);
 
   readonly rows = signal<AddonPriceRow[]>([]);
   readonly isLoading = signal(false);
@@ -41,7 +44,9 @@ export default class SystemAddonPricesComponent implements OnInit {
   readonly items = computed(() =>
     this.rows().map((row) => ({
       addonType: row.addonType,
-      label: LABELS[row.addonType] ?? row.addonType,
+      label: LABELS[row.addonType]
+        ? this.transloco.translate(LABELS[row.addonType])
+        : row.addonType,
       price: row.price,
       updatedBy: row.updatedBy,
       updatedAt: row.updatedAt,
@@ -81,7 +86,11 @@ export default class SystemAddonPricesComponent implements OnInit {
         } as Record<AddonType, string>),
       );
     } catch (err) {
-      this.loadError.set(err instanceof ApiError ? err.message : 'Không tải được bảng giá bán lẻ.');
+      this.loadError.set(
+        err instanceof ApiError
+          ? err.message
+          : this.transloco.translate('system.addonPrices.errors.loadFailed'),
+      );
     } finally {
       this.isLoading.set(false);
     }
@@ -108,7 +117,11 @@ export default class SystemAddonPricesComponent implements OnInit {
       this.rows.set(rows);
       this.saveSuccess.set(true);
     } catch (err) {
-      this.saveError.set(err instanceof ApiError ? err.message : 'Không lưu được giá bán lẻ.');
+      this.saveError.set(
+        err instanceof ApiError
+          ? err.message
+          : this.transloco.translate('system.addonPrices.errors.saveFailed'),
+      );
     } finally {
       this.isSaving.set(false);
     }

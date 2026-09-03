@@ -9,6 +9,7 @@ import {
   validate,
 } from '@angular/forms/signals';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   LucideEye,
   LucideEyeOff,
@@ -22,6 +23,7 @@ import { InputText } from 'primeng/inputtext';
 import { AuthStore } from '../../core/stores/auth.store';
 import AuthLayoutComponent from '../auth-layout/auth-layout';
 import LogoComponent from '../../shared/logo/logo';
+import { frontpageUrl } from '../../core/i18n/locale';
 
 @Component({
   selector: 'app-register',
@@ -39,13 +41,19 @@ import LogoComponent from '../../shared/logo/logo';
     LucideEyeOff,
     InputText,
     Button,
+    TranslocoPipe,
   ],
   templateUrl: './register.html',
   styleUrl: './register.css',
   encapsulation: ViewEncapsulation.None,
 })
 export default class RegisterPage {
+  // Link chính sách trên Frontpage — theo locale đang hiển thị (bỏ hardcode domain + /vi/)
+  readonly termsUrl = frontpageUrl('/policies/quyen-va-nghia-vu-cua-cac-ben');
+  readonly privacyUrl = frontpageUrl('/policies/chinh-sach-bao-mat');
+
   private route = inject(ActivatedRoute);
+  private readonly transloco = inject(TranslocoService);
   store = inject(AuthStore);
 
   registerModel = signal({
@@ -59,20 +67,28 @@ export default class RegisterPage {
   });
 
   registerForm = form(this.registerModel, (p) => {
-    required(p.firstName, { message: 'Họ là bắt buộc' });
-    required(p.lastName, { message: 'Tên là bắt buộc' });
-    required(p.email, { message: 'Email là bắt buộc' });
-    email(p.email, { message: 'Email không hợp lệ' });
-    required(p.phone, { message: 'Số điện thoại là bắt buộc' });
-    required(p.password, { message: 'Mật khẩu là bắt buộc' });
-    minLength(p.password, 8, { message: 'Mật khẩu tối thiểu 8 ký tự' });
-    required(p.repeatPassword, { message: 'Nhập lại mật khẩu là bắt buộc' });
+    required(p.firstName, {
+      message: this.transloco.translate('auth.register.familyNameRequired'),
+    });
+    required(p.lastName, { message: this.transloco.translate('auth.register.givenNameRequired') });
+    required(p.email, { message: this.transloco.translate('auth.register.emailRequired') });
+    email(p.email, { message: this.transloco.translate('validation.email') });
+    required(p.phone, { message: this.transloco.translate('auth.register.phoneRequired') });
+    required(p.password, { message: this.transloco.translate('auth.register.passwordRequired') });
+    minLength(p.password, 8, {
+      message: this.transloco.translate('auth.register.passwordMinLength'),
+    });
+    required(p.repeatPassword, {
+      message: this.transloco.translate('auth.register.repeatPasswordRequired'),
+    });
     validate(p.repeatPassword, (ctx) => {
       return ctx.value() === this.registerModel().password
         ? undefined
-        : patternError(/^$/, { message: 'Mật khẩu không khớp' });
+        : patternError(/^$/, {
+            message: this.transloco.translate('auth.register.passwordMismatch'),
+          });
     });
-    required(p.agreeToTerms, { message: 'Bạn phải đồng ý với điều khoản' });
+    required(p.agreeToTerms, { message: this.transloco.translate('auth.register.agreeRequired') });
   });
 
   // PrimeNG PassThrough

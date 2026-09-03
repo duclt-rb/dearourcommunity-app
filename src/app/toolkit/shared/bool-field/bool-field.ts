@@ -1,4 +1,5 @@
-import { Component, input, model } from '@angular/core';
+import { Component, inject, input, model } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-bool-field',
@@ -7,10 +8,15 @@ import { Component, input, model } from '@angular/core';
   styleUrl: './bool-field.css',
 })
 export class BoolFieldComponent {
+  private readonly transloco = inject(TranslocoService);
+
   label = input.required<string>();
-  trueLabel = input<string>('Có');
-  falseLabel = input<string>('Không');
-  /** Two-way bindable value, stored as the selected label text. */
+  trueLabel = input<string>(this.transloco.translate('common.yes'));
+  falseLabel = input<string>(this.transloco.translate('common.no'));
+  /** Giá trị persist ổn định — KHÔNG phải nhãn hiển thị (nhãn dịch được). */
+  trueValue = input<string>('yes');
+  falseValue = input<string>('no');
+  /** Two-way bindable value, stored as the stable option value. */
   value = model<string>('');
 
   select(option: string): void {

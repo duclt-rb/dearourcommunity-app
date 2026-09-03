@@ -3,6 +3,8 @@ export type PillarKey = 'environment' | 'social' | 'governance';
 export type ProfileFieldType = 'text' | 'date' | 'boolean';
 
 export interface ProfileField {
+  /** Khoá persist ổn định (không đổi khi dịch nhãn). */
+  id: string;
   label: string;
   hint?: string;
   /** Control to render; defaults to 'text'. */
@@ -34,6 +36,8 @@ export interface PillarSection {
 }
 
 export interface PriorityFocus {
+  /** Khoá persist ổn định (không đổi khi dịch nhãn). */
+  id: string;
   area: string;
   pillar: string;
   benefit: string;
@@ -67,10 +71,11 @@ export interface MaturityLevel {
  * Maturity scale from the Results Dashboard formula:
  * < 40% → Early Stage, < 70% → Developing, else Established.
  */
+// `label` là KEY i18n (toolkit.maturity.*) — dịch tại nơi hiển thị/store.
 export const MATURITY_LEVELS: MaturityLevel[] = [
-  { label: 'Đã thiết lập', min: 70, tone: 'success' },
-  { label: 'Đang phát triển', min: 40, tone: 'warning' },
-  { label: 'Giai đoạn đầu', min: 0, tone: 'error' },
+  { label: 'toolkit.maturity.established', min: 70, tone: 'success' },
+  { label: 'toolkit.maturity.developing', min: 40, tone: 'warning' },
+  { label: 'toolkit.maturity.early', min: 0, tone: 'error' },
 ];
 
 export function maturityLevelFor(percent: number): MaturityLevel {

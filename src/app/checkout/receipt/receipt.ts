@@ -1,8 +1,9 @@
 import { Component, computed, effect, inject, DestroyRef, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { LucideArrowRight, LucideCheck, LucideCircleX, LucideHome } from '@lucide/angular';
 import { Store } from '@ngrx/store';
-import { getMomoResultMessage } from '../../core/router/momo-result-codes';
+import { momoResultKey } from '../../core/router/momo-result-codes';
 import {
   selectDecodedExtraData,
   selectQueryAmount,
@@ -17,24 +18,26 @@ import { CheckoutStore } from '../checkout.store';
 import { PaymentService } from '../../core/services/payment.service';
 import { ProfileStore } from '../../profile/profile.store';
 
-// Bản đồ tên gói (chỉ dùng làm tên dự phòng hiển thị trên biên nhận khi
-// không có tên thật từ API). Đồng bộ ID theo master data mới (client ≥0.6.10).
-const PACKAGE_NAME_MAP: Record<string, string> = {
-  'youth-a': 'Gói Youth A',
-  'youth-b': 'Gói Youth B',
-  'youth-c': 'Gói Youth C',
-  'youth-c-plus': 'Gói Youth C+',
-  'org-a': 'Gói Doanh nghiệp A',
-  'org-b': 'Gói Doanh nghiệp B',
-  'org-c': 'Gói Doanh nghiệp C',
-  'org-p': 'Gói Doanh nghiệp P',
-};
+// Danh sách ID gói có tên dự phòng trong i18n (`checkout.packages.<id>` — chỉ dùng
+// hiển thị trên biên nhận khi không có tên thật từ API). Đồng bộ ID theo master data
+// mới (client ≥0.6.10).
+const KNOWN_PACKAGE_IDS = new Set([
+  'youth-a',
+  'youth-b',
+  'youth-c',
+  'youth-c-plus',
+  'org-a',
+  'org-b',
+  'org-c',
+  'org-p',
+]);
 
 @Component({
   selector: 'app-receipt',
   standalone: true,
   imports: [
     RouterLink,
+    TranslocoPipe,
     LucideCheck,
     LucideHome,
     LucideArrowRight,
@@ -51,6 +54,7 @@ export default class ReceiptComponent {
   private destroyRef = inject(DestroyRef);
   private paymentService = inject(PaymentService);
   private profileStore = inject(ProfileStore);
+  private transloco = inject(TranslocoService);
   readonly store = inject(CheckoutStore);
 
   // Chọn trực tiếp từ Router Store bằng Signal!
@@ -61,11 +65,12 @@ export default class ReceiptComponent {
   readonly extraDataObj = this.ngrxStore.selectSignal(selectDecodedExtraData);
 
   packageName = computed<string>(() => {
-    const extra = this.extraDataObj();
-    if (extra && extra.packageId) {
-      return PACKAGE_NAME_MAP[extra.packageId] ?? 'Gói Premium';
-    }
-    return 'Gói Premium';
+    const packageId = this.extraDataObj()?.packageId;
+    return this.transloco.translate(
+      packageId && KNOWN_PACKAGE_IDS.has(packageId)
+        ? 'checkout.packages.' + packageId
+        : 'checkout.packages.fallback',
+    );
   });
 
   // Aliases for 100% template compatibility
@@ -82,7 +87,9 @@ export default class ReceiptComponent {
 
   private activeTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  resultMessage = computed<string>(() => getMomoResultMessage(this.resultCode()));
+  resultMessage = computed<string>(() =>
+    this.transloco.translate(momoResultKey(this.resultCode())),
+  );
 
   // ── Lịch hẹn mentor gắn với đơn (CR-001) — render qua <app-booking-summary> ──
   // Flow MoMo: bookingId nằm trong extraData (redirect làm mất state SPA);

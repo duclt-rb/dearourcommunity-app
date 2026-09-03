@@ -1,6 +1,7 @@
 import { computed, inject } from '@angular/core';
 import { ApiError, PackageType, RegisterDto, UserPackageInfo } from '@dearourcommunity/client';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
+import { TranslocoService } from '@jsverse/transloco';
 import { AuthService } from '../services/auth.service';
 
 export interface AuthUser {
@@ -38,7 +39,7 @@ export const AuthStore = signalStore(
   withComputed(({ token }) => ({
     isAuthenticated: computed(() => !!token()),
   })),
-  withMethods((store, authService = inject(AuthService)) => ({
+  withMethods((store, authService = inject(AuthService), transloco = inject(TranslocoService)) => ({
     async loadCurrentUser() {
       if (!authService.token) return;
       patchState(store, { isLoading: true, error: null });
@@ -55,7 +56,8 @@ export const AuthStore = signalStore(
         patchState(store, {
           user: null,
           token: null,
-          error: err instanceof ApiError ? err.message : 'Không thể tải thông tin tài khoản',
+          error:
+            err instanceof ApiError ? err.message : transloco.translate('auth.errors.loadAccount'),
           isLoading: false,
         });
       }
@@ -76,7 +78,10 @@ export const AuthStore = signalStore(
         });
         return { success: true };
       } catch (err) {
-        const errMsg = err instanceof ApiError ? err.message : 'Email hoặc mật khẩu không đúng';
+        const errMsg =
+          err instanceof ApiError
+            ? err.message
+            : transloco.translate('auth.errors.invalidCredentials');
         patchState(store, {
           error: errMsg,
           isLoading: false,
@@ -100,7 +105,8 @@ export const AuthStore = signalStore(
         });
         return { success: true };
       } catch (err) {
-        const errMsg = err instanceof ApiError ? err.message : 'Đăng ký không thành công';
+        const errMsg =
+          err instanceof ApiError ? err.message : transloco.translate('auth.errors.registerFailed');
         patchState(store, {
           error: errMsg,
           isLoading: false,

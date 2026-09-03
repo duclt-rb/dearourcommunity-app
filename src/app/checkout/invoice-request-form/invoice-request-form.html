@@ -1,9 +1,9 @@
 @if (submitted(); as request) {
   <div class="invoice-success">
-    <p class="invoice-success__title">Đã ghi nhận yêu cầu xuất hoá đơn VAT ✓</p>
+    <p class="invoice-success__title">{{ 'checkout.invoiceRequest.successTitle' | transloco }}</p>
     <p class="invoice-success__desc">
-      Sau khi giao dịch được xác nhận và kế toán phát hành, hoá đơn điện tử (PDF và XML) sẽ được gửi
-      đến <strong>{{ request.email }}</strong
+      {{ 'checkout.invoiceRequest.successDescPrefix' | transloco }}
+      <strong>{{ request.email }}</strong
       >.
     </p>
   </div>
@@ -15,7 +15,7 @@
       [checked]="enabled()"
       (change)="toggleEnabled()"
     />
-    <span class="invoice-toggle__label">Yêu cầu xuất hoá đơn VAT cho giao dịch này</span>
+    <span class="invoice-toggle__label">{{ 'checkout.invoiceRequest.toggle' | transloco }}</span>
   </label>
 
   @if (enabled()) {
@@ -27,7 +27,7 @@
           [class.active]="buyerType() === 'company'"
           (click)="buyerType.set('company')"
         >
-          Doanh nghiệp
+          {{ 'checkout.invoiceRequest.company' | transloco }}
         </button>
         <button
           type="button"
@@ -35,117 +35,137 @@
           [class.active]="buyerType() === 'personal'"
           (click)="buyerType.set('personal')"
         >
-          Cá nhân
+          {{ 'checkout.invoiceRequest.personal' | transloco }}
         </button>
       </div>
 
       @if (buyerType() === 'company') {
         <div class="invoice-field">
           <label class="invoice-field__label"
-            >Tên công ty (theo Giấy CNĐKKD) <span class="req">*</span></label
+            >{{ 'checkout.invoiceRequest.companyName' | transloco }}
+            <span class="req">*</span></label
           >
           <input
             class="invoice-input"
             type="text"
             maxlength="255"
-            placeholder="VD: Công ty TNHH ABC"
+            [placeholder]="'checkout.invoiceRequest.companyNamePlaceholder' | transloco"
             [value]="companyName()"
             (input)="companyName.set($any($event.target).value)"
           />
           <p class="invoice-field__hint">
-            Ghi đầy đủ, đúng chính tả như trên giấy phép kinh doanh.
+            {{ 'checkout.invoiceRequest.companyNameHint' | transloco }}
           </p>
         </div>
         <div class="invoice-field">
-          <label class="invoice-field__label">Mã số thuế (MST) <span class="req">*</span></label>
+          <label class="invoice-field__label"
+            >{{ 'checkout.invoiceRequest.taxCode' | transloco }} <span class="req">*</span></label
+          >
           <input
             class="invoice-input"
             type="text"
             maxlength="20"
-            placeholder="10 hoặc 13 chữ số"
+            [placeholder]="'checkout.invoiceRequest.taxCodePlaceholder' | transloco"
             [value]="taxCode()"
             (input)="taxCode.set($any($event.target).value)"
           />
           @if (taxCode().trim() && !taxCodeValid()) {
-            <p class="invoice-error">Mã số thuế phải gồm 10 hoặc 13 chữ số.</p>
+            <p class="invoice-error">{{ 'checkout.invoiceRequest.taxCodeError' | transloco }}</p>
           }
         </div>
         <div class="invoice-field">
           <label class="invoice-field__label"
-            >Địa chỉ công ty (theo Giấy CNĐKKD) <span class="req">*</span></label
+            >{{ 'checkout.invoiceRequest.companyAddress' | transloco }}
+            <span class="req">*</span></label
           >
           <input
             class="invoice-input"
             type="text"
             maxlength="500"
-            placeholder="Địa chỉ trụ sở chính"
+            [placeholder]="'checkout.invoiceRequest.companyAddressPlaceholder' | transloco"
             [value]="address()"
             (input)="address.set($any($event.target).value)"
           />
-          <p class="invoice-field__hint">Ghi đầy đủ địa chỉ trụ sở chính.</p>
+          <p class="invoice-field__hint">
+            {{ 'checkout.invoiceRequest.companyAddressHint' | transloco }}
+          </p>
         </div>
         <div class="invoice-field">
           <label class="invoice-field__label"
-            >Người đại diện / Người liên hệ nhận hoá đơn <span class="req">*</span></label
+            >{{ 'checkout.invoiceRequest.contactName' | transloco }}
+            <span class="req">*</span></label
           >
           <input
             class="invoice-input"
             type="text"
             maxlength="255"
-            placeholder="Họ tên người phụ trách"
+            [placeholder]="'checkout.invoiceRequest.contactNamePlaceholder' | transloco"
             [value]="buyerName()"
             (input)="buyerName.set($any($event.target).value)"
           />
-          <p class="invoice-field__hint">Họ tên người phụ trách nhận và xử lý hoá đơn.</p>
+          <p class="invoice-field__hint">
+            {{ 'checkout.invoiceRequest.contactNameHint' | transloco }}
+          </p>
         </div>
       } @else {
         <div class="invoice-field">
-          <label class="invoice-field__label">Họ và tên <span class="req">*</span></label>
+          <label class="invoice-field__label"
+            >{{ 'checkout.invoiceRequest.fullName' | transloco }} <span class="req">*</span></label
+          >
           <input
             class="invoice-input"
             type="text"
             maxlength="255"
-            placeholder="Ghi đầy đủ theo CCCD/CMND"
+            [placeholder]="'checkout.invoiceRequest.fullNamePlaceholder' | transloco"
             [value]="buyerName()"
             (input)="buyerName.set($any($event.target).value)"
           />
         </div>
         <div class="invoice-field">
-          <label class="invoice-field__label">Số CCCD / CMND <span class="req">*</span></label>
+          <label class="invoice-field__label"
+            >{{ 'checkout.invoiceRequest.idNumber' | transloco }} <span class="req">*</span></label
+          >
           <input
             class="invoice-input"
             type="text"
             maxlength="20"
-            placeholder="CCCD 12 số hoặc CMND 9 số"
+            [placeholder]="'checkout.invoiceRequest.idNumberPlaceholder' | transloco"
             [value]="idNumber()"
             (input)="idNumber.set($any($event.target).value)"
           />
           @if (idNumber().trim() && !idNumberValid()) {
-            <p class="invoice-error">Số CCCD/CMND phải gồm 9 hoặc 12 chữ số.</p>
+            <p class="invoice-error">{{ 'checkout.invoiceRequest.idNumberError' | transloco }}</p>
           }
-          <p class="invoice-field__hint">Bắt buộc để đảm bảo tính hợp lệ của hoá đơn cá nhân.</p>
+          <p class="invoice-field__hint">
+            {{ 'checkout.invoiceRequest.idNumberHint' | transloco }}
+          </p>
         </div>
         <div class="invoice-field">
-          <label class="invoice-field__label">Mã số thuế cá nhân</label>
+          <label class="invoice-field__label">{{
+            'checkout.invoiceRequest.personalTaxCode' | transloco
+          }}</label>
           <input
             class="invoice-input"
             type="text"
             maxlength="20"
-            placeholder="Nếu có (10 chữ số)"
+            [placeholder]="'checkout.invoiceRequest.personalTaxCodePlaceholder' | transloco"
             [value]="taxCode()"
             (input)="taxCode.set($any($event.target).value)"
           />
           @if (taxCode().trim() && !taxCodeValid()) {
-            <p class="invoice-error">Mã số thuế phải gồm 10 hoặc 13 chữ số.</p>
+            <p class="invoice-error">{{ 'checkout.invoiceRequest.taxCodeError' | transloco }}</p>
           }
         </div>
         <div class="invoice-field">
-          <label class="invoice-field__label">Địa chỉ thường trú <span class="req">*</span></label>
+          <label class="invoice-field__label"
+            >{{ 'checkout.invoiceRequest.residentialAddress' | transloco }}
+            <span class="req">*</span></label
+          >
           <input
             class="invoice-input"
             type="text"
             maxlength="500"
-            placeholder="Theo CCCD/CMND hoặc địa chỉ hiện tại"
+            [placeholder]="'checkout.invoiceRequest.residentialAddressPlaceholder' | transloco"
             [value]="address()"
             (input)="address.set($any($event.target).value)"
           />
@@ -154,39 +174,41 @@
 
       <div class="invoice-field">
         <label class="invoice-field__label"
-          >Email nhận hoá đơn điện tử <span class="req">*</span></label
+          >{{ 'checkout.invoiceRequest.email' | transloco }} <span class="req">*</span></label
         >
         <input
           class="invoice-input"
           type="email"
           maxlength="255"
-          placeholder="email@congty.com"
+          [placeholder]="'checkout.invoiceRequest.emailPlaceholder' | transloco"
           [value]="email()"
           (input)="onEmailInput($any($event.target).value)"
         />
-        <p class="invoice-field__hint">Hoá đơn điện tử (PDF và XML) sẽ được gửi đến email này.</p>
+        <p class="invoice-field__hint">{{ 'checkout.invoiceRequest.emailHint' | transloco }}</p>
       </div>
       <div class="invoice-field">
-        <label class="invoice-field__label">Số điện thoại liên hệ</label>
+        <label class="invoice-field__label">{{
+          'checkout.invoiceRequest.phone' | transloco
+        }}</label>
         <input
           class="invoice-input"
           type="tel"
           maxlength="20"
-          placeholder="Không bắt buộc"
+          [placeholder]="'checkout.invoiceRequest.optionalPlaceholder' | transloco"
           [value]="phone()"
           (input)="phone.set($any($event.target).value)"
         />
         @if (phone().trim() && !phoneValid()) {
-          <p class="invoice-error">Số điện thoại liên hệ không hợp lệ.</p>
+          <p class="invoice-error">{{ 'checkout.invoiceRequest.phoneError' | transloco }}</p>
         }
       </div>
       <div class="invoice-field">
-        <label class="invoice-field__label">Ghi chú</label>
+        <label class="invoice-field__label">{{ 'checkout.invoiceRequest.note' | transloco }}</label>
         <textarea
           class="invoice-input invoice-textarea"
           rows="2"
           maxlength="500"
-          placeholder="Không bắt buộc"
+          [placeholder]="'checkout.invoiceRequest.optionalPlaceholder' | transloco"
           [value]="note()"
           (input)="note.set($any($event.target).value)"
         ></textarea>
@@ -200,11 +222,7 @@
           [checked]="confirmAccuracy()"
           (change)="confirmAccuracy.set(!confirmAccuracy())"
         />
-        <span
-          >Tôi xác nhận thông tin cung cấp ở trên là chính xác và đầy đủ. Nếu thông tin sai dẫn đến
-          hoá đơn cần điều chỉnh, việc xử lý có thể mất thêm thời gian theo quy định pháp luật về
-          hoá đơn điện tử.</span
-        >
+        <span>{{ 'checkout.invoiceRequest.confirmAccuracy' | transloco }}</span>
       </label>
       <label class="invoice-confirm">
         <input
@@ -213,10 +231,7 @@
           [checked]="confirmConsent()"
           (change)="confirmConsent.set(!confirmConsent())"
         />
-        <span
-          >Tôi đồng ý để Dear Our Community sử dụng thông tin trên để lập và gửi hoá đơn điện tử
-          theo quy định hiện hành.</span
-        >
+        <span>{{ 'checkout.invoiceRequest.confirmConsent' | transloco }}</span>
       </label>
 
       <button
@@ -225,36 +240,24 @@
         [disabled]="!formValid() || submitting()"
         (click)="submit()"
       >
-        {{ submitting() ? 'Đang gửi...' : 'Gửi yêu cầu xuất hoá đơn' }}
+        {{
+          (submitting() ? 'checkout.invoiceRequest.submitting' : 'checkout.invoiceRequest.submit')
+            | transloco
+        }}
       </button>
       @if (errorMsg()) {
         <p class="invoice-error">{{ errorMsg() }}</p>
       }
 
-      <!-- Ghi chú quy định về thời điểm xuất hoá đơn -->
+      <!-- Ghi chú quy định về thời điểm xuất hoá đơn — value i18n chứa sẵn <strong>
+           nên render qua innerHTML (Angular sanitize giữ lại thẻ strong) -->
       <details class="invoice-legal">
-        <summary>Quy định về thời điểm xuất hoá đơn</summary>
+        <summary>{{ 'checkout.invoiceRequest.legal.title' | transloco }}</summary>
         <ol>
-          <li>
-            <strong>Thời điểm lập hoá đơn:</strong> theo Điều 9 Nghị định 123/2020/NĐ-CP, với cung
-            cấp dịch vụ là thời điểm hoàn thành dịch vụ hoặc thời điểm thu tiền (nếu thu trước/trong
-            khi cung cấp), không phân biệt đã thu được tiền hay chưa.
-          </li>
-          <li>
-            <strong>Yêu cầu xuất hoá đơn:</strong> vui lòng gửi yêu cầu trong vòng
-            <strong>7 ngày</strong> kể từ ngày thanh toán thành công. Yêu cầu gửi sau vẫn được DOC
-            hỗ trợ nhưng có thể phát sinh thủ tục hoá đơn điều chỉnh.
-          </li>
-          <li>
-            <strong>Hoá đơn điện tử hợp lệ:</strong> lập theo Nghị định 123/2020/NĐ-CP và Thông tư
-            78/2021/TT-BTC, có mã xác thực của cơ quan thuế; file PDF và XML gửi qua email đã đăng
-            ký.
-          </li>
-          <li>
-            <strong>Điều chỉnh / huỷ hoá đơn:</strong> nếu sai sót thông tin, liên hệ DOC trong vòng
-            <strong>30 ngày</strong> kể từ ngày xuất để được lập hoá đơn điều chỉnh hoặc thay thế
-            theo quy định.
-          </li>
+          <li [innerHTML]="'checkout.invoiceRequest.legal.item1' | transloco"></li>
+          <li [innerHTML]="'checkout.invoiceRequest.legal.item2' | transloco"></li>
+          <li [innerHTML]="'checkout.invoiceRequest.legal.item3' | transloco"></li>
+          <li [innerHTML]="'checkout.invoiceRequest.legal.item4' | transloco"></li>
         </ol>
       </details>
     </div>

@@ -1,17 +1,17 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { environment } from '../../environments/environment';
 import { AuthService } from '../core/services/auth.service';
 import { AuthStore } from '../core/stores/auth.store';
 import { ToolkitAccessService } from './toolkit-access.service';
 import { findToolkit } from './toolkit.data';
+import { frontpageUrl } from '../core/i18n/locale';
 
 /**
  * CR-003 — `/toolkit` không còn trang danh sách trong app: catalog/giới thiệu
  * nằm ở Frontpage → hard-redirect sang đó.
  */
 export const toolkitCatalogRedirectGuard: CanActivateFn = () => {
-  window.location.href = `${environment.appUrl}/vi/toolkit`;
+  window.location.href = frontpageUrl('/toolkit');
   return false;
 };
 

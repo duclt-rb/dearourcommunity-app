@@ -12,11 +12,13 @@ import DataGovToolkitComponent from './datagov/datagov';
 import { getDataGov } from './datagov/datagov.data';
 import EnergyToolkitComponent from './energy/energy';
 import { getEnergyToolkit } from './energy/energy.data';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-toolkit',
   standalone: true,
   imports: [
+    TranslocoPipe,
     CommonModule,
     QuickScanComponent,
     WasteToolkitComponent,
@@ -28,6 +30,7 @@ import { getEnergyToolkit } from './energy/energy.data';
 export default class ToolkitComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private titleService = inject(Title);
+  private transloco = inject(TranslocoService);
 
   id = signal<string | null>(null);
   toolkit = computed<Toolkit | undefined>(() => findToolkit(this.id()));
@@ -39,7 +42,11 @@ export default class ToolkitComponent implements OnInit {
   constructor() {
     effect(() => {
       const name = this.toolkit()?.name;
-      this.titleService.setTitle(name ? `${name} | ${APP_TITLE}` : `Bộ công cụ | ${APP_TITLE}`);
+      this.titleService.setTitle(
+        name
+          ? `${name} | ${APP_TITLE}`
+          : `${this.transloco.translate('titles.toolkit')} | ${APP_TITLE}`,
+      );
     });
   }
 

@@ -22,6 +22,7 @@ import {
   LucideTrash2,
   LucideX,
 } from '@lucide/angular';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import type { MentorAvailabilitySlot } from '@dearourcommunity/client';
 import type { MonthDayCell } from './mentor-schedule.store';
 import { MentorScheduleStore, nowNaiveMinute, todayStr } from './mentor-schedule.store';
@@ -29,26 +30,45 @@ import { MentorScheduleStore, nowNaiveMinute, todayStr } from './mentor-schedule
 /** Số chip giờ tối đa hiển thị trong 1 ô ngày của grid tháng — dư ra hiện "+N nữa". */
 const MONTH_CELL_MAX_CHIPS = 3;
 
-/** Nhãn thứ đầy đủ theo getDay() (0 = CN) — heading panel chi tiết ngày. */
-const WEEKDAY_FULL = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+/** Key i18n nhãn thứ đầy đủ theo getDay() (0 = CN) — heading panel chi tiết ngày. */
+const WEEKDAY_FULL_KEYS = [
+  'system.mentorSchedule.weekdayFull.sun',
+  'system.mentorSchedule.weekdayFull.mon',
+  'system.mentorSchedule.weekdayFull.tue',
+  'system.mentorSchedule.weekdayFull.wed',
+  'system.mentorSchedule.weekdayFull.thu',
+  'system.mentorSchedule.weekdayFull.fri',
+  'system.mentorSchedule.weekdayFull.sat',
+];
+
+/** Key i18n nhãn thứ ngắn theo thứ tự grid (index 0 = T2 … 6 = CN). */
+const WEEKDAY_SHORT_KEYS = [
+  'system.mentorSchedule.weekdayShort.mon',
+  'system.mentorSchedule.weekdayShort.tue',
+  'system.mentorSchedule.weekdayShort.wed',
+  'system.mentorSchedule.weekdayShort.thu',
+  'system.mentorSchedule.weekdayShort.fri',
+  'system.mentorSchedule.weekdayShort.sat',
+  'system.mentorSchedule.weekdayShort.sun',
+];
 
 /** Trạng thái hiển thị của một slot (AMENDMENT 1). */
 type SlotStatus = 'booked' | 'past' | 'inactive' | 'available';
 
-/** Nhãn ngắn cho badge trong panel ngày. */
+/** Key i18n nhãn ngắn cho badge trong panel ngày. */
 const SLOT_STATUS_SHORT: Record<SlotStatus, string> = {
-  booked: 'Đã đặt',
-  past: 'Đã qua',
-  inactive: 'Đã tắt',
-  available: 'Trống',
+  booked: 'system.mentorSchedule.statusShort.booked',
+  past: 'system.mentorSchedule.statusShort.past',
+  inactive: 'system.mentorSchedule.statusShort.inactive',
+  available: 'system.mentorSchedule.statusShort.available',
 };
 
-/** Nhãn dài cho tooltip. */
+/** Key i18n nhãn dài cho tooltip. */
 const SLOT_STATUS_LABELS: Record<SlotStatus, string> = {
-  booked: 'Đã đặt — đã có booking được duyệt',
-  past: 'Đã qua',
-  inactive: 'Đã tắt',
-  available: 'Trống',
+  booked: 'system.mentorSchedule.statusLabel.booked',
+  past: 'system.mentorSchedule.statusLabel.past',
+  inactive: 'system.mentorSchedule.statusLabel.inactive',
+  available: 'system.mentorSchedule.statusLabel.available',
 };
 
 /** Date của p-datepicker → 'HH:mm' bằng getHours/getMinutes (naive, KHÔNG dùng toISOString/timezone). */
@@ -78,6 +98,7 @@ function defaultPickTime(): Date {
   imports: [
     FormsModule,
     DatePicker,
+    TranslocoPipe,
     LucideAlertCircle,
     LucideCalendarClock,
     LucideCheck,
@@ -99,6 +120,7 @@ function defaultPickTime(): Date {
 })
 export class MentorScheduleComponent {
   private store = inject(MentorScheduleStore);
+  private transloco = inject(TranslocoService);
 
   /** Mentor đang quản lý lịch — component cha (màn Quản lý mentor) truyền vào. */
   readonly mentorId = input.required<string>();
@@ -141,20 +163,20 @@ export class MentorScheduleComponent {
   /** Nhãn tháng đang xem — vd "Tháng 7/2026". */
   readonly monthLabel = computed(() => {
     const anchor = this.store.monthAnchor();
-    return `Tháng ${Number(anchor.slice(5, 7))}/${anchor.slice(0, 4)}`;
+    return this.transloco.translate('system.mentorSchedule.monthLabel', {
+      month: Number(anchor.slice(5, 7)),
+      year: anchor.slice(0, 4),
+    });
   });
 
-  /** Nhãn thứ cho hàng header của grid tháng (T2→CN, khớp cột grid). */
-  readonly monthWeekdayHeaders = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+  /** Key i18n nhãn thứ cho hàng header của grid tháng (T2→CN, khớp cột grid). */
+  readonly monthWeekdayHeaders = WEEKDAY_SHORT_KEYS;
 
-  /** Nút chọn THỨ của pattern generator (index 0 = T2 … 6 = CN). */
-  readonly composeWeekdayOptions = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+  /** Key i18n nút chọn THỨ của pattern generator (index 0 = T2 … 6 = CN). */
+  readonly composeWeekdayOptions = WEEKDAY_SHORT_KEYS;
 
-  /** Select "Áp dụng trong N tuần tới" của pattern generator. */
-  readonly weeksAheadOptions: { value: number; label: string }[] = [1, 2, 4, 8, 12].map((w) => ({
-    value: w,
-    label: `${w} tuần tới`,
-  }));
+  /** Select "Áp dụng trong N tuần tới" của pattern generator (label dịch ở template). */
+  readonly weeksAheadOptions: number[] = [1, 2, 4, 8, 12];
 
   readonly today = todayStr();
 
@@ -231,7 +253,7 @@ export class MentorScheduleComponent {
   /** Heading panel — vd "Thứ 2, 14/07/2026". */
   dayHeading(date: string): string {
     const [y, m, d] = date.split('-').map(Number);
-    const weekday = WEEKDAY_FULL[new Date(y, m - 1, d).getDay()];
+    const weekday = this.transloco.translate(WEEKDAY_FULL_KEYS[new Date(y, m - 1, d).getDay()]);
     return `${weekday}, ${date.slice(8, 10)}/${date.slice(5, 7)}/${y}`;
   }
 
@@ -246,11 +268,11 @@ export class MentorScheduleComponent {
   }
 
   slotStatusLabel(slot: MentorAvailabilitySlot): string {
-    return SLOT_STATUS_LABELS[this.slotStatus(slot)];
+    return this.transloco.translate(SLOT_STATUS_LABELS[this.slotStatus(slot)]);
   }
 
   slotStatusShort(slot: MentorAvailabilitySlot): string {
-    return SLOT_STATUS_SHORT[this.slotStatus(slot)];
+    return this.transloco.translate(SLOT_STATUS_SHORT[this.slotStatus(slot)]);
   }
 
   /** Giờ bắt đầu 'HH:mm' — cắt trực tiếp từ chuỗi naive, KHÔNG parse qua Date (A1-6). */

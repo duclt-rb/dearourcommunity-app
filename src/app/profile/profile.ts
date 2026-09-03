@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AuthService } from '../core/services/auth.service';
 import { ProfileStore } from './profile.store';
 import { SidebarComponent } from './sidebar/sidebar';
@@ -7,7 +8,7 @@ import { SidebarComponent } from './sidebar/sidebar';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [SidebarComponent, RouterOutlet],
+  imports: [SidebarComponent, RouterOutlet, TranslocoPipe],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })

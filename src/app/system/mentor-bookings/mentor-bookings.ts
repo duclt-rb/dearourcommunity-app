@@ -18,6 +18,7 @@ import {
 } from '@lucide/angular';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import type {
   BookingPackageType,
   CareerStage,
@@ -47,6 +48,7 @@ import { MentorBookingsStore } from './mentor-bookings.store';
     LucidePhone,
     LucideLoaderCircle,
     Toast,
+    TranslocoPipe,
   ],
   // MessageService scope theo màn — <p-toast> trong template dùng đúng instance này
   providers: [MentorBookingsStore, MessageService],
@@ -55,6 +57,7 @@ import { MentorBookingsStore } from './mentor-bookings.store';
 })
 export default class MentorBookingsComponent {
   private store = inject(MentorBookingsStore);
+  private transloco = inject(TranslocoService);
 
   // State
   readonly isLoading = this.store.isLoading;
@@ -148,7 +151,9 @@ export default class MentorBookingsComponent {
 
   /** Label badge trạng thái — tách sub-state "chờ thanh toán" khỏi "Chờ xử lý". */
   getStatusBadgeLabel(b: MentorBooking): string {
-    return this.isAwaitingPayment(b) ? 'Đã duyệt · chờ thanh toán' : this.getStatusLabel(b.status);
+    return this.isAwaitingPayment(b)
+      ? this.transloco.translate('system.mentorBookings.awaitingPayment')
+      : this.getStatusLabel(b.status);
   }
 
   /**
@@ -161,30 +166,33 @@ export default class MentorBookingsComponent {
   }
 
   getApproveLabel(b: MentorBooking): string {
-    if (this.isAwaitingPayment(b)) return 'Gửi lại link thanh toán';
-    if (b.packageType === 'existing') return 'Duyệt (trừ 1 lượt)';
-    if (b.packageType === 'single') {
-      return 'Duyệt & gửi link thanh toán';
+    if (this.isAwaitingPayment(b)) {
+      return this.transloco.translate('system.mentorBookings.approveLabels.resend');
     }
-    return 'Duyệt';
+    if (b.packageType === 'existing') {
+      return this.transloco.translate('system.mentorBookings.approveLabels.existing');
+    }
+    if (b.packageType === 'single') {
+      return this.transloco.translate('system.mentorBookings.approveLabels.single');
+    }
+    return this.transloco.translate('system.mentorBookings.approveLabels.default');
   }
 
   /** Tooltip nút duyệt nhanh trên bảng. */
   getApproveTooltip(b: MentorBooking): string {
     if (this.isAwaitingPayment(b)) {
-      return 'Booking đã duyệt, đang chờ thanh toán — bấm để gửi lại mail link thanh toán';
+      return this.transloco.translate('system.mentorBookings.tooltips.resend');
     }
-    return this.getApproveLabel(b) + ' — chốt tất cả khung giờ đề xuất';
+    const suffix = this.transloco.translate('system.mentorBookings.tooltips.approveAllSuffix');
+    return `${this.getApproveLabel(b)} ${suffix}`;
   }
 
   getStatusLabel(status: MentorBookingStatus): string {
     switch (status) {
       case 'pending':
-        return 'Chờ xử lý';
       case 'approved':
-        return 'Đã duyệt';
       case 'rejected':
-        return 'Đã từ chối';
+        return this.transloco.translate(`system.mentorBookings.status.${status}`);
       default:
         return status;
     }
@@ -193,47 +201,36 @@ export default class MentorBookingsComponent {
   getCareerStageLabel(value: CareerStage | null): string {
     switch (value) {
       case 'student':
-        return 'Sinh viên';
       case 'fresh-graduate':
-        return 'Mới tốt nghiệp';
       case 'working-under-2':
-        return 'Đi làm dưới 2 năm';
       case 'working-2-to-5':
-        return 'Đi làm 2–5 năm';
       case 'working-over-5':
-        return 'Đi làm trên 5 năm';
+        return this.transloco.translate(`system.mentorBookings.careerStage.${value}`);
       default:
-        return 'Chưa cung cấp';
+        return this.transloco.translate('system.mentorBookings.careerStage.notProvided');
     }
   }
 
   getPackageTypeLabel(value: BookingPackageType | null): string {
     switch (value) {
       case 'single':
-        return 'Buổi lẻ';
       case 'existing':
-        return 'Dùng lượt có sẵn';
+        return this.transloco.translate(`system.mentorBookings.packageType.${value}`);
       default:
-        return 'Chưa xác định';
+        return this.transloco.translate('system.mentorBookings.packageType.unknown');
     }
   }
 
   getTopicLabel(value: DiscussionTopic): string {
     switch (value) {
       case 'career-orientation':
-        return 'Định hướng nghề nghiệp';
       case 'esg-application':
-        return 'Ứng dụng ESG';
       case 'career-transition':
-        return 'Chuyển hướng sự nghiệp';
       case 'skill-development':
-        return 'Phát triển kỹ năng';
       case 'job-application':
-        return 'Ứng tuyển / tìm việc';
       case 'startup':
-        return 'Khởi nghiệp';
       case 'other':
-        return 'Khác';
+        return this.transloco.translate(`system.mentorBookings.topics.${value}`);
       default:
         return value;
     }

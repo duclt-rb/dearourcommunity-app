@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { OrganizationService } from '../../core/services/organization.service';
 import { PackagesService } from '../../core/services/packages.service';
 import { PurchasesService } from '../../core/services/purchases.service';
@@ -33,7 +34,7 @@ interface AssignableCourse {
 @Component({
   selector: 'app-profile-organization',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoPipe],
   templateUrl: './organization.html',
   styleUrl: './organization.css',
 })
@@ -41,6 +42,7 @@ export default class OrganizationComponent implements OnInit {
   private orgService = inject(OrganizationService);
   private packageService = inject(PackagesService);
   private purchasesService = inject(PurchasesService);
+  private readonly transloco = inject(TranslocoService);
   store = inject(ProfileStore);
 
   // States
@@ -129,7 +131,9 @@ export default class OrganizationComponent implements OnInit {
     }
     return [...remainingByCourse.entries()].map(([courseId, remaining]) => ({
       courseId,
-      title: pool.find((c) => c.courseId === courseId)?.title ?? `Khóa học #${courseId}`,
+      title:
+        pool.find((c) => c.courseId === courseId)?.title ??
+        this.transloco.translate('profile.organization.courseFallback', { id: courseId }),
       remaining,
     }));
   });
@@ -171,7 +175,7 @@ export default class OrganizationComponent implements OnInit {
       const msg =
         err instanceof Error
           ? err.message
-          : 'Không thể tải thông tin doanh nghiệp. Vui lòng thử lại sau.';
+          : this.transloco.translate('profile.organization.loadError');
       this.errorMessage.set(msg);
     } finally {
       this.loading.set(false);
@@ -221,7 +225,11 @@ export default class OrganizationComponent implements OnInit {
         if (!pool.has(courseId)) {
           pool.set(courseId, {
             courseId,
-            title: pc.course?.postTitle ?? `Khóa học #${pc.wpCourseId}`,
+            title:
+              pc.course?.postTitle ??
+              this.transloco.translate('profile.organization.courseFallback', {
+                id: pc.wpCourseId,
+              }),
           });
         }
       }
@@ -248,9 +256,12 @@ export default class OrganizationComponent implements OnInit {
       const member = this.assignableMembers().find((m) => m.userId === memberUserId);
       const course = this.coursePool().find((c) => c.courseId === courseId);
       this.successMessage.set(
-        `Đã gán khoá "${course?.title ?? courseId}" cho ${
-          member ? this.getMemberDisplayName(member) : 'thành viên'
-        } thành công!`,
+        this.transloco.translate('profile.organization.assignSuccess', {
+          course: course?.title ?? courseId,
+          member: member
+            ? this.getMemberDisplayName(member)
+            : this.transloco.translate('profile.organization.memberFallback'),
+        }),
       );
       this.assignMemberUserId.set('');
       this.assignCourseId.set('');
@@ -261,7 +272,9 @@ export default class OrganizationComponent implements OnInit {
       // Hiển thị message lỗi từ BE (vd hết lượt / member đã có khoá này)
       console.error('Failed to assign course selection:', err);
       const msg =
-        err instanceof Error ? err.message : 'Không thể gán khoá cho thành viên. Vui lòng thử lại.';
+        err instanceof Error
+          ? err.message
+          : this.transloco.translate('profile.organization.assignError');
       this.errorMessage.set(msg);
     } finally {
       this.assignLoading.set(false);
@@ -277,7 +290,8 @@ export default class OrganizationComponent implements OnInit {
   /** Tên khoá trong bảng đã gán (fallback #id nếu khoá không còn trong pool). */
   getSelectionCourseTitle(wpCourseId: number): string {
     return (
-      this.coursePool().find((c) => c.courseId === wpCourseId)?.title ?? `Khóa học #${wpCourseId}`
+      this.coursePool().find((c) => c.courseId === wpCourseId)?.title ??
+      this.transloco.translate('profile.organization.courseFallback', { id: wpCourseId })
     );
   }
 
@@ -288,14 +302,12 @@ export default class OrganizationComponent implements OnInit {
 
     const org = this.activeOrg();
     if (!org) {
-      this.errorMessage.set('Không tìm thấy thông tin doanh nghiệp.');
+      this.errorMessage.set(this.transloco.translate('profile.organization.orgNotFound'));
       return;
     }
 
     if (this.slotsUsed() >= this.maxSlots()) {
-      this.errorMessage.set(
-        'Số lượng thành viên hoạt động đã đạt giới hạn tối đa của gói học phí.',
-      );
+      this.errorMessage.set(this.transloco.translate('profile.organization.seatsLimitReached'));
       return;
     }
 
@@ -306,7 +318,7 @@ export default class OrganizationComponent implements OnInit {
     try {
       await this.orgService.inviteMember(org.id, { email });
       this.successMessage.set(
-        `Đã gửi lời mời tham gia doanh nghiệp tới email ${email} thành công!`,
+        this.transloco.translate('profile.organization.inviteSuccess', { email }),
       );
       this.inviteEmail.set('');
 
@@ -316,7 +328,9 @@ export default class OrganizationComponent implements OnInit {
     } catch (err) {
       console.error('Failed to invite member:', err);
       const msg =
-        err instanceof Error ? err.message : 'Có lỗi xảy ra khi gửi lời mời. Vui lòng thử lại.';
+        err instanceof Error
+          ? err.message
+          : this.transloco.translate('profile.organization.inviteError');
       this.errorMessage.set(msg);
     } finally {
       this.actionLoading.set(false);
@@ -328,7 +342,9 @@ export default class OrganizationComponent implements OnInit {
     if (!org) return;
 
     if (
-      !confirm(`Bạn có chắc chắn muốn xóa thành viên ${memberEmail} ra khỏi doanh nghiệp không?`)
+      !confirm(
+        this.transloco.translate('profile.organization.removeConfirm', { email: memberEmail }),
+      )
     ) {
       return;
     }
@@ -339,7 +355,7 @@ export default class OrganizationComponent implements OnInit {
 
     try {
       await this.orgService.removeMember(org.id, memberId);
-      this.successMessage.set(`Đã xóa thành viên khỏi doanh nghiệp thành công!`);
+      this.successMessage.set(this.transloco.translate('profile.organization.removeSuccess'));
 
       // Reload members list
       const membersList = await this.orgService.getMembers(org.id);
@@ -347,7 +363,9 @@ export default class OrganizationComponent implements OnInit {
     } catch (err) {
       console.error('Failed to remove member:', err);
       const msg =
-        err instanceof Error ? err.message : 'Không thể xóa thành viên. Vui lòng thử lại sau.';
+        err instanceof Error
+          ? err.message
+          : this.transloco.translate('profile.organization.removeError');
       this.errorMessage.set(msg);
     } finally {
       this.actionLoading.set(false);
@@ -359,11 +377,15 @@ export default class OrganizationComponent implements OnInit {
     if (member.user?.wpUser?.displayName) {
       return member.user.wpUser.displayName;
     }
-    return member.role === 'owner' ? 'Chủ sở hữu' : 'Thành viên';
+    return this.transloco.translate(
+      member.role === 'owner'
+        ? 'profile.organization.roleOwner'
+        : 'profile.organization.roleMember',
+    );
   }
 
   // Get email from nested wpUser structure
   getMemberEmail(member: OrganizationMember): string {
-    return member.user?.wpUser?.userEmail || 'N/A';
+    return member.user?.wpUser?.userEmail || this.transloco.translate('common.notAvailable');
   }
 }

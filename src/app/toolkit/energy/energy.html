@@ -3,23 +3,25 @@
   <header class="energy__bar">
     <div class="energy__bar-inner">
       <app-logo height="72px" class="energy__logo" />
-      <span class="energy__bar-progress">{{ progressPercent() }}% hoàn thành</span>
+      <span class="energy__bar-progress">
+        {{ 'toolkit.common.percentComplete' | transloco: { percent: progressPercent() } }}
+      </span>
     </div>
     <div class="energy__stepper">
       @for (step of steps; track step.kind; let i = $index) {
-        <button
-          type="button"
-          class="energy__step"
-          [class.is-active]="i === store.currentStep()"
-          [class.is-done]="i < store.currentStep()"
-          (click)="goToStep(i)"
-        >
-          <span
-            class="energy__step-bar"
-            [style.background]="i <= store.currentStep() ? 'var(--color-primary)' : null"
-          ></span>
-          <span class="energy__step-label">{{ step.label }}</span>
-        </button>
+      <button
+        type="button"
+        class="energy__step"
+        [class.is-active]="i === store.currentStep()"
+        [class.is-done]="i < store.currentStep()"
+        (click)="goToStep(i)"
+      >
+        <span
+          class="energy__step-bar"
+          [style.background]="i <= store.currentStep() ? 'var(--color-primary)' : null"
+        ></span>
+        <span class="energy__step-label">{{ step.label }}</span>
+      </button>
       }
     </div>
   </header>
@@ -27,681 +29,673 @@
   <main class="energy__main">
     <!-- Intro for first step only -->
     @if (store.currentStep() === 0) {
-      <div class="energy__intro">
-        <p class="energy__sector">{{ config.sector }}</p>
-        <h1 class="energy__title">{{ config.name }}</h1>
+    <div class="energy__intro">
+      <p class="energy__sector">{{ config.sector }}</p>
+      <h1 class="energy__title">{{ config.name }}</h1>
+    </div>
+    } @switch (currentStepData().kind) {
+    <!-- ════ STEP: ENERGY MAP ════ -->
+    @case ('map') {
+    <section class="energy__section">
+      <h2 class="energy__section-title">{{ 'toolkit.energy.mapTitle' | transloco }}</h2>
+      <p class="energy__section-note">{{ 'toolkit.energy.mapNote' | transloco }}</p>
+
+      <h3 class="energy__group-title">{{ 'toolkit.energy.partATitle' | transloco }}</h3>
+      <div class="energy__table-scroll">
+        <table class="energy__table">
+          <thead>
+            <tr>
+              <th class="energy__table-head-cell">{{ 'toolkit.common.month' | transloco }}</th>
+              <th>{{ 'toolkit.energy.elecKwh' | transloco }}</th>
+              <th>{{ 'toolkit.energy.elecCost' | transloco }}</th>
+              <th>{{ 'toolkit.energy.waterM3' | transloco }}</th>
+              <th>{{ 'toolkit.energy.waterCost' | transloco }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (m of months; track m) {
+            <tr>
+              <td class="energy__table-head-cell">{{ monthFullLabels[m] }}</td>
+              <td>
+                <input
+                  class="energy__cell"
+                  type="text"
+                  inputmode="numeric"
+                  [value]="store.mapKwhOf(m) ?? ''"
+                  (input)="store.setMapKwh(m, toNum($any($event.target).value))"
+                />
+              </td>
+              <td class="energy__cell-money">
+                <app-number-field
+                  [currency]="true"
+                  [value]="store.mapElecCostOf(m)"
+                  (valueChange)="store.setMapElecCost(m, $event)"
+                />
+              </td>
+              <td>
+                <input
+                  class="energy__cell"
+                  type="text"
+                  inputmode="numeric"
+                  [value]="store.mapWaterOf(m) ?? ''"
+                  (input)="store.setMapWater(m, toNum($any($event.target).value))"
+                />
+              </td>
+              <td class="energy__cell-money">
+                <app-number-field
+                  [currency]="true"
+                  [value]="store.mapWaterCostOf(m)"
+                  (valueChange)="store.setMapWaterCost(m, $event)"
+                />
+              </td>
+            </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <td class="energy__table-head-cell">{{ 'toolkit.energy.annualRow' | transloco }}</td>
+              <td class="energy__num">{{ num(store.mapTotals().annualKwh) }}</td>
+              <td class="energy__num">{{ vnd(store.mapTotals().annualElecCost) }}</td>
+              <td class="energy__num">{{ num(store.mapTotals().annualWater) }}</td>
+              <td class="energy__num">{{ vnd(store.mapTotals().annualWaterCost) }}</td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
+
+      <div class="energy__callout-row energy__callout-row--two">
+        <div class="energy__callout">
+          <span>{{ 'toolkit.energy.avgElecPrice' | transloco }}</span>
+          <strong>
+            {{ vnd(store.mapTotals().avgPricePerKwh) }} {{ 'common.vnd' | transloco }}/kWh
+          </strong>
+        </div>
+        <div class="energy__callout">
+          <span>{{ 'toolkit.energy.avgMonthlyCost' | transloco }}</span>
+          <strong>
+            {{ vnd(store.mapTotals().avgMonthlyCost) }} {{ 'common.vnd' | transloco }}
+          </strong>
+        </div>
+      </div>
+
+      <h3 class="energy__group-title energy__group-title--spaced">
+        {{ 'toolkit.energy.partBTitle' | transloco }}
+      </h3>
+      <p class="energy__section-note">{{ 'toolkit.energy.partBNote' | transloco }}</p>
+      <div class="energy__table-scroll">
+        <table class="energy__table">
+          <thead>
+            <tr>
+              <th class="energy__table-head-cell">
+                {{ 'toolkit.energy.systemHeader' | transloco }}
+              </th>
+              <th>{{ 'toolkit.energy.allocPct' | transloco }}</th>
+              <th>{{ 'toolkit.energy.estCostMonth' | transloco }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of store.allocationRows().rows; track row.id) {
+            <tr>
+              <td class="energy__table-head-cell">{{ row.label }}</td>
+              <td>
+                <input
+                  class="energy__cell"
+                  type="text"
+                  inputmode="numeric"
+                  [value]="store.allocationOf(row.id) ?? ''"
+                  (input)="store.setAllocation(row.id, toNum($any($event.target).value))"
+                />
+              </td>
+              <td class="energy__num">{{ vnd(row.estCost) }}</td>
+            </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <td class="energy__table-head-cell">
+                {{ 'toolkit.energy.allocTotalRow' | transloco }}
+              </td>
+              <td
+                class="energy__num"
+                [class.energy__num--warn]="store.allocationRows().totalPct !== 100"
+              >
+                {{ num(store.allocationRows().totalPct, 0) }}%
+              </td>
+              <td class="energy__num">{{ vnd(store.mapTotals().avgMonthlyCost) }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      @if (store.allocationRows().totalPct !== 100 && store.allocationRows().totalPct > 0) {
+      <p class="energy__insight">
+        {{ 'toolkit.energy.allocWarning' | transloco: { pct: num(store.allocationRows().totalPct, 0)
+        } }}
+      </p>
+      }
+    </section>
     }
-    @switch (currentStepData().kind) {
-      <!-- ════ STEP: ENERGY MAP ════ -->
-      @case ('map') {
-        <section class="energy__section">
-          <h2 class="energy__section-title">Bản đồ Năng lượng</h2>
-          <p class="energy__section-note">
-            Phần A: nhập tiêu thụ điện & nước 12 tháng. Phần B: phân bổ chi phí điện theo hệ thống
-            để tìm "điểm nóng" tốn điện nhất.
-          </p>
 
-          <h3 class="energy__group-title">Phần A — Tiêu thụ điện & nước 12 tháng</h3>
-          <div class="energy__table-scroll">
-            <table class="energy__table">
-              <thead>
-                <tr>
-                  <th class="energy__table-head-cell">Tháng</th>
-                  <th>Điện (kWh)</th>
-                  <th>Tiền điện (VNĐ)</th>
-                  <th>Nước (m³)</th>
-                  <th>Tiền nước (VNĐ)</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (m of months; track m) {
-                  <tr>
-                    <td class="energy__table-head-cell">{{ monthFullLabels[m] }}</td>
-                    <td>
-                      <input
-                        class="energy__cell"
-                        type="text"
-                        inputmode="numeric"
-                        [value]="store.mapKwhOf(m) ?? ''"
-                        (input)="store.setMapKwh(m, toNum($any($event.target).value))"
-                      />
-                    </td>
-                    <td class="energy__cell-money">
-                      <app-number-field
-                        [currency]="true"
-                        [value]="store.mapElecCostOf(m)"
-                        (valueChange)="store.setMapElecCost(m, $event)"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        class="energy__cell"
-                        type="text"
-                        inputmode="numeric"
-                        [value]="store.mapWaterOf(m) ?? ''"
-                        (input)="store.setMapWater(m, toNum($any($event.target).value))"
-                      />
-                    </td>
-                    <td class="energy__cell-money">
-                      <app-number-field
-                        [currency]="true"
-                        [value]="store.mapWaterCostOf(m)"
-                        (valueChange)="store.setMapWaterCost(m, $event)"
-                      />
-                    </td>
-                  </tr>
-                }
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td class="energy__table-head-cell">Cả năm</td>
-                  <td class="energy__num">{{ num(store.mapTotals().annualKwh) }}</td>
-                  <td class="energy__num">{{ vnd(store.mapTotals().annualElecCost) }}</td>
-                  <td class="energy__num">{{ num(store.mapTotals().annualWater) }}</td>
-                  <td class="energy__num">{{ vnd(store.mapTotals().annualWaterCost) }}</td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
+    <!-- ════ STEP: PRACTICES ASSESSMENT ════ -->
+    @case ('assessment') {
+    <section class="energy__section">
+      <h2 class="energy__section-title">{{ 'toolkit.energy.assessmentTitle' | transloco }}</h2>
+      <p class="energy__section-note">{{ 'toolkit.energy.assessmentNote' | transloco }}</p>
 
-          <div class="energy__callout-row energy__callout-row--two">
-            <div class="energy__callout">
-              <span>Đơn giá điện bình quân</span>
-              <strong>{{ vnd(store.mapTotals().avgPricePerKwh) }} VNĐ/kWh</strong>
+      @for (group of config.assessmentGroups; track group.id) {
+      <div class="energy__qgroup">
+        <h3 class="energy__group-title">{{ group.topic }}</h3>
+        <ul class="energy__questions">
+          @for (q of group.questions; track q.id) {
+          <li class="energy__question">
+            <div class="energy__question-body">
+              <p class="energy__question-text">{{ q.text }}</p>
+              <p class="energy__question-risk">
+                <svg lucideTriangleAlert [size]="13" strokeWidth="1.8"></svg>
+                <span>{{ q.risk }}</span>
+              </p>
+              @if (q.ref) {
+              <p class="energy__question-ref">{{ q.ref }}</p>
+              }
             </div>
-            <div class="energy__callout">
-              <span>Chi phí điện bình quân / tháng</span>
-              <strong>{{ vnd(store.mapTotals().avgMonthlyCost) }} VNĐ</strong>
-            </div>
-          </div>
-
-          <h3 class="energy__group-title energy__group-title--spaced">
-            Phần B — Phân bổ chi phí điện theo hệ thống
-          </h3>
-          <p class="energy__section-note">
-            Ước tính % chi phí điện mỗi hệ thống. Tổng nên đạt 100%. Chi phí ước tính/tháng tự tính
-            theo chi phí điện bình quân.
-          </p>
-          <div class="energy__table-scroll">
-            <table class="energy__table">
-              <thead>
-                <tr>
-                  <th class="energy__table-head-cell">Hệ thống / hạng mục</th>
-                  <th>% phân bổ</th>
-                  <th>Chi phí ước tính / tháng (VNĐ)</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (row of store.allocationRows().rows; track row.id) {
-                  <tr>
-                    <td class="energy__table-head-cell">{{ row.label }}</td>
-                    <td>
-                      <input
-                        class="energy__cell"
-                        type="text"
-                        inputmode="numeric"
-                        [value]="store.allocationOf(row.id) ?? ''"
-                        (input)="store.setAllocation(row.id, toNum($any($event.target).value))"
-                      />
-                    </td>
-                    <td class="energy__num">{{ vnd(row.estCost) }}</td>
-                  </tr>
-                }
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td class="energy__table-head-cell">Tổng cộng (nên = 100%)</td>
-                  <td
-                    class="energy__num"
-                    [class.energy__num--warn]="store.allocationRows().totalPct !== 100"
-                  >
-                    {{ num(store.allocationRows().totalPct, 0) }}%
-                  </td>
-                  <td class="energy__num">{{ vnd(store.mapTotals().avgMonthlyCost) }}</td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-          @if (store.allocationRows().totalPct !== 100 && store.allocationRows().totalPct > 0) {
-            <p class="energy__insight">
-              Tổng phân bổ đang là {{ num(store.allocationRows().totalPct, 0) }}% — điều chỉnh để
-              đạt 100% giúp ước tính chi phí từng hệ thống chính xác hơn.
-            </p>
-          }
-        </section>
-      }
-
-      <!-- ════ STEP: PRACTICES ASSESSMENT ════ -->
-      @case ('assessment') {
-        <section class="energy__section">
-          <h2 class="energy__section-title">Đánh giá thực hành quản lý năng lượng</h2>
-          <p class="energy__section-note">
-            Chấm trung thực: Đầy đủ · Một phần · Chưa có · N/A (Không áp dụng). 40 câu · 6 nhóm.
-          </p>
-
-          @for (group of config.assessmentGroups; track group.id) {
-            <div class="energy__qgroup">
-              <h3 class="energy__group-title">{{ group.topic }}</h3>
-              <ul class="energy__questions">
-                @for (q of group.questions; track q.id) {
-                  <li class="energy__question">
-                    <div class="energy__question-body">
-                      <p class="energy__question-text">{{ q.text }}</p>
-                      <p class="energy__question-risk">
-                        <svg lucideTriangleAlert [size]="13" strokeWidth="1.8"></svg>
-                        <span>{{ q.risk }}</span>
-                      </p>
-                      @if (q.ref) {
-                        <p class="energy__question-ref">{{ q.ref }}</p>
-                      }
-                    </div>
-                    <app-segmented-field
-                      class="energy__question-scale"
-                      [options]="assessmentOptions"
-                      [ariaLabel]="q.text"
-                      [value]="store.assessmentOf(q.id)"
-                      (valueChange)="store.setAssessment(q.id, $event)"
-                    />
-                  </li>
-                }
-              </ul>
-            </div>
-          }
-
-          <h3 class="energy__group-title energy__group-title--spaced">Tổng kết điểm đánh giá</h3>
-          <div class="energy__table-scroll">
-            <table class="energy__table">
-              <thead>
-                <tr>
-                  <th class="energy__table-head-cell">Nhóm</th>
-                  <th>Đầy đủ</th>
-                  <th>Một phần</th>
-                  <th>Chưa có</th>
-                  <th>N/A</th>
-                  <th class="energy__col-priority">Ưu tiên</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (r of store.assessmentResults(); track r.id) {
-                  <tr>
-                    <td class="energy__table-head-cell">{{ r.topic }}</td>
-                    <td class="energy__num">{{ r.full }}</td>
-                    <td class="energy__num">{{ r.partial }}</td>
-                    <td class="energy__num">{{ r.none }}</td>
-                    <td class="energy__num">{{ r.na }}</td>
-                    <td class="energy__col-priority">
-                      <app-select-field
-                        [options]="priorityOptions"
-                        placeholder="— Chọn —"
-                        [value]="store.assessmentPriorityOf(r.id)"
-                        (valueChange)="store.setAssessmentPriority(r.id, $event)"
-                      />
-                    </td>
-                  </tr>
-                }
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td class="energy__table-head-cell">Tổng cộng</td>
-                  <td class="energy__num">{{ store.assessmentTotals().full }}</td>
-                  <td class="energy__num">{{ store.assessmentTotals().partial }}</td>
-                  <td class="energy__num">{{ store.assessmentTotals().none }}</td>
-                  <td class="energy__num">{{ store.assessmentTotals().na }}</td>
-                  <td class="energy__col-priority"></td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-
-          <div class="energy__callout">
-            <span>Điểm quản lý năng lượng (%)</span>
-            <strong>
-              <span class="energy__dot" [class]="'is-' + store.assessmentOverallBand().tone"></span>
-              {{ store.assessmentOverall() }}% · {{ store.assessmentOverallBand().label }}
-            </strong>
-          </div>
-        </section>
-      }
-
-      <!-- ════ STEP: EQUIPMENT INVENTORY ════ -->
-      @case ('equipment') {
-        <section class="energy__section">
-          <h2 class="energy__section-title">Kiểm kê thiết bị tiêu thụ điện</h2>
-          <p class="energy__section-note">
-            Bảng tự tính kWh/tháng & chi phí: kWh = SL × công suất × giờ/ngày × ngày/tháng ÷ 1000.
-          </p>
-
-          <div class="energy__assumption">
-            <app-number-field
-              label="Đơn giá điện (VNĐ/kWh)"
-              [currency]="true"
-              [value]="store.rate()"
-              [placeholder]="vnd(config.defaultRate)"
-              (valueChange)="store.setRate($event)"
+            <app-segmented-field
+              class="energy__question-scale"
+              [options]="assessmentOptions"
+              [ariaLabel]="q.text"
+              [value]="store.assessmentOf(q.id)"
+              (valueChange)="store.setAssessment(q.id, $event)"
             />
-          </div>
+          </li>
+          }
+        </ul>
+      </div>
+      }
 
-          <div class="energy__table-scroll">
-            <table class="energy__table">
-              <thead>
-                <tr>
-                  <th class="energy__table-head-cell">Thiết bị / khu vực</th>
-                  <th>Số lượng</th>
-                  <th>Công suất (kW/cái)</th>
-                  <th>Giờ chạy (giờ/ngày)</th>
-                  <th>Ngày/tháng</th>
-                  <th>Điện (kWh/tháng)</th>
-                  <th>Chi phí (VNĐ/tháng)</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (row of store.equipmentRows().rows; track row.id) {
-                  <tr>
-                    <td class="energy__table-head-cell">{{ row.label }}</td>
-                    <td>
-                      <input
-                        class="energy__cell"
-                        type="text"
-                        inputmode="numeric"
-                        [value]="store.equipmentOf(row.id, 'qty') ?? ''"
-                        (input)="
+      <h3 class="energy__group-title energy__group-title--spaced">
+        {{ 'toolkit.common.assessmentSummaryTitle' | transloco }}
+      </h3>
+      <div class="energy__table-scroll">
+        <table class="energy__table">
+          <thead>
+            <tr>
+              <th class="energy__table-head-cell">{{ 'toolkit.common.group' | transloco }}</th>
+              <th>{{ 'toolkit.fields.scoreFull' | transloco }}</th>
+              <th>{{ 'toolkit.fields.scorePartial' | transloco }}</th>
+              <th>{{ 'toolkit.fields.scoreNone' | transloco }}</th>
+              <th>{{ 'common.notAvailable' | transloco }}</th>
+              <th class="energy__col-priority">{{ 'toolkit.fields.priority' | transloco }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of store.assessmentResults(); track r.id) {
+            <tr>
+              <td class="energy__table-head-cell">{{ r.topic }}</td>
+              <td class="energy__num">{{ r.full }}</td>
+              <td class="energy__num">{{ r.partial }}</td>
+              <td class="energy__num">{{ r.none }}</td>
+              <td class="energy__num">{{ r.na }}</td>
+              <td class="energy__col-priority">
+                <app-select-field
+                  [options]="priorityOptions"
+                  [value]="store.assessmentPriorityOf(r.id)"
+                  (valueChange)="store.setAssessmentPriority(r.id, $event)"
+                />
+              </td>
+            </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <td class="energy__table-head-cell">{{ 'toolkit.common.grandTotal' | transloco }}</td>
+              <td class="energy__num">{{ store.assessmentTotals().full }}</td>
+              <td class="energy__num">{{ store.assessmentTotals().partial }}</td>
+              <td class="energy__num">{{ store.assessmentTotals().none }}</td>
+              <td class="energy__num">{{ store.assessmentTotals().na }}</td>
+              <td class="energy__col-priority"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="energy__callout">
+        <span>{{ 'toolkit.energy.managementScore' | transloco }}</span>
+        <strong>
+          <span class="energy__dot" [class]="'is-' + store.assessmentOverallBand().tone"></span>
+          {{ store.assessmentOverall() }}% · {{ store.assessmentOverallBand().label }}
+        </strong>
+      </div>
+    </section>
+    }
+
+    <!-- ════ STEP: EQUIPMENT INVENTORY ════ -->
+    @case ('equipment') {
+    <section class="energy__section">
+      <h2 class="energy__section-title">{{ 'toolkit.energy.equipmentTitle' | transloco }}</h2>
+      <p class="energy__section-note">{{ 'toolkit.energy.equipmentNote' | transloco }}</p>
+
+      <div class="energy__assumption">
+        <app-number-field
+          [label]="'toolkit.energy.rateLabel' | transloco"
+          [currency]="true"
+          [value]="store.rate()"
+          [placeholder]="vnd(config.defaultRate)"
+          (valueChange)="store.setRate($event)"
+        />
+      </div>
+
+      <div class="energy__table-scroll">
+        <table class="energy__table">
+          <thead>
+            <tr>
+              <th class="energy__table-head-cell">
+                {{ 'toolkit.energy.equipmentHeader' | transloco }}
+              </th>
+              <th>{{ 'toolkit.energy.qtyHeader' | transloco }}</th>
+              <th>{{ 'toolkit.energy.powerHeader' | transloco }}</th>
+              <th>{{ 'toolkit.energy.hoursHeader' | transloco }}</th>
+              <th>{{ 'toolkit.energy.daysHeader' | transloco }}</th>
+              <th>{{ 'toolkit.energy.kwhMonthHeader' | transloco }}</th>
+              <th>{{ 'toolkit.energy.costMonthHeader' | transloco }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of store.equipmentRows().rows; track row.id) {
+            <tr>
+              <td class="energy__table-head-cell">{{ row.label }}</td>
+              <td>
+                <input
+                  class="energy__cell"
+                  type="text"
+                  inputmode="numeric"
+                  [value]="store.equipmentOf(row.id, 'qty') ?? ''"
+                  (input)="
                           store.setEquipment(row.id, 'qty', toNum($any($event.target).value))
                         "
-                      />
-                    </td>
-                    <td>
-                      <input
-                        class="energy__cell"
-                        type="text"
-                        inputmode="decimal"
-                        [value]="store.equipmentOf(row.id, 'kw') ?? ''"
-                        (input)="store.setEquipment(row.id, 'kw', toNum($any($event.target).value))"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        class="energy__cell"
-                        type="text"
-                        inputmode="decimal"
-                        [value]="store.equipmentOf(row.id, 'hours') ?? ''"
-                        (input)="
+                />
+              </td>
+              <td>
+                <input
+                  class="energy__cell"
+                  type="text"
+                  inputmode="decimal"
+                  [value]="store.equipmentOf(row.id, 'kw') ?? ''"
+                  (input)="store.setEquipment(row.id, 'kw', toNum($any($event.target).value))"
+                />
+              </td>
+              <td>
+                <input
+                  class="energy__cell"
+                  type="text"
+                  inputmode="decimal"
+                  [value]="store.equipmentOf(row.id, 'hours') ?? ''"
+                  (input)="
                           store.setEquipment(row.id, 'hours', toNum($any($event.target).value))
                         "
-                      />
-                    </td>
-                    <td>
-                      <input
-                        class="energy__cell"
-                        type="text"
-                        inputmode="numeric"
-                        [value]="store.equipmentOf(row.id, 'days') ?? ''"
-                        (input)="
+                />
+              </td>
+              <td>
+                <input
+                  class="energy__cell"
+                  type="text"
+                  inputmode="numeric"
+                  [value]="store.equipmentOf(row.id, 'days') ?? ''"
+                  (input)="
                           store.setEquipment(row.id, 'days', toNum($any($event.target).value))
                         "
-                      />
-                    </td>
-                    <td class="energy__num">{{ num(row.kwh) }}</td>
-                    <td class="energy__num">{{ vnd(row.cost) }}</td>
-                  </tr>
-                }
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td class="energy__table-head-cell">Tổng cộng</td>
-                  <td colspan="4"></td>
-                  <td class="energy__num">{{ num(store.equipmentRows().totalKwh) }}</td>
-                  <td class="energy__num">{{ vnd(store.equipmentRows().totalCost) }}</td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-
-          <p class="energy__insight">
-            Mẹo: so sánh tổng kWh kiểm kê ({{ num(store.equipmentRows().totalKwh) }} kWh/tháng) với
-            tiêu thụ thực tế trung bình ở Bản đồ Năng lượng ({{
-              num(store.mapTotals().annualKwh / 12)
-            }}
-            kWh/tháng) — chênh lệch lớn = có tải ẩn/thất thoát cần tìm.
-          </p>
-        </section>
-      }
-
-      <!-- ════ STEP: SAVINGS / ROI FINDER ════ -->
-      @case ('savings') {
-        <section class="energy__section">
-          <h2 class="energy__section-title">Cơ hội tiết kiệm năng lượng (ROI Finder)</h2>
-          <p class="energy__section-note">
-            Nhập chi phí đầu tư & ước tính tiết kiệm/năm cho từng giải pháp. Hoàn vốn (năm) = đầu tư
-            ÷ tiết kiệm/năm — số càng nhỏ càng ưu tiên.
-          </p>
-
-          <div class="energy__table-scroll">
-            <table class="energy__table">
-              <thead>
-                <tr>
-                  <th class="energy__table-head-cell">Giải pháp</th>
-                  <th>Mức đầu tư</th>
-                  <th>Chi phí đầu tư (VNĐ)</th>
-                  <th>Tiết kiệm/năm (VNĐ)</th>
-                  <th>Hoàn vốn (năm)</th>
-                  <th class="energy__col-priority">Ưu tiên</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (row of store.savingsRows().rows; track row.id) {
-                  <tr>
-                    <td class="energy__table-head-cell energy__table-head-cell--wide">
-                      {{ row.label }}
-                    </td>
-                    <td class="energy__num">{{ row.invest }}</td>
-                    <td class="energy__cell-money">
-                      <app-number-field
-                        [currency]="true"
-                        [value]="store.savingsOf(row.id, 'invest')"
-                        (valueChange)="store.setSavings(row.id, 'invest', $event)"
-                      />
-                    </td>
-                    <td class="energy__cell-money">
-                      <app-number-field
-                        [currency]="true"
-                        [value]="store.savingsOf(row.id, 'saving')"
-                        (valueChange)="store.setSavings(row.id, 'saving', $event)"
-                      />
-                    </td>
-                    <td class="energy__num">{{ row.payback !== null ? num(row.payback) : '—' }}</td>
-                    <td class="energy__col-priority">
-                      @if (row.priority) {
-                        <span class="energy__band">
-                          <span class="energy__dot" [class]="'is-' + row.priority.tone"></span>
-                          {{ row.priority.label }}
-                        </span>
-                      } @else {
-                        —
-                      }
-                    </td>
-                  </tr>
-                }
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td class="energy__table-head-cell">Tổng tiềm năng tiết kiệm / năm</td>
-                  <td colspan="2"></td>
-                  <td class="energy__num">{{ vnd(store.savingsRows().totalSaving) }}</td>
-                  <td colspan="2"></td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-
-          <p class="energy__insight">
-            Ưu tiên các giải pháp đầu tư thấp & hoàn vốn nhanh (LED, sửa rò rỉ, tối ưu vận hành)
-            trước khi cân nhắc đầu tư lớn (điện mặt trời, BESS).
-          </p>
-        </section>
-      }
-
-      <!-- ════ STEP: MONTHLY TRACKING ════ -->
-      @case ('tracking') {
-        <section class="energy__section">
-          <h2 class="energy__section-title">Theo dõi năng lượng hàng tháng</h2>
-          <p class="energy__section-note">
-            Cường độ (kWh/{{ config.outputLabel }}) là chỉ số hiệu quả thật — đã chuẩn hóa theo sản
-            lượng. % thay đổi cho thấy hiệu quả cải thiện hay xấu đi theo tháng.
-          </p>
-
-          <div class="energy__table-scroll">
-            <table class="energy__table">
-              <thead>
-                <tr>
-                  <th class="energy__table-head-cell">Tháng</th>
-                  <th>Điện (kWh)</th>
-                  <th>Chi phí (VNĐ)</th>
-                  <th>Sản lượng ({{ config.outputLabel }})</th>
-                  <th>Cường độ (kWh/đv)</th>
-                  <th>% thay đổi</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (row of store.trackRows(); track row.index) {
-                  <tr>
-                    <td class="energy__table-head-cell">{{ monthFullLabels[row.index] }}</td>
-                    <td>
-                      <input
-                        class="energy__cell"
-                        type="text"
-                        inputmode="numeric"
-                        [value]="store.trackKwhOf(row.index) ?? ''"
-                        (input)="store.setTrackKwh(row.index, toNum($any($event.target).value))"
-                      />
-                    </td>
-                    <td class="energy__cell-money">
-                      <app-number-field
-                        [currency]="true"
-                        [value]="store.trackCostOf(row.index)"
-                        (valueChange)="store.setTrackCost(row.index, $event)"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        class="energy__cell"
-                        type="text"
-                        inputmode="numeric"
-                        [value]="store.trackOutputOf(row.index) ?? ''"
-                        (input)="store.setTrackOutput(row.index, toNum($any($event.target).value))"
-                      />
-                    </td>
-                    <td class="energy__num">
-                      {{ row.hasIntensity ? num(row.intensity, 2) : '—' }}
-                    </td>
-                    <td class="energy__num">
-                      @if (row.pctChange !== null) {
-                        {{ row.pctChange > 0 ? '+' : '' }}{{ row.pctChange.toFixed(0) }}%
-                      } @else {
-                        —
-                      }
-                    </td>
-                  </tr>
-                }
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td class="energy__table-head-cell">Cả năm</td>
-                  <td class="energy__num">{{ num(store.trackTotals().totalKwh) }}</td>
-                  <td class="energy__num">{{ vnd(store.trackTotals().totalCost) }}</td>
-                  <td class="energy__num">{{ num(store.trackTotals().totalOutput) }}</td>
-                  <td class="energy__num">{{ num(store.trackTotals().avgIntensity, 2) }}</td>
-                  <td class="energy__num">—</td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-
-          <div class="energy__callout-row energy__callout-row--two">
-            <div class="energy__callout">
-              <span>Tổng điện / năm</span>
-              <strong>{{ num(store.trackTotals().totalKwh) }} kWh</strong>
-            </div>
-            <div class="energy__callout">
-              <span>Cường độ trung bình</span>
-              <strong
-                >{{ num(store.trackTotals().avgIntensity, 2) }} kWh/{{ config.outputLabel }}</strong
-              >
-            </div>
-          </div>
-        </section>
-      }
-
-      <!-- ════ STEP: 90-DAY ACTION PLAN ════ -->
-      @case ('plan') {
-        <section class="energy__section">
-          <h2 class="energy__section-title">Kế hoạch hành động 90 ngày</h2>
-          <p class="energy__section-note">
-            9 hành động khởi đầu gợi ý sẵn. Chuyên gia VIoT rà soát cùng bạn theo mốc 30/60/90 ngày.
-          </p>
-
-          <div class="energy__grid2">
-            @for (f of config.planFields; track f.label) {
-              @if (f.type === 'date') {
-                <app-date-field
-                  [label]="f.label"
-                  [value]="store.planInfoOf(f.label)"
-                  (valueChange)="store.setPlanInfo(f.label, $event)"
                 />
-              } @else {
-                <app-text-field
-                  [label]="f.label"
-                  [hint]="f.hint || ''"
-                  [value]="store.planInfoOf(f.label)"
-                  (valueChange)="store.setPlanInfo(f.label, $event)"
+              </td>
+              <td class="energy__num">{{ num(row.kwh) }}</td>
+              <td class="energy__num">{{ vnd(row.cost) }}</td>
+            </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <td class="energy__table-head-cell">{{ 'toolkit.common.grandTotal' | transloco }}</td>
+              <td colspan="4"></td>
+              <td class="energy__num">{{ num(store.equipmentRows().totalKwh) }}</td>
+              <td class="energy__num">{{ vnd(store.equipmentRows().totalCost) }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <p class="energy__insight">
+        {{ 'toolkit.energy.equipmentInsight' | transloco : { inventory:
+        num(store.equipmentRows().totalKwh), actual: num(store.mapTotals().annualKwh / 12), } }}
+      </p>
+    </section>
+    }
+
+    <!-- ════ STEP: SAVINGS / ROI FINDER ════ -->
+    @case ('savings') {
+    <section class="energy__section">
+      <h2 class="energy__section-title">{{ 'toolkit.energy.savingsTitle' | transloco }}</h2>
+      <p class="energy__section-note">{{ 'toolkit.energy.savingsNote' | transloco }}</p>
+
+      <div class="energy__table-scroll">
+        <table class="energy__table">
+          <thead>
+            <tr>
+              <th class="energy__table-head-cell">
+                {{ 'toolkit.energy.solutionHeader' | transloco }}
+              </th>
+              <th>{{ 'toolkit.energy.investLevelHeader' | transloco }}</th>
+              <th>{{ 'toolkit.energy.investCostHeader' | transloco }}</th>
+              <th>{{ 'toolkit.energy.savingYearHeader' | transloco }}</th>
+              <th>{{ 'toolkit.energy.paybackHeader' | transloco }}</th>
+              <th class="energy__col-priority">{{ 'toolkit.fields.priority' | transloco }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of store.savingsRows().rows; track row.id) {
+            <tr>
+              <td class="energy__table-head-cell energy__table-head-cell--wide">{{ row.label }}</td>
+              <td class="energy__num">{{ row.invest }}</td>
+              <td class="energy__cell-money">
+                <app-number-field
+                  [currency]="true"
+                  [value]="store.savingsOf(row.id, 'invest')"
+                  (valueChange)="store.setSavings(row.id, 'invest', $event)"
                 />
-              }
-            }
-          </div>
-
-          <h3 class="energy__group-title energy__group-title--spaced">
-            Danh sách hành động — Ưu tiên theo tác động & khả thi
-          </h3>
-          <div class="energy__actions">
-            @for (a of config.actions; track a.id; let i = $index) {
-              <div class="energy__action">
-                <div class="energy__action-head">
-                  <span class="energy__action-num">{{ i + 1 }}</span>
-                  <span class="energy__action-prio" [class]="'is-' + a.priority">
-                    {{ priorityLabels[a.priority] }}
-                  </span>
-                  <span class="energy__action-target">{{ a.targetDay }}</span>
-                </div>
-                <p class="energy__action-text">{{ a.action }}</p>
-                <p class="energy__action-measure">Tiêu chí hoàn thành: {{ a.measure }}</p>
-                <div class="energy__action-fields">
-                  <app-text-field
-                    label="Người phụ trách"
-                    [value]="store.actionOf(a.id, 'owner')"
-                    (valueChange)="store.setAction(a.id, 'owner', $event)"
-                  />
-                  <app-date-field
-                    label="Ngày bắt đầu"
-                    [value]="store.actionOf(a.id, 'start')"
-                    (valueChange)="store.setAction(a.id, 'start', $event)"
-                  />
-                  <div class="energy__field">
-                    <span class="energy__field-label">Trạng thái</span>
-                    <app-segmented-field
-                      [options]="actionStatusOptions"
-                      [value]="store.actionOf(a.id, 'status')"
-                      (valueChange)="store.setAction(a.id, 'status', $event)"
-                    />
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-
-          <h3 class="energy__group-title energy__group-title--spaced">
-            Mốc rà soát cùng chuyên gia
-          </h3>
-          <div class="energy__milestones">
-            @for (m of config.reviewMilestones; track m.id) {
-              <div class="energy__milestone">
-                <div class="energy__milestone-head">
-                  <span class="energy__milestone-title">{{ m.title }}</span>
-                </div>
-                <p class="energy__milestone-check">Trọng tâm: {{ m.focus }}</p>
-                <div class="energy__milestone-field">
-                  <app-date-field
-                    label="Ngày họp"
-                    [value]="store.milestoneOf(m.id, 'meetDate')"
-                    (valueChange)="store.setMilestone(m.id, 'meetDate', $event)"
-                  />
-                </div>
-                <app-textarea-field
-                  label="Ghi chú của chuyên gia"
-                  placeholder="Ghi chú từ buổi rà soát cùng chuyên gia VIoT"
-                  [rows]="2"
-                  [value]="store.milestoneOf(m.id, 'note')"
-                  (valueChange)="store.setMilestone(m.id, 'note', $event)"
+              </td>
+              <td class="energy__cell-money">
+                <app-number-field
+                  [currency]="true"
+                  [value]="store.savingsOf(row.id, 'saving')"
+                  (valueChange)="store.setSavings(row.id, 'saving', $event)"
                 />
-              </div>
+              </td>
+              <td class="energy__num">{{ row.payback !== null ? num(row.payback) : '—' }}</td>
+              <td class="energy__col-priority">
+                @if (row.priority) {
+                <span class="energy__band">
+                  <span class="energy__dot" [class]="'is-' + row.priority.tone"></span>
+                  {{ row.priority.label }}
+                </span>
+                } @else { — }
+              </td>
+            </tr>
             }
+          </tbody>
+          <tfoot>
+            <tr>
+              <td class="energy__table-head-cell">
+                {{ 'toolkit.energy.totalSavingPotential' | transloco }}
+              </td>
+              <td colspan="2"></td>
+              <td class="energy__num">{{ vnd(store.savingsRows().totalSaving) }}</td>
+              <td colspan="2"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <p class="energy__insight">{{ 'toolkit.energy.savingsInsight' | transloco }}</p>
+    </section>
+    }
+
+    <!-- ════ STEP: MONTHLY TRACKING ════ -->
+    @case ('tracking') {
+    <section class="energy__section">
+      <h2 class="energy__section-title">{{ 'toolkit.energy.trackingTitle' | transloco }}</h2>
+      <p class="energy__section-note">
+        {{ 'toolkit.energy.trackingNote' | transloco: { output: config.outputLabel } }}
+      </p>
+
+      <div class="energy__table-scroll">
+        <table class="energy__table">
+          <thead>
+            <tr>
+              <th class="energy__table-head-cell">{{ 'toolkit.common.month' | transloco }}</th>
+              <th>{{ 'toolkit.energy.elecKwh' | transloco }}</th>
+              <th>{{ 'toolkit.energy.costVndHeader' | transloco }}</th>
+              <th>
+                {{ 'toolkit.energy.outputHeader' | transloco: { output: config.outputLabel } }}
+              </th>
+              <th>{{ 'toolkit.energy.intensityHeader' | transloco }}</th>
+              <th>{{ 'toolkit.energy.pctChangeHeader' | transloco }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of store.trackRows(); track row.index) {
+            <tr>
+              <td class="energy__table-head-cell">{{ monthFullLabels[row.index] }}</td>
+              <td>
+                <input
+                  class="energy__cell"
+                  type="text"
+                  inputmode="numeric"
+                  [value]="store.trackKwhOf(row.index) ?? ''"
+                  (input)="store.setTrackKwh(row.index, toNum($any($event.target).value))"
+                />
+              </td>
+              <td class="energy__cell-money">
+                <app-number-field
+                  [currency]="true"
+                  [value]="store.trackCostOf(row.index)"
+                  (valueChange)="store.setTrackCost(row.index, $event)"
+                />
+              </td>
+              <td>
+                <input
+                  class="energy__cell"
+                  type="text"
+                  inputmode="numeric"
+                  [value]="store.trackOutputOf(row.index) ?? ''"
+                  (input)="store.setTrackOutput(row.index, toNum($any($event.target).value))"
+                />
+              </td>
+              <td class="energy__num">{{ row.hasIntensity ? num(row.intensity, 2) : '—' }}</td>
+              <td class="energy__num">
+                @if (row.pctChange !== null) { {{ row.pctChange > 0 ? '+' : '' }}{{
+                row.pctChange.toFixed(0) }}% } @else { — }
+              </td>
+            </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <td class="energy__table-head-cell">{{ 'toolkit.energy.annualRow' | transloco }}</td>
+              <td class="energy__num">{{ num(store.trackTotals().totalKwh) }}</td>
+              <td class="energy__num">{{ vnd(store.trackTotals().totalCost) }}</td>
+              <td class="energy__num">{{ num(store.trackTotals().totalOutput) }}</td>
+              <td class="energy__num">{{ num(store.trackTotals().avgIntensity, 2) }}</td>
+              <td class="energy__num">—</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="energy__callout-row energy__callout-row--two">
+        <div class="energy__callout">
+          <span>{{ 'toolkit.energy.totalElecYear' | transloco }}</span>
+          <strong>{{ num(store.trackTotals().totalKwh) }} kWh</strong>
+        </div>
+        <div class="energy__callout">
+          <span>{{ 'toolkit.energy.avgIntensity' | transloco }}</span>
+          <strong
+            >{{ num(store.trackTotals().avgIntensity, 2) }} kWh/{{ config.outputLabel }}</strong
+          >
+        </div>
+      </div>
+    </section>
+    }
+
+    <!-- ════ STEP: 90-DAY ACTION PLAN ════ -->
+    @case ('plan') {
+    <section class="energy__section">
+      <h2 class="energy__section-title">{{ 'toolkit.common.plan90Title' | transloco }}</h2>
+      <p class="energy__section-note">{{ 'toolkit.energy.planNote' | transloco }}</p>
+
+      <div class="energy__grid2">
+        @for (f of config.planFields; track f.id) { @if (f.type === 'date') {
+        <app-date-field
+          [label]="f.label"
+          [value]="store.planInfoOf(f.id)"
+          (valueChange)="store.setPlanInfo(f.id, $event)"
+        />
+        } @else {
+        <app-text-field
+          [label]="f.label"
+          [hint]="f.hint || ''"
+          [value]="store.planInfoOf(f.id)"
+          (valueChange)="store.setPlanInfo(f.id, $event)"
+        />
+        } }
+      </div>
+
+      <h3 class="energy__group-title energy__group-title--spaced">
+        {{ 'toolkit.common.actionListTitle' | transloco }}
+      </h3>
+      <div class="energy__actions">
+        @for (a of config.actions; track a.id; let i = $index) {
+        <div class="energy__action">
+          <div class="energy__action-head">
+            <span class="energy__action-num">{{ i + 1 }}</span>
+            <span class="energy__action-prio" [class]="'is-' + a.priority">
+              {{ priorityLabels[a.priority] }}
+            </span>
+            <span class="energy__action-target">{{ a.targetDay }}</span>
           </div>
-        </section>
-      }
-
-      <!-- ════ STEP: RESULTS ════ -->
-      @case ('results') {
-        <section class="energy__section">
-          <h2 class="energy__section-title">Kết quả</h2>
-          <p class="energy__section-note">Tổng hợp từ các bước bạn vừa hoàn thành.</p>
-
-          <div class="energy__overall">
-            <div>
-              <p class="energy__overall-label">Điểm quản lý năng lượng (đánh giá thực hành)</p>
-              <p class="energy__overall-score">{{ store.assessmentOverall() }}%</p>
+          <p class="energy__action-text">{{ a.action }}</p>
+          <p class="energy__action-measure">
+            {{ 'toolkit.common.measurePrefix' | transloco }} {{ a.measure }}
+          </p>
+          <div class="energy__action-fields">
+            <app-text-field
+              [label]="'toolkit.common.owner' | transloco"
+              [value]="store.actionOf(a.id, 'owner')"
+              (valueChange)="store.setAction(a.id, 'owner', $event)"
+            />
+            <app-date-field
+              [label]="'toolkit.common.startDate' | transloco"
+              [value]="store.actionOf(a.id, 'start')"
+              (valueChange)="store.setAction(a.id, 'start', $event)"
+            />
+            <div class="energy__field">
+              <span class="energy__field-label"> {{ 'toolkit.common.status' | transloco }} </span>
+              <app-segmented-field
+                [options]="actionStatusOptions"
+                [value]="store.actionOf(a.id, 'status')"
+                (valueChange)="store.setAction(a.id, 'status', $event)"
+              />
             </div>
-            <p class="energy__overall-band">
-              <span class="energy__dot" [class]="'is-' + store.assessmentOverallBand().tone"></span>
-              {{ store.assessmentOverallBand().label }}
-            </p>
           </div>
+        </div>
+        }
+      </div>
 
-          <div class="energy__chart">
-            <h3 class="energy__group-title">Điểm theo nhóm</h3>
-            <app-score-pie
-              [slices]="pieSlices()"
-              [centerLabel]="store.assessmentOverall() + '%'"
-              centerSub="Hiệu quả"
+      <h3 class="energy__group-title energy__group-title--spaced">
+        {{ 'toolkit.common.expertMilestones' | transloco }}
+      </h3>
+      <div class="energy__milestones">
+        @for (m of config.reviewMilestones; track m.id) {
+        <div class="energy__milestone">
+          <div class="energy__milestone-head">
+            <span class="energy__milestone-title">{{ m.title }}</span>
+          </div>
+          <p class="energy__milestone-check">
+            {{ 'toolkit.common.focusPrefix' | transloco }} {{ m.focus }}
+          </p>
+          <div class="energy__milestone-field">
+            <app-date-field
+              [label]="'toolkit.common.meetingDate' | transloco"
+              [value]="store.milestoneOf(m.id, 'meetDate')"
+              (valueChange)="store.setMilestone(m.id, 'meetDate', $event)"
             />
           </div>
-
-          <div class="energy__summary">
-            @for (r of store.assessmentResults(); track r.id) {
-              <div class="energy__summary-row">
-                <div class="energy__summary-top">
-                  <span class="energy__summary-label">{{ r.topic }}</span>
-                  <span class="energy__summary-score">
-                    Đầy đủ {{ r.full }} · Một phần {{ r.partial }} · Chưa có {{ r.none }}
-                  </span>
-                </div>
-                <app-meter [percent]="r.percent" [color]="sectionColors[r.id]" />
-                <div class="energy__summary-foot">
-                  <span>{{ r.percent }}%</span>
-                  <span class="energy__summary-band">
-                    <span class="energy__dot" [class]="'is-' + r.band.tone"></span>
-                    {{ r.band.label }}
-                  </span>
-                </div>
-              </div>
-            }
-          </div>
-
-          <div class="energy__result-cards">
-            <div class="energy__result-card">
-              <p class="energy__result-card-label">Tổng tải kiểm kê</p>
-              <p class="energy__result-card-value">
-                {{ num(store.equipmentRows().totalKwh) }} kWh/th
-              </p>
-              <p class="energy__result-card-sub">
-                {{ vnd(store.equipmentRows().totalCost) }} VNĐ/tháng
-              </p>
-            </div>
-            <div class="energy__result-card">
-              <p class="energy__result-card-label">Tiềm năng tiết kiệm / năm</p>
-              <p class="energy__result-card-value">
-                {{ vnd(store.savingsRows().totalSaving) }} VNĐ
-              </p>
-            </div>
-            <div class="energy__result-card">
-              <p class="energy__result-card-label">Cường độ trung bình</p>
-              <p class="energy__result-card-value">
-                {{ num(store.trackTotals().avgIntensity, 2) }}
-              </p>
-              <p class="energy__result-card-sub">kWh / {{ config.outputLabel }}</p>
-            </div>
-          </div>
-        </section>
-      }
+          <app-textarea-field
+            [label]="'toolkit.common.expertNotes' | transloco"
+            [placeholder]="'toolkit.energy.milestoneNotePlaceholder' | transloco"
+            [rows]="2"
+            [value]="store.milestoneOf(m.id, 'note')"
+            (valueChange)="store.setMilestone(m.id, 'note', $event)"
+          />
+        </div>
+        }
+      </div>
+    </section>
     }
+
+    <!-- ════ STEP: RESULTS ════ -->
+    @case ('results') {
+    <section class="energy__section">
+      <h2 class="energy__section-title">{{ 'toolkit.steps.results' | transloco }}</h2>
+      <p class="energy__section-note">{{ 'toolkit.common.resultsNote' | transloco }}</p>
+
+      <div class="energy__overall">
+        <div>
+          <p class="energy__overall-label">{{ 'toolkit.energy.overallLabel' | transloco }}</p>
+          <p class="energy__overall-score">{{ store.assessmentOverall() }}%</p>
+        </div>
+        <p class="energy__overall-band">
+          <span class="energy__dot" [class]="'is-' + store.assessmentOverallBand().tone"></span>
+          {{ store.assessmentOverallBand().label }}
+        </p>
+      </div>
+
+      <div class="energy__chart">
+        <h3 class="energy__group-title">{{ 'toolkit.fields.scorePieAria' | transloco }}</h3>
+        <app-score-pie
+          [slices]="pieSlices()"
+          [centerLabel]="store.assessmentOverall() + '%'"
+          [centerSub]="'toolkit.energy.centerSub' | transloco"
+        />
+      </div>
+
+      <div class="energy__summary">
+        @for (r of store.assessmentResults(); track r.id) {
+        <div class="energy__summary-row">
+          <div class="energy__summary-top">
+            <span class="energy__summary-label">{{ r.topic }}</span>
+            <span class="energy__summary-score">
+              {{ 'toolkit.fields.scoreFull' | transloco }} {{ r.full }} · {{
+              'toolkit.fields.scorePartial' | transloco }} {{ r.partial }} · {{
+              'toolkit.fields.scoreNone' | transloco }} {{ r.none }}
+            </span>
+          </div>
+          <app-meter [percent]="r.percent" [color]="sectionColors[r.id]" />
+          <div class="energy__summary-foot">
+            <span>{{ r.percent }}%</span>
+            <span class="energy__summary-band">
+              <span class="energy__dot" [class]="'is-' + r.band.tone"></span>
+              {{ r.band.label }}
+            </span>
+          </div>
+        </div>
+        }
+      </div>
+
+      <div class="energy__result-cards">
+        <div class="energy__result-card">
+          <p class="energy__result-card-label">
+            {{ 'toolkit.energy.inventoryLoadCard' | transloco }}
+          </p>
+          <p class="energy__result-card-value">
+            {{ num(store.equipmentRows().totalKwh) }} {{ 'toolkit.energy.kwhPerMonthShort' |
+            transloco }}
+          </p>
+          <p class="energy__result-card-sub">
+            {{ vnd(store.equipmentRows().totalCost) }} {{ 'toolkit.energy.vndPerMonth' | transloco
+            }}
+          </p>
+        </div>
+        <div class="energy__result-card">
+          <p class="energy__result-card-label">
+            {{ 'toolkit.energy.savingPotentialCard' | transloco }}
+          </p>
+          <p class="energy__result-card-value">
+            {{ vnd(store.savingsRows().totalSaving) }} {{ 'common.vnd' | transloco }}
+          </p>
+        </div>
+        <div class="energy__result-card">
+          <p class="energy__result-card-label">{{ 'toolkit.energy.avgIntensity' | transloco }}</p>
+          <p class="energy__result-card-value">{{ num(store.trackTotals().avgIntensity, 2) }}</p>
+          <p class="energy__result-card-sub">kWh / {{ config.outputLabel }}</p>
+        </div>
+      </div>
+    </section>
+    } }
 
     <!-- Step navigation -->
     <nav class="energy__nav">
@@ -711,18 +705,22 @@
         [disabled]="isFirstStep()"
         (click)="prevStep()"
       >
-        Quay lại
+        {{ 'common.back' | transloco }}
       </button>
 
       @if (currentStepData().kind === 'results') {
-        <button type="button" class="energy__nav-btn energy__nav-btn--ghost" (click)="resetScan()">
-          <svg lucideRotateCcw [size]="16" strokeWidth="2"></svg>
-          Làm lại
-        </button>
+      <button type="button" class="energy__nav-btn energy__nav-btn--ghost" (click)="resetScan()">
+        <svg lucideRotateCcw [size]="16" strokeWidth="2"></svg>
+        {{ 'toolkit.common.restart' | transloco }}
+      </button>
       } @else if (store.currentStep() === totalSteps - 2) {
-        <button type="button" class="energy__nav-btn" (click)="nextStep()">Hoàn tất</button>
+      <button type="button" class="energy__nav-btn" (click)="nextStep()">
+        {{ 'toolkit.common.finish' | transloco }}
+      </button>
       } @else {
-        <button type="button" class="energy__nav-btn" (click)="nextStep()">Tiếp tục</button>
+      <button type="button" class="energy__nav-btn" (click)="nextStep()">
+        {{ 'toolkit.common.continue' | transloco }}
+      </button>
       }
     </nav>
   </main>

@@ -8,22 +8,23 @@ import {
   withState,
 } from '@ngrx/signals';
 import { MessageService } from 'primeng/api';
+import { TranslocoService } from '@jsverse/transloco';
 import { ApiError, type MentorBooking, type MentorBookingStatus } from '@dearourcommunity/client';
 import { MentorBookingService } from '../../core/services/mentor-booking.service';
 
-function toErrorMessage(err: unknown): string {
+function toErrorMessage(err: unknown, transloco: TranslocoService): string {
   if (err instanceof ApiError) {
     // 409: booking đã được xử lý trước đó; 404: không tìm thấy; 400: dữ liệu không hợp lệ
     if (err.code === 409) {
-      return 'Yêu cầu này đã được xử lý trước đó. Vui lòng làm mới danh sách.';
+      return transloco.translate('system.mentorBookings.errors.alreadyProcessed');
     }
     if (err.code === 404) {
-      return 'Không tìm thấy yêu cầu đặt mentor.';
+      return transloco.translate('system.mentorBookings.errors.notFound');
     }
-    return err.message || 'Thao tác thất bại. Vui lòng thử lại.';
+    return err.message || transloco.translate('system.mentorBookings.errors.actionFailed');
   }
   console.error('Mentor booking action failed', err);
-  return 'Thao tác thất bại. Vui lòng thử lại.';
+  return transloco.translate('system.mentorBookings.errors.actionFailed');
 }
 
 const initialState = {
@@ -97,6 +98,7 @@ export const MentorBookingsStore = signalStore(
       store,
       bookingService = inject(MentorBookingService),
       messageService = inject(MessageService),
+      transloco = inject(TranslocoService),
     ) => {
       async function load() {
         patchState(store, { isLoading: true, loadError: null });
@@ -104,7 +106,7 @@ export const MentorBookingsStore = signalStore(
           const items = await bookingService.list();
           patchState(store, { bookings: items });
         } catch (err) {
-          patchState(store, { loadError: toErrorMessage(err) });
+          patchState(store, { loadError: toErrorMessage(err, transloco) });
         } finally {
           patchState(store, { isLoading: false });
         }
@@ -183,7 +185,7 @@ export const MentorBookingsStore = signalStore(
         async approve(b: MentorBooking, slotIds?: string[]) {
           if (slotIds && slotIds.length === 0) {
             patchState(store, {
-              actionError: 'Chọn ít nhất 1 khung giờ để chốt.',
+              actionError: transloco.translate('system.mentorBookings.errors.selectSlot'),
             });
             return;
           }
@@ -195,18 +197,25 @@ export const MentorBookingsStore = signalStore(
             const slotCount = slotIds?.length ?? b.selectedTimeSlots?.length ?? 0;
             let detail: string;
             if (isResend) {
-              detail = 'Đã gửi lại mail kèm link thanh toán cho học viên.';
+              detail = transloco.translate('system.mentorBookings.toasts.resendDetail');
             } else if (b.packageType === 'existing') {
-              detail = `Đã duyệt & trừ 1 lượt mentoring — đã chốt ${slotCount} khung giờ.`;
+              detail = transloco.translate('system.mentorBookings.toasts.approvedExisting', {
+                n: slotCount,
+              });
             } else if (b.packageType === 'single') {
-              detail =
-                'Đã duyệt & gửi link thanh toán — booking sẽ tự chuyển "Đã duyệt" khi học viên thanh toán xong.';
+              detail = transloco.translate('system.mentorBookings.toasts.approvedSingle');
             } else {
-              detail = `Đã duyệt booking — đã chốt ${slotCount} khung giờ.`;
+              detail = transloco.translate('system.mentorBookings.toasts.approvedGeneric', {
+                n: slotCount,
+              });
             }
             messageService.add({
               severity: 'success',
-              summary: isResend ? 'Đã gửi lại link thanh toán' : 'Duyệt thành công',
+              summary: transloco.translate(
+                isResend
+                  ? 'system.mentorBookings.toasts.resendSummary'
+                  : 'system.mentorBookings.toasts.approveSuccess',
+              ),
               detail,
               life: 6000,
             });
@@ -218,10 +227,10 @@ export const MentorBookingsStore = signalStore(
             });
             await load();
           } catch (err) {
-            const message = toErrorMessage(err);
+            const message = toErrorMessage(err, transloco);
             messageService.add({
               severity: 'error',
-              summary: 'Duyệt thất bại',
+              summary: transloco.translate('system.mentorBookings.toasts.approveFailed'),
               detail: message,
               life: 7000,
             });
@@ -239,8 +248,8 @@ export const MentorBookingsStore = signalStore(
             await bookingService.reject(b.id, reason || undefined);
             messageService.add({
               severity: 'success',
-              summary: 'Đã từ chối booking',
-              detail: 'Học viên sẽ nhận được mail thông báo từ chối.',
+              summary: transloco.translate('system.mentorBookings.toasts.rejectedSummary'),
+              detail: transloco.translate('system.mentorBookings.toasts.rejectedDetail'),
               life: 6000,
             });
             patchState(store, {
@@ -252,10 +261,10 @@ export const MentorBookingsStore = signalStore(
             });
             await load();
           } catch (err) {
-            const message = toErrorMessage(err);
+            const message = toErrorMessage(err, transloco);
             messageService.add({
               severity: 'error',
-              summary: 'Từ chối thất bại',
+              summary: transloco.translate('system.mentorBookings.toasts.rejectFailed'),
               detail: message,
               life: 7000,
             });

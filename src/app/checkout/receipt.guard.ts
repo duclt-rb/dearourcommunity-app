@@ -1,5 +1,5 @@
 import { CanActivateFn } from '@angular/router';
-import { environment } from '../../environments/environment';
+import { frontpageUrl } from '../core/i18n/locale';
 
 export const receiptGuard: CanActivateFn = (route) => {
   const queryParams = route.queryParams;
@@ -15,6 +15,6 @@ export const receiptGuard: CanActivateFn = (route) => {
   }
 
   // Nếu không đủ tham số, chuyển hướng về trang chọn gói đăng ký (app chính)
-  window.location.href = `${environment.appUrl}/packages`;
+  window.location.href = frontpageUrl('/packages');
   return false;
 };

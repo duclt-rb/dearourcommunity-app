@@ -2,14 +2,14 @@
   <div class="auth-form">
     <div class="auth-form__header">
       <app-logo class="auth-form__logo"></app-logo>
-      <h2 class="auth-form__title">Chào mừng trở lại</h2>
-      <p class="auth-form__subtitle">Đăng nhập để tiếp tục</p>
+      <h2 class="auth-form__title">{{ 'auth.login.title' | transloco }}</h2>
+      <p class="auth-form__subtitle">{{ 'auth.login.subtitle' | transloco }}</p>
     </div>
 
     <form class="auth-form__body" (submit)="onSubmit($event)">
       <!-- Email -->
       <div class="field">
-        <label for="email" class="field__label">Email</label>
+        <label for="email" class="field__label">{{ 'auth.login.emailLabel' | transloco }}</label>
         <span class="p-input-icon-left field__input-wrapper">
           <svg lucideMail [size]="18" strokeWidth="1.5"></svg>
           <input
@@ -30,8 +30,10 @@
       <!-- Password -->
       <div class="field">
         <div class="field__label-row">
-          <label for="password" class="field__label">Mật khẩu</label>
-          <a href="#" class="field__link">Quên mật khẩu?</a>
+          <label for="password" class="field__label">{{
+            'auth.login.passwordLabel' | transloco
+          }}</label>
+          <a href="#" class="field__link">{{ 'auth.login.forgotPassword' | transloco }}</a>
         </div>
         <span class="p-input-icon-left field__input-wrapper">
           <svg lucideLock [size]="18" strokeWidth="1.5"></svg>
@@ -40,7 +42,7 @@
             [type]="showPassword() ? 'text' : 'password'"
             pInputText
             [pt]="inputPt"
-            placeholder="Nhập mật khẩu"
+            [placeholder]="'auth.login.passwordPlaceholder' | transloco"
             [formField]="loginForm.password"
             autocomplete="current-password"
           />
@@ -48,7 +50,9 @@
             type="button"
             class="field__toggle"
             (click)="showPassword.set(!showPassword())"
-            [attr.aria-label]="showPassword() ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'"
+            [attr.aria-label]="
+              (showPassword() ? 'auth.login.hidePassword' : 'auth.login.showPassword') | transloco
+            "
           >
             @if (showPassword()) {
               <svg lucideEyeOff [size]="18" strokeWidth="1.5"></svg>
@@ -70,7 +74,7 @@
       <!-- Submit -->
       <p-button
         type="submit"
-        label="Đăng nhập"
+        [label]="'auth.login.submit' | transloco"
         [pt]="submitPt"
         styleClass="auth-form__submit"
         [loading]="loading()"
@@ -79,7 +83,7 @@
     </form>
 
     <div class="auth-form__divider">
-      <span>hoặc tiếp tục với</span>
+      <span>{{ 'auth.login.orContinueWith' | transloco }}</span>
     </div>
 
     <!-- Social Login -->
@@ -117,10 +121,10 @@
 
     <!-- Register Link -->
     <p class="auth-form__footer">
-      Chưa có tài khoản?
-      <a routerLink="/auth/register" queryParamsHandling="preserve" class="auth-form__link"
-        >Đăng ký</a
-      >
+      {{ 'auth.login.noAccount' | transloco }}
+      <a routerLink="/auth/register" queryParamsHandling="preserve" class="auth-form__link">{{
+        'auth.login.registerLink' | transloco
+      }}</a>
     </p>
   </div>
 </app-auth-layout>

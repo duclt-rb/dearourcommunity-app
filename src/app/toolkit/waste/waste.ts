@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { LucideRotateCcw, LucideTriangleAlert } from '@lucide/angular';
+import { intlLocale, localePick } from '../../core/i18n/locale';
 import LogoComponent from '../../shared/logo/logo';
 import { DateFieldComponent } from '../shared/date-field/date-field';
 import { MeterComponent } from '../shared/meter/meter';
@@ -32,6 +34,7 @@ interface Step {
   standalone: true,
   imports: [
     CommonModule,
+    TranslocoPipe,
     LogoComponent,
     LucideTriangleAlert,
     LucideRotateCcw,
@@ -51,6 +54,7 @@ interface Step {
 })
 export default class WasteToolkitComponent implements OnInit {
   readonly store = inject(WasteStore);
+  private readonly transloco = inject(TranslocoService);
   @Input({ required: true }) config!: WasteToolkitConfig;
 
   ngOnInit(): void {
@@ -70,40 +74,54 @@ export default class WasteToolkitComponent implements OnInit {
   readonly priorityOptions = PRIORITY_OPTIONS;
 
   readonly weeks = Array.from({ length: WEEKS }, (_, i) => i);
-  readonly monthFullLabels = [
-    'Tháng 1',
-    'Tháng 2',
-    'Tháng 3',
-    'Tháng 4',
-    'Tháng 5',
-    'Tháng 6',
-    'Tháng 7',
-    'Tháng 8',
-    'Tháng 9',
-    'Tháng 10',
-    'Tháng 11',
-    'Tháng 12',
-  ];
+  readonly monthFullLabels = localePick({
+    vi: [
+      'Tháng 1',
+      'Tháng 2',
+      'Tháng 3',
+      'Tháng 4',
+      'Tháng 5',
+      'Tháng 6',
+      'Tháng 7',
+      'Tháng 8',
+      'Tháng 9',
+      'Tháng 10',
+      'Tháng 11',
+      'Tháng 12',
+    ],
+    en: [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ],
+  });
 
-  readonly priorityLabels: Record<string, string> = {
-    critical: 'Quan trọng nhất',
-    important: 'Quan trọng',
-    quickwin: 'Dễ làm ngay',
-  };
-  readonly checklistPriorityLabels: Record<string, string> = {
-    critical: 'Bắt buộc',
-    important: 'Quan trọng',
-    standard: 'Tiêu chuẩn',
-  };
+  readonly priorityLabels: Record<string, string> = localePick({
+    vi: { critical: 'Quan trọng nhất', important: 'Quan trọng', quickwin: 'Dễ làm ngay' },
+    en: { critical: 'Top priority', important: 'Important', quickwin: 'Quick win' },
+  });
+  readonly checklistPriorityLabels: Record<string, string> = localePick({
+    vi: { critical: 'Bắt buộc', important: 'Quan trọng', standard: 'Tiêu chuẩn' },
+    en: { critical: 'Required', important: 'Important', standard: 'Standard' },
+  });
 
   steps: Step[] = [
-    { kind: 'mapping', label: 'Bản đồ' },
-    { kind: 'assessment', label: 'Đánh giá' },
-    { kind: 'contractor', label: 'Nhà thầu' },
-    { kind: 'food', label: 'Rác thực phẩm' },
-    { kind: 'dashboard', label: 'Tổng quan' },
-    { kind: 'plan', label: 'Kế hoạch 90 ngày' },
-    { kind: 'results', label: 'Kết quả' },
+    { kind: 'mapping', label: this.transloco.translate('toolkit.waste.steps.mapping') },
+    { kind: 'assessment', label: this.transloco.translate('toolkit.common.stepAssessment') },
+    { kind: 'contractor', label: this.transloco.translate('toolkit.waste.steps.contractor') },
+    { kind: 'food', label: this.transloco.translate('toolkit.waste.steps.food') },
+    { kind: 'dashboard', label: this.transloco.translate('toolkit.waste.steps.dashboard') },
+    { kind: 'plan', label: this.transloco.translate('toolkit.common.stepPlan90') },
+    { kind: 'results', label: this.transloco.translate('toolkit.steps.results') },
   ];
 
   /** Light pastel color per assessment section. */
@@ -153,17 +171,17 @@ export default class WasteToolkitComponent implements OnInit {
 
   resetScan(): void {
     if (typeof window !== 'undefined') {
-      const ok = window.confirm('Làm lại từ đầu? Toàn bộ dữ liệu bạn đã nhập sẽ bị xóa.');
+      const ok = window.confirm(this.transloco.translate('toolkit.common.confirmReset'));
       if (!ok) return;
     }
     this.store.reset();
   }
 
-  /** Format a number with VN thousands separators. */
+  /** Format a number with locale-aware thousands separators. */
   vnd(value: number): string {
-    return Math.round(value).toLocaleString('vi-VN');
+    return Math.round(value).toLocaleString(intlLocale());
   }
   num(value: number): string {
-    return Number(value.toFixed(1)).toLocaleString('vi-VN');
+    return Number(value.toFixed(1)).toLocaleString(intlLocale());
   }
 }

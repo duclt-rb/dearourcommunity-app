@@ -14,6 +14,7 @@ import {
   LucideSearch,
   LucideCalendarClock,
 } from '@lucide/angular';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import type { CreateMentorDto, MentorType } from '@dearourcommunity/client';
 import { MentorScheduleComponent } from './mentor-schedule/mentor-schedule';
 import { MentorsStore } from './mentors.store';
@@ -24,6 +25,7 @@ import { MentorsStore } from './mentors.store';
   imports: [
     FormField,
     MentorScheduleComponent,
+    TranslocoPipe,
     LucideUsers,
     LucidePlus,
     LucideTrash2,
@@ -43,6 +45,7 @@ import { MentorsStore } from './mentors.store';
 })
 export default class MentorsComponent {
   private store = inject(MentorsStore);
+  private transloco = inject(TranslocoService);
 
   // State (alias signal của store để template dùng trực tiếp)
   readonly searchQuery = this.store.searchQuery;
@@ -90,9 +93,15 @@ export default class MentorsComponent {
   });
 
   mentorForm = form(this.mentorModel, (m) => {
-    required(m.name, { message: 'Tên mentor là bắt buộc' });
-    required(m.slug, { message: 'Slug là bắt buộc' });
-    required(m.position, { message: 'Chức vụ là bắt buộc' });
+    required(m.name, {
+      message: this.transloco.translate('system.mentors.validation.nameRequired'),
+    });
+    required(m.slug, {
+      message: this.transloco.translate('system.mentors.validation.slugRequired'),
+    });
+    required(m.position, {
+      message: this.transloco.translate('system.mentors.validation.positionRequired'),
+    });
   });
 
   // Ô nhập thẻ dạng chip: phần text đang gõ dở (chưa thành chip)
@@ -207,8 +216,14 @@ export default class MentorsComponent {
   }
 
   getTypeLabel(types: MentorType[] | null): string {
-    if (!types || !types.length) return 'Chưa phân loại';
-    return types.map((t) => (t === 'youth' ? 'Cá nhân' : 'Doanh nghiệp')).join(' & ');
+    if (!types || !types.length) return this.transloco.translate('system.mentors.types.unset');
+    return types
+      .map((t) =>
+        this.transloco.translate(
+          t === 'youth' ? 'system.mentors.types.youth' : 'system.mentors.types.organization',
+        ),
+      )
+      .join(' & ');
   }
 
   getInitials(name: string): string {

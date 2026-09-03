@@ -1,12 +1,13 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { EnrolledCourse, ProfileStore } from '../profile.store';
-import { environment } from '../../../environments/environment';
+import { frontpageUrl } from '../../core/i18n/locale';
 
 @Component({
   selector: 'app-profile-courses',
   standalone: true,
-  imports: [],
+  imports: [TranslocoPipe],
   templateUrl: './courses.html',
   styleUrl: './courses.css',
 })
@@ -14,6 +15,7 @@ export default class CoursesComponent {
   store = inject(ProfileStore);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private readonly transloco = inject(TranslocoService);
 
   // Filters: all, in_progress, completed
   filter = signal<'all' | 'in_progress' | 'completed'>('all');
@@ -32,9 +34,9 @@ export default class CoursesComponent {
 
   onAction(course: EnrolledCourse) {
     if (course.id) {
-      window.location.href = `${environment.appUrl}/vi/courses/${course.id}/lessons`;
+      window.location.href = frontpageUrl(`/courses/${course.id}/lessons`);
     } else {
-      alert(`Bắt đầu học/học tiếp khóa: ${course.title}`);
+      alert(this.transloco.translate('profile.courses.startAlert', { title: course.title }));
     }
   }
 

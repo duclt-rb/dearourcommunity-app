@@ -1,5 +1,6 @@
 import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
+import { TranslocoService } from '@jsverse/transloco';
 import type { MentorAvailabilitySlot } from '@dearourcommunity/client';
 import { MentorService } from '../../../core/services/mentor.service';
 
@@ -191,6 +192,8 @@ export const MentorScheduleStore = signalStore(
     return { monthDays, isCurrentMonth, selectedDaySlots, composePreviewCount };
   }),
   withMethods((store, mentorService = inject(MentorService)) => {
+    const transloco = inject(TranslocoService);
+
     // Bỏ qua response cũ khi admin đổi tháng / đổi mentor trong lúc request đang bay
     let slotsRequestId = 0;
 
@@ -227,7 +230,10 @@ export const MentorScheduleStore = signalStore(
       } catch (err) {
         if (requestId !== slotsRequestId) return;
         patchState(store, {
-          slotsError: toErrorMessage(err, 'Không thể tải lịch khả dụng.'),
+          slotsError: toErrorMessage(
+            err,
+            transloco.translate('system.mentorSchedule.errors.loadFailed'),
+          ),
           isLoadingSlots: false,
         });
       }
@@ -244,7 +250,7 @@ export const MentorScheduleStore = signalStore(
       if (!startAts.length) {
         patchState(store, {
           slotNotice: null,
-          slotActionError: 'Mọi khung giờ đều đã qua — chỉ tạo được giờ trong tương lai.',
+          slotActionError: transloco.translate('system.mentorSchedule.errors.allPast'),
         });
         return false;
       }
@@ -263,19 +269,30 @@ export const MentorScheduleStore = signalStore(
           skipped += res.skipped;
         }
       } catch (err) {
-        failure = toErrorMessage(err, 'Không thể thêm khung giờ.');
+        failure = toErrorMessage(
+          err,
+          transloco.translate('system.mentorSchedule.errors.createFailed'),
+        );
       }
 
-      const parts = [`Đã thêm ${created} khung giờ`];
-      if (skipped > 0) parts.push(`bỏ qua ${skipped} khung trùng`);
-      if (droppedPast > 0) parts.push(`${droppedPast} khung đã qua không được tạo`);
+      const parts = [transloco.translate('system.mentorSchedule.notice.added', { n: created })];
+      if (skipped > 0) {
+        parts.push(
+          transloco.translate('system.mentorSchedule.notice.skippedDuplicates', { n: skipped }),
+        );
+      }
+      if (droppedPast > 0) {
+        parts.push(
+          transloco.translate('system.mentorSchedule.notice.droppedPast', { n: droppedPast }),
+        );
+      }
       const notice = failure ? null : `${parts.join(', ')}.`;
       patchState(store, {
         isCreatingSlots: false,
         slotNotice: notice,
         slotActionError: failure
           ? created > 0
-            ? `${failure} (đã kịp thêm ${created} khung giờ)`
+            ? `${failure} ${transloco.translate('system.mentorSchedule.errors.partialCreated', { n: created })}`
             : failure
           : null,
       });
@@ -349,7 +366,7 @@ export const MentorScheduleStore = signalStore(
         if (startAt <= nowNaiveMinute()) {
           patchState(store, {
             slotNotice: null,
-            slotActionError: 'Khung giờ đã qua — chỉ thêm được giờ trong tương lai.',
+            slotActionError: transloco.translate('system.mentorSchedule.errors.slotPast'),
           });
           return false;
         }
@@ -428,7 +445,10 @@ export const MentorScheduleStore = signalStore(
           });
         } catch (err) {
           patchState(store, {
-            slotActionError: toErrorMessage(err, 'Không thể cập nhật khung giờ.'),
+            slotActionError: toErrorMessage(
+              err,
+              transloco.translate('system.mentorSchedule.errors.updateFailed'),
+            ),
           });
         } finally {
           patchState(store, { slotActionId: null });
@@ -456,7 +476,10 @@ export const MentorScheduleStore = signalStore(
         } catch (err) {
           patchState(store, {
             confirmDeleteSlotId: null,
-            slotActionError: toErrorMessage(err, 'Không thể xoá khung giờ.'),
+            slotActionError: toErrorMessage(
+              err,
+              transloco.translate('system.mentorSchedule.errors.deleteFailed'),
+            ),
           });
         } finally {
           patchState(store, { slotActionId: null });

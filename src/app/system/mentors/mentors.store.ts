@@ -7,6 +7,7 @@ import {
   withMethods,
   withState,
 } from '@ngrx/signals';
+import { TranslocoService } from '@jsverse/transloco';
 import type { CreateMentorDto, Mentor, MentorType } from '@dearourcommunity/client';
 import { MentorService } from '../../core/services/mentor.service';
 
@@ -83,13 +84,17 @@ export const MentorsStore = signalStore(
     return { filteredMentors, selectedMentor, nextSortOrder };
   }),
   withMethods((store, mentorService = inject(MentorService)) => {
+    const transloco = inject(TranslocoService);
+
     async function load() {
       patchState(store, { isLoading: true, loadError: null });
       try {
         const items = await mentorService.list();
         patchState(store, { mentors: items });
       } catch (err) {
-        patchState(store, { loadError: toErrorMessage(err, 'Không thể tải danh sách mentor.') });
+        patchState(store, {
+          loadError: toErrorMessage(err, transloco.translate('system.mentors.errors.loadFailed')),
+        });
       } finally {
         patchState(store, { isLoading: false });
       }
@@ -154,7 +159,9 @@ export const MentorsStore = signalStore(
             patchState(store, { saveSuccess: false, mode: 'list', selectedMentorId: null });
           }, 1500);
         } catch (err) {
-          patchState(store, { saveError: toErrorMessage(err, 'Có lỗi xảy ra.') });
+          patchState(store, {
+            saveError: toErrorMessage(err, transloco.translate('system.mentors.errors.saveFailed')),
+          });
         } finally {
           patchState(store, { isSaving: false });
         }
@@ -182,7 +189,12 @@ export const MentorsStore = signalStore(
           });
           await load();
         } catch (err) {
-          patchState(store, { deleteError: toErrorMessage(err, 'Không thể xóa mentor.') });
+          patchState(store, {
+            deleteError: toErrorMessage(
+              err,
+              transloco.translate('system.mentors.errors.deleteFailed'),
+            ),
+          });
         } finally {
           patchState(store, { isDeleting: null });
         }

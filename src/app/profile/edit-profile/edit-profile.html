@@ -1,17 +1,19 @@
 <div class="tab-content active">
   <div class="edit-profile-section">
     <div class="profile-page-header">
-      <h1 class="profile-page-title">Chỉnh sửa thông tin</h1>
-      <p class="profile-page-subtitle">
-        Cập nhật thông tin cá nhân và ảnh đại diện để hoàn thiện hồ sơ của bạn.
-      </p>
+      <h1 class="profile-page-title">{{ 'profile.editProfile.title' | transloco }}</h1>
+      <p class="profile-page-subtitle">{{ 'profile.editProfile.subtitle' | transloco }}</p>
     </div>
 
     <!-- Photo Section -->
     <div class="photo-section">
       <div class="avatar">
         @if (tempAvatarUrl()) {
-          <img [src]="tempAvatarUrl()" class="avatar-img" alt="Ảnh đại diện" />
+          <img
+            [src]="tempAvatarUrl()"
+            class="avatar-img"
+            [alt]="'profile.editProfile.avatarAlt' | transloco"
+          />
         } @else {
           <div class="avatar-placeholder">
             <span>{{ store.displayName().charAt(0) }}</span>
@@ -19,9 +21,13 @@
         }
       </div>
       <div class="photo-actions">
-        <button class="btn-outline" (click)="changePhoto()">Đổi ảnh</button>
+        <button class="btn-outline" (click)="changePhoto()">
+          {{ 'profile.editProfile.changePhoto' | transloco }}
+        </button>
         @if (tempAvatarUrl()) {
-          <button class="btn-outline danger" (click)="removePhoto()">Xóa ảnh</button>
+          <button class="btn-outline danger" (click)="removePhoto()">
+            {{ 'profile.editProfile.removePhoto' | transloco }}
+          </button>
         }
       </div>
     </div>
@@ -37,12 +43,14 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label" for="lastName">Họ</label>
+          <label class="form-label" for="lastName">{{
+            'profile.editProfile.lastNameLabel' | transloco
+          }}</label>
           <input
             id="lastName"
             type="text"
             class="form-input"
-            placeholder="Ví dụ: Nguyễn Văn"
+            [placeholder]="'profile.editProfile.lastNamePlaceholder' | transloco"
             [formField]="profileForm.lastName"
           />
           @if (profileForm.lastName().touched() && profileForm.lastName().invalid()) {
@@ -50,12 +58,14 @@
           }
         </div>
         <div class="form-group">
-          <label class="form-label" for="firstName">Tên</label>
+          <label class="form-label" for="firstName">{{
+            'profile.editProfile.firstNameLabel' | transloco
+          }}</label>
           <input
             id="firstName"
             type="text"
             class="form-input"
-            placeholder="Ví dụ: Anh"
+            [placeholder]="'profile.editProfile.firstNamePlaceholder' | transloco"
             [formField]="profileForm.firstName"
           />
           @if (profileForm.firstName().touched() && profileForm.firstName().invalid()) {
@@ -66,12 +76,14 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label" for="phone">Số điện thoại</label>
+          <label class="form-label" for="phone">{{
+            'profile.editProfile.phoneLabel' | transloco
+          }}</label>
           <input
             id="phone"
             type="tel"
             class="form-input"
-            placeholder="Ví dụ: 0987654321"
+            [placeholder]="'profile.editProfile.phonePlaceholder' | transloco"
             [formField]="profileForm.phone"
           />
           @if (profileForm.phone().touched() && profileForm.phone().invalid()) {
@@ -79,7 +91,9 @@
           }
         </div>
         <div class="form-group">
-          <label class="form-label" for="email">Địa chỉ email</label>
+          <label class="form-label" for="email">{{
+            'profile.editProfile.emailLabel' | transloco
+          }}</label>
           <input
             id="email"
             type="email"
@@ -87,13 +101,16 @@
             [value]="store.email()"
             readonly
           />
-          <span class="field-help">Địa chỉ email đăng nhập không thể thay đổi.</span>
+          <span class="field-help">{{ 'profile.editProfile.emailHelp' | transloco }}</span>
         </div>
       </div>
 
       <div class="form-actions">
         <button type="submit" class="btn-primary" [disabled]="loading()">
-          {{ loading() ? 'Đang lưu...' : 'Lưu thay đổi' }}
+          {{
+            (loading() ? 'profile.editProfile.saving' : 'profile.editProfile.saveChanges')
+              | transloco
+          }}
         </button>
       </div>
     </form>

@@ -7,8 +7,9 @@ import {
   withMethods,
   withState,
 } from '@ngrx/signals';
-import { getWasteToolkit } from './waste.data';
+import { getWasteToolkit, WASTE_TOOLKITS_VI } from './waste.data';
 import { contractorVerdict, MaturityBand, readinessFor, WasteToolkitConfig } from './waste.types';
+import { needsMigration, rekeyRecord, TOOLKIT_PERSIST_VERSION } from '../shared/persist-migration';
 
 export const WEEKS = 4;
 export const MONTHS = 12;
@@ -44,10 +45,12 @@ interface WasteState {
   config: WasteToolkitConfig;
   /** localStorage key for the active toolkit; null until init. Not persisted. */
   storageKey: string | null;
+  /** Keyed theo FieldDef.id (V2) — trước đây key theo nhãn tiếng Việt. */
   mappingInfo: Record<string, string>;
   streams: Record<string, StreamRow>;
   assessment: Record<string, string>;
   assessmentPriority: Record<string, string>;
+  /** Keyed theo FieldDef.id (V2) — trước đây key theo nhãn tiếng Việt. */
   contractorInfo: Record<string, string>;
   contractorScores: Record<string, string>;
   contractorChecklist: Record<string, boolean>;
@@ -56,6 +59,7 @@ interface WasteState {
   /** Monthly totals (length 12) — direct entry, like the source monthly tab. */
   dashMonthlyVol: (number | null)[];
   dashMonthlyCost: (number | null)[];
+  /** Keyed theo FieldDef.id (V2) — trước đây key theo nhãn tiếng Việt. */
   planInfo: Record<string, string>;
   actions: Record<string, ActionRow>;
   milestones: Record<string, MilestoneRow>;
@@ -93,19 +97,46 @@ const EMPTY_ROW: StreamRow = {
 };
 const EMPTY_ACTION: ActionRow = { owner: '', start: '', target: '', status: '' };
 
-function loadPersisted(key: string): Partial<WasteState> | null {
+/** Persisted slice of the state. V2: mappingInfo/contractorInfo/planInfo key theo FieldDef.id. */
+type PersistedWaste = Partial<Omit<WasteState, 'config' | 'storageKey'>> & {
+  version?: number;
+};
+
+/** V1 persist theo nhãn VN; map nhãn→id build từ chính config VI (không drift). */
+export function migrateV1toV2(raw: PersistedWaste, config: WasteToolkitConfig): PersistedWaste {
+  const mappingMap = Object.fromEntries(config.mappingFields.map((f) => [f.label, f.id]));
+  const contractorMap = Object.fromEntries(config.contractorFields.map((f) => [f.label, f.id]));
+  const planMap = Object.fromEntries(config.planFields.map((f) => [f.label, f.id]));
+  return {
+    ...raw,
+    version: TOOLKIT_PERSIST_VERSION,
+    mappingInfo: rekeyRecord(raw.mappingInfo, mappingMap),
+    contractorInfo: rekeyRecord(raw.contractorInfo, contractorMap),
+    planInfo: rekeyRecord(raw.planInfo, planMap),
+  };
+}
+
+function loadPersisted(config: WasteToolkitConfig): PersistedWaste | null {
   if (typeof localStorage === 'undefined') return null;
+  const key = STORAGE_PREFIX + config.id;
   try {
     const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as Partial<WasteState>) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PersistedWaste;
+    if (!needsMigration(parsed)) return parsed;
+    // Map nhãn→id build từ bản VI (v1 persist nhãn VN) — bất kể locale đang chạy
+    const migrated = migrateV1toV2(parsed, WASTE_TOOLKITS_VI[config.id] ?? config);
+    // Ghi lại ngay để lần sau không migrate nữa (idempotent nhờ version check)
+    savePersisted(key, migrated);
+    return migrated;
   } catch {
     return null;
   }
 }
-function savePersisted(key: string, state: Omit<WasteState, 'config' | 'storageKey'>): void {
+function savePersisted(key: string, state: PersistedWaste): void {
   if (typeof localStorage === 'undefined') return;
   try {
-    localStorage.setItem(key, JSON.stringify(state));
+    localStorage.setItem(key, JSON.stringify({ ...state, version: TOOLKIT_PERSIST_VERSION }));
   } catch {
     // ignore
   }
@@ -246,8 +277,8 @@ export const WasteStore = signalStore(
   })),
 
   withMethods((store) => ({
-    setMappingInfo(key: string, value: string) {
-      patchState(store, (s) => ({ mappingInfo: { ...s.mappingInfo, [key]: value } }));
+    setMappingInfo(fieldId: string, value: string) {
+      patchState(store, (s) => ({ mappingInfo: { ...s.mappingInfo, [fieldId]: value } }));
     },
     setStreamField(id: string, field: keyof StreamRow, value: string | number | null) {
       patchState(store, (s) => ({
@@ -260,8 +291,8 @@ export const WasteStore = signalStore(
     setAssessmentPriority(id: string, value: string) {
       patchState(store, (s) => ({ assessmentPriority: { ...s.assessmentPriority, [id]: value } }));
     },
-    setContractorInfo(key: string, value: string) {
-      patchState(store, (s) => ({ contractorInfo: { ...s.contractorInfo, [key]: value } }));
+    setContractorInfo(fieldId: string, value: string) {
+      patchState(store, (s) => ({ contractorInfo: { ...s.contractorInfo, [fieldId]: value } }));
     },
     setContractorScore(id: string, value: string) {
       patchState(store, (s) => ({ contractorScores: { ...s.contractorScores, [id]: value } }));
@@ -289,8 +320,8 @@ export const WasteStore = signalStore(
         dashMonthlyCost: setCell(s.dashMonthlyCost, month, value, MONTHS),
       }));
     },
-    setPlanInfo(key: string, value: string) {
-      patchState(store, (s) => ({ planInfo: { ...s.planInfo, [key]: value } }));
+    setPlanInfo(fieldId: string, value: string) {
+      patchState(store, (s) => ({ planInfo: { ...s.planInfo, [fieldId]: value } }));
     },
     setAction(id: string, field: keyof ActionRow, value: string) {
       patchState(store, (s) => ({
@@ -307,18 +338,18 @@ export const WasteStore = signalStore(
     },
 
     // ── getters ──
-    mappingInfoOf: (key: string) => store.mappingInfo()[key] ?? '',
+    mappingInfoOf: (fieldId: string) => store.mappingInfo()[fieldId] ?? '',
     streamField: (id: string, field: keyof StreamRow) =>
       store.streams()[id]?.[field] ?? (field === 'volume' || field === 'cost' ? null : ''),
     assessmentOf: (id: string) => store.assessment()[id] ?? '',
     assessmentPriorityOf: (id: string) => store.assessmentPriority()[id] ?? '',
-    contractorInfoOf: (key: string) => store.contractorInfo()[key] ?? '',
+    contractorInfoOf: (fieldId: string) => store.contractorInfo()[fieldId] ?? '',
     contractorScoreOf: (id: string) => store.contractorScores()[id] ?? '',
     contractorCheckOf: (id: string) => store.contractorChecklist()[id] ?? false,
     foodLogOf: (id: string, week: number) => store.foodLog()[id]?.[week] ?? null,
     dashVolOf: (month: number) => store.dashMonthlyVol()[month] ?? null,
     dashCostOf: (month: number) => store.dashMonthlyCost()[month] ?? null,
-    planInfoOf: (key: string) => store.planInfo()[key] ?? '',
+    planInfoOf: (fieldId: string) => store.planInfo()[fieldId] ?? '',
     actionOf: (id: string, field: keyof ActionRow) => store.actions()[id]?.[field] ?? '',
     milestoneOf: (id: string, field: keyof MilestoneRow) => store.milestones()[id]?.[field] ?? '',
 
@@ -335,8 +366,9 @@ export const WasteStore = signalStore(
     init(config: WasteToolkitConfig) {
       if (store.storageKey()) return; // already initialised
       const key = STORAGE_PREFIX + config.id;
-      const saved = loadPersisted(key);
-      patchState(store, { ...(saved ?? {}), config, storageKey: key });
+      const saved = loadPersisted(config) ?? {};
+      delete saved.version; // `version` chỉ dành cho persistence — không đưa vào state
+      patchState(store, { ...saved, config, storageKey: key });
     },
     reset() {
       const key = store.storageKey();

@@ -2,7 +2,7 @@
   @if (loading()) {
     <div class="loading-state">
       <div class="spinner"></div>
-      <p>Đang tải thông tin tài khoản...</p>
+      <p>{{ 'profile.shell.loading' | transloco }}</p>
     </div>
   } @else {
     <div class="page-inner">

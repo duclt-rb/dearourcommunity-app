@@ -1,4 +1,5 @@
-import { computed, effect } from '@angular/core';
+import { computed, effect, inject } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import {
   patchState,
   signalStore,
@@ -17,12 +18,21 @@ import {
   PillarSection,
   QuickScanConfig,
 } from './quick-scan.types';
+import {
+  mapValue,
+  needsMigration,
+  rekeyRecord,
+  TOOLKIT_PERSIST_VERSION,
+} from '../shared/persist-migration';
+import { QUICK_SCANS_VI } from './quick-scan.data';
 
 /** Persisted slice of the scan, keyed per toolkit id in localStorage. */
 interface PersistedScan {
+  /** V2: profile key theo ProfileField.id, actionPlan key theo PriorityFocus.id. */
+  version?: number;
   scores: Record<string, number>;
   profile: Record<string, string>;
-  /** Action plan rows keyed by priority-focus area. Optional for back-compat. */
+  /** Action plan rows keyed by priority-focus id. Optional for back-compat. */
   actionPlan?: Record<string, ActionPlanRow>;
   currentStep: number;
 }
@@ -33,11 +43,42 @@ function storageKey(configId: string): string {
   return `${STORAGE_PREFIX}${configId}`;
 }
 
-function loadPersisted(configId: string): PersistedScan | null {
+/**
+ * V1 persist theo nhãn VN; map nhãn→id build từ chính config VI (không drift).
+ * `config` PHẢI là edition TIẾNG VIỆT (`QUICK_SCANS_VI`) — edition EN dịch nhãn
+ * nên map build từ nó sẽ không khớp payload v1.
+ */
+export function migrateV1toV2(raw: PersistedScan, config: QuickScanConfig): PersistedScan {
+  const profileMap = Object.fromEntries(config.profileFields.map((f) => [f.label, f.id]));
+  const focusMap = Object.fromEntries(config.priorityFocus.map((f) => [f.area, f.id]));
+  const profile = rekeyRecord(raw.profile, profileMap);
+  // Field boolean v1 lưu NHÃN 'Có'/'Không' làm value — chuyển sang 'yes'/'no' ổn định
+  for (const field of config.profileFields) {
+    if (field.type === 'boolean' && field.id in profile) {
+      profile[field.id] = mapValue(profile[field.id], { Có: 'yes', Không: 'no' });
+    }
+  }
+  return {
+    ...raw,
+    version: TOOLKIT_PERSIST_VERSION,
+    profile,
+    actionPlan: rekeyRecord(raw.actionPlan, focusMap),
+  };
+}
+
+function loadPersisted(config: QuickScanConfig): PersistedScan | null {
   if (typeof localStorage === 'undefined') return null;
   try {
-    const raw = localStorage.getItem(storageKey(configId));
-    return raw ? (JSON.parse(raw) as PersistedScan) : null;
+    const raw = localStorage.getItem(storageKey(config.id));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PersistedScan;
+    if (!needsMigration(parsed)) return parsed;
+    // Migrate bằng config TIẾNG VIỆT cùng id (v1 persist nhãn VN) — không phụ
+    // thuộc locale đang chạy; fallback config hiện hành cho id ngoài registry.
+    const migrated = migrateV1toV2(parsed, QUICK_SCANS_VI[config.id] ?? config);
+    // Ghi lại ngay để lần sau không migrate nữa (idempotent nhờ version check)
+    savePersisted(config.id, migrated);
+    return migrated;
   } catch {
     return null;
   }
@@ -46,7 +87,10 @@ function loadPersisted(configId: string): PersistedScan | null {
 function savePersisted(configId: string, data: PersistedScan): void {
   if (typeof localStorage === 'undefined') return;
   try {
-    localStorage.setItem(storageKey(configId), JSON.stringify(data));
+    localStorage.setItem(
+      storageKey(configId),
+      JSON.stringify({ ...data, version: TOOLKIT_PERSIST_VERSION }),
+    );
   } catch {
     // storage full / unavailable (e.g. private mode) — ignore
   }
@@ -103,7 +147,8 @@ export const QuickScanStore = signalStore(
   withState(initialState),
 
   // ── Base derivations (state only) ──
-  withComputed((store) => ({
+  // (transloco sync — file dịch preload trước routing; locale cố định mỗi page load)
+  withComputed((store, transloco = inject(TranslocoService)) => ({
     results: computed<PillarResult[]>(() => {
       const config = store.config();
       const scores = store.scores();
@@ -120,7 +165,7 @@ export const QuickScanStore = signalStore(
           score,
           max: pillar.maxScore,
           percent,
-          maturity: level.label,
+          maturity: transloco.translate(level.label),
           maturityTone: level.tone,
         };
       });
@@ -130,13 +175,13 @@ export const QuickScanStore = signalStore(
       const config = store.config();
       if (!config) return [];
       return [
-        { kind: 'profile', label: 'Thông tin' },
+        { kind: 'profile', label: transloco.translate('toolkit.steps.profile') },
         ...config.pillars.map((p, i) => ({
           kind: 'pillar' as const,
           label: p.label,
           pillarIndex: i,
         })),
-        { kind: 'results', label: 'Kết quả' },
+        { kind: 'results', label: transloco.translate('toolkit.steps.results') },
       ];
     }),
   })),
@@ -167,8 +212,8 @@ export const QuickScanStore = signalStore(
   })),
 
   // ── Maturity label needs totalPercent ──
-  withComputed((store) => ({
-    totalMaturity: computed(() => maturityFor(store.totalPercent())),
+  withComputed((store, transloco = inject(TranslocoService)) => ({
+    totalMaturity: computed(() => transloco.translate(maturityFor(store.totalPercent()))),
     totalMaturityTone: computed<MaturityTone>(() => maturityLevelFor(store.totalPercent()).tone),
   })),
 
@@ -179,7 +224,7 @@ export const QuickScanStore = signalStore(
         patchState(store, { config });
         return;
       }
-      const saved = loadPersisted(config.id);
+      const saved = loadPersisted(config);
       const totalSteps = config.pillars.length + 2;
       patchState(store, {
         config,
@@ -203,21 +248,21 @@ export const QuickScanStore = signalStore(
       patchState(store, (state) => ({ scores: { ...state.scores, [id]: value ?? 0 } }));
     },
 
-    profileOf(label: string): string {
-      return store.profile()[label] ?? '';
+    profileOf(fieldId: string): string {
+      return store.profile()[fieldId] ?? '';
     },
-    setProfile(label: string, value: string): void {
-      patchState(store, (state) => ({ profile: { ...state.profile, [label]: value } }));
+    setProfile(fieldId: string, value: string): void {
+      patchState(store, (state) => ({ profile: { ...state.profile, [fieldId]: value } }));
     },
 
-    actionPlanOf(area: string, field: ActionPlanField): string {
-      return store.actionPlan()[area]?.[field] ?? '';
+    actionPlanOf(focusId: string, field: ActionPlanField): string {
+      return store.actionPlan()[focusId]?.[field] ?? '';
     },
-    setActionPlan(area: string, field: ActionPlanField, value: string): void {
+    setActionPlan(focusId: string, field: ActionPlanField, value: string): void {
       patchState(store, (state) => ({
         actionPlan: {
           ...state.actionPlan,
-          [area]: { ...state.actionPlan[area], [field]: value },
+          [focusId]: { ...state.actionPlan[focusId], [field]: value },
         },
       }));
     },

@@ -6,7 +6,11 @@
   <div class="user-info">
     <div class="avatar">
       @if (store.avatarUrl()) {
-        <img [src]="store.avatarUrl()" class="avatar-img" alt="Ảnh đại diện" />
+        <img
+          [src]="store.avatarUrl()"
+          class="avatar-img"
+          [alt]="'profile.sidebar.avatarAlt' | transloco"
+        />
       } @else {
         <div class="avatar-placeholder">
           <span>{{ store.displayName().charAt(0) }}</span>
@@ -16,27 +20,38 @@
     <div class="user-details">
       <h2 class="user-name">{{ store.displayName() }}</h2>
       <p class="user-email">{{ store.email() }}</p>
-      <span class="user-package">{{ store.packageName() ?? 'Miễn phí' }}</span>
+      <span class="user-package">{{
+        store.packageName() ?? ('profile.sidebar.freePlan' | transloco)
+      }}</span>
     </div>
   </div>
 
   <div class="sidebar-divider"></div>
 
   <nav class="nav-tabs scrollbar-hide">
-    <button class="nav-tab" routerLink="dashboard" routerLinkActive="active">Hồ sơ</button>
+    <button class="nav-tab" routerLink="dashboard" routerLinkActive="active">
+      {{ 'profile.sidebar.dashboard' | transloco }}
+    </button>
     @if (store.isOrganization()) {
       <button class="nav-tab" routerLink="organization" routerLinkActive="active">
-        Doanh nghiệp
+        {{ 'profile.sidebar.organization' | transloco }}
       </button>
     }
-    <button class="nav-tab" routerLink="courses" routerLinkActive="active">Khóa học</button>
+    <button class="nav-tab" routerLink="courses" routerLinkActive="active">
+      {{ 'profile.sidebar.myCourses' | transloco }}
+    </button>
     @if (store.showPlansTab()) {
-      <button class="nav-tab" (click)="onUpgrade()">Nâng gói</button>
+      <button class="nav-tab" (click)="onUpgrade()">
+        {{ 'profile.sidebar.upgrade' | transloco }}
+      </button>
     }
     <button class="nav-tab" routerLink="edit-profile" routerLinkActive="active">
-      Đổi thông tin
+      {{ 'profile.sidebar.editProfile' | transloco }}
     </button>
-    <button class="nav-tab" routerLink="password" routerLinkActive="active">Đổi mật khẩu</button>
-    <button class="nav-tab logout" (click)="onLogout()">Đăng xuất</button>
+    <button class="nav-tab" routerLink="password" routerLinkActive="active">
+      {{ 'profile.sidebar.changePassword' | transloco }}
+    </button>
+    <button class="nav-tab logout" (click)="onLogout()">{{ 'common.logout' | transloco }}</button>
+    <div class="mt-3 px-1"><app-language-switcher /></div>
   </nav>
 </div>

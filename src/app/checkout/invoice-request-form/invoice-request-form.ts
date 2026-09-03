@@ -1,4 +1,5 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ApiError } from '@dearourcommunity/client';
 import type { InvoiceBuyerType, InvoiceRequest } from '@dearourcommunity/client';
 import { ClientService } from '../../core/services/client.service';
@@ -13,12 +14,14 @@ import { ProfileStore } from '../../profile/profile.store';
 @Component({
   selector: 'app-invoice-request-form',
   standalone: true,
+  imports: [TranslocoPipe],
   templateUrl: './invoice-request-form.html',
   styleUrl: './invoice-request-form.css',
 })
 export default class InvoiceRequestFormComponent {
   private readonly clientService = inject(ClientService);
   private readonly profileStore = inject(ProfileStore);
+  private readonly transloco = inject(TranslocoService);
 
   /** orderId của giao dịch vừa xác nhận (bank: bankTransfer.orderId; MoMo: query ở receipt). */
   readonly orderId = input.required<string>();
@@ -140,7 +143,7 @@ export default class InvoiceRequestFormComponent {
       this.errorMsg.set(
         err instanceof ApiError && err.message
           ? err.message
-          : 'Gửi yêu cầu xuất hoá đơn thất bại — vui lòng thử lại.',
+          : this.transloco.translate('checkout.invoiceRequest.submitError'),
       );
     } finally {
       this.submitting.set(false);

@@ -7,8 +7,9 @@ import {
   withMethods,
   withState,
 } from '@ngrx/signals';
-import { getEnergyToolkit } from './energy.data';
+import { getEnergyToolkit, ENERGY_TOOLKITS_VI } from './energy.data';
 import { EnergyToolkitConfig, MaturityBand, readinessFor } from './energy.types';
+import { needsMigration, rekeyRecord, TOOLKIT_PERSIST_VERSION } from '../shared/persist-migration';
 
 export const MONTHS = 12;
 
@@ -71,6 +72,7 @@ interface EnergyState {
   trackCost: (number | null)[];
   trackOutput: (number | null)[];
   // ── Kế hoạch 90 ngày ──
+  /** Keyed theo FieldDef.id (V2) — trước đây key theo nhãn tiếng Việt. */
   planInfo: Record<string, string>;
   actions: Record<string, ActionRow>;
   milestones: Record<string, MilestoneRow>;
@@ -99,19 +101,42 @@ const initialState: EnergyState = {
   currentStep: 0,
 };
 
-function loadPersisted(key: string): Partial<EnergyState> | null {
+/** Persisted slice of the state. V2: planInfo key theo FieldDef.id. */
+type PersistedEnergy = Partial<Omit<EnergyState, 'config' | 'storageKey'>> & {
+  version?: number;
+};
+
+/** V1 persist theo nhãn VN; map nhãn→id build từ chính config VI (không drift). */
+export function migrateV1toV2(raw: PersistedEnergy, config: EnergyToolkitConfig): PersistedEnergy {
+  const planMap = Object.fromEntries(config.planFields.map((f) => [f.label, f.id]));
+  return {
+    ...raw,
+    version: TOOLKIT_PERSIST_VERSION,
+    planInfo: rekeyRecord(raw.planInfo, planMap),
+  };
+}
+
+function loadPersisted(config: EnergyToolkitConfig): PersistedEnergy | null {
   if (typeof localStorage === 'undefined') return null;
+  const key = STORAGE_PREFIX + config.id;
   try {
     const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as Partial<EnergyState>) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PersistedEnergy;
+    if (!needsMigration(parsed)) return parsed;
+    // Map nhãn→id build từ bản VI (v1 persist nhãn VN) — bất kể locale đang chạy
+    const migrated = migrateV1toV2(parsed, ENERGY_TOOLKITS_VI[config.id] ?? config);
+    // Ghi lại ngay để lần sau không migrate nữa (idempotent nhờ version check)
+    savePersisted(key, migrated);
+    return migrated;
   } catch {
     return null;
   }
 }
-function savePersisted(key: string, state: Omit<EnergyState, 'config' | 'storageKey'>): void {
+function savePersisted(key: string, state: PersistedEnergy): void {
   if (typeof localStorage === 'undefined') return;
   try {
-    localStorage.setItem(key, JSON.stringify(state));
+    localStorage.setItem(key, JSON.stringify({ ...state, version: TOOLKIT_PERSIST_VERSION }));
   } catch {
     // ignore
   }
@@ -357,8 +382,8 @@ export const EnergyStore = signalStore(
     setTrackOutput(month: number, value: number | null) {
       patchState(store, (s) => ({ trackOutput: setCell(s.trackOutput, month, value, MONTHS) }));
     },
-    setPlanInfo(key: string, value: string) {
-      patchState(store, (s) => ({ planInfo: { ...s.planInfo, [key]: value } }));
+    setPlanInfo(fieldId: string, value: string) {
+      patchState(store, (s) => ({ planInfo: { ...s.planInfo, [fieldId]: value } }));
     },
     setAction(id: string, field: keyof ActionRow, value: string) {
       patchState(store, (s) => ({
@@ -389,7 +414,7 @@ export const EnergyStore = signalStore(
     trackKwhOf: (month: number) => store.trackKwh()[month] ?? null,
     trackCostOf: (month: number) => store.trackCost()[month] ?? null,
     trackOutputOf: (month: number) => store.trackOutput()[month] ?? null,
-    planInfoOf: (key: string) => store.planInfo()[key] ?? '',
+    planInfoOf: (fieldId: string) => store.planInfo()[fieldId] ?? '',
     actionOf: (id: string, field: keyof ActionRow) => store.actions()[id]?.[field] ?? '',
     milestoneOf: (id: string, field: keyof MilestoneRow) => store.milestones()[id]?.[field] ?? '',
 
@@ -406,8 +431,9 @@ export const EnergyStore = signalStore(
     init(config: EnergyToolkitConfig) {
       if (store.storageKey()) return; // already initialised
       const key = STORAGE_PREFIX + config.id;
-      const saved = loadPersisted(key);
-      patchState(store, { ...(saved ?? {}), config, storageKey: key });
+      const saved = loadPersisted(config) ?? {};
+      delete saved.version; // `version` chỉ dành cho persistence — không đưa vào state
+      patchState(store, { ...saved, config, storageKey: key });
     },
     reset() {
       const key = store.storageKey();

@@ -2,8 +2,10 @@
   <!-- Left Column: Package List -->
   <div class="system-sidebar">
     <div class="sidebar-header">
-      <h3 class="sidebar-title">Danh sách gói học</h3>
-      <span class="sidebar-count">{{ packages().length }} gói</span>
+      <h3 class="sidebar-title">{{ 'system.packages.listTitle' | transloco }}</h3>
+      <span class="sidebar-count">
+        {{ 'system.packages.count' | transloco: { count: packages().length } }}
+      </span>
     </div>
 
     @if (packagesResource.isLoading() && !packages().length) {
@@ -23,24 +25,31 @@
             <div class="package-item-header">
               <h4 class="package-name">{{ pkg.name }}</h4>
               <span class="package-badge" [class]="pkg.packageType">
-                {{ pkg.packageType === 'youth' ? 'Cá nhân' : 'Doanh nghiệp' }}
+                {{
+                  (pkg.packageType === 'youth'
+                    ? 'system.packages.badgeYouth'
+                    : 'system.packages.badgeOrg'
+                  ) | transloco
+                }}
               </span>
             </div>
-            <p class="package-desc-preview">{{ pkg.description || 'Không có mô tả' }}</p>
+            <p class="package-desc-preview">
+              {{ pkg.description || ('system.packages.noDescription' | transloco) }}
+            </p>
             <div class="package-meta">
               <span class="meta-item">
                 <svg lucideBookOpen [size]="14" strokeWidth="1.5"></svg>
-                {{ pkg.courses.length }} khóa học
+                {{ 'system.packages.courseCount' | transloco: { count: pkg.courses.length } }}
               </span>
               <span class="meta-item">
-                Slots: <strong>{{ pkg.slots }}</strong>
+                {{ 'system.packages.slotsLabel' | transloco }}: <strong>{{ pkg.slots }}</strong>
               </span>
               <span class="meta-price">
                 {{
                   pkg.price === -1
-                    ? 'Liên hệ'
+                    ? ('system.packages.priceContact' | transloco)
                     : pkg.price === 0
-                      ? 'Miễn phí'
+                      ? ('system.packages.priceFree' | transloco)
                       : (pkg.price | number) + 'đ'
                 }}
               </span>
@@ -62,7 +71,7 @@
             <div>
               <h2 class="editor-title">{{ pkg.name }}</h2>
               <p class="editor-subtitle">
-                ID Gói: <code>{{ pkg.id }}</code>
+                {{ 'system.packages.packageIdLabel' | transloco }}: <code>{{ pkg.id }}</code>
               </p>
             </div>
           </div>
@@ -74,14 +83,14 @@
               [class.active]="activeSubTab() === 'details'"
               (click)="activeSubTab.set('details')"
             >
-              Thông tin gói học
+              {{ 'system.packages.tabDetails' | transloco }}
             </button>
             <button
               class="editor-tab"
               [class.active]="activeSubTab() === 'courses'"
               (click)="activeSubTab.set('courses')"
             >
-              Quản lý khóa học ({{ pkg.courses.length }})
+              {{ 'system.packages.tabCourses' | transloco: { count: pkg.courses.length } }}
               @if (hasUnsavedCourses()) {
                 <span class="tab-unsaved-dot"></span>
               }
@@ -95,7 +104,7 @@
             @if (saveSuccess()) {
               <div class="alert success">
                 <svg lucideCheck [size]="18" strokeWidth="2"></svg>
-                <span>Cập nhật thông tin gói học thành công!</span>
+                <span>{{ 'system.packages.saveDetailsSuccess' | transloco }}</span>
               </div>
             }
             @if (saveError(); as err) {
@@ -109,13 +118,15 @@
             <div class="form-grid">
               <!-- Name -->
               <div class="field">
-                <label for="pkg-name" class="field__label">Tên gói học</label>
+                <label for="pkg-name" class="field__label">
+                  {{ 'system.packages.nameLabel' | transloco }}
+                </label>
                 <input
                   id="pkg-name"
                   type="text"
                   pInputText
                   [formField]="packageForm.name"
-                  placeholder="Nhập tên gói..."
+                  [placeholder]="'system.packages.namePlaceholder' | transloco"
                   class="w-full"
                 />
                 @if (packageForm.name().touched() && packageForm.name().invalid()) {
@@ -125,13 +136,15 @@
 
               <!-- Price -->
               <div class="field">
-                <label for="pkg-price" class="field__label">Giá tiền (VNĐ)</label>
+                <label for="pkg-price" class="field__label">
+                  {{ 'system.packages.priceLabel' | transloco }}
+                </label>
                 <input
                   id="pkg-price"
                   type="number"
                   pInputText
                   [formField]="packageForm.price"
-                  placeholder="Nhập giá tiền..."
+                  [placeholder]="'system.packages.pricePlaceholder' | transloco"
                   class="w-full"
                 />
                 <label class="field__checkbox">
@@ -140,7 +153,7 @@
                     [checked]="packageModel().isContactPrice"
                     (change)="toggleContactPrice($any($event.target).checked)"
                   />
-                  <span>Liên hệ (giá thỏa thuận)</span>
+                  <span>{{ 'system.packages.contactPriceCheckbox' | transloco }}</span>
                 </label>
                 @if (
                   !packageModel().isContactPrice &&
@@ -153,13 +166,15 @@
 
               <!-- Slots -->
               <div class="field">
-                <label for="pkg-slots" class="field__label">Số lượng slot thành viên</label>
+                <label for="pkg-slots" class="field__label">
+                  {{ 'system.packages.slotsFieldLabel' | transloco }}
+                </label>
                 <input
                   id="pkg-slots"
                   type="number"
                   pInputText
                   [formField]="packageForm.slots"
-                  placeholder="Số slot thành viên tối đa..."
+                  [placeholder]="'system.packages.slotsPlaceholder' | transloco"
                   class="w-full"
                 />
                 @if (packageForm.slots().touched() && packageForm.slots().invalid()) {
@@ -170,11 +185,13 @@
 
             <!-- Description -->
             <div class="field">
-              <label for="pkg-desc" class="field__label">Mô tả gói học</label>
+              <label for="pkg-desc" class="field__label">
+                {{ 'system.packages.descLabel' | transloco }}
+              </label>
               <textarea
                 id="pkg-desc"
                 [formField]="packageForm.description"
-                placeholder="Nhập mô tả chi tiết của gói học..."
+                [placeholder]="'system.packages.descPlaceholder' | transloco"
                 rows="4"
                 class="form-textarea"
               ></textarea>
@@ -182,15 +199,12 @@
 
             <!-- Credit tặng khi mua (CR-001 Q11 — replace-all app_package_credits) -->
             <div class="credits-config-section">
-              <h4 class="credits-config-title">Credit tặng khi mua gói</h4>
-              <p class="credits-config-desc">
-                Số lượt được cộng cho người mua khi thanh toán thành công. Để 0 hoặc trống nếu gói
-                không tặng loại credit đó.
-              </p>
+              <h4 class="credits-config-title">{{ 'system.packages.creditsTitle' | transloco }}</h4>
+              <p class="credits-config-desc">{{ 'system.packages.creditsDesc' | transloco }}</p>
               <div class="form-grid">
                 <div class="field">
                   <label for="pkg-mentoring-credits" class="field__label">
-                    Số buổi mentoring 1-1 (cá nhân)
+                    {{ 'system.packages.mentoringCreditsLabel' | transloco }}
                   </label>
                   <input
                     id="pkg-mentoring-credits"
@@ -204,7 +218,7 @@
                 <!-- CR-008: pool mentoring doanh nghiệp (gói mentor-org*) -->
                 <div class="field">
                   <label for="pkg-mentoring-org-credits" class="field__label">
-                    Số buổi mentoring 1-1 (doanh nghiệp)
+                    {{ 'system.packages.mentoringOrgCreditsLabel' | transloco }}
                   </label>
                   <input
                     id="pkg-mentoring-org-credits"
@@ -216,7 +230,9 @@
                   />
                 </div>
                 <div class="field">
-                  <label for="pkg-course-credits" class="field__label">Số suất chọn khoá</label>
+                  <label for="pkg-course-credits" class="field__label">
+                    {{ 'system.packages.courseCreditsLabel' | transloco }}
+                  </label>
                   <input
                     id="pkg-course-credits"
                     type="number"
@@ -228,7 +244,9 @@
                 </div>
                 <!-- CR-005: credit Quick Scan / Toolkit — tự điền 1 khi tick flag bên dưới -->
                 <div class="field">
-                  <label for="pkg-quickscan-credits" class="field__label">Số lượt Quick Scan</label>
+                  <label for="pkg-quickscan-credits" class="field__label">
+                    {{ 'system.packages.quickScanCreditsLabel' | transloco }}
+                  </label>
                   <input
                     id="pkg-quickscan-credits"
                     type="number"
@@ -239,7 +257,9 @@
                   />
                 </div>
                 <div class="field">
-                  <label for="pkg-toolkit-credits" class="field__label">Số lượt Toolkit</label>
+                  <label for="pkg-toolkit-credits" class="field__label">
+                    {{ 'system.packages.toolkitCreditsLabel' | transloco }}
+                  </label>
                   <input
                     id="pkg-toolkit-credits"
                     type="number"
@@ -254,10 +274,10 @@
 
             <!-- Quick Scan trong gói (CR-002 — flag `toolkit:<id>` trong features JSON) -->
             <div class="credits-config-section">
-              <h4 class="credits-config-title">Quick Scan trong gói</h4>
-              <p class="credits-config-desc">
-                Chọn các bài đánh giá nhanh ESG mà người mua gói này được truy cập.
-              </p>
+              <h4 class="credits-config-title">
+                {{ 'system.packages.quickScanTitle' | transloco }}
+              </h4>
+              <p class="credits-config-desc">{{ 'system.packages.quickScanDesc' | transloco }}</p>
               <div class="toolkit-grid">
                 @for (toolkit of quickScanToolkits; track toolkit.id) {
                   <label class="field__checkbox toolkit-option">
@@ -279,14 +299,11 @@
 
             <!-- Toolkit chuyên đề trong gói (CR-002) -->
             <div class="credits-config-section">
-              <h4 class="credits-config-title">Toolkit trong gói</h4>
-              <p class="credits-config-desc">
-                Chọn các bộ công cụ ESG chuyên đề mà người mua gói này được truy cập. Danh sách lấy
-                theo toolkit hiện có trên trang Toolkit.
-              </p>
+              <h4 class="credits-config-title">{{ 'system.packages.toolkitTitle' | transloco }}</h4>
+              <p class="credits-config-desc">{{ 'system.packages.toolkitDesc' | transloco }}</p>
               @for (group of toolkitGroups; track group.key) {
                 <div class="toolkit-group">
-                  <h5 class="toolkit-group__label">{{ group.label }}</h5>
+                  <h5 class="toolkit-group__label">{{ group.label | transloco }}</h5>
                   <div class="toolkit-grid">
                     @for (toolkit of group.items; track toolkit.id) {
                       <label class="field__checkbox toolkit-option">
@@ -311,12 +328,10 @@
             <!-- Gói con được bao gồm (CR-011) -->
             @if (includeCandidates().length > 0) {
               <div class="credits-config-section">
-                <h4 class="credits-config-title">Gói này bao gồm</h4>
-                <p class="credits-config-desc">
-                  Người mua gói này hưởng luôn quyền lợi của các gói được tick (đệ quy). Dùng để
-                  tính giá nâng cấp, nhãn "Gói A/B" của khoá học và chặn mua lại gói đã bao gồm. Chỉ
-                  chọn được gói cùng loại và không được tạo vòng lặp.
-                </p>
+                <h4 class="credits-config-title">
+                  {{ 'system.packages.includesTitle' | transloco }}
+                </h4>
+                <p class="credits-config-desc">{{ 'system.packages.includesDesc' | transloco }}</p>
                 <div class="toolkit-grid">
                   @for (candidate of includeCandidates(); track candidate.id) {
                     <label class="field__checkbox toolkit-option">
@@ -339,9 +354,10 @@
             <div class="form-actions">
               <button type="submit" class="btn primary" [disabled]="isSaving()">
                 @if (isSaving()) {
-                  <span class="spinner-small"></span> Đang lưu...
+                  <span class="spinner-small"></span> {{ 'system.packages.saving' | transloco }}
                 } @else {
-                  <svg lucideSave [size]="16" strokeWidth="2"></svg> Lưu thay đổi
+                  <svg lucideSave [size]="16" strokeWidth="2"></svg>
+                  {{ 'system.packages.saveChanges' | transloco }}
                 }
               </button>
             </div>
@@ -354,7 +370,7 @@
             @if (coursesSaveSuccess()) {
               <div class="alert success mb-4">
                 <svg lucideCheck [size]="18" strokeWidth="2"></svg>
-                <span>Lưu thay đổi danh sách khóa học thành công!</span>
+                <span>{{ 'system.packages.coursesSaveSuccess' | transloco }}</span>
               </div>
             }
             @if (coursesSaveError(); as err) {
@@ -367,7 +383,7 @@
               <div class="unsaved-banner animate-fade-in">
                 <div class="banner-text">
                   <svg lucideAlertCircle [size]="18" class="banner-icon"></svg>
-                  <span>Có thay đổi chưa lưu trên danh sách khóa học!</span>
+                  <span>{{ 'system.packages.unsavedBanner' | transloco }}</span>
                 </div>
                 <div class="banner-actions">
                   <button
@@ -377,9 +393,9 @@
                     (click)="savePackageCourses()"
                   >
                     @if (isSavingCourses()) {
-                      <span class="spinner-small"></span> Đang lưu...
+                      <span class="spinner-small"></span> {{ 'system.packages.saving' | transloco }}
                     } @else {
-                      Lưu ngay
+                      {{ 'system.packages.saveNow' | transloco }}
                     }
                   </button>
                 </div>
@@ -387,22 +403,22 @@
             }
 
             <div class="courses-header-row">
-              <h3 class="section-title">Danh sách khóa học chỉ định</h3>
-              <p class="section-desc">Điều chỉnh thứ tự hiển thị hoặc gỡ khóa học khỏi gói này.</p>
+              <h3 class="section-title">{{ 'system.packages.assignedTitle' | transloco }}</h3>
+              <p class="section-desc">{{ 'system.packages.assignedDesc' | transloco }}</p>
             </div>
 
             <!-- Assigned Courses List -->
             @if (!selectedPackageCourses().length) {
               <div class="empty-state-inner">
                 <svg lucideBookOpen [size]="32" class="empty-icon"></svg>
-                <p>Chưa có khóa học nào được chỉ định cho gói này.</p>
+                <p>{{ 'system.packages.noCourses' | transloco }}</p>
               </div>
             } @else {
               <div class="courses-list-table">
                 <div class="table-header">
-                  <div class="col-order">Thứ tự</div>
-                  <div class="col-title">Tên khóa học</div>
-                  <div class="col-actions">Thao tác</div>
+                  <div class="col-order">{{ 'system.packages.colOrder' | transloco }}</div>
+                  <div class="col-title">{{ 'system.packages.colTitle' | transloco }}</div>
+                  <div class="col-actions">{{ 'system.packages.colActions' | transloco }}</div>
                 </div>
 
                 <div class="table-body">
@@ -423,7 +439,7 @@
                             class="action-btn arrow"
                             [disabled]="idx === 0 || isSavingCourses()"
                             (click)="moveCourse(c.wpCourseId, 'up')"
-                            title="Di chuyển lên"
+                            [title]="'system.packages.moveUp' | transloco"
                           >
                             <svg lucideArrowUp [size]="14" strokeWidth="2"></svg>
                           </button>
@@ -434,7 +450,7 @@
                               idx === selectedPackageCourses().length - 1 || isSavingCourses()
                             "
                             (click)="moveCourse(c.wpCourseId, 'down')"
-                            title="Di chuyển xuống"
+                            [title]="'system.packages.moveDown' | transloco"
                           >
                             <svg lucideArrowDown [size]="14" strokeWidth="2"></svg>
                           </button>
@@ -446,7 +462,7 @@
                           class="action-btn delete"
                           [disabled]="isSavingCourses()"
                           (click)="removeCourse(c.wpCourseId)"
-                          title="Xóa khỏi gói học"
+                          [title]="'system.packages.removeFromPackage' | transloco"
                         >
                           <svg lucideTrash2 [size]="14" strokeWidth="2"></svg>
                         </button>
@@ -459,17 +475,15 @@
 
             <!-- Add Course Section: Searchable Catalog List -->
             <div class="add-course-section">
-              <h4 class="add-title">Kho khóa học hệ thống</h4>
-              <p class="section-desc mb-4">
-                Tìm kiếm và gán nhanh bất kỳ khóa học nào từ hệ thống vào gói học này.
-              </p>
+              <h4 class="add-title">{{ 'system.packages.catalogTitle' | transloco }}</h4>
+              <p class="section-desc mb-4">{{ 'system.packages.catalogDesc' | transloco }}</p>
 
               <div class="catalog-search-wrapper">
                 <div class="search-input-container">
                   <svg lucideSearch class="search-icon" [size]="16" strokeWidth="2"></svg>
                   <input
                     type="text"
-                    placeholder="Tìm khóa học theo tên hoặc ID..."
+                    [placeholder]="'system.packages.searchPlaceholder' | transloco"
                     [value]="searchQuery()"
                     (input)="searchQuery.set($any($event.target).value)"
                     class="form-input-search"
@@ -485,15 +499,17 @@
               @if (!filteredCoursesCatalog().length) {
                 <div class="empty-state-inner py-4">
                   <svg lucideSearch [size]="24" class="empty-icon"></svg>
-                  <p>Không tìm thấy khóa học nào phù hợp với từ khóa.</p>
+                  <p>{{ 'system.packages.noSearchResults' | transloco }}</p>
                 </div>
               } @else {
                 <div class="catalog-list-scroll">
                   <div class="catalog-table">
                     <div class="catalog-header">
                       <div class="col-cat-id">ID</div>
-                      <div class="col-cat-title">Tên khóa học</div>
-                      <div class="col-cat-action">Hành động</div>
+                      <div class="col-cat-title">{{ 'system.packages.colTitle' | transloco }}</div>
+                      <div class="col-cat-action">
+                        {{ 'system.packages.colAction' | transloco }}
+                      </div>
                     </div>
                     <div class="catalog-body">
                       @for (c of filteredCoursesCatalog(); track c.ID) {
@@ -509,7 +525,8 @@
                           <div class="col-cat-action">
                             @if (isCourseInSelectedPackage(c.ID)) {
                               <span class="badge-added">
-                                <svg lucideCheck [size]="14" strokeWidth="2.5"></svg> Đã thêm
+                                <svg lucideCheck [size]="14" strokeWidth="2.5"></svg>
+                                {{ 'system.packages.added' | transloco }}
                               </span>
                             } @else {
                               <button
@@ -518,7 +535,8 @@
                                 [disabled]="isSavingCourses()"
                                 (click)="addCourse(c.ID.toString())"
                               >
-                                <svg lucidePlus [size]="14" strokeWidth="2"></svg> Thêm
+                                <svg lucidePlus [size]="14" strokeWidth="2"></svg>
+                                {{ 'system.packages.add' | transloco }}
                               </button>
                             }
                           </div>
@@ -538,11 +556,8 @@
         <div class="empty-icon-wrap">
           <svg lucidePackage [size]="48" strokeWidth="1"></svg>
         </div>
-        <h3 class="empty-title">Chưa chọn gói học</h3>
-        <p class="empty-message">
-          Vui lòng chọn một gói học từ danh sách bên trái để bắt đầu quản trị thông tin chi tiết và
-          danh sách khóa học.
-        </p>
+        <h3 class="empty-title">{{ 'system.packages.emptyTitle' | transloco }}</h3>
+        <p class="empty-message">{{ 'system.packages.emptyMessage' | transloco }}</p>
       </div>
     }
   </div>

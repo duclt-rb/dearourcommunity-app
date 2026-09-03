@@ -15,12 +15,12 @@ export const routes: Routes = [
   },
   {
     path: 'auth/login',
-    title: 'Đăng nhập',
+    title: 'titles.login',
     loadComponent: () => import('./auth/login/login'),
   },
   {
     path: 'auth/register',
-    title: 'Đăng ký',
+    title: 'titles.register',
     loadComponent: () => import('./auth/register/register'),
   },
   {
@@ -35,39 +35,39 @@ export const routes: Routes = [
       },
       {
         path: 'dashboard',
-        title: 'Trang chủ',
+        title: 'titles.dashboard',
         loadComponent: () => import('./profile/dashboard/dashboard'),
       },
       {
         path: 'courses',
-        title: 'Khóa học của tôi',
+        title: 'titles.myCourses',
         loadComponent: () => import('./profile/courses/courses'),
       },
       {
         path: 'certificates',
-        title: 'Chứng chỉ',
+        title: 'titles.certificates',
         loadComponent: () => import('./profile/certificates/certificates'),
       },
       {
         path: 'edit-profile',
-        title: 'Chỉnh sửa hồ sơ',
+        title: 'titles.editProfile',
         loadComponent: () => import('./profile/edit-profile/edit-profile'),
       },
       {
         path: 'password',
-        title: 'Đổi mật khẩu',
+        title: 'titles.changePassword',
         loadComponent: () => import('./profile/password/password'),
       },
       {
         path: 'organization',
-        title: 'Tổ chức',
+        title: 'titles.organization',
         loadComponent: () => import('./profile/organization/organization'),
       },
     ],
   },
   {
     path: 'invitations/check',
-    title: 'Kiểm tra lời mời',
+    title: 'titles.invitationCheck',
     loadComponent: () => import('./invitations/check/check'),
   },
   {
@@ -82,33 +82,33 @@ export const routes: Routes = [
       },
       {
         path: 'packages',
-        title: 'Quản lý gói',
+        title: 'titles.systemPackages',
         loadComponent: () => import('./system/packages/packages'),
       },
       {
         path: 'transactions',
-        title: 'Quản lý giao dịch',
+        title: 'titles.systemTransactions',
         loadComponent: () => import('./system/transactions/transactions'),
       },
       {
         path: 'mentors',
-        title: 'Quản lý mentor',
+        title: 'titles.systemMentors',
         loadComponent: () => import('./system/mentors/mentors'),
       },
       {
         path: 'mentor-bookings',
-        title: 'Quản lý lịch hẹn mentor',
+        title: 'titles.systemMentorBookings',
         loadComponent: () => import('./system/mentor-bookings/mentor-bookings'),
       },
       {
         path: 'credits',
-        title: 'Điều chỉnh credit',
+        title: 'titles.systemCredits',
         loadComponent: () => import('./system/credits/credits'),
       },
       {
         // CR-012 — giá bán lẻ khoá / Quick Scan / Toolkit tại checkout
         path: 'addon-prices',
-        title: 'Giá bán lẻ',
+        title: 'titles.systemAddonPrices',
         loadComponent: () => import('./system/addon-prices/addon-prices'),
       },
     ],
@@ -124,26 +124,26 @@ export const routes: Routes = [
       },
       {
         path: 'billing',
-        title: 'Thanh toán',
+        title: 'titles.checkout',
         canActivate: [checkoutGuard, accountMatchGuard],
         loadComponent: () => import('./checkout/billing/billing'),
       },
       {
         path: 'wrong-account',
-        title: 'Sai tài khoản',
+        title: 'titles.wrongAccount',
         loadComponent: () => import('./checkout/wrong-account/wrong-account'),
       },
       {
         // UX 15/07 — màn xác nhận sau "Tôi đã chuyển khoản" (thông báo 72h + chứng từ
         // + form hoá đơn VAT) tách khỏi billing; vào bằng ?orderId=
         path: 'bank-confirmation',
-        title: 'Xác nhận chuyển khoản',
+        title: 'titles.bankConfirmation',
         canActivate: [bankConfirmationGuard],
         loadComponent: () => import('./checkout/bank-confirmation/bank-confirmation'),
       },
       {
         path: 'receipt',
-        title: 'Hóa đơn',
+        title: 'titles.receipt',
         canActivate: [receiptGuard],
         loadComponent: () => import('./checkout/receipt/receipt'),
       },
@@ -158,18 +158,18 @@ export const routes: Routes = [
   },
   {
     path: 'toolkit/locked',
-    title: 'Bộ công cụ',
+    title: 'titles.toolkit',
     loadComponent: () => import('./toolkit/toolkit-locked'),
   },
   {
     path: 'toolkit/:id',
-    title: 'Bộ công cụ',
+    title: 'titles.toolkit',
     canActivate: [toolkitAccessGuard],
     loadComponent: () => import('./toolkit/toolkit'),
   },
   {
     path: 'course/:courseId/lesson/:lessonId',
-    title: 'Bài học',
+    title: 'titles.lesson',
     loadComponent: () => import('./courses/lesson-player/lesson-player'),
   },
   {

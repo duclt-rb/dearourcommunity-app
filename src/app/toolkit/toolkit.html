@@ -11,14 +11,16 @@
   <div class="mx-auto max-w-[760px] px-6 py-24 text-center">
     <h1 class="text-2xl font-semibold text-gray-900">{{ tk.name }}</h1>
     @if (tk.comingSoon) {
-      <p class="mt-3 text-gray-600">Công cụ này sẽ sớm ra mắt.</p>
+      <p class="mt-3 text-gray-600">{{ 'toolkit.shell.comingSoon' | transloco }}</p>
     } @else {
-      <p class="mt-3 text-gray-600">Nội dung công cụ đang được cập nhật.</p>
+      <p class="mt-3 text-gray-600">{{ 'toolkit.shell.contentUpdating' | transloco }}</p>
     }
   </div>
 } @else {
   <div class="mx-auto max-w-[760px] px-6 py-24 text-center">
-    <h1 class="text-2xl font-semibold text-gray-900">Không tìm thấy công cụ</h1>
-    <p class="mt-3 text-gray-600">Đường dẫn không hợp lệ: {{ id() }}</p>
+    <h1 class="text-2xl font-semibold text-gray-900">
+      {{ 'toolkit.shell.notFoundTitle' | transloco }}
+    </h1>
+    <p class="mt-3 text-gray-600">{{ 'toolkit.shell.invalidPath' | transloco: { id: id() } }}</p>
   </div>
 }

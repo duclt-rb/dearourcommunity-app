@@ -11,23 +11,20 @@
       </div>
 
       <!-- Title -->
-      <h1 class="result-title">Thanh toán thành công!</h1>
+      <h1 class="result-title">{{ 'checkout.receipt.successTitle' | transloco }}</h1>
 
       <!-- Description -->
-      <p class="result-desc">Cảm ơn bạn! Đơn hàng đã được thanh toán thành công.</p>
+      <p class="result-desc">{{ 'checkout.receipt.successDesc' | transloco }}</p>
 
       <!-- Enrollment status -->
       <div class="enroll-status">
         @if (activating()) {
           <div class="spinner-sm dark"></div>
-          <span class="enroll-loading">Đang kích hoạt gói thành viên...</span>
+          <span class="enroll-loading">{{ 'checkout.receipt.activating' | transloco }}</span>
         } @else if (enrolled()) {
-          <span class="enroll-success">✓ Tài khoản của bạn đã được nâng cấp!</span>
+          <span class="enroll-success">{{ 'checkout.receipt.upgraded' | transloco }}</span>
         } @else {
-          <span class="enroll-timeout"
-            >✗ Kích hoạt tài khoản thất bại hoặc quá thời gian phản hồi. Vui lòng liên hệ hỗ
-            trợ.</span
-          >
+          <span class="enroll-timeout">{{ 'checkout.receipt.activationTimeout' | transloco }}</span>
         }
       </div>
 
@@ -35,19 +32,19 @@
       <div class="order-card">
         <div class="order-details">
           <div class="order-row">
-            <span class="order-label">Gói đăng ký</span>
+            <span class="order-label">{{ 'checkout.receipt.packageLabel' | transloco }}</span>
             <span class="order-value">{{ packageName() }}</span>
           </div>
           <div class="order-row">
-            <span class="order-label">Mã đơn hàng</span>
+            <span class="order-label">{{ 'checkout.receipt.orderId' | transloco }}</span>
             <span class="order-value">{{ orderId() }}</span>
           </div>
           <div class="order-row">
-            <span class="order-label">Mã giao dịch MoMo</span>
+            <span class="order-label">{{ 'checkout.receipt.momoTransId' | transloco }}</span>
             <span class="order-value">{{ transId() }}</span>
           </div>
           <div class="order-row amount">
-            <span class="order-label">Số tiền</span>
+            <span class="order-label">{{ 'checkout.receipt.amount' | transloco }}</span>
             <span class="order-value">₫ {{ amountFormatted() }}</span>
           </div>
         </div>
@@ -66,7 +63,7 @@
       <!-- Buttons -->
       <div class="action-row">
         <a routerLink="/profile/dashboard" class="btn btn-primary">
-          Về trang cá nhân
+          {{ 'checkout.backToDashboard' | transloco }}
           <svg lucideArrowRight [size]="20" strokeWidth="2"></svg>
         </a>
       </div>
@@ -85,7 +82,7 @@
       </div>
 
       <!-- Title -->
-      <h1 class="result-title">Thanh toán thất bại</h1>
+      <h1 class="result-title">{{ 'checkout.receipt.failTitle' | transloco }}</h1>
 
       <!-- Description -->
       <p class="result-desc">{{ resultMessage() }}</p>
@@ -94,15 +91,15 @@
       <div class="order-card">
         <div class="order-details">
           <div class="order-row">
-            <span class="order-label">Gói đăng ký</span>
+            <span class="order-label">{{ 'checkout.receipt.packageLabel' | transloco }}</span>
             <span class="order-value">{{ packageName() }}</span>
           </div>
           <div class="order-row">
-            <span class="order-label">Mã đơn hàng</span>
-            <span class="order-value">{{ orderId() || 'N/A' }}</span>
+            <span class="order-label">{{ 'checkout.receipt.orderId' | transloco }}</span>
+            <span class="order-value">{{ orderId() || ('common.notAvailable' | transloco) }}</span>
           </div>
           <div class="order-row amount">
-            <span class="order-label">Số tiền</span>
+            <span class="order-label">{{ 'checkout.receipt.amount' | transloco }}</span>
             <span class="order-value">₫ {{ amountFormatted() }}</span>
           </div>
         </div>
@@ -112,7 +109,7 @@
       <div class="action-row">
         <a routerLink="/profile/dashboard" class="btn btn-home">
           <svg lucideHome [size]="18" strokeWidth="2"></svg>
-          Trang chủ
+          {{ 'checkout.receipt.home' | transloco }}
         </a>
         <a
           routerLink="/checkout/billing"
@@ -122,7 +119,7 @@
           }"
           class="btn btn-primary"
         >
-          Thử lại
+          {{ 'common.retry' | transloco }}
           <svg lucideArrowRight [size]="20" strokeWidth="2"></svg>
         </a>
       </div>

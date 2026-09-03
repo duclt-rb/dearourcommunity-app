@@ -3,8 +3,9 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { LucideArrowRight, LucideLock } from '@lucide/angular';
 import LogoComponent from '../shared/logo/logo';
-import { environment } from '../../environments/environment';
 import { ToolkitAccessService } from './toolkit-access.service';
+import { frontpageUrl } from '../core/i18n/locale';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * CR-003 — trang khóa riêng: guard đưa về đây (`?toolkit=<id>`) khi user không có
@@ -14,7 +15,7 @@ import { ToolkitAccessService } from './toolkit-access.service';
 @Component({
   selector: 'app-toolkit-locked',
   standalone: true,
-  imports: [CommonModule, RouterLink, LogoComponent, LucideArrowRight, LucideLock],
+  imports: [TranslocoPipe, CommonModule, RouterLink, LogoComponent, LucideArrowRight, LucideLock],
   templateUrl: './toolkit-locked.html',
 })
 export default class ToolkitLockedComponent implements OnInit {
@@ -28,7 +29,7 @@ export default class ToolkitLockedComponent implements OnInit {
     return id ? this.access.packagesWithToolkit(id) : [];
   });
 
-  readonly frontpageToolkitUrl = `${environment.appUrl}/vi/toolkit`;
+  readonly frontpageToolkitUrl = frontpageUrl('/toolkit');
 
   ngOnInit() {
     this.route.queryParamMap.subscribe((params) => {

@@ -2,7 +2,7 @@
      + khung giờ. Ẩn im lặng nếu không có booking / không xem được. -->
 @if (booking(); as mb) {
   <div class="booking-summary">
-    <span class="booking-summary__title">Lịch hẹn mentor</span>
+    <span class="booking-summary__title">{{ 'checkout.bookingSummary.title' | transloco }}</span>
 
     <div class="booking-summary__mentor">
       @if (mb.mentor?.avatarUrl; as avatar) {
@@ -10,7 +10,7 @@
       }
       <div class="booking-summary__mentor-info">
         <span class="booking-summary__name">
-          {{ mb.mentor?.name || 'Admin sẽ điều phối mentor phù hợp' }}
+          {{ mb.mentor?.name || ('checkout.bookingSummary.mentorTbd' | transloco) }}
         </span>
         @if (mb.mentor?.position) {
           <span class="booking-summary__position">{{ mb.mentor?.position }}</span>

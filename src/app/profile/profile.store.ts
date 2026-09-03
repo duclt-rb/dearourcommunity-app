@@ -1,5 +1,6 @@
 import { computed, inject } from '@angular/core';
 import { OrgMembership, PackageType } from '@dearourcommunity/client';
+import { TranslocoService } from '@jsverse/transloco';
 import {
   patchState,
   signalStore,
@@ -71,7 +72,10 @@ export const ProfileStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withComputed(
-    ({ enrolledCourses, certificates, firstName, lastName, packageType, isOrgMember }) => ({
+    (
+      { enrolledCourses, certificates, firstName, lastName, packageType, isOrgMember },
+      transloco = inject(TranslocoService),
+    ) => ({
       stats: computed(() => {
         const courses = enrolledCourses();
         const completed = courses.filter((c) => c.progress === 100).length;
@@ -84,10 +88,10 @@ export const ProfileStore = signalStore(
           certificates: certsCount,
         };
       }),
-      displayName: computed(() => {
+      displayName: computed<string>(() => {
         const first = firstName().trim();
         const last = lastName().trim();
-        if (!first && !last) return 'Học viên';
+        if (!first && !last) return transloco.translate('profile.sidebar.defaultDisplayName');
         return `${first} ${last}`.trim();
       }),
       isOrganization: computed(() => packageType() === 'organization'),
@@ -95,7 +99,12 @@ export const ProfileStore = signalStore(
     }),
   ),
   withMethods(
-    (store, authService = inject(AuthService), courseService = inject(CourseService)) => ({
+    (
+      store,
+      authService = inject(AuthService),
+      courseService = inject(CourseService),
+      transloco = inject(TranslocoService),
+    ) => ({
       async loadProfile() {
         try {
           const user = await authService.me();
@@ -141,9 +150,16 @@ export const ProfileStore = signalStore(
             thumbnail:
               c.thumbnail ||
               'https://images.unsplash.com/photo-1513258496099-48168024aec0?w=600&auto=format&fit=crop&q=80',
-            lastActive:
-              c.progress === 100 ? 'Hoàn thành' : c.progress > 0 ? 'Đang học' : 'Chưa học',
-            category: decodeHtml(c.category?.name || 'Kỹ năng'),
+            lastActive: transloco.translate(
+              c.progress === 100
+                ? 'profile.courses.statusCompleted'
+                : c.progress > 0
+                  ? 'profile.courses.statusInProgress'
+                  : 'profile.courses.statusNotStarted',
+            ),
+            category: decodeHtml(
+              c.category?.name || transloco.translate('profile.courses.categoryFallback'),
+            ),
           }));
 
           patchState(store, {

@@ -1,4 +1,5 @@
 import { inject, computed } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { ApiError } from '@dearourcommunity/client';
 import type {
@@ -11,6 +12,7 @@ import type {
   UpgradeQuote,
   ValidateCouponResponse,
 } from '@dearourcommunity/client';
+import { formatNumber } from '../core/i18n/format';
 import { PackagesService } from '../core/services/packages.service';
 import { PaymentService } from '../core/services/payment.service';
 import { ToolkitAccessService } from '../toolkit/toolkit-access.service';
@@ -20,11 +22,9 @@ export type PaymentMethod = 'momo' | 'bank';
 /**
  * UX CR-006 amendment 15/07 — message thay cho 400 nguyên văn khi quyền sở hữu
  * Quick Scan/Toolkit đổi giữa chừng (admin duyệt/backfill sau khi trang đã load)
- * và app đã tự đồng bộ lại lựa chọn.
+ * và app đã tự đồng bộ lại lựa chọn. Chỉ giữ KEY ở module-level; dịch tại nơi dùng.
  */
-const OWNED_RECONCILED_MSG =
-  'Quyền Quick Scan/Toolkit của bạn vừa được cập nhật — mục bạn đã sở hữu được bỏ khỏi lựa chọn. ' +
-  'Vui lòng kiểm tra lại lựa chọn và thử lại.';
+const OWNED_RECONCILED_KEY = 'checkout.store.ownedReconciled';
 
 // CR-006 — id `esg-quick-scan-*` thuộc nhóm Quick Scan (credit quick_scan); còn lại là
 // toolkit chuyên đề (credit toolkit). Mirror quy ước BE (toolkits.service).
@@ -218,7 +218,7 @@ export const CheckoutStore = signalStore(
       // Coupon do server tính (changelog SDK 0.6.8): FE gửi giá gốc + couponCode, số tiền
       // sau giảm lấy từ response createBankTransfer (bankTransfer.amount) — không tự trừ ở client.
       paymentSuccess: computed(() => resultCode() === '0'),
-      amountFormatted: computed(() => amount().toLocaleString('vi-VN')),
+      amountFormatted: computed(() => formatNumber(amount())),
       // Mức giảm hiển thị sớm từ kết quả validate coupon (chỉ để xem trước; số thực thu vẫn
       // do server chốt lại khi tạo thanh toán/chuyển khoản).
       couponFinalPrice: computed(() => couponInfo()?.final_price ?? originalPrice()),
@@ -389,6 +389,7 @@ export const CheckoutStore = signalStore(
       paymentService = inject(PaymentService),
       packagesService = inject(PackagesService),
       toolkitAccess = inject(ToolkitAccessService),
+      transloco = inject(TranslocoService),
     ) => {
       /** UX 15/07 — không còn lựa chọn thực → chọn sẵn toàn bộ mục còn lại (UI khoá thao tác). */
       const autoSelectForcedToolkits = () => {
@@ -753,7 +754,8 @@ export const CheckoutStore = signalStore(
             // CR-004/CR-006 — 400 validate (vd bộ chọn không khớp) hiện nguyên văn để user sửa;
             // UX 15/07: nếu do quyền sở hữu vừa đổi thì tự đồng bộ lại và hiện message hành động được
             let errorMsg = blockedMsg ? null : toApiErrorMessage(err);
-            if (errorMsg && (await reconcileOwnedToolkits())) errorMsg = OWNED_RECONCILED_MSG;
+            if (errorMsg && (await reconcileOwnedToolkits()))
+              errorMsg = transloco.translate(OWNED_RECONCILED_KEY);
             patchState(store, {
               isLoading: false,
               paymentError: !blockedMsg,
@@ -807,7 +809,8 @@ export const CheckoutStore = signalStore(
             // CR-004/CR-006 — 400 validate hiện nguyên văn để user sửa lựa chọn;
             // UX 15/07: nếu do quyền sở hữu vừa đổi thì tự đồng bộ lại và hiện message hành động được
             let errorMsg = blockedMsg ? null : toApiErrorMessage(err);
-            if (errorMsg && (await reconcileOwnedToolkits())) errorMsg = OWNED_RECONCILED_MSG;
+            if (errorMsg && (await reconcileOwnedToolkits()))
+              errorMsg = transloco.translate(OWNED_RECONCILED_KEY);
             patchState(store, {
               bankCreating: false,
               bankCreateError: !blockedMsg,
@@ -870,7 +873,8 @@ export const CheckoutStore = signalStore(
             // CR-004/CR-006 — 400 validate (vd bộ chọn không khớp) hiện nguyên văn để user sửa;
             // UX 15/07: nếu do quyền sở hữu vừa đổi thì tự đồng bộ lại và hiện message hành động được
             let errorMsg = blockedMsg ? null : toApiErrorMessage(err);
-            if (errorMsg && (await reconcileOwnedToolkits())) errorMsg = OWNED_RECONCILED_MSG;
+            if (errorMsg && (await reconcileOwnedToolkits()))
+              errorMsg = transloco.translate(OWNED_RECONCILED_KEY);
             patchState(store, {
               isLoading: false,
               paymentError: !blockedMsg,

@@ -1,4 +1,5 @@
 import { Component, computed, input } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 export interface PieSlice {
   label: string;
@@ -16,6 +17,7 @@ interface PieSegment extends PieSlice {
 @Component({
   selector: 'app-score-pie',
   standalone: true,
+  imports: [TranslocoPipe],
   templateUrl: './score-pie.html',
   styleUrl: './score-pie.css',
 })

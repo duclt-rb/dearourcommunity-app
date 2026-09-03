@@ -1,6 +1,7 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import type { MentorBooking } from '@dearourcommunity/client';
 import { CheckoutStore, type PaymentMethod } from '../checkout.store';
 import { findToolkit } from '../../toolkit/toolkit.data';
@@ -27,6 +28,7 @@ import {
 import LogoComponent from '../../shared/logo/logo';
 import BookingSummaryComponent from '../booking-summary/booking-summary';
 import { environment } from '../../../environments/environment';
+import { frontpageUrl } from '../../core/i18n/locale';
 
 /**
  * CR-010 — `label` của gói là "Youth A" / "Organization C+" nên lấy phần cuối ("A", "C+") để
@@ -42,6 +44,7 @@ function toShortPackageLabel(label: string | null | undefined): string | null {
   imports: [
     DecimalPipe,
     RouterLink,
+    TranslocoPipe,
     LucideBookOpen,
     LucideCheck,
     LucideTag,
@@ -66,6 +69,7 @@ function toShortPackageLabel(label: string | null | undefined): string | null {
 export default class BillingComponent implements OnInit {
   readonly store = inject(CheckoutStore);
   readonly profileStore = inject(ProfileStore);
+  private readonly transloco = inject(TranslocoService);
   private readonly courseService = inject(CourseService);
   private readonly toolkitAccess = inject(ToolkitAccessService);
   private readonly router = inject(Router);
@@ -258,7 +262,9 @@ export default class BillingComponent implements OnInit {
       .map((pc) => ({
         // wp_course_id là bigint — BE serialize thành string, phải ép số để courseIds gửi lên đúng kiểu
         id: Number(pc.wpCourseId),
-        title: pc.course?.postTitle ?? `Khoá học #${pc.wpCourseId}`,
+        title:
+          pc.course?.postTitle ??
+          this.transloco.translate('checkout.billing.courseFallback', { id: pc.wpCourseId }),
         // Ảnh đại diện khoá (SDK 0.18.0) — null/undefined → card fallback icon sách
         thumbnailUrl: pc.course?.thumbnailUrl ?? null,
         // CR-010/CR-011 — gói xuất xứ: badge (khi không chia được section) + sắp xếp section
@@ -310,7 +316,7 @@ export default class BillingComponent implements OnInit {
   // Link tới trang chi tiết gói trên website chính (mở tab mới)
   readonly packageDetailUrl = computed<string | null>(() => {
     const id = this.store.selectedPackage()?.id;
-    return id ? `${environment.appUrl}/vi/what-we-offer/${id}` : null;
+    return id ? frontpageUrl(`/what-we-offer/${id}`) : null;
   });
 
   // Số tiền phải trả để hiển thị: với chuyển khoản đã tạo giao dịch thì lấy số thực thu

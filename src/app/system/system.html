@@ -4,41 +4,41 @@
     <div class="navbar-brand">
       <div class="brand-logo-glow"></div>
       <span class="navbar-logo-text">DEAR OUR COMMUNITY</span>
-      <span class="navbar-badge">TRANG QUẢN TRỊ</span>
+      <span class="navbar-badge">{{ 'system.shell.badge' | transloco }}</span>
     </div>
-    <a routerLink="/profile/dashboard" class="btn-back">
-      <svg lucideArrowLeft [size]="16" strokeWidth="2"></svg>
-      Quay lại Trang cá nhân
-    </a>
+    <div class="flex items-center gap-3">
+      <app-language-switcher />
+      <a routerLink="/profile/dashboard" class="btn-back">
+        <svg lucideArrowLeft [size]="16" strokeWidth="2"></svg>
+        {{ 'system.shell.backToProfile' | transloco }}
+      </a>
+    </div>
   </header>
 
   <div class="system-page-container">
     <div class="profile-page-header">
-      <h1 class="profile-page-title">Quản lý hệ thống</h1>
-      <p class="profile-page-subtitle">
-        Cấu hình danh sách các gói học phí, khóa học chỉ định và giám sát lịch sử giao dịch qua cổng
-        thanh toán.
-      </p>
+      <h1 class="profile-page-title">{{ 'system.shell.title' | transloco }}</h1>
+      <p class="profile-page-subtitle">{{ 'system.shell.subtitle' | transloco }}</p>
 
       <!-- Sub-navigation tabs (Packages & Transactions) -->
       <div class="system-main-tabs">
         <a class="system-main-tab" routerLink="packages" routerLinkActive="active">
-          Quản lý gói học
+          {{ 'system.shell.tabs.packages' | transloco }}
         </a>
         <a class="system-main-tab" routerLink="transactions" routerLinkActive="active">
-          Lịch sử giao dịch
+          {{ 'system.shell.tabs.transactions' | transloco }}
         </a>
         <a class="system-main-tab" routerLink="mentor-bookings" routerLinkActive="active">
-          Đặt lịch Mentor
+          {{ 'system.shell.tabs.mentorBookings' | transloco }}
         </a>
         <a class="system-main-tab" routerLink="mentors" routerLinkActive="active">
-          Quản lý Mentor
+          {{ 'system.shell.tabs.mentors' | transloco }}
         </a>
         <a class="system-main-tab" routerLink="credits" routerLinkActive="active">
-          Điều chỉnh Credit
+          {{ 'system.shell.tabs.credits' | transloco }}
         </a>
         <a class="system-main-tab" routerLink="addon-prices" routerLinkActive="active">
-          Giá bán lẻ
+          {{ 'system.shell.tabs.addonPrices' | transloco }}
         </a>
       </div>
     </div>

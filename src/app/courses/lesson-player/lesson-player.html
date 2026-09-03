@@ -17,7 +17,7 @@
       <!-- Back to Course -->
       <div class="back-link" (click)="backToCourse()">
         <svg lucideChevronLeft [size]="24" strokeWidth="2" style="color: #1c1c1c"></svg>
-        <span class="back-link-text">Quay lại chi tiết khoá học</span>
+        <span class="back-link-text">{{ 'lesson.sidebar.backToCourse' | transloco }}</span>
       </div>
 
       <!-- Render Chapters & Topics dynamically -->
@@ -68,7 +68,9 @@
                     <div class="topic-count-badge">
                       <svg lucideChevronDown [size]="16" strokeWidth="3"></svg>
                     </div>
-                    <span class="topic-count">{{ chapter.topicCount }} Chủ đề</span>
+                    <span class="topic-count">{{
+                      'lesson.sidebar.topicCount' | transloco: { n: chapter.topicCount }
+                    }}</span>
                   </div>
                 }
               </div>
@@ -113,13 +115,11 @@
         <svg lucideMessageSquare [size]="44" strokeWidth="1.5" style="color: #fff"></svg>
       </div>
       <div class="report-text">
-        <p class="report-title">Bài học không hoạt động đúng?</p>
-        <p class="report-body">
-          (Lỗi kỹ thuật, vấn đề nội dung, v.v.) Nhấn nút báo cáo để thông báo cho chúng tôi.
-        </p>
+        <p class="report-title">{{ 'lesson.report.cardTitle' | transloco }}</p>
+        <p class="report-body">{{ 'lesson.report.cardBody' | transloco }}</p>
       </div>
       <button class="report-btn" (click)="toggleReportDialog(true)">
-        <span class="report-btn-text">Báo cáo / Phản hồi</span>
+        <span class="report-btn-text">{{ 'lesson.report.cardButton' | transloco }}</span>
         <svg lucideChevronRight [size]="20" strokeWidth="2" style="color: #fff"></svg>
       </button>
     </div>
@@ -131,7 +131,11 @@
     <header class="header">
       <!-- Desktop -->
       <div class="header-desktop">
-        <button class="toggle-sidebar" (click)="toggleSidebar()" aria-label="Thu gọn thanh bên">
+        <button
+          class="toggle-sidebar"
+          (click)="toggleSidebar()"
+          [attr.aria-label]="'lesson.header.toggleSidebar' | transloco"
+        >
           <svg
             lucideChevronLeft
             [size]="20"
@@ -143,10 +147,12 @@
 
         <div class="header-progress">
           <div class="header-progress-text">
-            <span class="header-progress-pct">{{ progressPct() }}% Hoàn thành</span>
-            <span class="header-progress-steps"
-              >{{ completedSteps() }}/{{ totalSteps() }} Bước</span
-            >
+            <span class="header-progress-pct">{{
+              'lesson.header.completed' | transloco: { pct: progressPct() }
+            }}</span>
+            <span class="header-progress-steps">{{
+              'lesson.header.steps' | transloco: { done: completedSteps(), total: totalSteps() }
+            }}</span>
           </div>
           <div class="header-progress-bar">
             <div class="header-progress-fill" [style.width.%]="progressPct()"></div>
@@ -156,22 +162,22 @@
         <div class="header-nav">
           <button class="btn-nav btn-nav-prev" (click)="prevLesson()">
             <svg lucideChevronLeft [size]="20" strokeWidth="2"></svg>
-            Trước
+            {{ 'lesson.nav.prev' | transloco }}
           </button>
           <button class="btn-nav btn-nav-next" (click)="nextLesson()">
-            Tiếp
+            {{ 'lesson.nav.next' | transloco }}
             <svg lucideChevronRight [size]="20" strokeWidth="2"></svg>
           </button>
         </div>
 
         @if (!lessonCompleted()) {
           <button class="btn-complete" (click)="markComplete()">
-            <span>Đánh dấu hoàn thành</span>
+            <span>{{ 'lesson.nav.markComplete' | transloco }}</span>
             <svg lucideCheck [size]="20" strokeWidth="2"></svg>
           </button>
         } @else {
           <div class="badge-completed">
-            <span class="badge-completed-text">Đã hoàn thành</span>
+            <span class="badge-completed-text">{{ 'lesson.nav.completedBadge' | transloco }}</span>
           </div>
         }
 
@@ -184,19 +190,19 @@
       <div class="header-mobile">
         <div class="header-mobile-row1">
           <button class="mobile-menu-btn" (click)="openMobileDrawer()">
-            <span class="mobile-menu-btn-text">Bài học khoá học</span>
+            <span class="mobile-menu-btn-text">{{ 'lesson.drawer.title' | transloco }}</span>
             <svg lucideChevronDown [size]="16" strokeWidth="2.5" style="color: #8f50e2"></svg>
           </button>
           <div class="user-avatar-sm" style="width: 28px; height: 28px"><span>NV</span></div>
         </div>
         <div class="header-mobile-row2">
           <div class="header-mobile-progress-text">
-            <span style="font-weight: 700; color: var(--color-primary)"
-              >{{ progressPct() }}% Hoàn thành</span
-            >
-            <span style="color: rgba(28, 28, 28, 0.5)"
-              >{{ completedSteps() }}/{{ totalSteps() }} Bước</span
-            >
+            <span style="font-weight: 700; color: var(--color-primary)">{{
+              'lesson.header.completed' | transloco: { pct: progressPct() }
+            }}</span>
+            <span style="color: rgba(28, 28, 28, 0.5)">{{
+              'lesson.header.steps' | transloco: { done: completedSteps(), total: totalSteps() }
+            }}</span>
           </div>
           <div class="header-progress-bar">
             <div class="header-progress-fill" [style.width.%]="progressPct()"></div>
@@ -214,7 +220,9 @@
       <div class="breadcrumb-wrap">
         <div class="breadcrumb">
           <div class="breadcrumb-item">
-            <a href="#" class="breadcrumb-link" (click)="$event.preventDefault()">Học trực tuyến</a>
+            <a href="#" class="breadcrumb-link" (click)="$event.preventDefault()">{{
+              'lesson.breadcrumb.eLearning' | transloco
+            }}</a>
             <svg
               lucideChevronRight
               [size]="16"
@@ -223,9 +231,9 @@
             ></svg>
           </div>
           <div class="breadcrumb-item">
-            <a href="#" class="breadcrumb-link" (click)="$event.preventDefault()"
-              >ESG Căn Bản Cho Người Mới Bắt Đầu</a
-            >
+            <a href="#" class="breadcrumb-link" (click)="$event.preventDefault()">{{
+              'lesson.content.courseName' | transloco
+            }}</a>
             <svg
               lucideChevronRight
               [size]="16"
@@ -269,7 +277,7 @@
             <div class="video-overlay loading">
               <div style="display: flex; flex-direction: column; align-items: center; gap: 12px">
                 <div class="spinner"></div>
-                <span class="loading-text">Đang tải video...</span>
+                <span class="loading-text">{{ 'lesson.player.loadingVideo' | transloco }}</span>
               </div>
             </div>
           }
@@ -288,14 +296,22 @@
 
           <!-- Navigation Shortcuts -->
           <div style="display: flex; align-items: center; gap: 4px">
-            <button class="ctrl-btn" (click)="rewind()" aria-label="Lùi 10s">
+            <button
+              class="ctrl-btn"
+              (click)="rewind()"
+              [attr.aria-label]="'lesson.player.rewind' | transloco"
+            >
               <svg lucideRotateCcw [size]="16" strokeWidth="2"></svg>
             </button>
 
             <!-- Speed control -->
             <button class="ctrl-speed" (click)="changeSpeed()">{{ playbackSpeed() }}x</button>
 
-            <button class="ctrl-btn" (click)="forward()" aria-label="Tới 10s">
+            <button
+              class="ctrl-btn"
+              (click)="forward()"
+              [attr.aria-label]="'lesson.player.forward' | transloco"
+            >
               <svg lucideRotateCw [size]="16" strokeWidth="2"></svg>
             </button>
           </div>
@@ -348,14 +364,14 @@
 
               @if (showQuality()) {
                 <div class="quality-menu">
-                  <p class="quality-label">Chất lượng</p>
+                  <p class="quality-label">{{ 'lesson.player.quality' | transloco }}</p>
                   <button
                     class="quality-option"
                     [class.active]="selectedQuality() === 'auto'"
                     [class.default]="selectedQuality() !== 'auto'"
                     (click)="selectQuality('auto')"
                   >
-                    <span>Tự động</span>
+                    <span>{{ 'lesson.player.qualityAuto' | transloco }}</span>
                     @if (selectedQuality() === 'auto') {
                       <span class="quality-dot"></span>
                     }
@@ -410,12 +426,16 @@
         <div class="steps-header">
           <div class="steps-header-left">
             <svg lucideList [size]="24" strokeWidth="2" style="color: #fff"></svg>
-            <span class="steps-title">Nội dung bài học</span>
+            <span class="steps-title">{{ 'lesson.steps.title' | transloco }}</span>
           </div>
           <div class="steps-progress-info">
-            <span class="steps-progress-pct">{{ progressPct() }}% Hoàn thành</span>
+            <span class="steps-progress-pct">{{
+              'lesson.header.completed' | transloco: { pct: progressPct() }
+            }}</span>
             <div class="steps-divider"></div>
-            <span class="steps-count">{{ completedSteps() }}/{{ totalSteps() }} Bước</span>
+            <span class="steps-count">{{
+              'lesson.header.steps' | transloco: { done: completedSteps(), total: totalSteps() }
+            }}</span>
           </div>
         </div>
 
@@ -451,28 +471,30 @@
         <div class="bottom-nav-buttons">
           <button class="bottom-btn bottom-btn-prev" (click)="prevLesson()">
             <svg lucideChevronLeft [size]="16" strokeWidth="2" style="flex-shrink: 0"></svg>
-            <span>Trước</span>
+            <span>{{ 'lesson.nav.prev' | transloco }}</span>
           </button>
 
           @if (!lessonCompleted()) {
             <button class="bottom-btn bottom-btn-complete" (click)="markComplete()">
-              <span>Đánh dấu hoàn thành</span>
+              <span>{{ 'lesson.nav.markComplete' | transloco }}</span>
               <svg lucideCheck [size]="16" strokeWidth="2" style="flex-shrink: 0"></svg>
             </button>
           } @else {
             <div class="badge-completed" style="flex: 1; max-width: 200px">
-              <span class="badge-completed-text">Đã hoàn thành</span>
+              <span class="badge-completed-text">{{
+                'lesson.nav.completedBadge' | transloco
+              }}</span>
             </div>
           }
 
           <button class="bottom-btn bottom-btn-next" (click)="nextLesson()">
-            <span>Tiếp</span>
+            <span>{{ 'lesson.nav.next' | transloco }}</span>
             <svg lucideChevronRight [size]="16" strokeWidth="2" style="flex-shrink: 0"></svg>
           </button>
         </div>
 
         <button class="back-to-course-link" (click)="backToCourse()">
-          Quay lại chi tiết khoá học
+          {{ 'lesson.sidebar.backToCourse' | transloco }}
         </button>
       </div>
     </div>
@@ -488,7 +510,7 @@
 @if (mobileDrawerOpen()) {
   <div class="mobile-drawer">
     <div class="drawer-header">
-      <span class="drawer-title">Bài học khoá học</span>
+      <span class="drawer-title">{{ 'lesson.drawer.title' | transloco }}</span>
       <button class="drawer-close" (click)="closeMobileDrawer()">
         <svg lucideX [size]="24" strokeWidth="2"></svg>
       </button>
@@ -496,7 +518,7 @@
     <div class="drawer-body">
       <div class="drawer-back" (click)="backToCourse(); closeMobileDrawer()">
         <svg lucideChevronLeft [size]="24" strokeWidth="2" style="color: #1c1c1c"></svg>
-        <span class="drawer-back-text">Quay lại chi tiết khoá học</span>
+        <span class="drawer-back-text">{{ 'lesson.sidebar.backToCourse' | transloco }}</span>
       </div>
 
       <!-- Mobile chapter list -->
@@ -545,7 +567,9 @@
                   <div class="topic-count-badge">
                     <svg lucideChevronDown [size]="16" strokeWidth="3"></svg>
                   </div>
-                  <span class="topic-count">{{ chapter.topicCount }} Chủ đề</span>
+                  <span class="topic-count">{{
+                    'lesson.sidebar.topicCount' | transloco: { n: chapter.topicCount }
+                  }}</span>
                 </div>
               }
             </div>
@@ -589,11 +613,8 @@
     <div class="dialog">
       <div class="dialog-top">
         <div class="dialog-top-text">
-          <h2 class="dialog-title">Báo cáo sự cố</h2>
-          <p class="dialog-subtitle">
-            Hãy cho chúng tôi biết vấn đề bạn gặp phải để chúng tôi có thể cải thiện trải nghiệm học
-            tập của bạn.
-          </p>
+          <h2 class="dialog-title">{{ 'lesson.report.dialogTitle' | transloco }}</h2>
+          <p class="dialog-subtitle">{{ 'lesson.report.dialogSubtitle' | transloco }}</p>
         </div>
         <button class="dialog-close-btn" (click)="toggleReportDialog(false)">
           <svg lucideX [size]="20" strokeWidth="2"></svg>
@@ -606,7 +627,7 @@
         >
           <div class="dialog-field">
             <label class="dialog-field-label" for="report-type"
-              >Loại vấn đề <span class="required">*</span></label
+              >{{ 'lesson.report.typeLabel' | transloco }} <span class="required">*</span></label
             >
             <select
               id="report-type"
@@ -614,23 +635,25 @@
               required
               (change)="onReportTypeChange($event)"
             >
-              <option value="" disabled selected>Chọn loại vấn đề</option>
-              <option value="technical">Lỗi kỹ thuật</option>
-              <option value="content">Vấn đề nội dung</option>
-              <option value="video">Vấn đề video</option>
-              <option value="audio">Vấn đề âm thanh</option>
-              <option value="other">Khác</option>
+              <option value="" disabled selected>
+                {{ 'lesson.report.typePlaceholder' | transloco }}
+              </option>
+              <option value="technical">{{ 'lesson.report.types.technical' | transloco }}</option>
+              <option value="content">{{ 'lesson.report.types.content' | transloco }}</option>
+              <option value="video">{{ 'lesson.report.types.video' | transloco }}</option>
+              <option value="audio">{{ 'lesson.report.types.audio' | transloco }}</option>
+              <option value="other">{{ 'lesson.report.types.other' | transloco }}</option>
             </select>
           </div>
           <div class="dialog-field">
             <label class="dialog-field-label" for="report-message"
-              >Mô tả chi tiết <span class="required">*</span></label
+              >{{ 'lesson.report.messageLabel' | transloco }} <span class="required">*</span></label
             >
             <textarea
               id="report-message"
               class="dialog-textarea"
               rows="5"
-              placeholder="Mô tả vấn đề bạn gặp phải..."
+              [placeholder]="'lesson.report.messagePlaceholder' | transloco"
               required
               (input)="onReportMessageChange($event)"
             ></textarea>
@@ -640,7 +663,7 @@
             class="dialog-submit"
             [disabled]="!reportType() || !reportMessage()"
           >
-            Gửi báo cáo
+            {{ 'lesson.report.submit' | transloco }}
           </button>
         </form>
       </div>

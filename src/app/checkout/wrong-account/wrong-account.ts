@@ -1,12 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { LucideLogOut } from '@lucide/angular';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-wrong-account',
   standalone: true,
-  imports: [LucideLogOut],
+  imports: [TranslocoPipe, LucideLogOut],
   templateUrl: './wrong-account.html',
   styleUrl: './wrong-account.css',
 })
