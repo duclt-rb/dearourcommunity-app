@@ -4,271 +4,298 @@
     <div class="quick-scan__bar-inner">
       <app-logo height="72px" class="quick-scan__logo" />
       <span class="quick-scan__bar-progress">
-        {{ 'toolkit.quickScan.stepOf' | transloco: { current: store.currentStep() + 1, total:
-        store.totalSteps() } }}
+        {{
+          'toolkit.quickScan.stepOf'
+            | transloco: { current: store.currentStep() + 1, total: store.totalSteps() }
+        }}
       </span>
     </div>
 
     <!-- Step progress -->
     <div class="quick-scan__stepper">
       @for (step of store.steps(); track step.label; let i = $index) {
-      <button
-        type="button"
-        class="quick-scan__step"
-        [class.is-active]="i === store.currentStep()"
-        [class.is-done]="i < store.currentStep()"
-        [attr.aria-current]="i === store.currentStep() ? 'step' : null"
-        (click)="store.goToStep(i)"
-      >
-        <span
-          class="quick-scan__step-bar"
-          [style.background]="i <= store.currentStep() ? stepColor(step) : null"
-        ></span>
-        <span class="quick-scan__step-label">{{ step.label }}</span>
-      </button>
+        <button
+          type="button"
+          class="quick-scan__step"
+          [class.is-active]="i === store.currentStep()"
+          [class.is-done]="i < store.currentStep()"
+          [attr.aria-current]="i === store.currentStep() ? 'step' : null"
+          (click)="store.goToStep(i)"
+        >
+          <span
+            class="quick-scan__step-bar"
+            [style.background]="i <= store.currentStep() ? stepColor(step) : null"
+          ></span>
+          <span class="quick-scan__step-label">{{ step.label }}</span>
+        </button>
       }
     </div>
   </header>
 
   <main class="quick-scan__main">
     @switch (store.currentStepData()?.kind) {
-    <!-- Step: Business profile -->
-    @case ('profile') {
-    <section class="quick-scan__section">
-      <p class="quick-scan__sector">{{ config().sector }}</p>
-      <h1 class="quick-scan__title">{{ config().name }}</h1>
-      <p class="quick-scan__lead">{{ 'toolkit.quickScan.lead' | transloco }}</p>
-      <ul class="quick-scan__legend">
-        @for (opt of scaleOptions; track opt.value) {
-        <li><span class="quick-scan__legend-num">{{ opt.value }}</span> {{ opt.label }}</li>
-        }
-      </ul>
+      <!-- Step: Business profile -->
+      @case ('profile') {
+        <section class="quick-scan__section">
+          <p class="quick-scan__sector">{{ config().sector }}</p>
+          <h1 class="quick-scan__title">{{ config().name }}</h1>
+          <p class="quick-scan__lead">{{ 'toolkit.quickScan.lead' | transloco }}</p>
+          <ul class="quick-scan__legend">
+            @for (opt of scaleOptions; track opt.value) {
+              <li>
+                <span class="quick-scan__legend-num">{{ opt.value }}</span> {{ opt.label }}
+              </li>
+            }
+          </ul>
 
-      <h2 class="quick-scan__section-title quick-scan__section-title--spaced">
-        {{ 'toolkit.quickScan.companyInfoTitle' | transloco }}
-      </h2>
-      <p class="quick-scan__section-note">{{ 'toolkit.quickScan.companyInfoNote' | transloco }}</p>
-      <div class="quick-scan__profile">
-        @for (field of config().profileFields; track field.id) { @switch (field.type) { @case
-        ('date') {
-        <app-date-field
-          [label]="field.label"
-          [value]="store.profileOf(field.id)"
-          (valueChange)="store.setProfile(field.id, $event)"
-        />
-        } @case ('boolean') {
-        <app-bool-field
-          [label]="field.label"
-          [value]="store.profileOf(field.id)"
-          (valueChange)="store.setProfile(field.id, $event)"
-        />
-        } @default {
-        <app-text-field
-          [label]="field.label"
-          [hint]="field.hint || ''"
-          [value]="store.profileOf(field.id)"
-          (valueChange)="store.setProfile(field.id, $event)"
-        />
-        } } }
-      </div>
-    </section>
-    }
-
-    <!-- Step: Pillar -->
-    @case ('pillar') { @if (store.currentPillar(); as pillar) {
-    <section class="quick-scan__section">
-      <div class="quick-scan__pillar-head">
-        <span class="quick-scan__pillar-icon" [attr.data-pillar]="pillar.key">
-          @switch (pillar.key) { @case ('environment') {
-          <svg lucideLeaf [size]="20" strokeWidth="1.6"></svg>
-          } @case ('social') {
-          <svg lucideUsers [size]="20" strokeWidth="1.6"></svg>
-          } @case ('governance') {
-          <svg lucideLandmark [size]="20" strokeWidth="1.6"></svg>
-          } }
-        </span>
-        <div>
-          <h2 class="quick-scan__section-title">{{ pillar.label }}</h2>
+          <h2 class="quick-scan__section-title quick-scan__section-title--spaced">
+            {{ 'toolkit.quickScan.companyInfoTitle' | transloco }}
+          </h2>
           <p class="quick-scan__section-note">
-            {{ 'toolkit.quickScan.answered' | transloco : { answered: store.pillarAnswered(pillar),
-            total: store.pillarQuestionCount(pillar), } }}
+            {{ 'toolkit.quickScan.companyInfoNote' | transloco }}
           </p>
-        </div>
-      </div>
+          <div class="quick-scan__profile">
+            @for (field of config().profileFields; track field.id) {
+              @switch (field.type) {
+                @case ('date') {
+                  <app-date-field
+                    [label]="field.label"
+                    [value]="store.profileOf(field.id)"
+                    (valueChange)="store.setProfile(field.id, $event)"
+                  />
+                }
+                @case ('boolean') {
+                  <app-bool-field
+                    [label]="field.label"
+                    [value]="store.profileOf(field.id)"
+                    (valueChange)="store.setProfile(field.id, $event)"
+                  />
+                }
+                @default {
+                  <app-text-field
+                    [label]="field.label"
+                    [hint]="field.hint || ''"
+                    [value]="store.profileOf(field.id)"
+                    (valueChange)="store.setProfile(field.id, $event)"
+                  />
+                }
+              }
+            }
+          </div>
+        </section>
+      }
 
-      @for (group of pillar.groups; track group.topic) {
-      <div class="quick-scan__group">
-        <div class="quick-scan__group-head">
-          <h3 class="quick-scan__group-title">{{ group.topic }}</h3>
-          @if (group.priority) {
-          <app-priority-badge />
-          }
-        </div>
+      <!-- Step: Pillar -->
+      @case ('pillar') {
+        @if (store.currentPillar(); as pillar) {
+          <section class="quick-scan__section">
+            <div class="quick-scan__pillar-head">
+              <span class="quick-scan__pillar-icon" [attr.data-pillar]="pillar.key">
+                @switch (pillar.key) {
+                  @case ('environment') {
+                    <svg lucideLeaf [size]="20" strokeWidth="1.6"></svg>
+                  }
+                  @case ('social') {
+                    <svg lucideUsers [size]="20" strokeWidth="1.6"></svg>
+                  }
+                  @case ('governance') {
+                    <svg lucideLandmark [size]="20" strokeWidth="1.6"></svg>
+                  }
+                }
+              </span>
+              <div>
+                <h2 class="quick-scan__section-title">{{ pillar.label }}</h2>
+                <p class="quick-scan__section-note">
+                  {{
+                    'toolkit.quickScan.answered'
+                      | transloco
+                        : {
+                            answered: store.pillarAnswered(pillar),
+                            total: store.pillarQuestionCount(pillar),
+                          }
+                  }}
+                </p>
+              </div>
+            </div>
 
-        <ul class="quick-scan__questions">
-          @for (q of group.questions; track q.id) {
-          <li class="quick-scan__question">
-            <div class="quick-scan__question-body">
-              <p class="quick-scan__question-text">{{ q.text }}</p>
-              <p class="quick-scan__question-risk">
-                <svg lucideTriangleAlert [size]="13" strokeWidth="1.8"></svg>
-                <span>{{ q.risk }}</span>
+            @for (group of pillar.groups; track group.topic) {
+              <div class="quick-scan__group">
+                <div class="quick-scan__group-head">
+                  <h3 class="quick-scan__group-title">{{ group.topic }}</h3>
+                  @if (group.priority) {
+                    <app-priority-badge />
+                  }
+                </div>
+
+                <ul class="quick-scan__questions">
+                  @for (q of group.questions; track q.id) {
+                    <li class="quick-scan__question">
+                      <div class="quick-scan__question-body">
+                        <p class="quick-scan__question-text">{{ q.text }}</p>
+                        <p class="quick-scan__question-risk">
+                          <svg lucideTriangleAlert [size]="13" strokeWidth="1.8"></svg>
+                          <span>{{ q.risk }}</span>
+                        </p>
+                      </div>
+                      <app-score-scale
+                        [ariaLabel]="q.text"
+                        [value]="store.scoreOf(q.id)"
+                        (valueChange)="store.setScore(q.id, $event)"
+                      />
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+          </section>
+        }
+      }
+
+      <!-- Step: Results -->
+      @case ('results') {
+        <section class="quick-scan__section quick-scan__results">
+          <h2 class="quick-scan__section-title">{{ 'toolkit.steps.results' | transloco }}</h2>
+          <p class="quick-scan__section-note">{{ 'toolkit.common.resultsNote' | transloco }}</p>
+
+          <div class="quick-scan__overall">
+            <div>
+              <p class="quick-scan__overall-label">
+                {{ 'toolkit.quickScan.totalScore' | transloco }}
+              </p>
+              <p class="quick-scan__overall-score">
+                {{ store.totalScore()
+                }}<span class="quick-scan__overall-max">/ {{ store.totalMax() }}</span>
               </p>
             </div>
-            <app-score-scale
-              [ariaLabel]="q.text"
-              [value]="store.scoreOf(q.id)"
-              (valueChange)="store.setScore(q.id, $event)"
-            />
-          </li>
-          }
-        </ul>
-      </div>
-      }
-    </section>
-    } }
-
-    <!-- Step: Results -->
-    @case ('results') {
-    <section class="quick-scan__section quick-scan__results">
-      <h2 class="quick-scan__section-title">{{ 'toolkit.steps.results' | transloco }}</h2>
-      <p class="quick-scan__section-note">{{ 'toolkit.common.resultsNote' | transloco }}</p>
-
-      <div class="quick-scan__overall">
-        <div>
-          <p class="quick-scan__overall-label">{{ 'toolkit.quickScan.totalScore' | transloco }}</p>
-          <p class="quick-scan__overall-score">
-            {{ store.totalScore() }}<span class="quick-scan__overall-max"
-              >/ {{ store.totalMax() }}</span
-            >
-          </p>
-        </div>
-        <div class="quick-scan__overall-right">
-          <p class="quick-scan__overall-percent">{{ store.totalPercent() }}%</p>
-          <p class="quick-scan__overall-maturity">
-            <span
-              class="quick-scan__maturity-dot"
-              [class]="'is-' + store.totalMaturityTone()"
-            ></span>
-            {{ store.totalMaturity() }}
-          </p>
-        </div>
-      </div>
-
-      <div class="quick-scan__chart">
-        <h3 class="quick-scan__group-title">{{ 'toolkit.fields.scorePieAria' | transloco }}</h3>
-        <app-score-pie
-          [slices]="pieSlices()"
-          [centerLabel]="store.totalScore() + '/' + store.totalMax()"
-          [centerSub]="'toolkit.quickScan.totalScore' | transloco"
-        />
-      </div>
-
-      <div class="quick-scan__pillars-summary">
-        @for (r of store.results(); track r.key) {
-        <div class="quick-scan__summary-row">
-          <div class="quick-scan__summary-top">
-            <span class="quick-scan__summary-label">{{ r.label }}</span>
-            <span class="quick-scan__summary-score">{{ r.score }} / {{ r.max }}</span>
-          </div>
-          <app-meter [percent]="r.percent" [color]="colorFor(r.key)" />
-          <div class="quick-scan__summary-foot">
-            <span>{{ r.percent }}%</span>
-            <span class="quick-scan__summary-maturity">
-              <span class="quick-scan__maturity-dot" [class]="'is-' + r.maturityTone"></span>
-              {{ r.maturity }}
-            </span>
-          </div>
-        </div>
-        }
-      </div>
-
-      <div class="quick-scan__focus">
-        <h3 class="quick-scan__group-title">{{ 'toolkit.quickScan.focusTitle' | transloco }}</h3>
-        <ul class="quick-scan__focus-list">
-          @for (f of config().priorityFocus; track f.id) {
-          <li class="quick-scan__focus-item">
-            <div class="quick-scan__focus-head">
-              <span class="quick-scan__focus-area">{{ f.area }}</span>
-              <span class="quick-scan__focus-pillar">{{ f.pillar }}</span>
+            <div class="quick-scan__overall-right">
+              <p class="quick-scan__overall-percent">{{ store.totalPercent() }}%</p>
+              <p class="quick-scan__overall-maturity">
+                <span
+                  class="quick-scan__maturity-dot"
+                  [class]="'is-' + store.totalMaturityTone()"
+                ></span>
+                {{ store.totalMaturity() }}
+              </p>
             </div>
-            <p class="quick-scan__focus-benefit">{{ f.benefit }}</p>
-          </li>
-          }
-        </ul>
-      </div>
+          </div>
 
-      <div class="quick-scan__plan">
-        <h3 class="quick-scan__group-title">{{ 'toolkit.quickScan.planTitle' | transloco }}</h3>
-        <p class="quick-scan__section-note">{{ 'toolkit.quickScan.planNote' | transloco }}</p>
-        <div class="quick-scan__plan-scroll">
-          <table class="quick-scan__plan-table">
-            <thead>
-              <tr>
-                <th scope="col">{{ 'toolkit.quickScan.planAreaHeader' | transloco }}</th>
-                <th scope="col">{{ 'toolkit.quickScan.planActionHeader' | transloco }}</th>
-                <th scope="col">{{ 'toolkit.common.owner' | transloco }}</th>
-                <th scope="col">{{ 'toolkit.quickScan.planDeadlineHeader' | transloco }}</th>
-                <th scope="col">{{ 'toolkit.common.status' | transloco }}</th>
-              </tr>
-            </thead>
-            <tbody>
+          <div class="quick-scan__chart">
+            <h3 class="quick-scan__group-title">{{ 'toolkit.fields.scorePieAria' | transloco }}</h3>
+            <app-score-pie
+              [slices]="pieSlices()"
+              [centerLabel]="store.totalScore() + '/' + store.totalMax()"
+              [centerSub]="'toolkit.quickScan.totalScore' | transloco"
+            />
+          </div>
+
+          <div class="quick-scan__pillars-summary">
+            @for (r of store.results(); track r.key) {
+              <div class="quick-scan__summary-row">
+                <div class="quick-scan__summary-top">
+                  <span class="quick-scan__summary-label">{{ r.label }}</span>
+                  <span class="quick-scan__summary-score">{{ r.score }} / {{ r.max }}</span>
+                </div>
+                <app-meter [percent]="r.percent" [color]="colorFor(r.key)" />
+                <div class="quick-scan__summary-foot">
+                  <span>{{ r.percent }}%</span>
+                  <span class="quick-scan__summary-maturity">
+                    <span class="quick-scan__maturity-dot" [class]="'is-' + r.maturityTone"></span>
+                    {{ r.maturity }}
+                  </span>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="quick-scan__focus">
+            <h3 class="quick-scan__group-title">
+              {{ 'toolkit.quickScan.focusTitle' | transloco }}
+            </h3>
+            <ul class="quick-scan__focus-list">
               @for (f of config().priorityFocus; track f.id) {
-              <tr>
-                <th scope="row" class="quick-scan__plan-area">{{ f.area }}</th>
-                <td>
-                  <input
-                    type="text"
-                    class="quick-scan__plan-input"
-                    [placeholder]="'toolkit.quickScan.planActionPlaceholder' | transloco"
-                    [value]="store.actionPlanOf(f.id, 'action')"
-                    (input)="onPlanInput(f.id, 'action', $event)"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    class="quick-scan__plan-input"
-                    [placeholder]="'toolkit.quickScan.planOwnerPlaceholder' | transloco"
-                    [value]="store.actionPlanOf(f.id, 'owner')"
-                    (input)="onPlanInput(f.id, 'owner', $event)"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    class="quick-scan__plan-input"
-                    [placeholder]="'toolkit.quickScan.planDeadlinePlaceholder' | transloco"
-                    [value]="store.actionPlanOf(f.id, 'deadline')"
-                    (input)="onPlanInput(f.id, 'deadline', $event)"
-                  />
-                </td>
-                <td>
-                  <select
-                    class="quick-scan__plan-input quick-scan__plan-select"
-                    (change)="onPlanInput(f.id, 'status', $event)"
-                  >
-                    <option value="" [selected]="store.actionPlanOf(f.id, 'status') === ''">
-                      —
-                    </option>
-                    @for (s of statusOptions; track s.value) {
-                    <option
-                      [value]="s.value"
-                      [selected]="store.actionPlanOf(f.id, 'status') === s.value"
-                    >
-                      {{ s.label }}
-                    </option>
-                    }
-                  </select>
-                </td>
-              </tr>
+                <li class="quick-scan__focus-item">
+                  <div class="quick-scan__focus-head">
+                    <span class="quick-scan__focus-area">{{ f.area }}</span>
+                    <span class="quick-scan__focus-pillar">{{ f.pillar }}</span>
+                  </div>
+                  <p class="quick-scan__focus-benefit">{{ f.benefit }}</p>
+                </li>
               }
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-    } }
+            </ul>
+          </div>
+
+          <div class="quick-scan__plan">
+            <h3 class="quick-scan__group-title">{{ 'toolkit.quickScan.planTitle' | transloco }}</h3>
+            <p class="quick-scan__section-note">{{ 'toolkit.quickScan.planNote' | transloco }}</p>
+            <div class="quick-scan__plan-scroll">
+              <table class="quick-scan__plan-table">
+                <thead>
+                  <tr>
+                    <th scope="col">{{ 'toolkit.quickScan.planAreaHeader' | transloco }}</th>
+                    <th scope="col">{{ 'toolkit.quickScan.planActionHeader' | transloco }}</th>
+                    <th scope="col">{{ 'toolkit.common.owner' | transloco }}</th>
+                    <th scope="col">{{ 'toolkit.quickScan.planDeadlineHeader' | transloco }}</th>
+                    <th scope="col">{{ 'toolkit.common.status' | transloco }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (f of config().priorityFocus; track f.id) {
+                    <tr>
+                      <th scope="row" class="quick-scan__plan-area">{{ f.area }}</th>
+                      <td>
+                        <input
+                          type="text"
+                          class="quick-scan__plan-input"
+                          [placeholder]="'toolkit.quickScan.planActionPlaceholder' | transloco"
+                          [value]="store.actionPlanOf(f.id, 'action')"
+                          (input)="onPlanInput(f.id, 'action', $event)"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          class="quick-scan__plan-input"
+                          [placeholder]="'toolkit.quickScan.planOwnerPlaceholder' | transloco"
+                          [value]="store.actionPlanOf(f.id, 'owner')"
+                          (input)="onPlanInput(f.id, 'owner', $event)"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          class="quick-scan__plan-input"
+                          [placeholder]="'toolkit.quickScan.planDeadlinePlaceholder' | transloco"
+                          [value]="store.actionPlanOf(f.id, 'deadline')"
+                          (input)="onPlanInput(f.id, 'deadline', $event)"
+                        />
+                      </td>
+                      <td>
+                        <select
+                          class="quick-scan__plan-input quick-scan__plan-select"
+                          (change)="onPlanInput(f.id, 'status', $event)"
+                        >
+                          <option value="" [selected]="store.actionPlanOf(f.id, 'status') === ''">
+                            —
+                          </option>
+                          @for (s of statusOptions; track s.value) {
+                            <option
+                              [value]="s.value"
+                              [selected]="store.actionPlanOf(f.id, 'status') === s.value"
+                            >
+                              {{ s.label }}
+                            </option>
+                          }
+                        </select>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      }
+    }
 
     <!-- Step navigation -->
     <nav class="quick-scan__nav">
@@ -282,22 +309,22 @@
       </button>
 
       @if (store.currentStepData()?.kind === 'results') {
-      <button
-        type="button"
-        class="quick-scan__nav-btn quick-scan__nav-btn--ghost"
-        (click)="resetScan()"
-      >
-        <svg lucideRotateCcw [size]="16" strokeWidth="2"></svg>
-        {{ 'toolkit.common.restart' | transloco }}
-      </button>
+        <button
+          type="button"
+          class="quick-scan__nav-btn quick-scan__nav-btn--ghost"
+          (click)="resetScan()"
+        >
+          <svg lucideRotateCcw [size]="16" strokeWidth="2"></svg>
+          {{ 'toolkit.common.restart' | transloco }}
+        </button>
       } @else if (store.currentStep() === store.totalSteps() - 2) {
-      <button type="button" class="quick-scan__nav-btn" (click)="store.nextStep()">
-        {{ 'toolkit.common.finish' | transloco }}
-      </button>
+        <button type="button" class="quick-scan__nav-btn" (click)="store.nextStep()">
+          {{ 'toolkit.common.finish' | transloco }}
+        </button>
       } @else {
-      <button type="button" class="quick-scan__nav-btn" (click)="store.nextStep()">
-        {{ 'toolkit.common.continue' | transloco }}
-      </button>
+        <button type="button" class="quick-scan__nav-btn" (click)="store.nextStep()">
+          {{ 'toolkit.common.continue' | transloco }}
+        </button>
       }
     </nav>
   </main>

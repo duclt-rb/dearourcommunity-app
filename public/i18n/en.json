@@ -155,7 +155,8 @@
       "agreeRequired": "You must agree to the terms",
       "submit": "Create account",
       "haveAccount": "Already have an account?",
-      "loginLink": "Sign in"
+      "loginLink": "Sign in",
+      "phoneInvalid": "Invalid phone number — e.g. 0912345678 or +61431724942"
     },
     "layout": {
       "headline1": "A comprehensive solution",
@@ -589,7 +590,8 @@
       "saving": "Saving...",
       "saveChanges": "Save changes",
       "saveSuccess": "Profile updated successfully!",
-      "saveError": "Something went wrong while saving. Please try again!"
+      "saveError": "Something went wrong while saving. Please try again!",
+      "phoneInvalid": "Invalid phone number — e.g. 0912345678 or +61431724942"
     },
     "password": {
       "title": "Change password",

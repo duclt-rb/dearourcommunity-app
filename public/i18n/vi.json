@@ -155,7 +155,8 @@
       "agreeRequired": "Bạn phải đồng ý với điều khoản",
       "submit": "Tạo tài khoản",
       "haveAccount": "Đã có tài khoản?",
-      "loginLink": "Đăng nhập"
+      "loginLink": "Đăng nhập",
+      "phoneInvalid": "Số điện thoại không hợp lệ — VD: 0912345678 hoặc +61431724942"
     },
     "layout": {
       "headline1": "Giải pháp toàn diện",
@@ -589,7 +590,8 @@
       "saving": "Đang lưu...",
       "saveChanges": "Lưu thay đổi",
       "saveSuccess": "Đã cập nhật thông tin hồ sơ thành công!",
-      "saveError": "Có lỗi xảy ra khi lưu thông tin. Vui lòng thử lại!"
+      "saveError": "Có lỗi xảy ra khi lưu thông tin. Vui lòng thử lại!",
+      "phoneInvalid": "Số điện thoại không hợp lệ — VD: 0912345678 hoặc +61431724942"
     },
     "password": {
       "title": "Đổi mật khẩu",

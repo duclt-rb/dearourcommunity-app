@@ -1,7 +1,8 @@
 import { computed, inject } from '@angular/core';
-import { ApiError, PackageType, RegisterDto, UserPackageInfo } from '@dearourcommunity/client';
+import { PackageType, RegisterDto, UserPackageInfo } from '@dearourcommunity/client';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { TranslocoService } from '@jsverse/transloco';
+import { apiErrorMessage } from '../api-error';
 import { AuthService } from '../services/auth.service';
 
 export interface AuthUser {
@@ -56,8 +57,7 @@ export const AuthStore = signalStore(
         patchState(store, {
           user: null,
           token: null,
-          error:
-            err instanceof ApiError ? err.message : transloco.translate('auth.errors.loadAccount'),
+          error: apiErrorMessage(err, transloco.translate('auth.errors.loadAccount')),
           isLoading: false,
         });
       }
@@ -78,10 +78,7 @@ export const AuthStore = signalStore(
         });
         return { success: true };
       } catch (err) {
-        const errMsg =
-          err instanceof ApiError
-            ? err.message
-            : transloco.translate('auth.errors.invalidCredentials');
+        const errMsg = apiErrorMessage(err, transloco.translate('auth.errors.invalidCredentials'));
         patchState(store, {
           error: errMsg,
           isLoading: false,
@@ -105,8 +102,7 @@ export const AuthStore = signalStore(
         });
         return { success: true };
       } catch (err) {
-        const errMsg =
-          err instanceof ApiError ? err.message : transloco.translate('auth.errors.registerFailed');
+        const errMsg = apiErrorMessage(err, transloco.translate('auth.errors.registerFailed'));
         patchState(store, {
           error: errMsg,
           isLoading: false,

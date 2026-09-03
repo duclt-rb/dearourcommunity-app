@@ -24,6 +24,7 @@ import { AuthStore } from '../../core/stores/auth.store';
 import AuthLayoutComponent from '../auth-layout/auth-layout';
 import LogoComponent from '../../shared/logo/logo';
 import { frontpageUrl } from '../../core/i18n/locale';
+import { isValidPhone, normalizePhone } from '../../core/phone';
 
 @Component({
   selector: 'app-register',
@@ -74,6 +75,14 @@ export default class RegisterPage {
     required(p.email, { message: this.transloco.translate('auth.register.emailRequired') });
     email(p.email, { message: this.transloco.translate('validation.email') });
     required(p.phone, { message: this.transloco.translate('auth.register.phoneRequired') });
+    // Format kiểm trên bản đã normalize (bỏ khoảng trắng/gạch) — đồng bộ rule với BE
+    validate(p.phone, (ctx) =>
+      ctx.value() === '' || isValidPhone(ctx.value())
+        ? undefined
+        : patternError(/^$/, {
+            message: this.transloco.translate('auth.register.phoneInvalid'),
+          }),
+    );
     required(p.password, { message: this.transloco.translate('auth.register.passwordRequired') });
     minLength(p.password, 8, {
       message: this.transloco.translate('auth.register.passwordMinLength'),
@@ -142,7 +151,8 @@ export default class RegisterPage {
     if (this.registerForm().invalid()) return;
 
     try {
-      const dto = this.registerModel();
+      // Gửi số đã normalize — user gõ "0912 345 678" hay "+61 431..." đều hợp lệ
+      const dto = { ...this.registerModel(), phone: normalizePhone(this.registerModel().phone) };
       const result = await this.store.register(dto);
       if (result.success) {
         const redirect = this.route.snapshot.queryParamMap.get('redirect');

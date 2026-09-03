@@ -1,7 +1,9 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { form, FormField, required } from '@angular/forms/signals';
+import { form, FormField, patternError, required, validate } from '@angular/forms/signals';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ProfileStore } from '../profile.store';
+import { isValidPhone, normalizePhone } from '../../core/phone';
+import { apiErrorMessage } from '../../core/api-error';
 
 @Component({
   selector: 'app-profile-edit',
@@ -28,6 +30,14 @@ export default class EditProfileComponent implements OnInit {
       message: this.transloco.translate('profile.editProfile.firstNameRequired'),
     });
     required(p.phone, { message: this.transloco.translate('profile.editProfile.phoneRequired') });
+    // Format kiểm trên bản đã normalize (bỏ khoảng trắng/gạch) — đồng bộ rule với BE
+    validate(p.phone, (ctx) =>
+      ctx.value() === '' || isValidPhone(ctx.value())
+        ? undefined
+        : patternError(/^$/, {
+            message: this.transloco.translate('profile.editProfile.phoneInvalid'),
+          }),
+    );
   });
 
   // Avatar được điều khiển bằng nút bấm nên giữ riêng ngoài form.
@@ -72,10 +82,17 @@ export default class EditProfileComponent implements OnInit {
 
     try {
       const { firstName, lastName, phone } = this.profileModel();
-      await this.store.updateProfile(firstName, lastName, phone, this.tempAvatarUrl());
+      await this.store.updateProfile(
+        firstName,
+        lastName,
+        normalizePhone(phone),
+        this.tempAvatarUrl(),
+      );
       this.successMessage.set(this.transloco.translate('profile.editProfile.saveSuccess'));
-    } catch {
-      this.errorMessage.set(this.transloco.translate('profile.editProfile.saveError'));
+    } catch (err) {
+      this.errorMessage.set(
+        apiErrorMessage(err, this.transloco.translate('profile.editProfile.saveError')),
+      );
     } finally {
       this.loading.set(false);
     }
