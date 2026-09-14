@@ -708,6 +708,9 @@
       "addonsHint": "Các mục dưới đây KHÔNG nằm trong gói bạn đang mua — bạn đã chọn mua lẻ, tiền được cộng vào đơn và thanh toán một lần cùng gói.",
       "addonsCount": "Mua thêm ({{n}} mục)",
       "removeAddon": "Bỏ mục mua thêm",
+      "paidPicks": "+{{n}} mua thêm",
+      "freeBadge": "Miễn phí",
+      "upsellHint": "Bạn có thể chọn thêm ngoài số lượt miễn phí — mỗi bài thêm tính {{price}} ₫, cộng thẳng vào đơn và thanh toán một lần cùng gói.",
       "coupon": {
         "label": "Mã giảm giá",
         "placeholder": "Nhập mã giảm giá",

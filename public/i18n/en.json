@@ -708,6 +708,9 @@
       "addonsHint": "The items below are NOT part of the package you are buying — you chose to buy them separately; their price is added to the order and paid in one go together with the package.",
       "addonsCount": "Add-ons ({{n}} items)",
       "removeAddon": "Remove add-on",
+      "paidPicks": "+{{n}} add-on",
+      "freeBadge": "Included",
+      "upsellHint": "You can pick more than the free allowance — each extra item costs {{price}} ₫, added to this order and paid together with the package.",
       "coupon": {
         "label": "Discount code",
         "placeholder": "Enter discount code",

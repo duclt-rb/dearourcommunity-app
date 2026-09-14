@@ -170,22 +170,10 @@ export const CheckoutStore = signalStore(
       enrolledCourseIds,
       upgradeQuote,
       checkoutPlan,
-      selectedAddons,
     }) => ({
       // ── CR-012: mua lẻ tại checkout ──────────────────────────────────────────
       /** Món bán được cho gói này (server tính: đã loại món miễn phí trong gói / đã sở hữu). */
       addonCandidates: computed<AddonCandidate[]>(() => checkoutPlan()?.addonCandidates ?? []),
-      /** Tổng tiền món thêm — chỉ để HIỂN THỊ; số thực thu do server cộng lại khi tạo đơn. */
-      addonAmount: computed(() => {
-        const priceByKey = new Map(
-          (checkoutPlan()?.addonCandidates ?? []).map((c) => [addonKey(c), c.price]),
-        );
-        return selectedAddons().reduce(
-          (sum, addon) => sum + (priceByKey.get(addonKey(addon)) ?? 0),
-          0,
-        );
-      }),
-      selectedAddonCount: computed(() => selectedAddons().length),
       // CR-011 — số mục phải chọn do SERVER tính theo từng bucket (gói). FE chỉ hiển thị và
       // gate; BE validate lại bằng đúng hàm này nên không thể lệch.
       planCourseRequired: computed(() => checkoutPlan()?.courses.required ?? 0),
@@ -311,6 +299,96 @@ export const CheckoutStore = signalStore(
       ),
     }),
   ),
+  // ── CR-017: tick QUÁ số lượt miễn phí → phần dư thành món MUA LẺ ngay trong lưới ──────────
+  // Thứ tự tick quyết định: N bài đầu của mỗi nhóm là miễn phí (gửi `toolkitIds`), bài dư là
+  // add-on (gửi `addons`, server tính giá theo `app_addon_prices`). Chỉ cho tick dư khi BE liệt
+  // kê bài đó trong `addonCandidates` (có giá, chưa sở hữu) để không ăn 400 lúc submit.
+  withComputed(
+    ({
+      selectedToolkitIds,
+      selectedAddons,
+      checkoutPlan,
+      poolQuickScanIds,
+      poolToolkitIds,
+      requiredQuickScanSelections,
+      requiredToolkitSelections,
+    }) => {
+      const split = computed(() => {
+        const qs: string[] = [];
+        const tk: string[] = [];
+        for (const id of selectedToolkitIds()) (isQuickScanId(id) ? qs : tk).push(id);
+        const nQs = requiredQuickScanSelections();
+        const nTk = requiredToolkitSelections();
+        return {
+          freeQs: qs.slice(0, nQs),
+          paidQs: qs.slice(nQs),
+          freeTk: tk.slice(0, nTk),
+          paidTk: tk.slice(nTk),
+        };
+      });
+      const candidateKeys = computed(
+        () => new Set((checkoutPlan()?.addonCandidates ?? []).map((c) => addonKey(c))),
+      );
+      const priceByKey = computed(
+        () => new Map((checkoutPlan()?.addonCandidates ?? []).map((c) => [addonKey(c), c.price])),
+      );
+      /** Món mua lẻ sinh ra từ phần tick dư trong lưới. */
+      const toolkitAddons = computed<CheckoutAddon[]>(() => {
+        const s = split();
+        return [
+          ...s.paidQs.map((refId) => ({ type: 'quick_scan' as const, refId })),
+          ...s.paidTk.map((refId) => ({ type: 'toolkit' as const, refId })),
+        ];
+      });
+      /** Toàn bộ món mua lẻ gửi lên server: deep-link (`?addons=`) + tick dư; loại món trùng phần miễn phí. */
+      const allAddons = computed<CheckoutAddon[]>(() => {
+        const s = split();
+        const free = new Set([...s.freeQs, ...s.freeTk]);
+        const merged = new Map<string, CheckoutAddon>();
+        for (const addon of [...selectedAddons(), ...toolkitAddons()]) {
+          if (addon.type !== 'extra_course' && free.has(addon.refId)) continue;
+          merged.set(addonKey(addon), addon);
+        }
+        return [...merged.values()];
+      });
+      const quickScanUpsellPrice = computed(() => checkoutPlan()?.addonPrices.quick_scan ?? 0);
+      const toolkitUpsellPrice = computed(() => checkoutPlan()?.addonPrices.toolkit ?? 0);
+      /** Bài trong pool gói mà BE cho bán lẻ (có trong addonCandidates + giá > 0). */
+      const upsellableToolkitIds = computed(() => {
+        const keys = candidateKeys();
+        const ids = new Set<string>();
+        if (quickScanUpsellPrice() > 0)
+          poolQuickScanIds().forEach((id) => keys.has(`quick_scan:${id}`) && ids.add(id));
+        if (toolkitUpsellPrice() > 0)
+          poolToolkitIds().forEach((id) => keys.has(`toolkit:${id}`) && ids.add(id));
+        return ids;
+      });
+      return {
+        freeToolkitIds: computed(() => [...split().freeQs, ...split().freeTk]),
+        paidToolkitIds: computed(() => [...split().paidQs, ...split().paidTk]),
+        freeQuickScanCount: computed(() => split().freeQs.length),
+        freeToolkitCount: computed(() => split().freeTk.length),
+        paidQuickScanCount: computed(() => split().paidQs.length),
+        paidToolkitCount: computed(() => split().paidTk.length),
+        quickScanUpsellPrice,
+        toolkitUpsellPrice,
+        upsellableToolkitIds,
+        canUpsellQuickScan: computed(() =>
+          poolQuickScanIds().some((id) => upsellableToolkitIds().has(id)),
+        ),
+        canUpsellToolkit: computed(() =>
+          poolToolkitIds().some((id) => upsellableToolkitIds().has(id)),
+        ),
+        toolkitAddons,
+        allAddons,
+        /** Tổng tiền món thêm — chỉ để HIỂN THỊ; số thực thu do server cộng lại khi tạo đơn. */
+        addonAmount: computed(() =>
+          allAddons().reduce((sum, addon) => sum + (priceByKey().get(addonKey(addon)) ?? 0), 0),
+        ),
+        selectedAddonCount: computed(() => allAddons().length),
+      };
+    },
+  ),
   withComputed(
     ({
       poolQuickScanIds,
@@ -356,8 +434,8 @@ export const CheckoutStore = signalStore(
       selectedCourseIds,
       requiredQuickScanSelections,
       requiredToolkitSelections,
-      selectedQuickScanCount,
-      selectedToolkitCount,
+      freeQuickScanCount,
+      freeToolkitCount,
     }) => ({
       // Đã chọn đủ N khoá (hoặc gói không yêu cầu)
       courseSelectionComplete: computed(
@@ -365,13 +443,11 @@ export const CheckoutStore = signalStore(
           requiredCourseSelections() === 0 ||
           selectedCourseIds().length === requiredCourseSelections(),
       ),
-      // CR-006 — đã chọn đủ theo TỪNG nhóm
+      // CR-006 — đã chọn đủ theo TỪNG nhóm (CR-017: đếm phần MIỄN PHÍ, tick dư không ảnh hưởng)
       quickScanSelectionComplete: computed(
-        () => selectedQuickScanCount() === requiredQuickScanSelections(),
+        () => freeQuickScanCount() === requiredQuickScanSelections(),
       ),
-      toolkitSelectionComplete: computed(
-        () => selectedToolkitCount() === requiredToolkitSelections(),
-      ),
+      toolkitSelectionComplete: computed(() => freeToolkitCount() === requiredToolkitSelections()),
     }),
   ),
   withComputed(
@@ -483,11 +559,25 @@ export const CheckoutStore = signalStore(
         const sellable = new Set(
           (store.checkoutPlan()?.addonCandidates ?? []).map((candidate) => addonKey(candidate)),
         );
+        // CR-017 — món deep-link là bài trong pool của gói → tick vào lưới (thành miễn phí hay
+        // mua thêm tuỳ thứ tự), không nằm ở khối "Mua thêm" riêng để không hiện 2 lần.
+        const poolIds = new Set([...store.poolQuickScanIds(), ...store.poolToolkitIds()]);
+        const owned = new Set(store.ownedToolkitIds());
+        const picks = [...store.selectedToolkitIds()];
         const merged = new Map<string, CheckoutAddon>();
         for (const addon of [...store.selectedAddons(), ...store.pendingAddonRefs()]) {
-          if (sellable.has(addonKey(addon))) merged.set(addonKey(addon), addon);
+          if (!sellable.has(addonKey(addon))) continue;
+          if (addon.type !== 'extra_course' && poolIds.has(addon.refId)) {
+            if (!owned.has(addon.refId) && !picks.includes(addon.refId)) picks.push(addon.refId);
+            continue;
+          }
+          merged.set(addonKey(addon), addon);
         }
-        patchState(store, { selectedAddons: [...merged.values()], pendingAddonRefs: [] });
+        patchState(store, {
+          selectedAddons: [...merged.values()],
+          pendingAddonRefs: [],
+          selectedToolkitIds: picks,
+        });
       };
 
       return {
@@ -607,7 +697,8 @@ export const CheckoutStore = signalStore(
           const capacity = isQuickScanId(toolkitId)
             ? store.requiredQuickScanSelections() - store.selectedQuickScanCount()
             : store.requiredToolkitSelections() - store.selectedToolkitCount();
-          if (capacity > 0) {
+          // CR-017 — hết lượt miễn phí vẫn tick được nếu BE bán lẻ bài đó → thành món mua thêm
+          if (capacity > 0 || store.upsellableToolkitIds().has(toolkitId)) {
             patchState(store, { selectedToolkitIds: [...ids, toolkitId] });
           }
         },
@@ -735,10 +826,10 @@ export const CheckoutStore = signalStore(
               // CR-006 — Quick Scan/Toolkit chọn tại checkout
               toolkitIds:
                 store.requiredQuickScanSelections() + store.requiredToolkitSelections() > 0
-                  ? store.selectedToolkitIds()
+                  ? store.freeToolkitIds()
                   : undefined,
               // CR-012 — món mua lẻ (server tự cộng tiền theo bảng giá)
-              addons: store.selectedAddons().length ? store.selectedAddons() : undefined,
+              addons: store.allAddons().length ? store.allAddons() : undefined,
             });
 
             if (response && response.payUrl) {
@@ -794,10 +885,10 @@ export const CheckoutStore = signalStore(
                 store.requiredCourseSelections() > 0 ? store.selectedCourseIds() : undefined,
               toolkitIds:
                 store.requiredQuickScanSelections() + store.requiredToolkitSelections() > 0
-                  ? store.selectedToolkitIds()
+                  ? store.freeToolkitIds()
                   : undefined,
               // CR-012 — món mua lẻ: số tiền trên QR phải là TỔNG THU (gói + món thêm)
-              addons: store.selectedAddons().length ? store.selectedAddons() : undefined,
+              addons: store.allAddons().length ? store.allAddons() : undefined,
             });
 
             patchState(store, { bankTransfer: response, bankCreating: false });
@@ -854,10 +945,10 @@ export const CheckoutStore = signalStore(
                 store.requiredCourseSelections() > 0 ? store.selectedCourseIds() : undefined,
               toolkitIds:
                 store.requiredQuickScanSelections() + store.requiredToolkitSelections() > 0
-                  ? store.selectedToolkitIds()
+                  ? store.freeToolkitIds()
                   : undefined,
               // CR-012 — bước này persist món mua lẻ vào giao dịch (nguồn chân lý fulfillment)
-              addons: store.selectedAddons().length ? store.selectedAddons() : undefined,
+              addons: store.allAddons().length ? store.allAddons() : undefined,
             });
 
             if (response.status === 'awaiting_confirmation' || response.status === 'success') {

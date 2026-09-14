@@ -934,6 +934,31 @@
   background: rgba(28, 28, 28, 0.8);
 }
 
+/* CR-017 — bài tick QUÁ lượt miễn phí: viền nét đứt (cùng ngôn ngữ với card mua lẻ) + giá */
+.course-card-mini.paid.selected {
+  border-style: dashed;
+  background: rgba(143, 80, 226, 0.03);
+}
+.course-card-mini__free-badge {
+  margin-top: -2px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-success-500, #008600);
+  background: rgba(0, 134, 0, 0.08);
+  border-radius: 999px;
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+.course-select-counter--paid {
+  margin-left: 6px;
+  color: var(--color-primary, #8f50e2);
+  background: rgba(143, 80, 226, 0.1);
+  border-style: dashed;
+}
+.course-select-hint--upsell {
+  color: var(--color-primary, #8f50e2);
+}
+
 .course-card-mini__pkg-badge {
   margin-top: -4px;
   font-size: 10px;

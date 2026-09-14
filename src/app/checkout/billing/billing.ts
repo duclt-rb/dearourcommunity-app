@@ -213,8 +213,15 @@ export default class BillingComponent implements OnInit {
   // ── CR-006: chọn Quick Scan / Toolkit tại checkout ──
   requiredQuickScans = this.store.requiredQuickScanSelections;
   requiredToolkits = this.store.requiredToolkitSelections;
-  selectedQuickScanCount = this.store.selectedQuickScanCount;
-  selectedToolkitCount = this.store.selectedToolkitCount;
+  // CR-017 — bộ đếm "x/N" chỉ đếm phần MIỄN PHÍ; phần tick dư hiện riêng là "mua thêm"
+  selectedQuickScanCount = this.store.freeQuickScanCount;
+  selectedToolkitCount = this.store.freeToolkitCount;
+  paidQuickScanCount = this.store.paidQuickScanCount;
+  paidToolkitCount = this.store.paidToolkitCount;
+  quickScanUpsellPrice = this.store.quickScanUpsellPrice;
+  toolkitUpsellPrice = this.store.toolkitUpsellPrice;
+  canUpsellQuickScan = this.store.canUpsellQuickScan;
+  canUpsellToolkit = this.store.canUpsellToolkit;
   quickScanSelectionComplete = this.store.quickScanSelectionComplete;
   toolkitSelectionComplete = this.store.toolkitSelectionComplete;
   /** Gate tổng cho nút thanh toán: đủ khoá + đủ Quick Scan + đủ Toolkit. */
@@ -242,6 +249,16 @@ export default class BillingComponent implements OnInit {
 
   isToolkitSelected(id: string): boolean {
     return this.store.selectedToolkitIds().includes(id);
+  }
+
+  /** CR-017 — bài đã tick nhưng nằm NGOÀI số lượt miễn phí → tính giá bán lẻ. */
+  isToolkitPaid(id: string): boolean {
+    return this.store.paidToolkitIds().includes(id);
+  }
+
+  /** CR-017 — bài còn tick thêm được dù đã đủ lượt (BE có bán lẻ). */
+  isToolkitUpsellable(id: string): boolean {
+    return this.store.upsellableToolkitIds().has(id);
   }
 
   toggleToolkit(id: string) {

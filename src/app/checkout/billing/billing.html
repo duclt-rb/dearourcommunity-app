@@ -15,826 +15,971 @@
       <div class="step-item">
         <div class="step-circle" [class.active]="step() === 1" [class.done]="step() > 1">
           @if (step() > 1) {
-          <svg lucideCheck [size]="16" strokeWidth="2.5"></svg>
-          } @else { 1 }
+            <svg lucideCheck [size]="16" strokeWidth="2.5"></svg>
+          } @else {
+            1
+          }
         </div>
-        <span class="step-label" [class.active]="step() === 1" [class.dim]="step() !== 1"
-          >{{ 'checkout.billing.steps.order' | transloco }}</span
-        >
+        <span class="step-label" [class.active]="step() === 1" [class.dim]="step() !== 1">{{
+          'checkout.billing.steps.order' | transloco
+        }}</span>
       </div>
       <div class="step-connector"></div>
       <div class="step-item">
         <div class="step-circle" [class.active]="step() === 2" [class.dim]="step() < 2">2</div>
-        <span class="step-label" [class.active]="step() === 2" [class.dim]="step() !== 2"
-          >{{ 'checkout.billing.steps.payment' | transloco }}</span
-        >
+        <span class="step-label" [class.active]="step() === 2" [class.dim]="step() !== 2">{{
+          'checkout.billing.steps.payment' | transloco
+        }}</span>
       </div>
     </div>
 
     <!-- ===== STEP 1: Order ===== -->
     @if (step() === 1) {
-    <div class="step-content visible">
-      <div class="order-card">
-        <div class="order-card-header">
-          <h2 class="order-card-title">{{ 'checkout.billing.orderDetails' | transloco }}</h2>
-        </div>
-        <div class="order-card-body">
-          <!-- Selected Plan — ẩn khi thanh toán booking (khối lịch hẹn bên dưới đã
+      <div class="step-content visible">
+        <div class="order-card">
+          <div class="order-card-header">
+            <h2 class="order-card-title">{{ 'checkout.billing.orderDetails' | transloco }}</h2>
+          </div>
+          <div class="order-card-body">
+            <!-- Selected Plan — ẩn khi thanh toán booking (khối lịch hẹn bên dưới đã
                  nêu dịch vụ + giá, card gói với ID/mô tả dài là thừa) -->
-          @if (!store.bookingRef()) {
-          <div style="display: flex; flex-direction: column; gap: 8px">
-            <span class="section-label">{{ 'checkout.billing.selectedPackage' | transloco }}</span>
-            <div class="course-row">
-              <span class="course-name">
-                @if (packageDetailUrl(); as url) {
-                <a class="pkg-name-link" [href]="url" target="_blank" rel="noopener noreferrer">
-                  {{ store.selectedPackage()?.name }}
-                  <svg lucideExternalLink [size]="14" strokeWidth="2"></svg>
-                </a>
-                } @else { {{ store.selectedPackage()?.name }} }
-                <span
-                  style="
-                    display: inline-block;
-                    font-size: 11px;
-                    font-weight: 500;
-                    color: var(--color-primary, #8f50e2);
-                    background: rgba(143, 80, 226, 0.08);
-                    padding: 2px 6px;
-                    border-radius: 4px;
-                    margin-left: 8px;
-                    font-family: monospace;
-                    vertical-align: middle;
-                  "
-                >
-                  ID: {{ store.selectedPackage()?.id }}
-                </span>
-                <span
-                  style="
-                    display: block;
-                    font-size: 13px;
-                    font-weight: 400;
-                    color: rgba(28, 28, 28, 0.5);
-                    margin-top: 4px;
-                  "
-                >
-                  {{ store.selectedPackage()?.description }}
-                </span>
-              </span>
-              <!-- CR-009 — cạnh tên gói luôn là GIÁ NIÊM YẾT; phần chênh phải trả nằm ở
+            @if (!store.bookingRef()) {
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <span class="section-label">{{
+                  'checkout.billing.selectedPackage' | transloco
+                }}</span>
+                <div class="course-row">
+                  <span class="course-name">
+                    @if (packageDetailUrl(); as url) {
+                      <a
+                        class="pkg-name-link"
+                        [href]="url"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {{ store.selectedPackage()?.name }}
+                        <svg lucideExternalLink [size]="14" strokeWidth="2"></svg>
+                      </a>
+                    } @else {
+                      {{ store.selectedPackage()?.name }}
+                    }
+                    <span
+                      style="
+                        display: inline-block;
+                        font-size: 11px;
+                        font-weight: 500;
+                        color: var(--color-primary, #8f50e2);
+                        background: rgba(143, 80, 226, 0.08);
+                        padding: 2px 6px;
+                        border-radius: 4px;
+                        margin-left: 8px;
+                        font-family: monospace;
+                        vertical-align: middle;
+                      "
+                    >
+                      ID: {{ store.selectedPackage()?.id }}
+                    </span>
+                    <span
+                      style="
+                        display: block;
+                        font-size: 13px;
+                        font-weight: 400;
+                        color: rgba(28, 28, 28, 0.5);
+                        margin-top: 4px;
+                      "
+                    >
+                      {{ store.selectedPackage()?.description }}
+                    </span>
+                  </span>
+                  <!-- CR-009 — cạnh tên gói luôn là GIÁ NIÊM YẾT; phần chênh phải trả nằm ở
                        khối tổng cộng bên dưới để user thấy rõ đã được trừ bao nhiêu. -->
-              <span class="course-price">₫ {{ listPrice() | number: '1.0-0' }}</span>
-            </div>
-          </div>
-          }
-
-          <!-- Lịch hẹn mentor gắn với lượt thanh toán (CR-001) — component tự ẩn
-                 nếu không có bookingRef / không xem được (mua gói thường giữ nguyên) -->
-          @if (store.bookingRef(); as bookingRef) {
-          <app-booking-summary [bookingId]="bookingRef" (bookingLoaded)="onBookingLoaded($event)" />
-          }
-
-          <!-- CR-011 — đang hỏi server số lượt/giá thì hiện skeleton: số mục phải chọn có
-                 thể đổi sau khi có kế hoạch checkout, render sớm sẽ nhảy layout. -->
-          @if (quoteLoading() && !store.bookingRef()) {
-          <div class="dashed-divider"></div>
-          <div class="checkout-skeleton">
-            <span class="skeleton-line skeleton-line--label"></span>
-            <span class="skeleton-line skeleton-line--hint"></span>
-            <div class="course-select-grid">
-              <span class="skeleton-card"></span>
-              <span class="skeleton-card"></span>
-            </div>
-          </div>
-          }
-
-          <!-- CR-004: gói có lượt chọn khoá → BẮT BUỘC chọn đúng N khoá tại checkout.
-                 Tiền về: gói cá nhân auto-enroll; gói org giữ chỗ suất để gán member sau. -->
-          @if (!quoteLoading() && requiredSelections() > 0 && !store.bookingRef()) {
-          <div class="dashed-divider"></div>
-          <div style="display: flex; flex-direction: column; gap: 8px">
-            <span class="section-label">
-              {{ 'checkout.billing.selectCourses' | transloco }}
-              <span class="course-select-counter" [class.complete]="courseSelectionComplete()">
-                {{ selectedCourseCount() }}/{{ requiredSelections() }}
-              </span>
-            </span>
-            <p class="course-select-hint">
-              @if (isOrgPackage()) { {{ 'checkout.billing.courseHintOrg' | transloco: { n:
-              requiredSelections() } }} } @else { {{ 'checkout.billing.courseHintPersonal' |
-              transloco: { n: requiredSelections() } }} }
-            </p>
-            <!-- CR-011 — mỗi gói là một "túi lượt" riêng nên chia SECTION theo gói, mỗi
-                     section có bộ đếm riêng và tự khoá khi đã chọn đủ lượt của gói đó. -->
-            @for (section of courseSections(); track section.packageId ?? 'all') { @if
-            (section.label) {
-            <span class="course-section-head">
-              {{ 'checkout.billing.packageBadge' | transloco: { label: section.label } }}
-              <span
-                class="course-select-counter"
-                [class.complete]="section.selected >= section.capacity"
-              >
-                {{ section.selected }}/{{ section.capacity }}
-              </span>
-            </span>
+                  <span class="course-price">₫ {{ listPrice() | number: '1.0-0' }}</span>
+                </div>
+              </div>
             }
-            <div class="course-select-grid">
-              <!-- Mini card: click chọn/bỏ chọn, mỗi khoá tối đa 1 lần (amendment 06/07) -->
-              @for (course of section.courses; track course.id; let i = $index) {
-              <button
-                type="button"
-                class="course-card-mini"
-                [class.selected]="isCourseSelected(course.id)"
-                [disabled]="
+
+            <!-- Lịch hẹn mentor gắn với lượt thanh toán (CR-001) — component tự ẩn
+                 nếu không có bookingRef / không xem được (mua gói thường giữ nguyên) -->
+            @if (store.bookingRef(); as bookingRef) {
+              <app-booking-summary
+                [bookingId]="bookingRef"
+                (bookingLoaded)="onBookingLoaded($event)"
+              />
+            }
+
+            <!-- CR-011 — đang hỏi server số lượt/giá thì hiện skeleton: số mục phải chọn có
+                 thể đổi sau khi có kế hoạch checkout, render sớm sẽ nhảy layout. -->
+            @if (quoteLoading() && !store.bookingRef()) {
+              <div class="dashed-divider"></div>
+              <div class="checkout-skeleton">
+                <span class="skeleton-line skeleton-line--label"></span>
+                <span class="skeleton-line skeleton-line--hint"></span>
+                <div class="course-select-grid">
+                  <span class="skeleton-card"></span>
+                  <span class="skeleton-card"></span>
+                </div>
+              </div>
+            }
+
+            <!-- CR-004: gói có lượt chọn khoá → BẮT BUỘC chọn đúng N khoá tại checkout.
+                 Tiền về: gói cá nhân auto-enroll; gói org giữ chỗ suất để gán member sau. -->
+            @if (!quoteLoading() && requiredSelections() > 0 && !store.bookingRef()) {
+              <div class="dashed-divider"></div>
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <span class="section-label">
+                  {{ 'checkout.billing.selectCourses' | transloco }}
+                  <span class="course-select-counter" [class.complete]="courseSelectionComplete()">
+                    {{ selectedCourseCount() }}/{{ requiredSelections() }}
+                  </span>
+                </span>
+                <p class="course-select-hint">
+                  @if (isOrgPackage()) {
+                    {{ 'checkout.billing.courseHintOrg' | transloco: { n: requiredSelections() } }}
+                  } @else {
+                    {{
+                      'checkout.billing.courseHintPersonal' | transloco: { n: requiredSelections() }
+                    }}
+                  }
+                </p>
+                <!-- CR-011 — mỗi gói là một "túi lượt" riêng nên chia SECTION theo gói, mỗi
+                     section có bộ đếm riêng và tự khoá khi đã chọn đủ lượt của gói đó. -->
+                @for (section of courseSections(); track section.packageId ?? 'all') {
+                  @if (section.label) {
+                    <span class="course-section-head">
+                      {{ 'checkout.billing.packageBadge' | transloco: { label: section.label } }}
+                      <span
+                        class="course-select-counter"
+                        [class.complete]="section.selected >= section.capacity"
+                      >
+                        {{ section.selected }}/{{ section.capacity }}
+                      </span>
+                    </span>
+                  }
+                  <div class="course-select-grid">
+                    <!-- Mini card: click chọn/bỏ chọn, mỗi khoá tối đa 1 lần (amendment 06/07) -->
+                    @for (course of section.courses; track course.id; let i = $index) {
+                      <button
+                        type="button"
+                        class="course-card-mini"
+                        [class.selected]="isCourseSelected(course.id)"
+                        [disabled]="
                           !isCourseSelected(course.id) &&
                           (section.label
                             ? section.selected >= section.capacity
                             : courseSelectionComplete())
                         "
-                (click)="toggleCourse(course.id)"
-              >
-                <span class="course-card-mini__thumb tone-{{ i % 4 }}">
-                  @if (course.thumbnailUrl) {
-                  <img
-                    class="course-card-mini__img"
-                    [src]="course.thumbnailUrl"
-                    alt=""
-                    loading="lazy"
-                  />
-                  } @else {
-                  <svg lucideBookOpen [size]="18" strokeWidth="2"></svg>
-                  }
-                </span>
-                <span class="course-card-mini__title">{{ course.title }}</span>
-                <!-- Tiêu đề section đã nêu tên gói → badge chỉ dùng khi không chia được
+                        (click)="toggleCourse(course.id)"
+                      >
+                        <span class="course-card-mini__thumb tone-{{ i % 4 }}">
+                          @if (course.thumbnailUrl) {
+                            <img
+                              class="course-card-mini__img"
+                              [src]="course.thumbnailUrl"
+                              alt=""
+                              loading="lazy"
+                            />
+                          } @else {
+                            <svg lucideBookOpen [size]="18" strokeWidth="2"></svg>
+                          }
+                        </span>
+                        <span class="course-card-mini__title">{{ course.title }}</span>
+                        <!-- Tiêu đề section đã nêu tên gói → badge chỉ dùng khi không chia được
                              section (chưa nạp được kế hoạch checkout) -->
-                @if (!section.label && course.sourceLabel) {
-                <span class="course-card-mini__pkg-badge"
-                  >{{ 'checkout.billing.packageBadge' | transloco: { label: course.sourceLabel }
-                  }}</span
-                >
+                        @if (!section.label && course.sourceLabel) {
+                          <span class="course-card-mini__pkg-badge">{{
+                            'checkout.billing.packageBadge'
+                              | transloco: { label: course.sourceLabel }
+                          }}</span>
+                        }
+                        <span
+                          class="course-card-mini__check"
+                          [class.checked]="isCourseSelected(course.id)"
+                        >
+                          @if (isCourseSelected(course.id)) {
+                            <svg lucideCheck [size]="12" strokeWidth="3"></svg>
+                          }
+                        </span>
+                      </button>
+                    }
+                  </div>
                 }
-                <span class="course-card-mini__check" [class.checked]="isCourseSelected(course.id)">
-                  @if (isCourseSelected(course.id)) {
-                  <svg lucideCheck [size]="12" strokeWidth="3"></svg>
-                  }
-                </span>
-              </button>
-              }
-            </div>
+              </div>
             }
-          </div>
-          }
 
-          <!-- CR-006: gói có lượt Quick Scan → BẮT BUỘC chọn đúng N bài từ pool của gói.
+            <!-- CR-006: gói có lượt Quick Scan → BẮT BUỘC chọn đúng N bài từ pool của gói.
                  UX 15/07 — mục đã sở hữu hiện disabled + badge; sở hữu hết pool → khối info;
                  hết lựa chọn thực → store chọn sẵn, card khoá thao tác. -->
-          @if ( !quoteLoading() && (requiredQuickScans() > 0 || quickScanFullyOwned()) &&
-          !store.bookingRef() ) {
-          <div class="dashed-divider"></div>
-          <div style="display: flex; flex-direction: column; gap: 8px">
-            <span class="section-label">
-              {{ 'checkout.billing.selectQuickScan' | transloco }} @if (requiredQuickScans() > 0) {
-              <span class="course-select-counter" [class.complete]="quickScanSelectionComplete()">
-                {{ selectedQuickScanCount() }}/{{ requiredQuickScans() }}
-              </span>
-              }
-            </span>
-            @if (quickScanFullyOwned()) {
-            <div class="pool-owned-note">
-              <svg lucideCircleCheck [size]="18" strokeWidth="2"></svg>
-              <span>{{ 'checkout.billing.quickScanFullyOwned' | transloco }}</span>
-            </div>
-            } @else {
-            <p class="course-select-hint">
-              {{ 'checkout.billing.quickScanHint' | transloco: { n: requiredQuickScans() } }} @if
-              (quickScanForced()) { {{ 'checkout.billing.quickScanForced' | transloco }} }
-            </p>
-            }
-            <div class="course-select-grid">
-              @for (item of quickScanPool(); track item.id) {
-              <button
-                type="button"
-                class="course-card-mini"
-                [class.selected]="isToolkitSelected(item.id)"
-                [class.owned]="item.owned"
-                [disabled]="
+            @if (
+              !quoteLoading() &&
+              (requiredQuickScans() > 0 || quickScanFullyOwned()) &&
+              !store.bookingRef()
+            ) {
+              <div class="dashed-divider"></div>
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <span class="section-label">
+                  {{ 'checkout.billing.selectQuickScan' | transloco }}
+                  @if (requiredQuickScans() > 0) {
+                    <span
+                      class="course-select-counter"
+                      [class.complete]="quickScanSelectionComplete()"
+                    >
+                      {{ selectedQuickScanCount() }}/{{ requiredQuickScans() }}
+                    </span>
+                  }
+                  @if (paidQuickScanCount() > 0) {
+                    <span class="course-select-counter course-select-counter--paid">
+                      {{ 'checkout.billing.paidPicks' | transloco: { n: paidQuickScanCount() } }}
+                    </span>
+                  }
+                </span>
+                @if (quickScanFullyOwned()) {
+                  <div class="pool-owned-note">
+                    <svg lucideCircleCheck [size]="18" strokeWidth="2"></svg>
+                    <span>{{ 'checkout.billing.quickScanFullyOwned' | transloco }}</span>
+                  </div>
+                } @else {
+                  <p class="course-select-hint">
+                    {{ 'checkout.billing.quickScanHint' | transloco: { n: requiredQuickScans() } }}
+                    @if (quickScanForced()) {
+                      {{ 'checkout.billing.quickScanForced' | transloco }}
+                    }
+                  </p>
+                  <!-- CR-017 — tick quá số lượt → mỗi bài dư tính giá bán lẻ, cộng vào đơn -->
+                  @if (canUpsellQuickScan()) {
+                    <p class="course-select-hint course-select-hint--upsell">
+                      {{
+                        'checkout.billing.upsellHint'
+                          | transloco: { price: (quickScanUpsellPrice() | number: '1.0-0') }
+                      }}
+                    </p>
+                  }
+                }
+                <div class="course-select-grid">
+                  @for (item of quickScanPool(); track item.id) {
+                    <button
+                      type="button"
+                      class="course-card-mini"
+                      [class.selected]="isToolkitSelected(item.id)"
+                      [class.owned]="item.owned"
+                      [class.paid]="isToolkitPaid(item.id)"
+                      [disabled]="
                         item.owned ||
                         quickScanForced() ||
-                        (!isToolkitSelected(item.id) && quickScanSelectionComplete())
+                        (!isToolkitSelected(item.id) &&
+                          quickScanSelectionComplete() &&
+                          !isToolkitUpsellable(item.id))
                       "
-                (click)="toggleToolkit(item.id)"
-              >
-                <span class="course-card-mini__thumb tone-1">
-                  <svg lucideZap [size]="18" strokeWidth="2"></svg>
-                </span>
-                <span class="course-card-mini__title">{{ item.title }}</span>
-                @if (item.owned) {
-                <span class="course-card-mini__owned-badge">
-                  <svg lucideCircleCheck [size]="12" strokeWidth="2.5"></svg>
-                  {{ 'checkout.billing.ownedBadge' | transloco }}
-                </span>
-                } @else {
-                <span class="course-card-mini__check" [class.checked]="isToolkitSelected(item.id)">
-                  @if (isToolkitSelected(item.id)) {
-                  <svg lucideCheck [size]="12" strokeWidth="3"></svg>
+                      (click)="toggleToolkit(item.id)"
+                    >
+                      <span class="course-card-mini__thumb tone-1">
+                        <svg lucideZap [size]="18" strokeWidth="2"></svg>
+                      </span>
+                      <span class="course-card-mini__title">{{ item.title }}</span>
+                      @if (isToolkitSelected(item.id) && isToolkitPaid(item.id)) {
+                        <span class="course-card-mini__addon-price">
+                          + ₫ {{ quickScanUpsellPrice() | number: '1.0-0' }}
+                        </span>
+                      } @else if (isToolkitSelected(item.id) && canUpsellQuickScan()) {
+                        <span class="course-card-mini__free-badge">
+                          {{ 'checkout.billing.freeBadge' | transloco }}
+                        </span>
+                      }
+                      @if (item.owned) {
+                        <span class="course-card-mini__owned-badge">
+                          <svg lucideCircleCheck [size]="12" strokeWidth="2.5"></svg>
+                          {{ 'checkout.billing.ownedBadge' | transloco }}
+                        </span>
+                      } @else {
+                        <span
+                          class="course-card-mini__check"
+                          [class.checked]="isToolkitSelected(item.id)"
+                        >
+                          @if (isToolkitSelected(item.id)) {
+                            <svg lucideCheck [size]="12" strokeWidth="3"></svg>
+                          }
+                        </span>
+                      }
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- CR-006: gói có lượt Toolkit chuyên đề → BẮT BUỘC chọn đúng N bộ từ pool của gói.
+                 UX 15/07 — cùng quy tắc hiển thị với Quick Scan ở trên. -->
+            @if (
+              !quoteLoading() &&
+              (requiredToolkits() > 0 || toolkitFullyOwned()) &&
+              !store.bookingRef()
+            ) {
+              <div class="dashed-divider"></div>
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <span class="section-label">
+                  {{ 'checkout.billing.selectToolkit' | transloco }}
+                  @if (requiredToolkits() > 0) {
+                    <span
+                      class="course-select-counter"
+                      [class.complete]="toolkitSelectionComplete()"
+                    >
+                      {{ selectedToolkitCount() }}/{{ requiredToolkits() }}
+                    </span>
+                  }
+                  @if (paidToolkitCount() > 0) {
+                    <span class="course-select-counter course-select-counter--paid">
+                      {{ 'checkout.billing.paidPicks' | transloco: { n: paidToolkitCount() } }}
+                    </span>
                   }
                 </span>
+                @if (toolkitFullyOwned()) {
+                  <div class="pool-owned-note">
+                    <svg lucideCircleCheck [size]="18" strokeWidth="2"></svg>
+                    <span>{{ 'checkout.billing.toolkitFullyOwned' | transloco }}</span>
+                  </div>
+                } @else {
+                  <p class="course-select-hint">
+                    {{ 'checkout.billing.toolkitHint' | transloco: { n: requiredToolkits() } }}
+                    @if (toolkitForced()) {
+                      {{ 'checkout.billing.toolkitForced' | transloco }}
+                    }
+                  </p>
+                  <!-- CR-017 — tick quá số lượt → mỗi bộ dư tính giá bán lẻ, cộng vào đơn -->
+                  @if (canUpsellToolkit()) {
+                    <p class="course-select-hint course-select-hint--upsell">
+                      {{
+                        'checkout.billing.upsellHint'
+                          | transloco: { price: (toolkitUpsellPrice() | number: '1.0-0') }
+                      }}
+                    </p>
+                  }
                 }
-              </button>
-              }
-            </div>
-          </div>
-          }
-
-          <!-- CR-006: gói có lượt Toolkit chuyên đề → BẮT BUỘC chọn đúng N bộ từ pool của gói.
-                 UX 15/07 — cùng quy tắc hiển thị với Quick Scan ở trên. -->
-          @if ( !quoteLoading() && (requiredToolkits() > 0 || toolkitFullyOwned()) &&
-          !store.bookingRef() ) {
-          <div class="dashed-divider"></div>
-          <div style="display: flex; flex-direction: column; gap: 8px">
-            <span class="section-label">
-              {{ 'checkout.billing.selectToolkit' | transloco }} @if (requiredToolkits() > 0) {
-              <span class="course-select-counter" [class.complete]="toolkitSelectionComplete()">
-                {{ selectedToolkitCount() }}/{{ requiredToolkits() }}
-              </span>
-              }
-            </span>
-            @if (toolkitFullyOwned()) {
-            <div class="pool-owned-note">
-              <svg lucideCircleCheck [size]="18" strokeWidth="2"></svg>
-              <span>{{ 'checkout.billing.toolkitFullyOwned' | transloco }}</span>
-            </div>
-            } @else {
-            <p class="course-select-hint">
-              {{ 'checkout.billing.toolkitHint' | transloco: { n: requiredToolkits() } }} @if
-              (toolkitForced()) { {{ 'checkout.billing.toolkitForced' | transloco }} }
-            </p>
-            }
-            <div class="course-select-grid">
-              @for (item of toolkitPool(); track item.id) {
-              <button
-                type="button"
-                class="course-card-mini"
-                [class.selected]="isToolkitSelected(item.id)"
-                [class.owned]="item.owned"
-                [disabled]="
+                <div class="course-select-grid">
+                  @for (item of toolkitPool(); track item.id) {
+                    <button
+                      type="button"
+                      class="course-card-mini"
+                      [class.selected]="isToolkitSelected(item.id)"
+                      [class.owned]="item.owned"
+                      [class.paid]="isToolkitPaid(item.id)"
+                      [disabled]="
                         item.owned ||
                         toolkitForced() ||
-                        (!isToolkitSelected(item.id) && toolkitSelectionComplete())
+                        (!isToolkitSelected(item.id) &&
+                          toolkitSelectionComplete() &&
+                          !isToolkitUpsellable(item.id))
                       "
-                (click)="toggleToolkit(item.id)"
-              >
-                <span class="course-card-mini__thumb tone-2">
-                  <svg lucideWrench [size]="18" strokeWidth="2"></svg>
-                </span>
-                <span class="course-card-mini__title">{{ item.title }}</span>
-                @if (item.owned) {
-                <span class="course-card-mini__owned-badge">
-                  <svg lucideCircleCheck [size]="12" strokeWidth="2.5"></svg>
-                  {{ 'checkout.billing.ownedBadge' | transloco }}
-                </span>
-                } @else {
-                <span class="course-card-mini__check" [class.checked]="isToolkitSelected(item.id)">
-                  @if (isToolkitSelected(item.id)) {
-                  <svg lucideCheck [size]="12" strokeWidth="3"></svg>
+                      (click)="toggleToolkit(item.id)"
+                    >
+                      <span class="course-card-mini__thumb tone-2">
+                        <svg lucideWrench [size]="18" strokeWidth="2"></svg>
+                      </span>
+                      <span class="course-card-mini__title">{{ item.title }}</span>
+                      @if (isToolkitSelected(item.id) && isToolkitPaid(item.id)) {
+                        <span class="course-card-mini__addon-price">
+                          + ₫ {{ toolkitUpsellPrice() | number: '1.0-0' }}
+                        </span>
+                      } @else if (isToolkitSelected(item.id) && canUpsellToolkit()) {
+                        <span class="course-card-mini__free-badge">
+                          {{ 'checkout.billing.freeBadge' | transloco }}
+                        </span>
+                      }
+                      @if (item.owned) {
+                        <span class="course-card-mini__owned-badge">
+                          <svg lucideCircleCheck [size]="12" strokeWidth="2.5"></svg>
+                          {{ 'checkout.billing.ownedBadge' | transloco }}
+                        </span>
+                      } @else {
+                        <span
+                          class="course-card-mini__check"
+                          [class.checked]="isToolkitSelected(item.id)"
+                        >
+                          @if (isToolkitSelected(item.id)) {
+                            <svg lucideCheck [size]="12" strokeWidth="3"></svg>
+                          }
+                        </span>
+                      }
+                    </button>
                   }
-                </span>
-                }
-              </button>
-              }
-            </div>
-          </div>
-          }
-
-          <!-- CR-012 — MUA LẺ: chỉ hiện món khách đã chọn từ trang gói (deep-link `?addons=`);
-                 checkout KHÔNG upsell lại. Bỏ hết món → mục tự ẩn. -->
-          @if (!quoteLoading() && selectedAddonItems().length > 0 && !store.bookingRef()) {
-          <div class="dashed-divider"></div>
-          <div style="display: flex; flex-direction: column; gap: 8px">
-            <span class="section-label">
-              {{ 'checkout.billing.addons' | transloco }}
-              <span class="course-select-counter complete">{{ selectedAddonCount() }}</span>
-            </span>
-            <p class="course-select-hint">{{ 'checkout.billing.addonsHint' | transloco }}</p>
-            <div class="course-select-grid">
-              @for ( item of selectedAddonItems(); track item.type + ':' + item.refId; let i =
-              $index ) {
-              <div class="course-card-mini course-card-mini--addon selected">
-                <span class="course-card-mini__thumb tone-{{ i % 4 }}">
-                  @if (item.thumbnailUrl) {
-                  <img
-                    class="course-card-mini__img"
-                    [src]="item.thumbnailUrl"
-                    alt=""
-                    loading="lazy"
-                  />
-                  } @else if (item.type === 'extra_course') {
-                  <svg lucideBookOpen [size]="18" strokeWidth="2"></svg>
-                  } @else {
-                  <svg lucideWrench [size]="18" strokeWidth="2"></svg>
-                  }
-                </span>
-                <span class="course-card-mini__title">{{ item.title }}</span>
-                @if (item.packageLabel) {
-                <span class="course-card-mini__pkg-badge"
-                  >{{ 'checkout.billing.packageBadge' | transloco: { label: item.packageLabel }
-                  }}</span
-                >
-                }
-                <span class="course-card-mini__addon-price">
-                  + ₫ {{ item.price | number: '1.0-0' }}
-                </span>
-                <button
-                  type="button"
-                  class="course-card-mini__remove"
-                  [attr.aria-label]="'checkout.billing.removeAddon' | transloco"
-                  (click)="removeAddon(item)"
-                >
-                  <svg lucideX [size]="12" strokeWidth="3"></svg>
-                </button>
-              </div>
-              }
-            </div>
-          </div>
-          }
-
-          <div class="dashed-divider"></div>
-
-          <!-- Promo Code -->
-          <div style="display: flex; flex-direction: column; gap: 8px">
-            <span class="section-label">{{ 'checkout.billing.coupon.label' | transloco }}</span>
-
-            <!-- Coupon input (shown when no coupon applied) -->
-            @if (!couponApplied()) {
-            <div>
-              <div class="coupon-input-row">
-                <input
-                  class="coupon-input"
-                  type="text"
-                  #promoInput
-                  [placeholder]="'checkout.billing.coupon.placeholder' | transloco"
-                  (keyup.enter)="applyCoupon(promoInput.value)"
-                />
-                <button
-                  class="btn-apply"
-                  [disabled]="couponValidating()"
-                  (click)="applyCoupon(promoInput.value)"
-                >
-                  {{ (couponValidating() ? 'checkout.billing.coupon.validating' :
-                  'checkout.billing.coupon.apply' ) | transloco }}
-                </button>
-              </div>
-              <div class="coupon-hint" style="margin-top: 8px">
-                <svg
-                  lucideTag
-                  [size]="20"
-                  strokeWidth="2"
-                  style="color: var(--color-primary); flex-shrink: 0"
-                ></svg>
-                <span class="coupon-hint-text"
-                  >{{ 'checkout.billing.coupon.hint' | transloco }}</span
-                >
-              </div>
-            </div>
-            } @else {
-            <!-- Coupon applied state -->
-            <div>
-              <div class="coupon-applied">
-                <div class="coupon-applied-left">
-                  <svg
-                    lucideTag
-                    [size]="16"
-                    strokeWidth="2"
-                    style="color: var(--color-accent-green); flex-shrink: 0"
-                  ></svg>
-                  <span class="coupon-code">{{ appliedCode() }}</span>
                 </div>
-                <button class="btn-remove-coupon" (click)="removeCoupon()">
-                  <svg lucideX [size]="16" strokeWidth="2"></svg>
-                </button>
               </div>
+            }
+
+            <!-- CR-012 — MUA LẺ: chỉ hiện món khách đã chọn từ trang gói (deep-link `?addons=`);
+                 checkout KHÔNG upsell lại. Bỏ hết món → mục tự ẩn. -->
+            @if (!quoteLoading() && selectedAddonItems().length > 0 && !store.bookingRef()) {
+              <div class="dashed-divider"></div>
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <span class="section-label">
+                  {{ 'checkout.billing.addons' | transloco }}
+                  <span class="course-select-counter complete">{{ selectedAddonCount() }}</span>
+                </span>
+                <p class="course-select-hint">{{ 'checkout.billing.addonsHint' | transloco }}</p>
+                <div class="course-select-grid">
+                  @for (
+                    item of selectedAddonItems();
+                    track item.type + ':' + item.refId;
+                    let i = $index
+                  ) {
+                    <div class="course-card-mini course-card-mini--addon selected">
+                      <span class="course-card-mini__thumb tone-{{ i % 4 }}">
+                        @if (item.thumbnailUrl) {
+                          <img
+                            class="course-card-mini__img"
+                            [src]="item.thumbnailUrl"
+                            alt=""
+                            loading="lazy"
+                          />
+                        } @else if (item.type === 'extra_course') {
+                          <svg lucideBookOpen [size]="18" strokeWidth="2"></svg>
+                        } @else {
+                          <svg lucideWrench [size]="18" strokeWidth="2"></svg>
+                        }
+                      </span>
+                      <span class="course-card-mini__title">{{ item.title }}</span>
+                      @if (item.packageLabel) {
+                        <span class="course-card-mini__pkg-badge">{{
+                          'checkout.billing.packageBadge' | transloco: { label: item.packageLabel }
+                        }}</span>
+                      }
+                      <span class="course-card-mini__addon-price">
+                        + ₫ {{ item.price | number: '1.0-0' }}
+                      </span>
+                      <button
+                        type="button"
+                        class="course-card-mini__remove"
+                        [attr.aria-label]="'checkout.billing.removeAddon' | transloco"
+                        (click)="removeAddon(item)"
+                      >
+                        <svg lucideX [size]="12" strokeWidth="3"></svg>
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <div class="dashed-divider"></div>
+
+            <!-- Promo Code -->
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <span class="section-label">{{ 'checkout.billing.coupon.label' | transloco }}</span>
+
+              <!-- Coupon input (shown when no coupon applied) -->
+              @if (!couponApplied()) {
+                <div>
+                  <div class="coupon-input-row">
+                    <input
+                      class="coupon-input"
+                      type="text"
+                      #promoInput
+                      [placeholder]="'checkout.billing.coupon.placeholder' | transloco"
+                      (keyup.enter)="applyCoupon(promoInput.value)"
+                    />
+                    <button
+                      class="btn-apply"
+                      [disabled]="couponValidating()"
+                      (click)="applyCoupon(promoInput.value)"
+                    >
+                      {{
+                        (couponValidating()
+                          ? 'checkout.billing.coupon.validating'
+                          : 'checkout.billing.coupon.apply'
+                        ) | transloco
+                      }}
+                    </button>
+                  </div>
+                  <div class="coupon-hint" style="margin-top: 8px">
+                    <svg
+                      lucideTag
+                      [size]="20"
+                      strokeWidth="2"
+                      style="color: var(--color-primary); flex-shrink: 0"
+                    ></svg>
+                    <span class="coupon-hint-text">{{
+                      'checkout.billing.coupon.hint' | transloco
+                    }}</span>
+                  </div>
+                </div>
+              } @else {
+                <!-- Coupon applied state -->
+                <div>
+                  <div class="coupon-applied">
+                    <div class="coupon-applied-left">
+                      <svg
+                        lucideTag
+                        [size]="16"
+                        strokeWidth="2"
+                        style="color: var(--color-accent-green); flex-shrink: 0"
+                      ></svg>
+                      <span class="coupon-code">{{ appliedCode() }}</span>
+                    </div>
+                    <button class="btn-remove-coupon" (click)="removeCoupon()">
+                      <svg lucideX [size]="16" strokeWidth="2"></svg>
+                    </button>
+                  </div>
+                  @if (couponDiscount() > 0) {
+                    <p class="coupon-note">
+                      {{
+                        'checkout.billing.coupon.discountApplied'
+                          | transloco: { amount: (couponDiscount() | number: '1.0-0') }
+                      }}
+                    </p>
+                  } @else {
+                    <p class="coupon-note">{{ 'checkout.billing.coupon.validNote' | transloco }}</p>
+                  }
+                </div>
+              }
+
+              <!-- Coupon error -->
+              @if (couponError()) {
+                <p class="coupon-error">
+                  {{ couponErrorMsg() || ('checkout.billing.coupon.invalid' | transloco) }}
+                </p>
+              }
+            </div>
+
+            <div class="dashed-divider"></div>
+
+            <!-- Total -->
+            <div class="total-section">
+              <!-- CR-009 — nâng cấp gói: hiện rõ giá gói và phần đã trừ của gói đang sở hữu -->
+              @if (isUpgrade()) {
+                <div class="total-row">
+                  <span class="total-label">{{
+                    'checkout.billing.listPriceLabel' | transloco
+                  }}</span>
+                  <span class="total-value">₫ {{ listPrice() | number: '1.0-0' }}</span>
+                </div>
+                <div class="total-row">
+                  <span class="total-label">{{
+                    'checkout.billing.alreadyOwned' | transloco: { name: upgradeFromName() }
+                  }}</span>
+                  <span class="total-value bank-field-discount"
+                    >− ₫ {{ upgradeCreditAmount() | number: '1.0-0' }}</span
+                  >
+                </div>
+              }
               @if (couponDiscount() > 0) {
-              <p class="coupon-note">
-                {{ 'checkout.billing.coupon.discountApplied' | transloco: { amount:
-                (couponDiscount() | number: '1.0-0') } }}
-              </p>
-              } @else {
-              <p class="coupon-note">{{ 'checkout.billing.coupon.validNote' | transloco }}</p>
+                <div class="total-row">
+                  <span class="total-label">{{ 'checkout.billing.subtotal' | transloco }}</span>
+                  <span class="total-value">₫ {{ originalPrice | number: '1.0-0' }}</span>
+                </div>
+                <div class="total-row">
+                  <span class="total-label">{{
+                    'checkout.billing.discountWithCode' | transloco: { code: appliedCode() }
+                  }}</span>
+                  <span class="total-value bank-field-discount"
+                    >− ₫ {{ couponDiscount() | number: '1.0-0' }}</span
+                  >
+                </div>
               }
-            </div>
-            }
-
-            <!-- Coupon error -->
-            @if (couponError()) {
-            <p class="coupon-error">
-              {{ couponErrorMsg() || ('checkout.billing.coupon.invalid' | transloco) }}
-            </p>
-            }
-          </div>
-
-          <div class="dashed-divider"></div>
-
-          <!-- Total -->
-          <div class="total-section">
-            <!-- CR-009 — nâng cấp gói: hiện rõ giá gói và phần đã trừ của gói đang sở hữu -->
-            @if (isUpgrade()) {
-            <div class="total-row">
-              <span class="total-label">{{ 'checkout.billing.listPriceLabel' | transloco }}</span>
-              <span class="total-value">₫ {{ listPrice() | number: '1.0-0' }}</span>
-            </div>
-            <div class="total-row">
-              <span class="total-label"
-                >{{ 'checkout.billing.alreadyOwned' | transloco: { name: upgradeFromName() }
-                }}</span
-              >
-              <span class="total-value bank-field-discount"
-                >− ₫ {{ upgradeCreditAmount() | number: '1.0-0' }}</span
-              >
-            </div>
-            } @if (couponDiscount() > 0) {
-            <div class="total-row">
-              <span class="total-label">{{ 'checkout.billing.subtotal' | transloco }}</span>
-              <span class="total-value">₫ {{ originalPrice | number: '1.0-0' }}</span>
-            </div>
-            <div class="total-row">
-              <span class="total-label"
-                >{{ 'checkout.billing.discountWithCode' | transloco: { code: appliedCode() }
-                }}</span
-              >
-              <span class="total-value bank-field-discount"
-                >− ₫ {{ couponDiscount() | number: '1.0-0' }}</span
-              >
-            </div>
-            }
-            <!-- CR-012 — phần mua lẻ nằm ngoài giá gói và KHÔNG được coupon giảm (D6) -->
-            @if (addonAmount() > 0) {
-            <div class="total-row">
-              <span class="total-label"
-                >{{ 'checkout.billing.addonsCount' | transloco: { n: selectedAddonCount() } }}</span
-              >
-              <span class="total-value">+ ₫ {{ addonAmount() | number: '1.0-0' }}</span>
-            </div>
-            }
-            <div class="total-row final">
-              <span class="total-label">{{ 'checkout.billing.total' | transloco }}</span>
-              @if (quoteLoading()) {
-              <span class="skeleton-line skeleton-line--price"></span>
-              } @else {
-              <span class="total-value">₫ {{ finalTotal() | number: '1.0-0' }}</span>
+              <!-- CR-012 — phần mua lẻ nằm ngoài giá gói và KHÔNG được coupon giảm (D6) -->
+              @if (addonAmount() > 0) {
+                <div class="total-row">
+                  <span class="total-label">{{
+                    'checkout.billing.addonsCount' | transloco: { n: selectedAddonCount() }
+                  }}</span>
+                  <span class="total-value">+ ₫ {{ addonAmount() | number: '1.0-0' }}</span>
+                </div>
               }
+              <div class="total-row final">
+                <span class="total-label">{{ 'checkout.billing.total' | transloco }}</span>
+                @if (quoteLoading()) {
+                  <span class="skeleton-line skeleton-line--price"></span>
+                } @else {
+                  <span class="total-value">₫ {{ finalTotal() | number: '1.0-0' }}</span>
+                }
+              </div>
+              <p class="vat-note">{{ 'checkout.billing.vatIncluded' | transloco }}</p>
             </div>
-            <p class="vat-note">{{ 'checkout.billing.vatIncluded' | transloco }}</p>
           </div>
         </div>
-      </div>
 
-      <!-- CR-001: booking đã xử lý xong → thay nút thanh toán bằng banner trạng thái -->
-      @if (bookingAlreadyPaid()) {
-      <div class="booking-notice booking-notice--success">
-        <svg lucideCircleCheck [size]="20" strokeWidth="2"></svg>
-        <span>{{ 'checkout.billing.bookingPaid' | transloco }}</span>
-      </div>
-      } @else if (bookingRejected()) {
-      <div class="booking-notice booking-notice--error">
-        <svg lucideCircleX [size]="20" strokeWidth="2"></svg>
-        <span>{{ 'checkout.billing.bookingRejected' | transloco }}</span>
-      </div>
-      } @else {
-      <!-- CR-009 — không lấy được báo giá thì KHÔNG cho thanh toán (số tiền và số lượt chọn
+        <!-- CR-001: booking đã xử lý xong → thay nút thanh toán bằng banner trạng thái -->
+        @if (bookingAlreadyPaid()) {
+          <div class="booking-notice booking-notice--success">
+            <svg lucideCircleCheck [size]="20" strokeWidth="2"></svg>
+            <span>{{ 'checkout.billing.bookingPaid' | transloco }}</span>
+          </div>
+        } @else if (bookingRejected()) {
+          <div class="booking-notice booking-notice--error">
+            <svg lucideCircleX [size]="20" strokeWidth="2"></svg>
+            <span>{{ 'checkout.billing.bookingRejected' | transloco }}</span>
+          </div>
+        } @else {
+          <!-- CR-009 — không lấy được báo giá thì KHÔNG cho thanh toán (số tiền và số lượt chọn
                của lượt nâng cấp đều sai nếu đoán từ config gói) -->
-      @if (quoteError()) {
-      <div class="booking-notice booking-notice--error">
-        <svg lucideCircleX [size]="20" strokeWidth="2"></svg>
-        <span>
-          {{ 'checkout.billing.quoteError' | transloco }}
-          <button type="button" class="quote-retry" (click)="retryQuote()">
-            {{ 'common.retry' | transloco }}
+          @if (quoteError()) {
+            <div class="booking-notice booking-notice--error">
+              <svg lucideCircleX [size]="20" strokeWidth="2"></svg>
+              <span>
+                {{ 'checkout.billing.quoteError' | transloco }}
+                <button type="button" class="quote-retry" (click)="retryQuote()">
+                  {{ 'common.retry' | transloco }}
+                </button>
+              </span>
+            </div>
+          }
+          <!-- CR-009 — chờ báo giá nâng cấp xong mới cho thanh toán (tránh gửi giá niêm yết) -->
+          <button
+            class="btn-checkout"
+            [disabled]="!selectionComplete() || quoteLoading() || quoteError()"
+            (click)="goToPayment()"
+          >
+            {{ 'checkout.billing.proceedToPayment' | transloco }}
+            <svg lucideSend [size]="20" strokeWidth="2"></svg>
           </button>
-        </span>
+          @if (!selectionComplete()) {
+            <p class="course-select-remaining">
+              @if (!courseSelectionComplete()) {
+                {{
+                  'checkout.billing.remainingCourses'
+                    | transloco: { n: requiredSelections() - selectedCourseCount() }
+                }}
+              }
+              @if (!quickScanSelectionComplete()) {
+                {{
+                  'checkout.billing.remainingQuickScans'
+                    | transloco: { n: requiredQuickScans() - selectedQuickScanCount() }
+                }}
+              }
+              @if (!toolkitSelectionComplete()) {
+                {{
+                  'checkout.billing.remainingToolkits'
+                    | transloco: { n: requiredToolkits() - selectedToolkitCount() }
+                }}
+              }
+            </p>
+          }
+        }
       </div>
-      }
-      <!-- CR-009 — chờ báo giá nâng cấp xong mới cho thanh toán (tránh gửi giá niêm yết) -->
-      <button
-        class="btn-checkout"
-        [disabled]="!selectionComplete() || quoteLoading() || quoteError()"
-        (click)="goToPayment()"
-      >
-        {{ 'checkout.billing.proceedToPayment' | transloco }}
-        <svg lucideSend [size]="20" strokeWidth="2"></svg>
-      </button>
-      @if (!selectionComplete()) {
-      <p class="course-select-remaining">
-        @if (!courseSelectionComplete()) { {{ 'checkout.billing.remainingCourses' | transloco: { n:
-        requiredSelections() - selectedCourseCount() } }} } @if (!quickScanSelectionComplete()) { {{
-        'checkout.billing.remainingQuickScans' | transloco: { n: requiredQuickScans() -
-        selectedQuickScanCount() } }} } @if (!toolkitSelectionComplete()) { {{
-        'checkout.billing.remainingToolkits' | transloco: { n: requiredToolkits() -
-        selectedToolkitCount() } }} }
-      </p>
-      } }
-    </div>
     }
 
     <!-- ===== STEP 2: Payment ===== -->
     @if (step() === 2) {
-    <div class="step-content visible">
-      <div class="order-card">
-        <div class="order-card-header">
-          <h2 class="order-card-title">{{ 'checkout.billing.paymentMethod' | transloco }}</h2>
-          <p class="order-card-subtitle">{{ 'checkout.billing.paymentMethodHint' | transloco }}</p>
-        </div>
-        <div class="order-card-body">
-          <!-- MoMo -->
-          <button
-            type="button"
-            class="payment-option"
-            [class.selected]="paymentMethod() === 'momo'"
-            [class.disabled]="momoDisabled"
-            [attr.aria-pressed]="paymentMethod() === 'momo'"
-            [disabled]="momoDisabled"
-            (click)="selectPaymentMethod('momo')"
-          >
-            <div class="payment-icon-box">
-              <img
-                src="/logo/MOMO-Logo-App.png"
-                alt="MoMo"
-                style="width: 28px; height: 28px; object-fit: contain"
-              />
-            </div>
-            <div class="payment-texts">
-              <span class="payment-option-name">
-                MoMo @if (momoDisabled) {
-                <span class="payment-option-badge"
-                  >{{ 'checkout.billing.comingSoon' | transloco }}</span
-                >
-                }
-              </span>
-              <span class="payment-option-desc">
-                @if (momoDisabled) { {{ 'checkout.billing.momoInDevelopment' | transloco }} } @else
-                { {{ 'checkout.billing.momoDesc' | transloco }} }
-              </span>
-            </div>
-            @if (!momoDisabled) {
-            <div class="radio-circle" [class.selected]="paymentMethod() === 'momo'">
-              @if (paymentMethod() === 'momo') {
-              <div class="radio-dot"></div>
-              }
-            </div>
-            }
-          </button>
-
-          <!-- Bank Transfer -->
-          <button
-            type="button"
-            class="payment-option"
-            [class.selected]="paymentMethod() === 'bank'"
-            [attr.aria-pressed]="paymentMethod() === 'bank'"
-            (click)="selectPaymentMethod('bank')"
-          >
-            <div class="payment-icon-box">
-              <svg lucideLandmark [size]="22" strokeWidth="2"></svg>
-            </div>
-            <div class="payment-texts">
-              <span class="payment-option-name"
-                >{{ 'checkout.billing.bankTransfer' | transloco }}</span
-              >
-              <span class="payment-option-desc"
-                >{{ 'checkout.billing.bankTransferDesc' | transloco }}</span
-              >
-            </div>
-            <div class="radio-circle" [class.selected]="paymentMethod() === 'bank'">
-              @if (paymentMethod() === 'bank') {
-              <div class="radio-dot"></div>
-              }
-            </div>
-          </button>
-
-          <!-- Bank transfer details + QR — ẩn khi booking đã bị chặn thanh toán
-                 (đã xử lý xong / BE 400 chống trùng) để user không quét QR/bấm tiếp -->
-          @if (paymentMethod() === 'bank' && !bookingBlocked() && !paymentBlockedMsg()) {
-          <div class="bank-panel">
-            @if (bankTransferSubmitted()) {
-            <!-- UX 15/07 — màn xác nhận (thông báo 72h + chứng từ + form hoá đơn) đã tách
-                       sang /checkout/bank-confirmation; nhánh này chỉ còn cho back-nav -->
-            <div class="booking-notice booking-notice--success">
-              <svg lucideCircleCheck [size]="20" strokeWidth="2"></svg>
-              <span>
-                {{ 'checkout.billing.bankSubmittedNotice' | transloco }}
-                <a
-                  class="bank-submitted-link"
-                  [routerLink]="['/checkout/bank-confirmation']"
-                  [queryParams]="{ orderId: bankTransfer()?.orderId }"
-                  >{{ 'checkout.billing.bankSubmittedLink' | transloco }}</a
-                >.
-              </span>
-            </div>
-            } @else if (bankCreating()) {
-            <div class="bank-loading">
-              <div class="spinner-sm"></div>
-              <span>{{ 'checkout.billing.bankCreating' | transloco }}</span>
-            </div>
-            } @else if (bankCreateError()) {
-            <div class="bank-error">
-              <p class="bank-error-text">
-                <!-- CR-004/CR-006: 400 validate từ BE → hiện nguyên văn để user biết sửa gì -->
-                {{ paymentErrorMsg() || ('checkout.billing.bankCreateError' | transloco) }}
-              </p>
-              <button type="button" class="btn-apply" (click)="retryBankTransfer()">
-                {{ 'common.retry' | transloco }}
-              </button>
-            </div>
-            } @else if (bankTransfer(); as bank) { @if (bank.qrUrl) {
-            <div class="bank-qr">
-              <img
-                [src]="bank.qrUrl"
-                [alt]="'checkout.billing.qrAlt' | transloco"
-                class="bank-qr-img"
-              />
-              <span class="bank-qr-caption">{{ 'checkout.billing.qrCaption' | transloco }}</span>
-            </div>
-            }
-
-            <div class="bank-fields">
-              <div class="bank-field">
-                <span class="bank-field-label">{{ 'checkout.billing.bankName' | transloco }}</span>
-                <span class="bank-field-value">{{ bank.bankName }}</span>
+      <div class="step-content visible">
+        <div class="order-card">
+          <div class="order-card-header">
+            <h2 class="order-card-title">{{ 'checkout.billing.paymentMethod' | transloco }}</h2>
+            <p class="order-card-subtitle">
+              {{ 'checkout.billing.paymentMethodHint' | transloco }}
+            </p>
+          </div>
+          <div class="order-card-body">
+            <!-- MoMo -->
+            <button
+              type="button"
+              class="payment-option"
+              [class.selected]="paymentMethod() === 'momo'"
+              [class.disabled]="momoDisabled"
+              [attr.aria-pressed]="paymentMethod() === 'momo'"
+              [disabled]="momoDisabled"
+              (click)="selectPaymentMethod('momo')"
+            >
+              <div class="payment-icon-box">
+                <img
+                  src="/logo/MOMO-Logo-App.png"
+                  alt="MoMo"
+                  style="width: 28px; height: 28px; object-fit: contain"
+                />
               </div>
-              <div class="bank-field">
-                <span class="bank-field-label">{{ 'checkout.billing.accountNo' | transloco }}</span>
-                <button
-                  type="button"
-                  class="bank-field-copy"
-                  (click)="copyToClipboard(bank.accountNo, 'accountNo')"
-                >
-                  <span class="bank-field-value">{{ bank.accountNo }}</span>
-                  @if (copiedField() === 'accountNo') {
-                  <svg lucideCheck [size]="15" strokeWidth="2.5"></svg>
-                  } @else {
-                  <svg lucideCopy [size]="15" strokeWidth="2"></svg>
+              <div class="payment-texts">
+                <span class="payment-option-name">
+                  MoMo
+                  @if (momoDisabled) {
+                    <span class="payment-option-badge">{{
+                      'checkout.billing.comingSoon' | transloco
+                    }}</span>
                   }
-                </button>
-              </div>
-              <div class="bank-field">
-                <span class="bank-field-label"
-                  >{{ 'checkout.billing.accountName' | transloco }}</span
-                >
-                <span class="bank-field-value">{{ bank.accountName }}</span>
-              </div>
-              @if (bank.discountAmount > 0) {
-              <div class="bank-field">
-                <span class="bank-field-label"
-                  >{{ 'checkout.billing.discountWithCode' | transloco: { code: bank.couponCode }
-                  }}</span
-                >
-                <span class="bank-field-value bank-field-discount"
-                  >− ₫ {{ bank.discountAmount | number: '1.0-0' }}</span
-                >
-              </div>
-              }
-              <div class="bank-field">
-                <span class="bank-field-label">{{ 'checkout.billing.amount' | transloco }}</span>
-                <span class="bank-field-value">
-                  @if (bank.discountAmount > 0) {
-                  <span class="bank-field-original"
-                    >₫ {{ bank.originalAmount | number: '1.0-0' }}</span
-                  >
-                  } ₫ {{ bank.amount | number: '1.0-0' }}
+                </span>
+                <span class="payment-option-desc">
+                  @if (momoDisabled) {
+                    {{ 'checkout.billing.momoInDevelopment' | transloco }}
+                  } @else {
+                    {{ 'checkout.billing.momoDesc' | transloco }}
+                  }
                 </span>
               </div>
-              <div class="bank-field">
-                <span class="bank-field-label"
-                  >{{ 'checkout.billing.transferContent' | transloco }}</span
-                >
-                <button
-                  type="button"
-                  class="bank-field-copy"
-                  (click)="copyToClipboard(bank.transferContent, 'content')"
-                >
-                  <span class="bank-field-value">{{ bank.transferContent }}</span>
-                  @if (copiedField() === 'content') {
-                  <svg lucideCheck [size]="15" strokeWidth="2.5"></svg>
-                  } @else {
-                  <svg lucideCopy [size]="15" strokeWidth="2"></svg>
+              @if (!momoDisabled) {
+                <div class="radio-circle" [class.selected]="paymentMethod() === 'momo'">
+                  @if (paymentMethod() === 'momo') {
+                    <div class="radio-dot"></div>
                   }
-                </button>
-              </div>
-            </div>
+                </div>
+              }
+            </button>
 
-            <p class="bank-note">{{ 'checkout.billing.bankNote' | transloco }}</p>
-            }
-          </div>
-          }
-
-          <div class="dashed-divider"></div>
-
-          <!-- Order summary -->
-          <div style="display: flex; flex-direction: column; gap: 4px">
-            <div
-              class="course-row"
-              style="font-size: 14px; color: rgba(28, 28, 28, 0.6); letter-spacing: 0.14px"
+            <!-- Bank Transfer -->
+            <button
+              type="button"
+              class="payment-option"
+              [class.selected]="paymentMethod() === 'bank'"
+              [attr.aria-pressed]="paymentMethod() === 'bank'"
+              (click)="selectPaymentMethod('bank')"
             >
-              <span
-                class="course-name"
-                style="
-                  font-size: 14px;
-                  font-weight: 400;
-                  display: flex;
-                  align-items: center;
-                  gap: 8px;
-                "
+              <div class="payment-icon-box">
+                <svg lucideLandmark [size]="22" strokeWidth="2"></svg>
+              </div>
+              <div class="payment-texts">
+                <span class="payment-option-name">{{
+                  'checkout.billing.bankTransfer' | transloco
+                }}</span>
+                <span class="payment-option-desc">{{
+                  'checkout.billing.bankTransferDesc' | transloco
+                }}</span>
+              </div>
+              <div class="radio-circle" [class.selected]="paymentMethod() === 'bank'">
+                @if (paymentMethod() === 'bank') {
+                  <div class="radio-dot"></div>
+                }
+              </div>
+            </button>
+
+            <!-- Bank transfer details + QR — ẩn khi booking đã bị chặn thanh toán
+                 (đã xử lý xong / BE 400 chống trùng) để user không quét QR/bấm tiếp -->
+            @if (paymentMethod() === 'bank' && !bookingBlocked() && !paymentBlockedMsg()) {
+              <div class="bank-panel">
+                @if (bankTransferSubmitted()) {
+                  <!-- UX 15/07 — màn xác nhận (thông báo 72h + chứng từ + form hoá đơn) đã tách
+                       sang /checkout/bank-confirmation; nhánh này chỉ còn cho back-nav -->
+                  <div class="booking-notice booking-notice--success">
+                    <svg lucideCircleCheck [size]="20" strokeWidth="2"></svg>
+                    <span>
+                      {{ 'checkout.billing.bankSubmittedNotice' | transloco }}
+                      <a
+                        class="bank-submitted-link"
+                        [routerLink]="['/checkout/bank-confirmation']"
+                        [queryParams]="{ orderId: bankTransfer()?.orderId }"
+                        >{{ 'checkout.billing.bankSubmittedLink' | transloco }}</a
+                      >.
+                    </span>
+                  </div>
+                } @else if (bankCreating()) {
+                  <div class="bank-loading">
+                    <div class="spinner-sm"></div>
+                    <span>{{ 'checkout.billing.bankCreating' | transloco }}</span>
+                  </div>
+                } @else if (bankCreateError()) {
+                  <div class="bank-error">
+                    <p class="bank-error-text">
+                      <!-- CR-004/CR-006: 400 validate từ BE → hiện nguyên văn để user biết sửa gì -->
+                      {{ paymentErrorMsg() || ('checkout.billing.bankCreateError' | transloco) }}
+                    </p>
+                    <button type="button" class="btn-apply" (click)="retryBankTransfer()">
+                      {{ 'common.retry' | transloco }}
+                    </button>
+                  </div>
+                } @else if (bankTransfer(); as bank) {
+                  @if (bank.qrUrl) {
+                    <div class="bank-qr">
+                      <img
+                        [src]="bank.qrUrl"
+                        [alt]="'checkout.billing.qrAlt' | transloco"
+                        class="bank-qr-img"
+                      />
+                      <span class="bank-qr-caption">{{
+                        'checkout.billing.qrCaption' | transloco
+                      }}</span>
+                    </div>
+                  }
+
+                  <div class="bank-fields">
+                    <div class="bank-field">
+                      <span class="bank-field-label">{{
+                        'checkout.billing.bankName' | transloco
+                      }}</span>
+                      <span class="bank-field-value">{{ bank.bankName }}</span>
+                    </div>
+                    <div class="bank-field">
+                      <span class="bank-field-label">{{
+                        'checkout.billing.accountNo' | transloco
+                      }}</span>
+                      <button
+                        type="button"
+                        class="bank-field-copy"
+                        (click)="copyToClipboard(bank.accountNo, 'accountNo')"
+                      >
+                        <span class="bank-field-value">{{ bank.accountNo }}</span>
+                        @if (copiedField() === 'accountNo') {
+                          <svg lucideCheck [size]="15" strokeWidth="2.5"></svg>
+                        } @else {
+                          <svg lucideCopy [size]="15" strokeWidth="2"></svg>
+                        }
+                      </button>
+                    </div>
+                    <div class="bank-field">
+                      <span class="bank-field-label">{{
+                        'checkout.billing.accountName' | transloco
+                      }}</span>
+                      <span class="bank-field-value">{{ bank.accountName }}</span>
+                    </div>
+                    @if (bank.discountAmount > 0) {
+                      <div class="bank-field">
+                        <span class="bank-field-label">{{
+                          'checkout.billing.discountWithCode' | transloco: { code: bank.couponCode }
+                        }}</span>
+                        <span class="bank-field-value bank-field-discount"
+                          >− ₫ {{ bank.discountAmount | number: '1.0-0' }}</span
+                        >
+                      </div>
+                    }
+                    <div class="bank-field">
+                      <span class="bank-field-label">{{
+                        'checkout.billing.amount' | transloco
+                      }}</span>
+                      <span class="bank-field-value">
+                        @if (bank.discountAmount > 0) {
+                          <span class="bank-field-original"
+                            >₫ {{ bank.originalAmount | number: '1.0-0' }}</span
+                          >
+                        }
+                        ₫ {{ bank.amount | number: '1.0-0' }}
+                      </span>
+                    </div>
+                    <div class="bank-field">
+                      <span class="bank-field-label">{{
+                        'checkout.billing.transferContent' | transloco
+                      }}</span>
+                      <button
+                        type="button"
+                        class="bank-field-copy"
+                        (click)="copyToClipboard(bank.transferContent, 'content')"
+                      >
+                        <span class="bank-field-value">{{ bank.transferContent }}</span>
+                        @if (copiedField() === 'content') {
+                          <svg lucideCheck [size]="15" strokeWidth="2.5"></svg>
+                        } @else {
+                          <svg lucideCopy [size]="15" strokeWidth="2"></svg>
+                        }
+                      </button>
+                    </div>
+                  </div>
+
+                  <p class="bank-note">{{ 'checkout.billing.bankNote' | transloco }}</p>
+                }
+              </div>
+            }
+
+            <div class="dashed-divider"></div>
+
+            <!-- Order summary -->
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <div
+                class="course-row"
+                style="font-size: 14px; color: rgba(28, 28, 28, 0.6); letter-spacing: 0.14px"
               >
-                <!-- Checkout booking: không lặp lại tên gói/ID — nhãn gọn là đủ -->
-                @if (store.bookingRef()) { {{ 'checkout.bookingSummary.title' | transloco }} } @else
-                { @if (packageDetailUrl(); as url) {
-                <a class="pkg-name-link" [href]="url" target="_blank" rel="noopener noreferrer">
-                  {{ store.selectedPackage()?.name }}
-                  <svg lucideExternalLink [size]="13" strokeWidth="2"></svg>
-                </a>
-                } @else { {{ store.selectedPackage()?.name }} }
                 <span
+                  class="course-name"
                   style="
-                    display: inline-block;
-                    font-size: 10px;
-                    font-weight: 500;
-                    color: var(--color-primary, #8f50e2);
-                    background: rgba(143, 80, 226, 0.08);
-                    padding: 1px 5px;
-                    border-radius: 4px;
-                    font-family: monospace;
+                    font-size: 14px;
+                    font-weight: 400;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
                   "
                 >
-                  ID: {{ store.selectedPackage()?.id }}
+                  <!-- Checkout booking: không lặp lại tên gói/ID — nhãn gọn là đủ -->
+                  @if (store.bookingRef()) {
+                    {{ 'checkout.bookingSummary.title' | transloco }}
+                  } @else {
+                    @if (packageDetailUrl(); as url) {
+                      <a
+                        class="pkg-name-link"
+                        [href]="url"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {{ store.selectedPackage()?.name }}
+                        <svg lucideExternalLink [size]="13" strokeWidth="2"></svg>
+                      </a>
+                    } @else {
+                      {{ store.selectedPackage()?.name }}
+                    }
+                    <span
+                      style="
+                        display: inline-block;
+                        font-size: 10px;
+                        font-weight: 500;
+                        color: var(--color-primary, #8f50e2);
+                        background: rgba(143, 80, 226, 0.08);
+                        padding: 1px 5px;
+                        border-radius: 4px;
+                        font-family: monospace;
+                      "
+                    >
+                      ID: {{ store.selectedPackage()?.id }}
+                    </span>
+                  }
                 </span>
-                }
-              </span>
-              <span style="white-space: nowrap">₫ {{ originalPrice | number: '1.0-0' }}</span>
-            </div>
-            <div class="total-row final">
-              <span class="total-label">{{ 'checkout.billing.total' | transloco }}</span>
-              <span class="total-value">₫ {{ displayTotal() | number: '1.0-0' }}</span>
+                <span style="white-space: nowrap">₫ {{ originalPrice | number: '1.0-0' }}</span>
+              </div>
+              <div class="total-row final">
+                <span class="total-label">{{ 'checkout.billing.total' | transloco }}</span>
+                <span class="total-value">₫ {{ displayTotal() | number: '1.0-0' }}</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Trạng thái booking / lỗi thanh toán — notice booking ưu tiên trước lỗi đỏ chung -->
-      @if (paymentBlockedMsg(); as blockedMsg) {
-      <!-- 400 từ guard chống trùng (vd giao dịch đang chờ admin duyệt) — nguyên văn BE -->
-      <div class="booking-notice booking-notice--warn">
-        <svg lucideInfo [size]="20" strokeWidth="2"></svg>
-        <span>{{ blockedMsg }}</span>
-      </div>
-      } @else if (bookingAlreadyPaid()) {
-      <div class="booking-notice booking-notice--success">
-        <svg lucideCircleCheck [size]="20" strokeWidth="2"></svg>
-        <span>{{ 'checkout.billing.bookingPaid' | transloco }}</span>
-      </div>
-      } @else if (bookingRejected()) {
-      <div class="booking-notice booking-notice--error">
-        <svg lucideCircleX [size]="20" strokeWidth="2"></svg>
-        <span>{{ 'checkout.billing.bookingRejected' | transloco }}</span>
-      </div>
-      } @else if (paymentError()) {
-      <!-- CR-004/CR-006: 400 validate từ BE → hiện nguyên văn để user biết sửa gì -->
-      <p class="error-msg">
-        {{ paymentErrorMsg() || ('checkout.billing.paymentFailed' | transloco) }}
-      </p>
-      }
-
-      <div class="action-row">
-        @if (bankTransferSubmitted()) {
-        <a routerLink="/profile/dashboard" class="btn-confirm">
-          {{ 'checkout.backToDashboard' | transloco }}
-          <svg lucideArrowRight [size]="20" strokeWidth="2"></svg>
-        </a>
-        } @else if (bookingBlocked() || paymentBlockedMsg()) {
-        <!-- Booking đã xử lý / bị chặn trùng → không còn gì để thanh toán -->
-        <a routerLink="/profile/dashboard" class="btn-confirm">
-          {{ 'checkout.backToDashboard' | transloco }}
-          <svg lucideArrowRight [size]="20" strokeWidth="2"></svg>
-        </a>
-        } @else {
-        <button class="btn-back" [disabled]="loading()" (click)="backToOrder()">
-          <svg lucideArrowLeft [size]="18" strokeWidth="2"></svg>
-          {{ 'common.back' | transloco }}
-        </button>
-        <button
-          class="btn-confirm"
-          [disabled]="loading() || (paymentMethod() === 'bank' && !bankTransfer())"
-          (click)="confirmPayment()"
-        >
-          @if (loading()) {
-          <div class="spinner-sm"></div>
-          {{ 'common.processing' | transloco }} } @else if (paymentMethod() === 'bank') { {{
-          'checkout.billing.iHaveTransferred' | transloco }}
-          <svg lucideCheck [size]="20" strokeWidth="2"></svg>
-          } @else { {{ 'checkout.billing.payWithMomo' | transloco }}
-          <svg lucideSend [size]="20" strokeWidth="2"></svg>
-          }
-        </button>
+        <!-- Trạng thái booking / lỗi thanh toán — notice booking ưu tiên trước lỗi đỏ chung -->
+        @if (paymentBlockedMsg(); as blockedMsg) {
+          <!-- 400 từ guard chống trùng (vd giao dịch đang chờ admin duyệt) — nguyên văn BE -->
+          <div class="booking-notice booking-notice--warn">
+            <svg lucideInfo [size]="20" strokeWidth="2"></svg>
+            <span>{{ blockedMsg }}</span>
+          </div>
+        } @else if (bookingAlreadyPaid()) {
+          <div class="booking-notice booking-notice--success">
+            <svg lucideCircleCheck [size]="20" strokeWidth="2"></svg>
+            <span>{{ 'checkout.billing.bookingPaid' | transloco }}</span>
+          </div>
+        } @else if (bookingRejected()) {
+          <div class="booking-notice booking-notice--error">
+            <svg lucideCircleX [size]="20" strokeWidth="2"></svg>
+            <span>{{ 'checkout.billing.bookingRejected' | transloco }}</span>
+          </div>
+        } @else if (paymentError()) {
+          <!-- CR-004/CR-006: 400 validate từ BE → hiện nguyên văn để user biết sửa gì -->
+          <p class="error-msg">
+            {{ paymentErrorMsg() || ('checkout.billing.paymentFailed' | transloco) }}
+          </p>
         }
+
+        <div class="action-row">
+          @if (bankTransferSubmitted()) {
+            <a routerLink="/profile/dashboard" class="btn-confirm">
+              {{ 'checkout.backToDashboard' | transloco }}
+              <svg lucideArrowRight [size]="20" strokeWidth="2"></svg>
+            </a>
+          } @else if (bookingBlocked() || paymentBlockedMsg()) {
+            <!-- Booking đã xử lý / bị chặn trùng → không còn gì để thanh toán -->
+            <a routerLink="/profile/dashboard" class="btn-confirm">
+              {{ 'checkout.backToDashboard' | transloco }}
+              <svg lucideArrowRight [size]="20" strokeWidth="2"></svg>
+            </a>
+          } @else {
+            <button class="btn-back" [disabled]="loading()" (click)="backToOrder()">
+              <svg lucideArrowLeft [size]="18" strokeWidth="2"></svg>
+              {{ 'common.back' | transloco }}
+            </button>
+            <button
+              class="btn-confirm"
+              [disabled]="loading() || (paymentMethod() === 'bank' && !bankTransfer())"
+              (click)="confirmPayment()"
+            >
+              @if (loading()) {
+                <div class="spinner-sm"></div>
+                {{ 'common.processing' | transloco }}
+              } @else if (paymentMethod() === 'bank') {
+                {{ 'checkout.billing.iHaveTransferred' | transloco }}
+                <svg lucideCheck [size]="20" strokeWidth="2"></svg>
+              } @else {
+                {{ 'checkout.billing.payWithMomo' | transloco }}
+                <svg lucideSend [size]="20" strokeWidth="2"></svg>
+              }
+            </button>
+          }
+        </div>
       </div>
-    </div>
     }
   </div>
 </section>
