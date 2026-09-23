@@ -12,6 +12,8 @@ import DataGovToolkitComponent from './datagov/datagov';
 import { getDataGov } from './datagov/datagov.data';
 import EnergyToolkitComponent from './energy/energy';
 import { getEnergyToolkit } from './energy/energy.data';
+import CsiToolkitComponent from './csi/csi';
+import { getCsiToolkit } from './csi/csi.data';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
@@ -24,6 +26,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
     WasteToolkitComponent,
     DataGovToolkitComponent,
     EnergyToolkitComponent,
+    CsiToolkitComponent,
   ],
   templateUrl: './toolkit.html',
 })
@@ -38,6 +41,7 @@ export default class ToolkitComponent implements OnInit {
   wasteToolkit = computed(() => getWasteToolkit(this.id()));
   dataGovToolkit = computed(() => getDataGov(this.id()));
   energyToolkit = computed(() => getEnergyToolkit(this.id()));
+  csiToolkit = computed(() => getCsiToolkit(this.id()));
 
   constructor() {
     effect(() => {

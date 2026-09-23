@@ -30,6 +30,7 @@ const TOOLKIT_GROUP_LABELS: Record<ToolkitGroup, string> = {
   waste: 'system.packages.toolkitGroups.waste',
   datagov: 'system.packages.toolkitGroups.datagov',
   energy: 'system.packages.toolkitGroups.energy',
+  csi: 'system.packages.toolkitGroups.csi',
 };
 
 @Component({

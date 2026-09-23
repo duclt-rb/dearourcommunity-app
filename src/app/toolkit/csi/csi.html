@@ -1,0 +1,664 @@
+<div class="csi">
+  <!-- Top bar -->
+  <header class="csi__bar">
+    <div class="csi__bar-inner">
+      <app-logo height="72px" class="csi__logo" />
+      <span class="csi__bar-progress">
+        {{ 'toolkit.common.percentComplete' | transloco: { percent: progressPercent() } }}
+      </span>
+    </div>
+    <div class="csi__stepper">
+      @for (step of steps; track $index; let i = $index) {
+        <button
+          type="button"
+          class="csi__step"
+          [class.is-active]="i === store.currentStep()"
+          [class.is-done]="i < store.currentStep()"
+          (click)="goToStep(i)"
+        >
+          <span
+            class="csi__step-bar"
+            [style.background]="i <= store.currentStep() ? 'var(--color-primary)' : null"
+          ></span>
+          <span class="csi__step-label">{{ step.label }}</span>
+        </button>
+      }
+    </div>
+  </header>
+
+  <main class="csi__main">
+    <!-- Intro for first step only -->
+    @if (store.currentStep() === 0) {
+      <div class="csi__intro">
+        <p class="csi__sector">{{ config.sector }}</p>
+        <h1 class="csi__title">{{ config.name }}</h1>
+        <p class="csi__lead">{{ config.brand }}</p>
+      </div>
+    }
+    @switch (currentStepData().kind) {
+      <!-- ════ STEPS: READING PAGES (Hướng dẫn · Giới thiệu CSI · Thuật ngữ) ════ -->
+      @case ('guide') {
+        <ng-container *ngTemplateOutlet="docPage; context: { $implicit: currentDoc() }" />
+      }
+      @case ('intro') {
+        <ng-container *ngTemplateOutlet="docPage; context: { $implicit: currentDoc() }" />
+      }
+      @case ('glossary') {
+        <ng-container *ngTemplateOutlet="docPage; context: { $implicit: currentDoc() }" />
+      }
+
+      <!-- ════ STEP: COMPANY PROFILE ════ -->
+      @case ('profile') {
+        @let profile = config.profile;
+        <section class="csi__section">
+          <h2 class="csi__section-title">{{ profile.title }}</h2>
+          <p class="csi__section-note">{{ profile.subtitle }}</p>
+          <p class="csi__section-note">{{ profile.note }}</p>
+
+          <h3 class="csi__group-title">{{ profile.generalTitle }}</h3>
+          <div class="csi__fields">
+            @for (f of profile.generalFields; track f.id) {
+              @if (f.options) {
+                <app-select-field
+                  [label]="f.label"
+                  [options]="f.options"
+                  [value]="store.generalOf(f.id)"
+                  (valueChange)="store.setGeneral(f.id, $event)"
+                />
+              } @else {
+                <app-text-field
+                  [label]="f.label"
+                  [value]="store.generalOf(f.id)"
+                  (valueChange)="store.setGeneral(f.id, $event)"
+                />
+              }
+            }
+          </div>
+
+          @for (info of profile.infoBlocks; track info.id) {
+            <div class="csi__info">
+              <p class="csi__info-title">{{ info.title }}</p>
+              <p class="csi__info-text">{{ info.text }}</p>
+            </div>
+          }
+          @for (table of profile.yearTables; track table.id) {
+            <h3 class="csi__group-title csi__group-title--spaced">{{ table.title }}</h3>
+            <div class="csi__table-scroll">
+              <table class="csi__table csi__table--stack csi__table--cols-3">
+                <thead>
+                  <tr>
+                    <th class="csi__table-head-cell">{{ table.headers[0] }}</th>
+                    <th>{{ table.headers[1] }}</th>
+                    <th>{{ table.headers[2] }}</th>
+                    <th>{{ table.headers[3] }}</th>
+                    <th>{{ table.headers[4] }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of table.rows; track row.id) {
+                    <tr>
+                      <td class="csi__table-head-cell">{{ row.label }}</td>
+                      @for (y of years; track y) {
+                        <td [attr.data-label]="y.slice(1)">
+                          <input
+                            class="csi__cell"
+                            type="text"
+                            [attr.aria-label]="row.label"
+                            [value]="store.profileYearOf(row.id, y)"
+                            (input)="store.setProfileYear(row.id, y, $any($event.target).value)"
+                          />
+                        </td>
+                      }
+                      <td class="csi__stack-full" [attr.data-label]="table.headers[4]">
+                        <input
+                          class="csi__cell csi__cell-text"
+                          type="text"
+                          [attr.aria-label]="table.headers[4]"
+                          [value]="store.profileYearOf(row.id, 'note')"
+                          (input)="store.setProfileYear(row.id, 'note', $any($event.target).value)"
+                        />
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+
+          <h3 class="csi__group-title csi__group-title--spaced">{{ profile.standards.title }}</h3>
+          <div class="csi__fields">
+            @for (row of profile.standards.rows; track row.id) {
+              <app-text-field
+                [label]="row.label"
+                [value]="store.standardOf(row.id)"
+                (valueChange)="store.setStandard(row.id, $event)"
+              />
+            }
+          </div>
+
+          <h3 class="csi__group-title csi__group-title--spaced">{{ profile.violations.title }}</h3>
+          <div class="csi__table-scroll">
+            <table class="csi__table csi__table--stack csi__table--cols-2">
+              <thead>
+                <tr>
+                  <th class="csi__table-head-cell">{{ profile.violations.headers[0] }}</th>
+                  <th class="csi__th-wrap">{{ profile.violations.headers[1] }}</th>
+                  <th class="csi__th-wrap">{{ profile.violations.headers[2] }}</th>
+                  <th class="csi__th-wrap">{{ profile.violations.headers[3] }}</th>
+                  <th class="csi__th-wrap">{{ profile.violations.headers[4] }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of profile.violations.rows; track row.id) {
+                  <tr>
+                    <td class="csi__table-head-cell">{{ row.label }}</td>
+                    <td [attr.data-label]="profile.violations.headers[1]">
+                      <app-select-field
+                        class="csi__cell-select"
+                        [options]="yesNoOptions"
+                        [value]="store.violationOf(row.id, 'violated')"
+                        (valueChange)="store.setViolation(row.id, 'violated', $event)"
+                      />
+                    </td>
+                    <td [attr.data-label]="profile.violations.headers[2]">
+                      <app-select-field
+                        class="csi__cell-select"
+                        [options]="yesNoOptions"
+                        [value]="store.violationOf(row.id, 'fixed')"
+                        (valueChange)="store.setViolation(row.id, 'fixed', $event)"
+                      />
+                    </td>
+                    <td [attr.data-label]="profile.violations.headers[3]">
+                      <input
+                        class="csi__cell csi__cell-text"
+                        type="text"
+                        [attr.aria-label]="profile.violations.headers[3]"
+                        [value]="store.violationOf(row.id, 'agency')"
+                        (input)="store.setViolation(row.id, 'agency', $any($event.target).value)"
+                      />
+                    </td>
+                    <td [attr.data-label]="profile.violations.headers[4]">
+                      <input
+                        class="csi__cell csi__cell-text"
+                        type="text"
+                        [attr.aria-label]="profile.violations.headers[4]"
+                        [value]="store.violationOf(row.id, 'evidence')"
+                        (input)="store.setViolation(row.id, 'evidence', $any($event.target).value)"
+                      />
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="csi__group-title csi__group-title--spaced">{{ profile.sectionA.title }}</h3>
+          <div class="csi__table-scroll">
+            <table class="csi__table csi__table--stack csi__table--cols-2">
+              <thead>
+                <tr>
+                  <th class="csi__table-head-cell">{{ profile.sectionA.headers[0] }}</th>
+                  <th class="csi__th-wrap">{{ profile.sectionA.headers[1] }}</th>
+                  <th class="csi__th-wrap">{{ profile.sectionA.headers[2] }}</th>
+                  <th class="csi__th-wrap">{{ profile.sectionA.headers[3] }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of profile.sectionA.rows; track row.id) {
+                  <tr>
+                    <td class="csi__table-head-cell">{{ row.label }}</td>
+                    <td class="csi__num" [attr.data-label]="profile.sectionA.headers[1]">
+                      {{ row.maxScore }}
+                    </td>
+                    <td
+                      class="csi__cell-answer csi__stack-full"
+                      [attr.data-label]="profile.sectionA.headers[2]"
+                    >
+                      <app-segmented-field
+                        [options]="yesNoOptions"
+                        [ariaLabel]="row.label"
+                        [value]="store.sectionAOf(row.id) || 'no'"
+                        (valueChange)="store.setSectionA(row.id, $event)"
+                      />
+                    </td>
+                    <td class="csi__num" [attr.data-label]="profile.sectionA.headers[3]">
+                      {{ store.sectionAOf(row.id) === 'yes' ? row.maxScore : 0 }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+      }
+
+      <!-- ════ STEPS: INDICATORS I / G / E / L&S ════ -->
+      @case ('section') {
+        @if (currentSection(); as section) {
+          <section class="csi__section">
+            <h2 class="csi__section-title">{{ section.title }}</h2>
+            <p class="csi__section-note">{{ section.subtitle }}</p>
+            <p class="csi__section-note">{{ section.note }}</p>
+
+            @for (group of section.groups; track group.id) {
+              <div class="csi__qgroup">
+                <div class="csi__qgroup-head">
+                  <h3 class="csi__group-title">{{ group.title }}</h3>
+                  <span class="csi__qgroup-score">
+                    {{ section.headers.maxScore }}: {{ group.declaredMax }}
+                    @if (groupResult(group.id); as g) {
+                      · {{ percent(g.rate) }}%
+                    }
+                  </span>
+                </div>
+
+                @for (block of group.blocks; track block.id) {
+                  @if (block.title) {
+                    <div class="csi__block-head">
+                      <span class="csi__block-title">{{ block.title }}</span>
+                      <span class="csi__block-max">
+                        {{ section.headers.maxScore }}: {{ block.declaredMax }}
+                      </span>
+                    </div>
+                  }
+                  <ul class="csi__questions">
+                    @for (ind of block.indicators; track ind.id) {
+                      <li class="csi__indicator">
+                        <div class="csi__question">
+                          <div class="csi__question-body">
+                            <div class="csi__question-meta">
+                              <span class="csi__code">{{ ind.id }}</span>
+                              <span class="csi__level" [class.is-advance]="ind.level === 'A'">
+                                {{ ind.level }}
+                              </span>
+                              <span class="csi__points">
+                                {{ section.headers.maxScore }}: {{ ind.maxScore }}
+                              </span>
+                            </div>
+                            <p class="csi__question-text">{{ ind.text }}</p>
+                            <p class="csi__question-hint">
+                              <svg lucideLightbulb [size]="13" strokeWidth="1.8"></svg>
+                              <span>
+                                <strong>{{ section.headers.hint }}:</strong> {{ ind.hint }}
+                              </span>
+                            </p>
+                            <p class="csi__question-hint">
+                              <svg lucideFileText [size]="13" strokeWidth="1.8"></svg>
+                              <span>
+                                <strong>{{ section.headers.evidence }}:</strong>
+                                {{ ind.evidence }}
+                              </span>
+                            </p>
+                          </div>
+                          <div class="csi__question-scale">
+                            <span class="csi__field-label">{{ section.headers.answer }}</span>
+                            <app-segmented-field
+                              [options]="answerOptions"
+                              [ariaLabel]="ind.text"
+                              [value]="store.answerOf(ind.id)"
+                              (valueChange)="store.setAnswer(ind.id, $event)"
+                            />
+                          </div>
+                        </div>
+
+                        @if (ind.unit !== undefined) {
+                          <div class="csi__years">
+                            <div class="csi__field csi__years-unit">
+                              <span class="csi__field-label">{{ section.headers.unit }}</span>
+                              <span class="csi__unit">{{ ind.unit }}</span>
+                            </div>
+                            @for (y of years; track y) {
+                              <label class="csi__field">
+                                <span class="csi__field-label">{{ section.headers[y] }}</span>
+                                <input
+                                  class="csi__cell csi__cell-year"
+                                  type="text"
+                                  [value]="store.indicatorYearOf(ind.id, y)"
+                                  (input)="
+                                    store.setIndicatorYear(ind.id, y, $any($event.target).value)
+                                  "
+                                />
+                              </label>
+                            }
+                          </div>
+                        }
+
+                        <div class="csi__meta-fields">
+                          <app-text-field
+                            [label]="section.headers.note ?? ''"
+                            [value]="store.metaOf(ind.id, 'note')"
+                            (valueChange)="store.setMeta(ind.id, 'note', $event)"
+                          />
+                          <app-text-field
+                            [label]="section.headers.owner ?? ''"
+                            [value]="store.metaOf(ind.id, 'owner')"
+                            (valueChange)="store.setMeta(ind.id, 'owner', $event)"
+                          />
+                          <app-date-field
+                            [label]="section.headers.deadline ?? ''"
+                            [value]="store.metaOf(ind.id, 'deadline')"
+                            (valueChange)="store.setMeta(ind.id, 'deadline', $event)"
+                          />
+                        </div>
+
+                        @let prio = priorityOf(ind);
+                        <p class="csi__indicator-foot">
+                          {{ section.headers.priority }}:
+                          <span class="csi__prio" [class]="'csi__prio ' + priorityTone[prio]">
+                            {{ priorityLabels[prio] }}
+                          </span>
+                        </p>
+                      </li>
+                    }
+                  </ul>
+                }
+              </div>
+            }
+            @if (sectionTotal(); as t) {
+              <div class="csi__callout">
+                <span>{{ section.total.label }}</span>
+                <strong>
+                  {{ section.headers.maxScore }} {{ section.total.maxScore }} ·
+                  {{ section.headers.selfScore }} {{ score(t.self) }} ·
+                  {{ section.headers.available }} {{ score(t.available) }} · {{ percent(t.rate) }}%
+                  {{ 'toolkit.common.readiness' | transloco | lowercase }}
+                </strong>
+              </div>
+            }
+          </section>
+        }
+      }
+
+      <!-- ════ STEP: SCORECARD ════ -->
+      @case ('dashboard') {
+        @let d = config.dashboard; @let total = store.grandTotal();
+        <section class="csi__section">
+          <h2 class="csi__section-title">{{ d.title }}</h2>
+          <p class="csi__section-note">{{ d.subtitle }}</p>
+          <p class="csi__section-note">{{ d.note }}</p>
+
+          <div class="csi__overall">
+            <div>
+              <p class="csi__overall-label">{{ d.partsHeaders[5] }}</p>
+              <p class="csi__overall-score">{{ percent(total.rate) }}%</p>
+            </div>
+            <p class="csi__overall-band">
+              {{ d.partsHeaders[6] }}: {{ score(total.converted) }} / {{ total.published }}
+            </p>
+          </div>
+
+          <h3 class="csi__group-title csi__group-title--spaced">{{ d.partsTitle }}</h3>
+          <div class="csi__table-scroll">
+            <table class="csi__table csi__table--stack csi__table--cols-2">
+              <thead>
+                <tr>
+                  <th class="csi__table-head-cell">{{ d.partsHeaders[0] }}</th>
+                  @for (h of d.partsHeaders.slice(1); track $index) {
+                    <th class="csi__th-wrap">{{ h }}</th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of store.partResults(); track p.id) {
+                  <tr>
+                    <td class="csi__table-head-cell">{{ p.label }}</td>
+                    <td class="csi__num" [attr.data-label]="d.partsHeaders[1]">
+                      {{ p.published }}
+                    </td>
+                    <td class="csi__num" [attr.data-label]="d.partsHeaders[2]">
+                      {{ p.component }}
+                    </td>
+                    <td class="csi__num" [attr.data-label]="d.partsHeaders[3]">
+                      {{ score(p.available) }}
+                    </td>
+                    <td class="csi__num" [attr.data-label]="d.partsHeaders[4]">
+                      {{ score(p.self) }}
+                    </td>
+                    <td class="csi__num" [attr.data-label]="d.partsHeaders[5]">
+                      {{ percent(p.rate) }}%
+                    </td>
+                    <td class="csi__num" [attr.data-label]="d.partsHeaders[6]">
+                      {{ score(p.converted) }}
+                    </td>
+                  </tr>
+                }
+                <tr class="csi__table-total">
+                  <td class="csi__table-head-cell">{{ total.label }}</td>
+                  <td class="csi__num" [attr.data-label]="d.partsHeaders[1]">
+                    {{ total.published }}
+                  </td>
+                  <td class="csi__num" [attr.data-label]="d.partsHeaders[2]">
+                    {{ total.component }}
+                  </td>
+                  <td class="csi__num" [attr.data-label]="d.partsHeaders[3]">
+                    {{ score(total.available) }}
+                  </td>
+                  <td class="csi__num" [attr.data-label]="d.partsHeaders[4]">
+                    {{ score(total.self) }}
+                  </td>
+                  <td class="csi__num" [attr.data-label]="d.partsHeaders[5]">
+                    {{ percent(total.rate) }}%
+                  </td>
+                  <td class="csi__num" [attr.data-label]="d.partsHeaders[6]">
+                    {{ score(total.converted) }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="csi__insight">{{ d.partsNote }}</p>
+
+          <h3 class="csi__group-title csi__group-title--spaced">{{ d.complianceTitle }}</h3>
+          <p class="csi__section-note">
+            {{ d.complianceHeaders[0] }} · {{ d.complianceHeaders[1] }}
+          </p>
+          <div class="csi__result-cards">
+            @for (label of d.complianceRows; track $index; let i = $index) {
+              <div class="csi__result-card">
+                <p class="csi__result-card-label">{{ label }}</p>
+                <p class="csi__result-card-value">{{ store.compliance()[i] }}</p>
+              </div>
+            }
+          </div>
+
+          <h3 class="csi__group-title csi__group-title--spaced">{{ d.groupsTitle }}</h3>
+          <div class="csi__summary">
+            @for (g of store.groupResults(); track g.id) {
+              <div class="csi__summary-row">
+                <div class="csi__summary-top">
+                  <span class="csi__summary-label">{{ g.title }}</span>
+                  <span class="csi__summary-score">{{ g.shortLabel }}</span>
+                </div>
+                <app-meter [percent]="meter(g.rate)" />
+                <div class="csi__summary-foot">
+                  <span>
+                    {{ d.groupsHeaders[2] }} {{ score(g.available) }} · {{ d.groupsHeaders[3] }}
+                    {{ score(g.self) }}
+                  </span>
+                  <span>{{ d.groupsHeaders[4] }} {{ percent(g.rate) }}%</span>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- ════ STEP: ACTION PLAN ════ -->
+      @case ('plan') {
+        @let plan = config.plan;
+        <section class="csi__section">
+          <h2 class="csi__section-title">{{ plan.title }}</h2>
+          @for (n of plan.notes; track $index) {
+            <p class="csi__section-note">{{ n }}</p>
+          }
+
+          <div class="csi__field csi__plan-filter">
+            <span class="csi__field-label">{{ plan.headers[7] }}</span>
+            <app-segmented-field
+              [options]="priorityFilters"
+              [ariaLabel]="plan.headers[7]"
+              [value]="planFilter()"
+              (valueChange)="planFilter.set($event)"
+            />
+          </div>
+
+          <div class="csi__actions">
+            @for (p of filteredPlan(); track p.indicator.id) {
+              <div class="csi__action">
+                <div class="csi__action-head">
+                  <span class="csi__code">{{ p.indicator.id }}</span>
+                  <span class="csi__level" [class.is-advance]="p.indicator.level === 'A'">
+                    {{ p.indicator.level }}
+                  </span>
+                  <span class="csi__prio" [class]="'csi__prio ' + priorityTone[p.priority]">
+                    {{ priorityLabels[p.priority] }}
+                  </span>
+                  <span class="csi__action-area">{{ p.shortLabel }} · {{ p.groupTitle }}</span>
+                  <span class="csi__action-target">
+                    {{ plan.headers[5] }} {{ p.indicator.maxScore }} · {{ plan.headers[8] }}
+                    {{ p.missing }}
+                  </span>
+                </div>
+                <p class="csi__action-text">{{ p.indicator.text }}</p>
+                <p class="csi__action-measure">
+                  <strong>{{ plan.headers[6] }}:</strong> {{ answerLabel(p.answer) }}
+                </p>
+                <p class="csi__action-measure">
+                  <strong>{{ plan.headers[9] }}:</strong> {{ p.indicator.hint }}
+                </p>
+                <div class="csi__action-fields">
+                  <app-text-field
+                    [label]="plan.headers[10]"
+                    [value]="store.metaOf(p.indicator.id, 'owner')"
+                    (valueChange)="store.setMeta(p.indicator.id, 'owner', $event)"
+                  />
+                  <app-date-field
+                    [label]="plan.headers[11]"
+                    [value]="store.metaOf(p.indicator.id, 'deadline')"
+                    (valueChange)="store.setMeta(p.indicator.id, 'deadline', $event)"
+                  />
+                  <div class="csi__field">
+                    <span class="csi__field-label">{{ plan.headers[12] }}</span>
+                    <app-segmented-field
+                      [options]="statusOptions"
+                      [ariaLabel]="plan.headers[12]"
+                      [value]="store.planOf(p.indicator.id, 'status')"
+                      (valueChange)="store.setPlan(p.indicator.id, 'status', $event)"
+                    />
+                  </div>
+                  <app-text-field
+                    [label]="plan.headers[13]"
+                    [value]="store.planOf(p.indicator.id, 'progress')"
+                    (valueChange)="store.setPlan(p.indicator.id, 'progress', $event)"
+                  />
+                </div>
+              </div>
+            } @empty {
+              <p class="csi__section-note">{{ 'toolkit.csi.planEmpty' | transloco }}</p>
+            }
+          </div>
+        </section>
+      }
+    }
+
+    <!-- Step navigation -->
+    <nav class="csi__nav">
+      <button
+        type="button"
+        class="csi__nav-btn csi__nav-btn--ghost"
+        [disabled]="isFirstStep()"
+        (click)="prevStep()"
+      >
+        {{ 'common.back' | transloco }}
+      </button>
+
+      @if (currentStepData().kind === 'plan') {
+        <button type="button" class="csi__nav-btn csi__nav-btn--ghost" (click)="resetScan()">
+          <svg lucideRotateCcw [size]="16" strokeWidth="2"></svg>
+          {{ 'toolkit.common.restart' | transloco }}
+        </button>
+      } @else if (store.currentStep() === totalSteps - 2) {
+        <button type="button" class="csi__nav-btn" (click)="nextStep()">
+          {{ 'toolkit.common.finish' | transloco }}
+        </button>
+      } @else {
+        <button type="button" class="csi__nav-btn" (click)="nextStep()">
+          {{ 'toolkit.common.continue' | transloco }}
+        </button>
+      }
+    </nav>
+  </main>
+</div>
+
+<!-- Trang đọc: tiêu đề sheet + các mục (đoạn văn / cặp nhãn–nội dung / bảng) nguyên văn. -->
+<ng-template #docPage let-doc>
+  @if (doc) {
+    <section class="csi__section">
+      @if (doc.id !== 'guide') {
+        <h2 class="csi__section-title">{{ doc.header[0] }}</h2>
+        @for (line of doc.header.slice(1); track $index) {
+          <p class="csi__section-note">{{ line }}</p>
+        }
+      }
+      @for (s of doc.sections; track s.id; let first = $first) {
+        <h3
+          class="csi__group-title"
+          [class.csi__group-title--spaced]="!first || doc.id !== 'guide'"
+        >
+          {{ s.title }}
+        </h3>
+        @for (b of s.blocks; track $index) {
+          @switch (b.kind) {
+            @case ('paragraph') {
+              <p class="csi__para">{{ b.text }}</p>
+            }
+            @case ('pairs') {
+              <dl class="csi__pairs">
+                @for (row of b.rows; track $index) {
+                  <div class="csi__pair">
+                    <dt>{{ row.label }}</dt>
+                    <dd>{{ row.text }}</dd>
+                  </div>
+                }
+              </dl>
+            }
+            @case ('table') {
+              <div class="csi__table-scroll csi__doc-table">
+                <table
+                  class="csi__table csi__table--stack"
+                  [class.csi__table--cols-2]="docCols(b) === 2"
+                >
+                  <thead>
+                    <tr>
+                      @for (h of b.headers; track $index; let hi = $index) {
+                        <th [class.csi__table-head-cell]="hi === 0" class="csi__th-wrap">
+                          {{ h }}
+                        </th>
+                      }
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of b.rows; track $index) {
+                      <tr>
+                        @for (c of row; track $index; let ci = $index) {
+                          <td
+                            [class.csi__table-head-cell]="ci === 0"
+                            [class.csi__td-sub]="isIndented(c)"
+                            [attr.data-label]="b.headers[ci]"
+                            class="csi__td-wrap"
+                          >
+                            {{ c }}
+                          </td>
+                        }
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          }
+        }
+      }
+    </section>
+  }
+</ng-template>

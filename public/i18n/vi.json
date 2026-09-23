@@ -512,6 +512,21 @@
       "resultsTitle": "Bảng Rủi ro & Kết quả",
       "resultsNote": "Tổng hợp tự động từ trang Đánh giá — điểm & mức rủi ro theo từng nhóm. Đèn đỏ = cần hành động ngay.",
       "overallLabel": "Mức độ sẵn sàng tuân thủ PDPL"
+    },
+    "csi": {
+      "steps": {
+        "guide": "Hướng dẫn sử dụng",
+        "intro": "Giới thiệu CSI 2026",
+        "glossary": "Thuật ngữ & pháp lý",
+        "profile": "Hồ sơ doanh nghiệp",
+        "I": "Chỉ số I",
+        "G": "Chỉ số G",
+        "E": "Chỉ số E",
+        "LS": "Chỉ số L&S",
+        "dashboard": "Bảng điểm tổng hợp",
+        "plan": "Kế hoạch hành động"
+      },
+      "planEmpty": "Không có chỉ số nào ở mức ưu tiên này."
     }
   },
   "profile": {
@@ -944,7 +959,8 @@
         "quickScan": "Đánh giá nhanh ESG (Quick Scan)",
         "waste": "Bộ công cụ Chất thải",
         "datagov": "Quản trị Dữ liệu & PDPL",
-        "energy": "Hiệu quả Năng lượng"
+        "energy": "Hiệu quả Năng lượng",
+        "csi": "Bộ chỉ số CSI 2026"
       },
       "includesTitle": "Gói này bao gồm",
       "includesDesc": "Người mua gói này hưởng luôn quyền lợi của các gói được tick (đệ quy). Dùng để tính giá nâng cấp, nhãn \"Gói A/B\" của khoá học và chặn mua lại gói đã bao gồm. Chỉ chọn được gói cùng loại và không được tạo vòng lặp.",

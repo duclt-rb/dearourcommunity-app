@@ -1,6 +1,6 @@
 import { localePick } from '../core/i18n/locale';
 
-export type ToolkitGroup = 'quick-scan' | 'waste' | 'datagov' | 'energy';
+export type ToolkitGroup = 'quick-scan' | 'waste' | 'datagov' | 'energy' | 'csi';
 
 export interface Toolkit {
   id: string;
@@ -81,6 +81,14 @@ export const TOOLKITS: Toolkit[] = localePick({
         'Bản đồ năng lượng, đánh giá thực hành (40 câu), kiểm kê thiết bị (máy nén khí, động cơ…), cơ hội tiết kiệm (ROI), theo dõi cường độ & kế hoạch 90 ngày.',
     },
     {
+      id: 'csi-2026-sme',
+      name: 'Bộ công cụ ESG theo Bộ chỉ số CSI 2026',
+      group: 'csi',
+      sector: 'Phiên bản dành cho doanh nghiệp nhỏ và siêu nhỏ',
+      description:
+        'Bộ công cụ giúp doanh nghiệp trả lời ba câu hỏi: (1) Chúng ta đang ở đâu so với chuẩn CSI? (2) Khoảng cách lớn nhất nằm ở đâu? (3) Trong 12 tháng tới cần làm gì trước?',
+    },
+    {
       id: 'coming-soon-1',
       name: 'Bộ công cụ mới',
       description: 'Công cụ tiếp theo đang được phát triển.',
@@ -151,6 +159,14 @@ export const TOOLKITS: Toolkit[] = localePick({
       sector: 'Manufacturing',
       description:
         'Energy map, practice assessment (40 questions), equipment inventory (air compressors, motors…), savings opportunities (ROI), intensity tracking & 90-day plan.',
+    },
+    {
+      id: 'csi-2026-sme',
+      name: 'ESG Toolkit based on the CSI 2026 Index',
+      group: 'csi',
+      sector: 'Edition for small and micro enterprises',
+      description:
+        'The toolkit helps enterprises answer three questions: (1) Where do we stand against the CSI standard? (2) Where are the biggest gaps? (3) What should we do first in the next 12 months?',
     },
     {
       id: 'coming-soon-1',

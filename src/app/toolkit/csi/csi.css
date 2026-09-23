@@ -1,0 +1,1056 @@
+.csi {
+  min-height: 100dvh;
+  background: var(--color-bg-subtle);
+  color: var(--color-gray-900);
+  font-family: var(--font-sans);
+}
+
+/* ── Top bar + stepper ── */
+.csi__bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+  backdrop-filter: saturate(160%) blur(10px);
+  border-bottom: 1px solid var(--color-border-light);
+}
+.csi__bar-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.csi__logo {
+  flex-shrink: 0;
+}
+.csi__bar-progress {
+  font-size: 0.8125rem;
+  color: var(--color-gray-600);
+  font-variant-numeric: tabular-nums;
+}
+.csi__stepper {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px 14px;
+  display: flex;
+  gap: 8px;
+}
+.csi__step {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+.csi__step-bar {
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--color-gray-200);
+  transition: background 0.2s ease;
+}
+.csi__step.is-done .csi__step-bar {
+  opacity: 0.5;
+}
+.csi__step.is-active .csi__step-bar {
+  opacity: 1;
+}
+.csi__step-label {
+  font-size: 0.6875rem;
+  color: var(--color-gray-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.csi__step.is-active .csi__step-label {
+  color: var(--color-gray-900);
+  font-weight: 500;
+}
+
+/* ── Layout ── */
+.csi__main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 32px 24px 96px;
+}
+.csi__intro {
+  padding-bottom: 28px;
+}
+.csi__sector {
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 10px;
+}
+.csi__title {
+  font-size: 1.875rem;
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+}
+.csi__lead {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-gray-700);
+  max-width: 64ch;
+}
+
+.csi__section {
+  padding-top: 4px;
+}
+.csi__section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.csi__section-note {
+  font-size: 0.875rem;
+  color: var(--color-gray-600);
+  margin-top: 4px;
+  margin-bottom: 22px;
+}
+
+.csi__group-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-gray-900);
+}
+.csi__group-title--spaced {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.csi__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.csi__field-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-gray-800);
+}
+
+/* ── Assessment questions ── */
+.csi__qgroup {
+  margin-top: 28px;
+}
+.csi__qgroup-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.csi__qgroup-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-gray-700);
+  font-variant-numeric: tabular-nums;
+}
+.csi__questions {
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+}
+.csi__question {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+.csi__question-body {
+  flex: 1;
+  min-width: 0;
+}
+.csi__question-text {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+.csi__question-risk {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-gray-600);
+}
+.csi__question-risk svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.csi__question-ref {
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: var(--color-primary-700);
+}
+.csi__question-scale {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 340px;
+  flex-shrink: 0;
+}
+
+/* ── Callout ── */
+.csi__callout {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: var(--radius-card);
+  background: var(--color-primary-50);
+  font-size: 0.875rem;
+  color: var(--color-gray-700);
+}
+.csi__callout strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  color: var(--color-gray-900);
+}
+.csi__insight {
+  margin-top: 16px;
+  padding: 14px 18px;
+  border-radius: var(--radius-card);
+  background: var(--color-warning-50);
+  border: 1px solid var(--color-warning-100);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--color-gray-700);
+}
+
+/* ── Status dot ── */
+.csi__dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.csi__dot.is-error {
+  background: var(--color-error-500);
+}
+.csi__dot.is-warning {
+  background: var(--color-warning-500);
+}
+.csi__dot.is-success {
+  background: var(--color-success-500);
+}
+
+/* ── Tables ── */
+.csi__table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-card);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.csi__table-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+.csi__table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.8125rem;
+}
+.csi__table th,
+.csi__table td {
+  padding: 8px 10px;
+  text-align: center;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--color-border-light);
+  white-space: nowrap;
+}
+.csi__table thead th {
+  background: var(--color-bg-muted);
+  font-weight: 600;
+  color: var(--color-gray-700);
+}
+.csi__table tbody td {
+  background: var(--color-bg);
+}
+.csi__table-head-cell {
+  text-align: left !important;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--color-bg);
+  font-weight: 500;
+  min-width: 220px;
+  white-space: normal;
+}
+/* `.csi__table td { nowrap }` thắng `.csi__table-head-cell` về specificity → nhãn dài không
+   xuống dòng và đẩy cột nhãn rộng hết bảng. Tăng specificity để nhãn được wrap. */
+.csi__table .csi__table-head-cell {
+  white-space: normal;
+}
+.csi__table thead .csi__table-head-cell {
+  z-index: 3;
+  background: var(--color-bg-muted);
+}
+.csi__cell {
+  width: 56px;
+  height: 42px;
+  padding: 0 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  text-align: left;
+  color: var(--color-gray-900);
+  background: var(--color-bg);
+}
+.csi__cell:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+.csi__cell-text {
+  width: 160px;
+}
+.csi__cell-select {
+  display: inline-block;
+  min-width: 180px;
+}
+.csi__cell-date {
+  min-width: 150px;
+}
+.csi__cell-owner {
+  min-width: 150px;
+}
+.csi__freq {
+  color: var(--color-gray-600);
+}
+.csi__col-status {
+  min-width: 220px;
+  text-align: left !important;
+}
+
+/* ── Action plan ── */
+.csi__actions {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.csi__action {
+  padding: 16px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-card);
+  background: var(--color-bg);
+}
+.csi__action-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.csi__action-num {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-gray-100);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-gray-700);
+}
+.csi__action-prio {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+}
+.csi__action-prio.is-critical {
+  color: var(--color-error-700);
+  background: var(--color-error-50);
+}
+.csi__action-prio.is-important {
+  color: var(--color-warning-700);
+  background: var(--color-warning-50);
+}
+.csi__action-prio.is-quickwin {
+  color: var(--color-success-700);
+  background: var(--color-success-50);
+}
+.csi__action-area {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-gray-700);
+}
+.csi__action-target {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--color-gray-500);
+}
+.csi__action-text {
+  margin-top: 10px;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+.csi__action-measure {
+  margin-top: 6px;
+  font-size: 0.8125rem;
+  color: var(--color-gray-600);
+}
+.csi__action-fields {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: 14px;
+}
+
+/* ── Results ── */
+.csi__overall {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 22px 24px;
+  border-radius: var(--radius-card);
+  background: var(--color-primary-900);
+  color: #fff;
+}
+.csi__overall-label {
+  font-size: 0.8125rem;
+  opacity: 0.75;
+}
+.csi__overall-score {
+  font-size: 2.25rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+.csi__overall-band {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9375rem;
+}
+.csi__chart {
+  margin-top: 28px;
+}
+.csi__chart app-score-pie {
+  margin-top: 16px;
+}
+.csi__summary {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.csi__summary-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.csi__summary-label {
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+.csi__summary-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  color: var(--color-gray-600);
+  white-space: nowrap;
+}
+.csi__summary-suggest {
+  margin-top: 8px;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-gray-600);
+}
+
+/* ── Nav ── */
+.csi__nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border-light);
+}
+.csi__nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 132px;
+  height: 46px;
+  padding: 0 22px;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    transform 0.08s ease;
+}
+.csi__nav-btn:hover {
+  background: var(--color-primary-hover);
+}
+.csi__nav-btn:active {
+  transform: translateY(1px);
+}
+.csi__nav-btn--ghost {
+  background: transparent;
+  border-color: var(--color-border);
+  color: var(--color-gray-800);
+}
+.csi__nav-btn--ghost:hover {
+  background: var(--color-bg-muted);
+}
+.csi__nav-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .csi__main {
+    padding: 24px 16px 72px;
+  }
+  .csi__stepper {
+    padding: 0 16px 14px;
+  }
+  .csi__step-label {
+    display: none;
+  }
+  .csi__step.is-active .csi__step-label {
+    display: block;
+  }
+  .csi__question {
+    flex-direction: column;
+    gap: 14px;
+  }
+  .csi__question-scale {
+    width: 100%;
+  }
+  .csi__nav-btn {
+    min-width: 0;
+    flex: 1;
+  }
+}
+
+/* ── CSI: reading pages (Hướng dẫn · Giới thiệu CSI · Thuật ngữ) ── */
+.csi__para {
+  margin-top: 10px;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-gray-700);
+  max-width: 80ch;
+}
+.csi__pairs {
+  margin-top: 12px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-card);
+  background: var(--color-bg);
+  overflow: hidden;
+}
+.csi__pair {
+  display: grid;
+  grid-template-columns: minmax(180px, 280px) 1fr;
+  gap: 16px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border-light);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+.csi__pair:last-child {
+  border-bottom: none;
+}
+.csi__pair dt {
+  font-weight: 600;
+  color: var(--color-gray-900);
+}
+.csi__pair dd {
+  color: var(--color-gray-700);
+}
+.csi__doc-table {
+  margin-top: 12px;
+}
+.csi__th-wrap,
+.csi__td-wrap {
+  white-space: normal !important;
+}
+.csi__td-wrap {
+  line-height: 1.5;
+}
+/* Dòng con của bảng gốc (nhãn thụt đầu dòng) — HTML gộp khoảng trắng nên thụt bằng padding. */
+.csi__td-sub.csi__table-head-cell {
+  padding-left: 28px;
+  font-weight: 400;
+  color: var(--color-gray-700);
+}
+.csi__num {
+  font-variant-numeric: tabular-nums;
+}
+.csi__table-total td {
+  font-weight: 600;
+  background: var(--color-bg-muted) !important;
+}
+
+/* ── CSI: company profile ── */
+.csi__fields {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 20px;
+}
+.csi__info {
+  margin-top: 20px;
+  padding: 14px 18px;
+  border-radius: var(--radius-card);
+  background: var(--color-primary-50);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--color-gray-700);
+}
+.csi__info-title {
+  font-weight: 600;
+  color: var(--color-gray-900);
+  margin-bottom: 4px;
+}
+.csi__cell-answer {
+  min-width: 200px;
+}
+
+/* ── CSI: indicators ── */
+.csi__block-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--color-bg-muted);
+}
+.csi__block-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-gray-800);
+}
+.csi__block-max {
+  font-size: 0.75rem;
+  color: var(--color-gray-600);
+  white-space: nowrap;
+}
+.csi__indicator {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+.csi__indicator .csi__question {
+  padding: 0;
+  border-bottom: none;
+}
+.csi__question-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.csi__code {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--color-gray-100);
+  color: var(--color-gray-800);
+  white-space: nowrap;
+}
+.csi__level {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  color: var(--color-primary-700);
+  background: var(--color-primary-50);
+}
+.csi__level.is-advance {
+  color: var(--color-success-700);
+  background: var(--color-success-50);
+}
+.csi__points {
+  font-size: 0.75rem;
+  color: var(--color-gray-500);
+}
+.csi__question-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-gray-600);
+}
+.csi__question-hint svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.csi__question-hint strong {
+  font-weight: 600;
+  color: var(--color-gray-700);
+}
+.csi__years {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  align-items: end;
+}
+.csi__unit {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  font-size: 0.875rem;
+  color: var(--color-gray-700);
+}
+.csi__cell-year {
+  width: 100%;
+}
+.csi__meta-fields {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 14px;
+  align-items: end;
+}
+.csi__meta-fields app-date-field,
+.csi__meta-fields app-date-field input,
+.csi__action-fields app-date-field,
+.csi__action-fields app-date-field input {
+  width: 100%;
+}
+.csi__indicator-foot {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--color-gray-500);
+}
+
+/* ── CSI: priority chip (tone dùng lại từ action-prio) ── */
+.csi__prio {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+}
+.csi__prio.is-critical {
+  color: var(--color-error-700);
+  background: var(--color-error-50);
+}
+.csi__prio.is-important {
+  color: var(--color-warning-700);
+  background: var(--color-warning-50);
+}
+.csi__prio.is-quickwin {
+  color: var(--color-success-700);
+  background: var(--color-success-50);
+}
+.csi__prio.is-neutral {
+  color: var(--color-gray-600);
+  background: var(--color-gray-100);
+}
+
+/* ── CSI: scorecard ── */
+.csi__result-cards {
+  margin-top: 4px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.csi__result-card {
+  padding: 18px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-card);
+  background: var(--color-bg);
+}
+.csi__result-card-label {
+  font-size: 0.8125rem;
+  color: var(--color-gray-600);
+}
+.csi__result-card-value {
+  margin-top: 8px;
+  font-size: 1.375rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.csi__summary-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+  font-size: 0.8125rem;
+  color: var(--color-gray-600);
+}
+
+/* ── CSI: action plan ── */
+.csi__plan-filter {
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 1024px) {
+  /* 10 bước không đủ chỗ cho 10 nhãn: chỉ hiện nhãn bước đang mở (như mobile). */
+  .csi__step-label {
+    display: none;
+  }
+  .csi__step.is-active {
+    flex: 0 0 auto;
+  }
+  .csi__step.is-active .csi__step-label {
+    display: block;
+  }
+  /* Bảng nhiều cột số (bảng điểm): nhãn hẹp lại để tiêu đề cột số không bị bóp nhiều dòng. */
+  .csi__table .csi__table-head-cell {
+    width: 240px;
+    min-width: 160px;
+  }
+  .csi__th-wrap:not(.csi__table-head-cell) {
+    min-width: 76px;
+  }
+  /* Ô nhập trong bảng co theo cột thay vì bề rộng cố định (bảng vi phạm có 4 ô nhập). */
+  .csi__table .csi__cell-text,
+  .csi__table .csi__cell-select {
+    width: 100%;
+    min-width: 96px;
+  }
+  .csi__meta-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .csi__meta-fields > :first-child {
+    grid-column: 1 / -1;
+  }
+  .csi__years {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .csi__years-unit {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .csi__years-unit .csi__unit {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Header gọn hơn — trang CSI dài, header sticky không nên chiếm ~1/6 màn hình. */
+  .csi__bar-inner {
+    padding: 8px 16px;
+  }
+  .csi__logo img {
+    height: 44px !important;
+  }
+  .csi__stepper {
+    gap: 4px;
+  }
+  .csi__title {
+    font-size: 1.5rem;
+  }
+  .csi__section-title {
+    font-size: 1.125rem;
+  }
+
+  .csi__fields,
+  .csi__result-cards {
+    grid-template-columns: 1fr;
+  }
+  .csi__result-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .csi__result-card {
+    padding: 14px;
+  }
+  .csi__action {
+    padding: 14px;
+  }
+  .csi__action-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .csi__action-fields > :nth-child(n + 3) {
+    grid-column: 1 / -1;
+  }
+  .csi__action-target {
+    margin-left: 0;
+    flex-basis: 100%;
+  }
+  .csi__qgroup-head,
+  .csi__block-head {
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+  .csi__overall {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 18px 20px;
+  }
+  .csi__summary-top,
+  .csi__summary-foot {
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+  .csi__callout {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .csi__pair {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  /* Bộ lọc mức ưu tiên: 6 lựa chọn → hàng chip cuộn ngang thay vì bẻ chữ nhiều dòng. */
+  .csi .csi__plan-filter .segmented-field {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin: 0 -16px;
+    padding: 0 16px 4px;
+    scrollbar-width: none;
+  }
+  .csi .csi__plan-filter .segmented-field::-webkit-scrollbar {
+    display: none;
+  }
+  .csi .csi__plan-filter .segmented-field__btn {
+    flex: 0 0 auto;
+    min-height: 36px;
+    white-space: nowrap;
+    border-radius: var(--radius-pill);
+  }
+
+  /* ── Bảng xếp chồng: mỗi dòng thành 1 thẻ, ô dữ liệu có nhãn cột riêng ── */
+  .csi__table-scroll:has(.csi__table--stack) {
+    overflow: visible;
+    border: none;
+    border-radius: 0;
+  }
+  .csi__table--stack,
+  .csi__table--stack tbody {
+    display: block;
+  }
+  .csi__table--stack thead {
+    display: none;
+  }
+  .csi__table--stack tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px 12px;
+    padding: 14px;
+    margin-bottom: 10px;
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-card);
+    background: var(--color-bg);
+  }
+  .csi__table--cols-2 tr {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .csi__table--cols-3 tr {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .csi__table--stack td {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 4px;
+    min-width: 0;
+    padding: 0;
+    border: none;
+    background: none !important;
+    text-align: left;
+    white-space: normal;
+  }
+  .csi__table--stack td::before {
+    content: attr(data-label);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--color-gray-500);
+  }
+  .csi__table--stack td.csi__table-head-cell {
+    position: static;
+    grid-column: 1 / -1;
+    min-width: 0;
+    font-weight: 600;
+    color: var(--color-gray-900);
+  }
+  .csi__table--stack td.csi__table-head-cell::before,
+  .csi__table--stack td:not([data-label])::before {
+    display: none;
+  }
+  .csi__table--stack .csi__td-sub.csi__table-head-cell {
+    padding-left: 0;
+    font-weight: 500;
+  }
+  .csi__table--stack .csi__stack-full {
+    grid-column: 1 / -1;
+  }
+  .csi__table--stack .csi__num {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-gray-900);
+  }
+  .csi__table--stack .csi__table-total {
+    background: var(--color-bg-muted);
+  }
+  .csi__table--stack .csi__cell,
+  .csi__table--stack .csi__cell-text,
+  .csi__table--stack .csi__cell-select {
+    width: 100%;
+    min-width: 0;
+  }
+  .csi__table--stack .csi__cell-answer {
+    min-width: 0;
+  }
+  .csi__doc-table {
+    margin-top: 12px;
+  }
+}
+
+@media (max-width: 400px) {
+  .csi__years {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .csi__years .csi__cell {
+    padding: 0 8px;
+  }
+}

@@ -512,6 +512,21 @@
       "resultsTitle": "Risk Board & Results",
       "resultsNote": "Compiled automatically from the Assessment page — score & risk level per group. Red = act now.",
       "overallLabel": "PDPL compliance readiness"
+    },
+    "csi": {
+      "steps": {
+        "guide": "How to use",
+        "intro": "CSI 2026 Introduction",
+        "glossary": "Glossary & legal",
+        "profile": "Company profile",
+        "I": "Indicators I",
+        "G": "Indicators G",
+        "E": "Indicators E",
+        "LS": "Indicators L&S",
+        "dashboard": "Scorecard",
+        "plan": "Action plan"
+      },
+      "planEmpty": "No indicators at this priority level."
     }
   },
   "profile": {
@@ -944,7 +959,8 @@
         "quickScan": "ESG Quick Scan",
         "waste": "Waste Toolkit",
         "datagov": "Data Governance & PDPL",
-        "energy": "Energy Efficiency"
+        "energy": "Energy Efficiency",
+        "csi": "CSI 2026 Index"
       },
       "includesTitle": "This package includes",
       "includesDesc": "Buyers of this package also receive the benefits of the ticked packages (recursively). Used to compute upgrade pricing, the course \"Package A/B\" labels, and to block re-purchasing an included package. Only packages of the same type can be selected, and cycles are not allowed.",
