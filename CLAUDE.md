@@ -65,6 +65,7 @@ Feature-scoped stores (`profile.store.ts`, `lesson-player.store.ts`) live next t
 - **PrimeNG PassThrough:** use `inputPt` / `submitPt` objects for inline PrimeNG styling (border, background, font); SCSS handles hover/focus/invalid states with `!important` to override the theme
 - **Formatting:** Prettier — single quotes, trailing commas, 100-char width, 2-space tabs, LF endings
 - **Pre-commit:** Husky + lint-staged runs ESLint `--fix` on `*.{ts,html}` and Prettier on `*.{ts,html,css,scss,json,md}`
+- **Version:** tăng `version` trong `package.json` cùng commit với mỗi sửa lỗi (patch) / tính năng (minor) — `npm version <x.y.z> --no-git-tag-version`; docs/test/format thì không. Hiện ở dashboard "Phiên bản vX.Y.Z" (nhúng lúc `npm run build` qua `scripts/ng-build-info.mjs`)
 
 ## Project Structure
 
