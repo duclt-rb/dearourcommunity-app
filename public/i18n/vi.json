@@ -553,7 +553,8 @@
       "emptyInProgress": "Bạn không có khóa học nào đang học dở. Hãy bắt đầu khóa học mới!",
       "viewAllCourses": "Xem tất cả khóa học",
       "inProgressBadge": "Đang học ({{pct}}%)",
-      "continueAlert": "Tiếp tục học khóa: {{title}} ({{pct}}% hoàn tất)"
+      "continueAlert": "Tiếp tục học khóa: {{title}} ({{pct}}% hoàn tất)",
+      "buildTitle": "Phiên bản"
     },
     "courses": {
       "title": "Khóa học của tôi",

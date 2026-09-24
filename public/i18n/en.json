@@ -553,7 +553,8 @@
       "emptyInProgress": "You have no courses in progress. Start a new course!",
       "viewAllCourses": "View all courses",
       "inProgressBadge": "In progress ({{pct}}%)",
-      "continueAlert": "Continue course: {{title}} ({{pct}}% complete)"
+      "continueAlert": "Continue course: {{title}} ({{pct}}% complete)",
+      "buildTitle": "Version"
     },
     "courses": {
       "title": "My courses",

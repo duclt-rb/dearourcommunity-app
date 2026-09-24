@@ -1,12 +1,13 @@
 import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import BuildInfoComponent from '../../shared/build-info/build-info';
 import { EnrolledCourse, ProfileStore } from '../profile.store';
 
 @Component({
   selector: 'app-profile-dashboard',
   standalone: true,
-  imports: [RouterLink, TranslocoPipe],
+  imports: [RouterLink, TranslocoPipe, BuildInfoComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
