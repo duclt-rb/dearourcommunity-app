@@ -20,7 +20,9 @@
     "bankConfirmation": "Transfer confirmation",
     "receipt": "Receipt",
     "toolkit": "Toolkit",
-    "lesson": "Lesson"
+    "lesson": "Lesson",
+    "forgotPassword": "Forgot password",
+    "resetPassword": "Reset password"
   },
   "common": {
     "save": "Save",
@@ -173,6 +175,47 @@
       "loadAccount": "Could not load your account details",
       "invalidCredentials": "Incorrect email or password",
       "registerFailed": "Registration failed"
+    },
+    "forgotPassword": {
+      "title": "Forgot your password?",
+      "subtitle": "Enter the email you use to sign in. We'll send you a link to create a new password.",
+      "submit": "Send reset link",
+      "sentTitle": "Check your inbox",
+      "sentBefore": "If ",
+      "sentAfter": " has an account, we've just sent a password reset link to that email.",
+      "hintExpiry": "The link is valid for 60 minutes and can only be used once.",
+      "hintSpam": "Can't find it? Check your Spam or Promotions folder.",
+      "hintAccount": "Still nothing? You may have signed up with a different email.",
+      "resend": "Resend email",
+      "resendIn": "Resend in {{s}}s",
+      "changeEmail": "Use a different email",
+      "backToLogin": "Back to sign in",
+      "tooManyRequests": "Too many attempts. Please wait a minute and try again.",
+      "sendFailed": "We couldn't send the email. Please try again in a few minutes."
+    },
+    "resetPassword": {
+      "title": "Create a new password",
+      "checking": "Checking your link…",
+      "subtitle": "Set a new password for",
+      "passwordLabel": "New password",
+      "passwordPlaceholder": "At least 8 characters",
+      "passwordRequired": "Please enter a new password",
+      "confirmLabel": "Confirm new password",
+      "confirmPlaceholder": "Re-enter password",
+      "confirmRequired": "Please re-enter your password",
+      "submit": "Save new password",
+      "failed": "We couldn't reset your password. Please try again.",
+      "doneTitle": "Password changed",
+      "doneText": "Your password has been updated. Sign in with your new password.",
+      "goToLogin": "Sign in",
+      "expiredTitle": "This link has expired",
+      "expiredText": "Password reset links are valid for 60 minutes. Please request a new one.",
+      "invalidTitle": "This link can't be used",
+      "invalidText": "This link is incorrect or has already been used. If you still need to reset your password, request a new link.",
+      "errorTitle": "We couldn't check your link",
+      "errorText": "There was a connection problem. Please check your network and try again.",
+      "requestNew": "Send a new link",
+      "retry": "Try again"
     }
   },
   "invitations": {

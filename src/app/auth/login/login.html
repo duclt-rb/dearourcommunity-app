@@ -33,7 +33,13 @@
           <label for="password" class="field__label">{{
             'auth.login.passwordLabel' | transloco
           }}</label>
-          <a href="#" class="field__link">{{ 'auth.login.forgotPassword' | transloco }}</a>
+          <a
+            routerLink="/auth/forgot-password"
+            [queryParams]="{ email: loginModel().email || null }"
+            queryParamsHandling="merge"
+            class="field__link"
+            >{{ 'auth.login.forgotPassword' | transloco }}</a
+          >
         </div>
         <span class="p-input-icon-left field__input-wrapper">
           <svg lucideLock [size]="18" strokeWidth="1.5"></svg>

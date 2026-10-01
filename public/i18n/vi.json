@@ -20,7 +20,9 @@
     "bankConfirmation": "Xác nhận chuyển khoản",
     "receipt": "Hóa đơn",
     "toolkit": "Bộ công cụ",
-    "lesson": "Bài học"
+    "lesson": "Bài học",
+    "forgotPassword": "Quên mật khẩu",
+    "resetPassword": "Đặt lại mật khẩu"
   },
   "common": {
     "save": "Lưu",
@@ -173,6 +175,47 @@
       "loadAccount": "Không thể tải thông tin tài khoản",
       "invalidCredentials": "Email hoặc mật khẩu không đúng",
       "registerFailed": "Đăng ký không thành công"
+    },
+    "forgotPassword": {
+      "title": "Quên mật khẩu?",
+      "subtitle": "Nhập email bạn dùng để đăng nhập. Chúng tôi sẽ gửi cho bạn đường dẫn để tạo mật khẩu mới.",
+      "submit": "Gửi link đặt lại mật khẩu",
+      "sentTitle": "Kiểm tra hộp thư của bạn",
+      "sentBefore": "Nếu ",
+      "sentAfter": " đã đăng ký tài khoản, chúng tôi vừa gửi đường dẫn đặt lại mật khẩu tới email này.",
+      "hintExpiry": "Đường dẫn có hiệu lực trong 60 phút và chỉ dùng được một lần.",
+      "hintSpam": "Không thấy email? Hãy xem thêm mục Spam hoặc Quảng cáo.",
+      "hintAccount": "Vẫn không nhận được? Có thể bạn đã đăng ký bằng một email khác.",
+      "resend": "Gửi lại email",
+      "resendIn": "Gửi lại sau {{s}} giây",
+      "changeEmail": "Dùng email khác",
+      "backToLogin": "Quay lại đăng nhập",
+      "tooManyRequests": "Bạn đã thử quá nhiều lần. Vui lòng đợi 1 phút rồi thử lại.",
+      "sendFailed": "Chưa gửi được email. Vui lòng thử lại sau ít phút."
+    },
+    "resetPassword": {
+      "title": "Tạo mật khẩu mới",
+      "checking": "Đang kiểm tra đường dẫn…",
+      "subtitle": "Đặt mật khẩu mới cho tài khoản",
+      "passwordLabel": "Mật khẩu mới",
+      "passwordPlaceholder": "Tối thiểu 8 ký tự",
+      "passwordRequired": "Vui lòng nhập mật khẩu mới",
+      "confirmLabel": "Nhập lại mật khẩu mới",
+      "confirmPlaceholder": "Nhập lại mật khẩu",
+      "confirmRequired": "Vui lòng nhập lại mật khẩu",
+      "submit": "Lưu mật khẩu mới",
+      "failed": "Chưa đặt lại được mật khẩu. Vui lòng thử lại.",
+      "doneTitle": "Đã đổi mật khẩu",
+      "doneText": "Mật khẩu của bạn đã được cập nhật. Hãy đăng nhập bằng mật khẩu mới.",
+      "goToLogin": "Đăng nhập",
+      "expiredTitle": "Đường dẫn đã hết hạn",
+      "expiredText": "Đường dẫn đặt lại mật khẩu chỉ có hiệu lực trong 60 phút. Hãy yêu cầu một đường dẫn mới.",
+      "invalidTitle": "Đường dẫn không còn dùng được",
+      "invalidText": "Đường dẫn này không đúng hoặc đã được sử dụng. Nếu bạn vẫn cần đổi mật khẩu, hãy yêu cầu một đường dẫn mới.",
+      "errorTitle": "Không kiểm tra được đường dẫn",
+      "errorText": "Có lỗi kết nối. Vui lòng kiểm tra mạng rồi thử lại.",
+      "requestNew": "Gửi lại link mới",
+      "retry": "Thử lại"
     }
   },
   "invitations": {
