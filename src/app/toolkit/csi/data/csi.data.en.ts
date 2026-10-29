@@ -1,2522 +1,2642 @@
-/**
- * ESG Toolkit based on the CSI 2026 Index — small & micro enterprise edition (English edition).
- * Translation of `csi.data.vi.ts`; structure (ids, keys, scores, order) is locked to the VI
- * edition by `parity.spec.ts`.
- */
+// TỰ SINH bởi tools/csi-readiness/build-data.py từ file Excel nguồn (CR-023) — KHÔNG sửa tay.
+// Muốn đổi nội dung: sửa nguồn (extract.py / tr/chunk-*.en.json) rồi chạy lại script.
 import type { CsiToolkitConfig } from '../csi.types';
 
 export const CSI_TOOLKITS_EN: Record<string, CsiToolkitConfig> = {
   'csi-2026-sme': {
     id: 'csi-2026-sme',
-    name: 'ESG TOOLKIT BASED ON THE CSI 2026 INDEX',
-    sector: 'EDITION FOR SMALL AND MICRO ENTERPRISES',
-    brand: 'Dear Our Community | ESG Knowledge Hub',
     guide: {
-      id: 'guide',
-      header: [
-        'ESG TOOLKIT BASED ON THE CSI 2026 INDEX',
-        'EDITION FOR SMALL AND MICRO ENTERPRISES',
-        'Dear Our Community | ESG Knowledge Hub',
-      ],
+      title: 'ESG Readiness Assessment',
+      subtitle: 'Where does your business stand, and what is still missing?',
+      audience: 'For small and micro enterprises',
+      brand: 'Dear Our Community',
+      byline: 'ESG Knowledge Hub and ESG Practice Community',
       sections: [
         {
-          id: 'guide-s1',
-          title: 'What is this toolkit for?',
+          title: 'How does this tool help you?',
           blocks: [
             {
               kind: 'paragraph',
-              text: 'This is an ESG self-assessment and planning tool for Vietnamese enterprises, built on the CSI 2026 Corporate Sustainability Index issued by the Vietnam Chamber of Commerce and Industry (VCCI) and the Vietnam Business Council for Sustainable Development (VBCSD).',
+              text: "Many small businesses know ESG is becoming important - customers ask, banks ask, overseas partners ask - but they don't know where they stand or what to start with. This tool is built to answer exactly these three questions:",
             },
             {
-              kind: 'paragraph',
-              text: 'The toolkit helps enterprises answer three questions: (1) Where do we stand against the CSI standard? (2) Where are the biggest gaps? (3) What should we do first in the next 12 months?',
-            },
-            {
-              kind: 'paragraph',
-              text: "The toolkit is NOT an official application dossier. The official dossier is submitted online at vbcsd.vn/dangkycsi using the Organising Committee's form. The scores in this file are SELF-ASSESSED scores, for guidance only, not scores awarded by the Evaluation Council.",
+              kind: 'list',
+              items: [
+                '1. How ready is my business?',
+                '2. What is still missing?',
+                '3. What should I do first?',
+              ],
             },
           ],
         },
         {
-          id: 'guide-s2',
-          title: 'Why did Dear Our Community choose CSI as the foundation?',
+          title: 'This is not an exam',
           blocks: [
             {
               kind: 'paragraph',
-              text: '1. CSI is designed for Vietnamese enterprises - closely aligned with current Vietnamese law, while referencing international practices (ISSB/IFRS S1-S2, TCFD, the UN Guiding Principles on Business and Human Rights).',
+              text: 'The tool does not give scores and does not rank anyone. You only need to answer "Yes" or "Not yet" for each item. For questions about figures such as revenue or the insurance contribution rate, you pick one of the ready-made ranges - no exact number needed.',
             },
             {
               kind: 'paragraph',
-              text: '2. CSI has two editions by enterprise size, so micro enterprises are not held to the standards of large corporations.',
+              text: 'The result shows which of three levels your business is at, for each area and for the business as a whole:',
             },
             {
-              kind: 'paragraph',
-              text: '3. CSI clearly separates compliance indicators (C) from advanced indicators (A) - helping enterprises know what is mandatory and what creates competitive advantage.',
-            },
-            {
-              kind: 'paragraph',
-              text: '4. CSI is tied to a national programme that has run for 11 consecutive years, with an independent evaluation mechanism and a community of enterprises practising together.',
+              kind: 'pairs',
+              rows: [
+                {
+                  label: 'READY',
+                  text: 'All legally mandatory items are in place. The business has a solid foundation to go further - do more advanced items, or join sustainable business assessment programs.',
+                },
+                {
+                  label: 'ALMOST READY',
+                  text: 'Most mandatory items are in place, with a few specific gaps left to close. Usually only a few months of focused effort.',
+                },
+                {
+                  label: 'NOT READY',
+                  text: 'Many mandatory items are still missing. This is a very common starting point - and the list of gaps will tell you exactly where to begin.',
+                },
+              ],
             },
           ],
         },
         {
-          id: 'guide-s3',
-          title: 'Six steps to use',
+          title: 'Four steps to use the tool',
           blocks: [
             {
               kind: 'pairs',
               rows: [
                 {
                   label: 'Step 1',
-                  text: 'Read the "CSI 2026 Introduction" page to understand the structure of the index and the scoring scale.',
+                  text: 'Fill in the "Company information" page. It takes about 3 minutes.',
                 },
                 {
                   label: 'Step 2',
-                  text: 'Fill in the "Company profile" page. This is the data foundation for all later sections. Data for all 3 years 2023, 2024, 2025 is required.',
+                  text: "Answer 105 questions in four sections: Business and operational data, Corporate governance, Environment, Employees and society. It takes about 45 - 60 minutes. You don't have to do it in one sitting - you can save and continue later.",
                 },
                 {
                   label: 'Step 3',
-                  text: 'Self-assess the 4 indicator groups in turn: Results (I), Governance (G), Environment (E), Labour - Social (L&S). Answer Yes or No for each indicator, exactly as in the official CSI Programme form. Only answer "Yes" when the enterprise is actually implementing it AND has supporting documentation - this is also how the Evaluation Council reviews dossiers.',
+                  text: 'Open the "Readiness results" page to see the readiness level of each area and of the business as a whole.',
                 },
                 {
                   label: 'Step 4',
-                  text: 'View the "Scorecard" page to see your readiness level for each pillar.',
-                },
-                {
-                  label: 'Step 5',
-                  text: 'Open the "Action plan" page and filter by HIGH priority to address the legal compliance indicators first.',
-                },
-                {
-                  label: 'Step 6',
-                  text: 'Use the "12-month roadmap" and "Records & documents checklist" pages to assign owners and specific deadlines.',
+                  text: 'Open the "Gaps to close" page, filter by Priority level, and assign an owner and a due date for each item.',
                 },
               ],
             },
           ],
         },
         {
-          id: 'guide-s4',
-          title: 'Colour conventions in the file',
+          title: 'How to answer',
           blocks: [
             {
               kind: 'pairs',
               rows: [
                 {
-                  label: 'YELLOW cells',
-                  text: 'Cells the enterprise needs to fill in or select',
+                  label: 'Yes',
+                  text: 'The business is doing this AND has documents to prove it. Each question suggests which documents you need.',
                 },
                 {
-                  label: 'GREY cells',
-                  text: 'Auto-calculated formula cells - do not edit',
-                },
-                {
-                  label: 'WHITE cells',
-                  text: 'Reference content, read-only',
-                },
-                {
-                  label: 'Answer Yes',
-                  text: "The enterprise is implementing it AND has supporting documentation. Earns the indicator's full maximum points",
-                },
-                {
-                  label: 'Answer No',
-                  text: 'Not yet implemented, or in progress, or done but without supporting records. Earns 0 points',
+                  label: 'Not yet',
+                  text: 'Not done yet, only partly done, or done but without documents to prove it. Note the actual progress in the Notes box if you wish.',
                 },
                 {
                   label: 'Not applicable',
-                  text: 'The indicator does not arise at the enterprise. Excluded from both the numerator and the denominator when calculating the readiness rate',
+                  text: 'This does not arise in your business - for example, no canteen, no scrap imports. This question will not be counted.',
                 },
                 {
-                  label: 'C (Core) indicator',
-                  text: 'Core indicator, tied to legal compliance - the enterprise needs to complete all C indicators relevant to its specific characteristics',
-                },
-                {
-                  label: 'A (Advance) indicator',
-                  text: 'Advanced indicator, tied to programmes and initiatives that reduce environmental - social risks and create competitive advantage',
+                  label: 'Figure questions',
+                  text: 'Choose the range that fits your most recent year. If you don\'t have the figures yet, choose "No data yet" - this is also a gap to close.',
                 },
               ],
             },
           ],
         },
         {
-          id: 'guide-s5',
-          title: 'Key principles for self-assessment',
+          title: 'Two types of items',
           blocks: [
             {
-              kind: 'paragraph',
-              text: 'Honesty matters more than a high score. The purpose of the toolkit is to see the real gaps, not to produce a good-looking scorecard. An indicator marked "Yes" without supporting records will not be recognised by the Evaluation Council.',
-            },
-            {
-              kind: 'paragraph',
-              text: 'The toolkit uses exactly the Yes/No answer format of the official CSI form, so that the self-assessment results reflect as closely as possible what the Evaluation Council will see. If the enterprise has started but not yet completed the work or does not yet have records, the correct answer is still "No" - and record the actual progress in the "Notes / existing records" column for tracking.',
-            },
-            {
-              kind: 'paragraph',
-              text: 'Every indicator requires data and documents for the 3 years of the assessment period (2023-2025). If you do not yet have a record-keeping system, start from the "Records & documents checklist" page.',
-            },
-            {
-              kind: 'paragraph',
-              text: 'For any indicator that genuinely does not arise at the enterprise (for example: no scrap imports, no staff canteen), select "Not applicable". That indicator will be excluded from the denominator when calculating the readiness rate.',
+              kind: 'pairs',
+              rows: [
+                {
+                  label: 'Mandatory',
+                  text: "Items tied to Vietnamese legal requirements. They determine your business's readiness level.",
+                },
+                {
+                  label: 'Advanced',
+                  text: 'Extra items the business does to reduce risk and gain an edge. They are added value and do not affect the readiness level.',
+                },
+              ],
             },
           ],
         },
         {
-          id: 'guide-s6',
-          title: 'Note on deadlines',
+          title: 'A word of advice',
           blocks: [
             {
               kind: 'paragraph',
-              text: "The CSI 2026 Programme submission window closes at 23:59 on 08/8/2026. If your enterprise starts after this time, use the toolkit to prepare for the following year's assessment cycle - all data and records need to be accumulated over 3 years, so starting early is always beneficial.",
+              text: 'Please answer honestly. The goal is to see the real gaps so you know what to do, not to get a nice-looking result. An item answered "Yes" without supporting documents won\'t help when customers, banks or assessors ask about it.',
+            },
+          ],
+        },
+        {
+          title: 'Need a companion on the way?',
+          blocks: [
+            {
+              kind: 'paragraph',
+              text: 'The ESG Practice Community of Dear Our Community is where Vietnamese small and medium enterprises close these gaps together - sharing document templates and real-world experience, and getting unstuck with experts. Learn more at dearourcommunity.asia or contact crystal@dearourcommunity.com.',
             },
           ],
         },
       ],
+      footer:
+        'This tool is built on the CSI 2026 Corporate Sustainability Index (the version for small and micro enterprises) issued by VCCI and VBCSD. Each question corresponds to one CSI indicator - see the original code and wording in the two collapsed columns at the end of each question page.',
     },
-    intro: {
-      id: 'intro',
-      header: ['INTRODUCTION TO THE CSI 2026 INDEX - EDITION FOR SMALL AND MICRO ENTERPRISES'],
-      sections: [
+    profile: {
+      title: 'Company information',
+      timeHint: 'Takes about 3 minutes',
+      fields: [
         {
-          id: 'intro-s1',
-          title: 'What is CSI?',
-          blocks: [
+          id: 'f5',
+          label: 'Company name',
+        },
+        {
+          id: 'f6',
+          label: 'Main line of business',
+        },
+        {
+          id: 'f7',
+          label: 'Field of operation',
+          options: [
             {
-              kind: 'paragraph',
-              text: 'CSI (Corporate Sustainability Index) is a set of criteria for assessing the level of sustainable development of enterprises in Vietnam, developed under the lead of VCCI and used as the scoring basis in the Programme for Assessing and Announcing Sustainable Enterprises in Vietnam. 2026 is the 11th consecutive year the programme has been implemented.',
+              label: 'Manufacturing, processing',
             },
             {
-              kind: 'paragraph',
-              text: 'CSI integrates the three factors Environment - Social - Governance (E-S-G) into strategic planning, resource allocation, action planning, and the recording and storage of performance data.',
+              label: 'Construction, trade, services',
             },
           ],
         },
         {
-          id: 'intro-s2',
-          title: "What's new in CSI 2026",
-          blocks: [
+          id: 'f8',
+          label: 'Number of employees covered by social insurance',
+          options: [
             {
-              kind: 'paragraph',
-              text: 'CSI 2026 has been updated in line with the compliance requirements of Vietnamese policy and law in 2026 and with new international sustainability reporting standards adapted to the Vietnamese context, including the standards of the International Sustainability Standards Board (ISSB), the recommendations of the Task Force on Climate-related Financial Disclosures (TCFD) and the UN Guiding Principles on Business and Human Rights.',
+              label: 'Under 10 people',
             },
             {
-              kind: 'paragraph',
-              text: 'For medium and large enterprises, CSI 2026 requires evidence of concrete actions and measurable results, rather than merely stating targets.',
+              label: '10 to 50 people',
             },
             {
-              kind: 'paragraph',
-              text: 'Enterprises in international supply chains or with foreign strategic partners (accounting for 20% or more of revenue or supplying 20% or more of materials) are encouraged to additionally prepare certain metrics under IFRS S1 (general requirements for sustainability-related disclosures) and IFRS S2 (climate-related disclosures).',
-            },
-          ],
-        },
-        {
-          id: 'intro-s3',
-          title: 'Two indicator levels',
-          blocks: [
-            {
-              kind: 'paragraph',
-              text: 'Core indicators (C - Core): indicators related to legal compliance. Enterprises are required to complete all C indicators relevant to their specific production and business characteristics. This is the part that must be prioritised first.',
+              label: '51 to 100 people',
             },
             {
-              kind: 'paragraph',
-              text: 'Advanced indicators (A - Advance): indicators related to programmes, actions and measures to mitigate risks and the impact of risks arising from environmental and social factors, while contributing to building a sustainable business ecosystem.',
+              label: 'Over 100 people',
             },
           ],
         },
         {
-          id: 'intro-s4',
-          title: 'Assessment period and data requirements',
-          blocks: [
+          id: 'f9',
+          label:
+            'Business group by environmental criteria (Article 28 of the Law on Environmental Protection 2020)',
+          options: [
             {
-              kind: 'paragraph',
-              text: 'The corporate sustainable development assessment period is 2023 - 2025. Enterprises need to provide complete, accurate and clear information, images, documents and data for all 3 years, and are encouraged to update information, documents and data in the form of periodic statistics and reports up to the time of submission.',
+              label: 'Group 2',
             },
             {
-              kind: 'paragraph',
-              text: 'Enterprises also need to explain, clarify and self-assess their level of implementation of the indicators in connection with the information and documents provided.',
+              label: 'Group 3',
             },
-          ],
-        },
-        {
-          id: 'intro-s5',
-          title: 'Structure of the index',
-          blocks: [
             {
-              kind: 'pairs',
-              rows: [
-                {
-                  label: 'Section A - Company overview',
-                  text: 'Part I: General information about the enterprise. Part II: Organisational structure, model and key personnel.',
-                },
-                {
-                  label: 'Section B - Assessment indicators and scoring scale',
-                  text: 'Part III: Results indicators for the 3 years 2023-2025 (I). Part IV: Governance indicators (G). Part V: Environmental indicators (E). Part VI: Labour - social indicators (L&S).',
-                },
-                {
-                  label: 'Number of indicators',
-                  text: '105 indicators, comprising 86 C indicators (82%) and 19 A indicators (18%).',
-                },
-                {
-                  label: 'Maximum points',
-                  text: '600 points.',
-                },
-              ],
+              label: 'Group 4',
+            },
+            {
+              label: 'Not yet determined',
             },
           ],
         },
         {
-          id: 'intro-s6',
-          title: 'Official CSI 2026 scoring scale',
-          blocks: [
+          id: 'f10',
+          label: 'Main market',
+          options: [
             {
-              kind: 'table',
-              headers: ['Part of the Index', 'Base points', 'Bonus points'],
-              rows: [
-                ['Section A - Company overview', '18', '0'],
-                ['    Part I: Company information', '14', '0'],
-                ['    Part II: Organisational structure, model and key personnel', '4', '0'],
-                ['Section B - Assessment indicators and scoring scale', '527', '55'],
-                ['    Part III: Results indicators for the 3 years 2023-2025 (I)', '178', '20'],
-                ['    Part IV: Governance indicators (G)', '70', '7'],
-                ['    Part V: Environmental indicators (E)', '138', '14'],
-                ['    Part VI: Labour - social indicators (L&S)', '141', '14'],
-                ['TOTAL MAXIMUM POINTS OF THE INDEX', '545', '55'],
-              ],
+              label: 'Domestic',
+            },
+            {
+              label: 'Export',
+            },
+            {
+              label: 'Both domestic and export',
             },
           ],
         },
         {
-          id: 'intro-s7',
-          title: 'CSI 2026 Programme information',
-          blocks: [
+          id: 'f11',
+          label: 'Has the company ever taken part in the CSI Program?',
+          options: [
             {
-              kind: 'pairs',
-              rows: [
-                {
-                  label: 'Lead organisation',
-                  text: 'Vietnam Chamber of Commerce and Industry (VCCI)',
-                },
-                {
-                  label: 'Implementing organisation',
-                  text: 'Vietnam Business Council for Sustainable Development (VBCSD)',
-                },
-                {
-                  label: 'Programme Steering Committee',
-                  text: 'VCCI; Central Policy and Strategy Commission; Ministry of Agriculture and Environment; Ministry of Home Affairs; Ministry of Finance; Vietnam General Confederation of Labour',
-                },
-                {
-                  label: 'Legal basis for implementation',
-                  text: 'Notice No. 398/TB-VPCP dated 15/12/2015 of the Government Office on ranking sustainable enterprises',
-                },
-                {
-                  label: '2026 policy direction',
-                  text: 'Resolution No. 68 on private sector development; Resolution No. 57 on breakthroughs in science, technology, innovation and national digital transformation; Resolutions No. 138 and 139 issued in May 2025',
-                },
-                {
-                  label: 'CSI 2026 submission deadline',
-                  text: '23:59 on 08/8/2026',
-                },
-                {
-                  label: 'Online submission portal',
-                  text: 'https://vbcsd.vn/dangkycsi',
-                },
-                {
-                  label: 'Programme information page',
-                  text: 'https://vbcsd.vn/csi/',
-                },
-                {
-                  label: 'Participation fee',
-                  text: 'Free of charge',
-                },
-                {
-                  label: 'Dossier language',
-                  text: 'The Programme only accepts dossiers in Vietnamese',
-                },
-                {
-                  label: 'Confidentiality',
-                  text: 'The Organising Committee commits to keeping all information provided by enterprises confidential',
-                },
-                {
-                  label: 'Expected recognition categories',
-                  text: 'Top 100 Sustainable Enterprises in Vietnam 2026; Top 10 Sustainable Enterprises in manufacturing; Top 10 Sustainable Enterprises in trade - services; Pioneering Enterprises in circular economy and greenhouse gas emission reduction; Breakthrough Enterprises in corporate governance (thematic categories may change)',
-                },
-                {
-                  label: 'Support contacts',
-                  text: 'Mr. Nguyễn Thành Trung - 0945 22 3333 - trungnt@vcci.com.vn | Mr. Hoàng Lê Anh - 0989 131 594 - anhhl@vcci.com.vn',
-                },
-              ],
+              label: 'Has taken part',
+            },
+            {
+              label: 'Has not taken part',
             },
           ],
         },
         {
-          id: 'intro-s8',
-          title: 'HOW CSI IS ACTUALLY SCORED',
-          blocks: [
+          id: 'f12',
+          label: 'Which assessment round is this?',
+          options: [
             {
-              kind: 'paragraph',
-              text: 'This section explains the actual scoring mechanism of the CSI Programme, so that enterprises correctly understand what the scores mean and do not form false expectations.',
+              label: 'First time',
             },
             {
-              kind: 'pairs',
-              rows: [
-                {
-                  label: 'The points printed in the Index are for reference',
-                  text: 'The official note in the CSI 2026 Index clearly states: "The scores proposed in the CSI 2026 Index are for reference so that enterprises can self-assess and estimate their level of completion of specific indicators in particular, as well as the overall state of sustainable development of the enterprise in general."',
-                },
-                {
-                  label: 'Actual scores differ by field of activity',
-                  text: 'The same note states: "For detailed scores by the enterprise\'s field of activity, please visit the CSI 2026 Programme at the website https://vbcsd.vn/". The score weighting between the economic, environmental and social aspects is adjusted by sector group (manufacturing; trade - services; mixed) to ensure fairness. Therefore, two enterprises giving identical answers but in different sectors may still have different total scores.',
-                },
-                {
-                  label: 'Enterprises self-declare, the Council scores',
-                  text: 'On the official form, the enterprise marks Yes/No for each indicator, attaches supporting documents and explains its level of implementation. The enterprise does NOT score itself. Scoring is carried out by the independent Evaluation Council.',
-                },
-                {
-                  label: 'The evaluation process has three steps',
-                  text: "(1) The independent Evaluation Council scores 03 rounds of dossiers against the CSI Index; (2) information is verified through the relevant competent authorities; (3) the Programme Steering Committee approves based on the Evaluation Council's proposal. The Council comprises representatives of ministries, sectors and agencies participating in the Programme, as well as representatives of enterprises, organisations, experts and press agencies.",
-                },
-                {
-                  label: 'Bonus points',
-                  text: 'The Index publishes the maximum bonus points for each part of Section B (Section A has no bonus points), but does NOT publish the criteria for earning bonus points. Bonus points are awarded by the Evaluation Council based on the actual dossier. Therefore this toolkit does not include bonus points in the self-assessment.',
-                },
-                {
-                  label: 'There is no pass / fail score threshold',
-                  text: 'The CSI Programme is a ranking programme, not a threshold-based certification programme. The published results are the Top 100 Sustainable Enterprises, Top 10 in manufacturing and Top 10 in trade - services. Therefore no score is published as "passing" or "good" - the score needed to make the Top depends on the dossiers of the other enterprises competing that year.',
-                },
-                {
-                  label: 'The only absolute standard: complete all C indicators',
-                  text: 'The Index clearly states that enterprises "are required to complete all C indicators relevant to the enterprise\'s own specific production and business characteristics". This is the only absolute standard set by CSI and the most realistic target for enterprises to aim for, rather than chasing a score. The Scorecard of this toolkit therefore places the status of C indicators ahead of the total score.',
-                },
-              ],
+              label: 'Second time',
+            },
+            {
+              label: 'Third time or more',
             },
           ],
         },
         {
-          id: 'intro-s9',
-          title: 'KEY EXPLANATIONS FROM THE NOTES OF THE CSI 2026 INDEX',
-          blocks: [
+          id: 'f13',
+          label: 'Person doing the assessment',
+        },
+        {
+          id: 'f14',
+          label: 'Job title',
+        },
+        {
+          id: 'f15',
+          label: 'Assessment date',
+          type: 'date',
+        },
+      ],
+      infoBlocks: [
+        {
+          title: 'Business group by environmental criteria',
+          text: 'Group 2: medium scale or capacity, with a risk of adverse environmental impact, or small scale but with environmentally sensitive factors. Group 3: small scale or capacity, with a pollution risk that must be managed and treated as required by regulations. Group 4: no risk of adverse environmental impact. The group determines whether the business needs an environmental permit or only an environmental registration. If you are unsure, choose "Not yet determined" - and clarifying it is the first thing to do.',
+        },
+        {
+          title: 'Is this tool right for your business?',
+          text: 'This tool is for small and micro enterprises under Decree 80/2021/ND-CP. If your business has more than 100 employees covered by social insurance, or revenue above VND 50 billion (manufacturing, construction) or above VND 100 billion (trade, services), it is likely already in the medium-sized group - please use the toolkit for medium and large enterprises.',
+        },
+      ],
+    },
+    parts: [
+      {
+        no: 1,
+        title: 'Part 1 - Business and operational data',
+        subtitle: 'Economy, employees and the environment in numbers',
+        note: "Choose the range that matches your most recent year's data. To take part in assessment programs such as CSI, a company needs data and supporting documents for 3 consecutive years.",
+        groups: [
+          {
+            title: 'Economy',
+            questions: [
+              {
+                num: '1.1',
+                text: "What is the company's revenue for the most recent year?",
+                kind: 'core',
+                evidence:
+                  'Financial statements for 3 years; corporate income tax finalization return.',
+                code: 'I 1',
+                csiText: 'Total revenue',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'Under VND 3 billion',
+                  },
+                  {
+                    label: 'From VND 3 billion to 10 billion',
+                  },
+                  {
+                    label: 'From VND 10 billion to 50 billion',
+                  },
+                  {
+                    label: 'From VND 50 billion to 100 billion',
+                  },
+                  {
+                    label: 'Over VND 100 billion',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action:
+                  'Extract 3 years of revenue figures from the financial statements. If revenue has declined, prepare an explanation of the causes and the remedial measures.',
+              },
+              {
+                num: '1.2',
+                text: 'In the most recent year, did the company make a profit or a loss (profit before tax)?',
+                kind: 'core',
+                evidence:
+                  'Income statements for 3 years; corporate income tax finalization return.',
+                code: 'I 3',
+                csiText: 'Profit before tax',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'Loss',
+                    tag: 'attention',
+                  },
+                  {
+                    label: 'Break-even',
+                  },
+                  {
+                    label: 'Profit under VND 500 million',
+                  },
+                  {
+                    label: 'Profit from VND 500 million to 2 billion',
+                  },
+                  {
+                    label: 'Profit over VND 2 billion',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action:
+                  'Extract profit before tax for 3 years and make sure it matches the financial statements and tax returns.',
+              },
+              {
+                num: '1.3',
+                text: "What is the company's return on equity (ROE) for the most recent year?",
+                kind: 'core',
+                evidence: 'ROE calculation sheet with the formula; balance sheets for 3 years.',
+                code: 'I 4',
+                csiText: 'Return on equity (ROE)',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'Negative',
+                    tag: 'attention',
+                  },
+                  {
+                    label: 'From 0 to 5%',
+                  },
+                  {
+                    label: 'From 5 to 15%',
+                  },
+                  {
+                    label: 'Over 15%',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action:
+                  'Calculate ROE = Profit after tax / Average equity. State the formula you used so others can cross-check it.',
+              },
+              {
+                num: '1.4',
+                text: "What is the company's return on total assets (ROA) for the most recent year?",
+                kind: 'core',
+                evidence: 'ROA calculation sheet with the formula; balance sheets for 3 years.',
+                code: 'I 5',
+                csiText: 'Return on assets (ROA)',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'Negative',
+                    tag: 'attention',
+                  },
+                  {
+                    label: 'From 0 to 3%',
+                  },
+                  {
+                    label: 'From 3 to 10%',
+                  },
+                  {
+                    label: 'Over 10%',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action: 'Calculate ROA = Profit after tax / Average total assets.',
+              },
+              {
+                num: '1.5',
+                text: "What is the company's return on sales (ROS) for the most recent year?",
+                kind: 'core',
+                evidence: 'ROS calculation sheet with the formula; income statements for 3 years.',
+                code: 'I 6',
+                csiText: 'Return on sales (ROS)',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'Negative',
+                    tag: 'attention',
+                  },
+                  {
+                    label: 'From 0 to 3%',
+                  },
+                  {
+                    label: 'From 3 to 10%',
+                  },
+                  {
+                    label: 'Over 10%',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action: 'Calculate ROS = Profit after tax / Net revenue.',
+              },
+              {
+                num: '1.6',
+                text: 'What is the total amount the company paid to the State budget in the most recent year (taxes, fees, charges)?',
+                kind: 'core',
+                evidence:
+                  'Tax obligation confirmation from the tax authority; State budget payment documents for 3 years.',
+                code: 'I 7',
+                csiText: 'Total contributions to the State budget',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'Under VND 100 million',
+                  },
+                  {
+                    label: 'From VND 100 million to 500 million',
+                  },
+                  {
+                    label: 'From VND 500 million to 2 billion',
+                  },
+                  {
+                    label: 'Over VND 2 billion',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action:
+                  'Add up all payments made to the State budget: corporate income tax, VAT, fees, charges, land rent, etc.',
+              },
+              {
+                num: '1.7',
+                text: 'In the most recent year, how much did the company spend on community and social support programs?',
+                kind: 'advanced',
+                evidence:
+                  'List of programs with budgets; payment documents; thank-you letters or confirmation from the receiving organization.',
+                code: 'I 8',
+                csiText: 'Budget for community and social support through programmes/initiatives',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'Nothing spent',
+                    tag: 'missing',
+                  },
+                  {
+                    label: 'Under VND 50 million',
+                  },
+                  {
+                    label: 'From VND 50 million to 200 million',
+                  },
+                  {
+                    label: 'Over VND 200 million',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action:
+                  'Record the community spending budget by year and by program. State clearly the number of beneficiaries.',
+              },
+            ],
+          },
+          {
+            title: 'Society',
+            questions: [
+              {
+                num: '1.8',
+                text: 'What is the share of women among mid-level managers (deputy head of department and above)?',
+                kind: 'core',
+                evidence: 'Organization chart; list of managers by gender; appointment decisions.',
+                code: 'I 12',
+                csiText:
+                  'Percentage of women in middle management (deputy head of department and above)',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'No women',
+                  },
+                  {
+                    label: 'Under 30%',
+                  },
+                  {
+                    label: 'From 30 to 50%',
+                  },
+                  {
+                    label: 'Over 50%',
+                  },
+                  {
+                    label: 'Not applicable - no mid-level management',
+                    tag: 'na',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action:
+                  'Calculate the share of women in management positions at deputy head of department level and above. If the share is low, include an improvement plan in the business plan.',
+              },
+              {
+                num: '1.9',
+                text: "What is the share of women on the board of directors or the members' council / board of management?",
+                kind: 'core',
+                evidence: 'Charter; list of leadership members; appointment decisions.',
+                code: 'I 13',
+                csiText:
+                  'Percentage of women leaders on the Executive Board and Board of Directors',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'No women',
+                  },
+                  {
+                    label: 'Under 30%',
+                  },
+                  {
+                    label: 'From 30 to 50%',
+                  },
+                  {
+                    label: 'Over 50%',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action: "Calculate the share of women in the company's top leadership body.",
+              },
+              {
+                num: '1.10',
+                text: "What is employees' average monthly income (including salary, allowances and bonuses)?",
+                kind: 'core',
+                evidence: 'Payroll for 3 years; total payroll report; personal income tax returns.',
+                code: 'I 14',
+                csiText: 'Average monthly income of employees',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'Under VND 5 million',
+                    tag: 'attention',
+                  },
+                  {
+                    label: 'From VND 5 million to 8 million',
+                  },
+                  {
+                    label: 'From VND 8 million to 12 million',
+                  },
+                  {
+                    label: 'From VND 12 million to 20 million',
+                  },
+                  {
+                    label: 'Over VND 20 million',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action:
+                  'Calculate the average monthly income of all employees. Compare it with the regional minimum wage that applies in your area.',
+              },
+              {
+                num: '1.11',
+                text: 'How does the average income of female employees compare with that of male employees?',
+                kind: 'core',
+                evidence: 'Payroll broken down by gender; pay regulation.',
+                code: 'I 15',
+                csiText: 'Average monthly income of employees by gender (male/female)',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'Women earn over 20% less than men',
+                    tag: 'attention',
+                  },
+                  {
+                    label: 'Women earn 5 to 20% less than men',
+                  },
+                  {
+                    label: 'About equal - difference under 5%',
+                  },
+                  {
+                    label: 'Women earn more than men',
+                  },
+                  {
+                    label: 'Not applicable - employees of only one gender',
+                    tag: 'na',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action:
+                  'Separate average income by gender. If the gap is large, prepare an explanation based on the mix of job positions.',
+              },
+              {
+                num: '1.12',
+                text: 'What share of employees are covered by full compulsory insurance (out of all employees required to be covered)?',
+                kind: 'core',
+                evidence:
+                  'Social insurance payment result notice (form C12-TS); confirmation of no social insurance debt.',
+                code: 'I 16',
+                csiText:
+                  'Percentage of employees covered by all types of compulsory insurance out of total employees subject to compulsory contributions',
+                answer: 'range',
+                options: [
+                  {
+                    label: '100%',
+                  },
+                  {
+                    label: 'From 90% to under 100%',
+                    tag: 'fix',
+                  },
+                  {
+                    label: 'From 70% to under 90%',
+                    tag: 'fix',
+                  },
+                  {
+                    label: 'Under 70%',
+                    tag: 'fix',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action:
+                  'Review the list of employees who must be covered and pay the missing contributions. The mandatory target is 100%.',
+              },
+              {
+                num: '1.13',
+                text: 'On average, how many hours of training does each employee receive per year?',
+                kind: 'core',
+                evidence: 'Annual training plan; attendance lists; training hours summary.',
+                code: 'I 17',
+                csiText:
+                  'Annual training hours per employee among those requiring training (orientation and onboarding; compliance; soft skills; professional skills; other training)',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'No training held',
+                    tag: 'missing',
+                  },
+                  {
+                    label: 'Under 8 hours',
+                  },
+                  {
+                    label: 'From 8 to 24 hours',
+                  },
+                  {
+                    label: 'Over 24 hours',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action:
+                  'Summarize training hours in 5 categories: onboarding, regulatory compliance, soft skills, professional skills, other.',
+              },
+              {
+                num: '1.14',
+                text: 'How many workplace accidents or incidents occurred in the last 3 years?',
+                kind: 'core',
+                evidence:
+                  'Workplace accident log; investigation reports (if any); periodic occupational safety and health reports.',
+                code: 'I 19',
+                csiText:
+                  'Number of occupational accidents and incidents occurring during the reporting period (2023-2025)',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'None occurred',
+                  },
+                  {
+                    label: '1 to 2 cases',
+                    tag: 'attention',
+                  },
+                  {
+                    label: '3 or more cases',
+                    tag: 'attention',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action:
+                  'Count the cases across all 3 years. If none occurred, you still need periodic safety reports as proof. If any occurred, check that the causes have been investigated and fixed.',
+              },
+            ],
+          },
+          {
+            title: 'Environment',
+            questions: [
+              {
+                num: '1.15',
+                text: 'Has the company carried out any initiative to reduce plastic waste?',
+                kind: 'advanced',
+                evidence:
+                  'Implementation plan or minutes; photos; investment documents; volume tracking log.',
+                code: 'I 22',
+                csiText:
+                  'Activities and initiatives implemented to reduce plastic waste (number of activities; investment level; amount of plastic waste recycled or reused)',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'Not yet',
+                    tag: 'missing',
+                  },
+                  {
+                    label: '1 initiative',
+                  },
+                  {
+                    label: '2 or more initiatives',
+                  },
+                  {
+                    label: 'Not applicable - no significant use of plastic',
+                    tag: 'na',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action:
+                  'Start with the easiest steps: replace single-use plastic packaging, take back packaging, stop using plastic bottles in the office. Record the amount invested and the volume of plastic reduced.',
+              },
+              {
+                num: '1.16',
+                text: "To what extent is the company's solid waste sorted and handed over to licensed operators?",
+                kind: 'core',
+                evidence:
+                  'Waste handover documents; contracts with licensed treatment operators; waste source owner log.',
+                code: 'I 23',
+                csiText:
+                  'Amount of solid waste sorted, collected, stored, transported and treated (domestic; ordinary industrial; hazardous industrial)',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'All of it',
+                  },
+                  {
+                    label: 'Most of it',
+                    tag: 'fix',
+                  },
+                  {
+                    label: 'A small part',
+                    tag: 'fix',
+                  },
+                  {
+                    label: 'Not done yet',
+                    tag: 'missing',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action:
+                  'Record waste volumes in 3 categories (domestic, ordinary industrial, hazardous waste) for each year, matching the handover documents. All waste must be handed over in accordance with regulations.',
+              },
+              {
+                num: '1.17',
+                text: "What are the company's direct costs for solid waste management each year?",
+                kind: 'core',
+                evidence: 'Waste treatment service contracts; invoices and payment documents.',
+                code: 'I 24',
+                csiText: 'Direct costs related to solid waste management',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'Under VND 10 million',
+                  },
+                  {
+                    label: 'From VND 10 million to 50 million',
+                  },
+                  {
+                    label: 'From VND 50 million to 200 million',
+                  },
+                  {
+                    label: 'Over VND 200 million',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action:
+                  'Add up collection, treatment and transport fees and the cost of the waste storage area.',
+              },
+              {
+                num: '1.18',
+                text: 'By what percentage has the company reduced its energy consumption through saving measures?',
+                kind: 'advanced',
+                evidence:
+                  'Before-and-after comparison of electricity and fuel consumption; electricity bills; energy audit report (if any).',
+                code: 'I 27',
+                csiText:
+                  'Percentage of energy saved through the application of energy saving and efficiency measures',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'No measures yet',
+                    tag: 'missing',
+                  },
+                  {
+                    label: 'Under 5%',
+                  },
+                  {
+                    label: 'From 5 to 10%',
+                  },
+                  {
+                    label: 'Over 10%',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action:
+                  'Install LED lights and inverters, maintain equipment, set a rule to switch off equipment when not in use - then compare bills before and after.',
+              },
+              {
+                num: '1.19',
+                text: 'How does the company track water consumption per unit of product or service?',
+                kind: 'core',
+                evidence:
+                  'Water bills or water extraction permit; water meter reading log; output data.',
+                code: 'I 31',
+                csiText: 'Typical water consumption per unit of product/service',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'Calculated monthly',
+                  },
+                  {
+                    label: 'Calculated yearly',
+                  },
+                  {
+                    label: 'Only the total water bill, not calculated per product',
+                    tag: 'missing',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action:
+                  'Record the water meter reading each month and divide by output to get water use per unit of product. Install meters by area if possible.',
+              },
+              {
+                num: '1.20',
+                text: 'By what percentage has the company reduced its water use through saving measures?',
+                kind: 'core',
+                evidence:
+                  'Before-and-after comparison of water use; description of water-saving measures.',
+                code: 'I 32',
+                csiText:
+                  'Percentage of water consumption saved through the application of measures to enhance water saving and efficiency',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'No measures yet',
+                    tag: 'missing',
+                  },
+                  {
+                    label: 'Under 5%',
+                  },
+                  {
+                    label: 'From 5 to 10%',
+                  },
+                  {
+                    label: 'Over 10%',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action:
+                  'Apply water-saving measures (fix leaks, water-saving taps, reuse washing water) and compare the data before and after.',
+              },
+              {
+                num: '1.21',
+                text: 'What share of wastewater is collected and treated to standard before being discharged into the environment?',
+                kind: 'core',
+                evidence:
+                  'Periodic wastewater monitoring results; environmental permit; wastewater connection or treatment contract.',
+                code: 'I 33',
+                csiText:
+                  'Percentage of wastewater collected and treated to meet technical standards and regulations before discharge into the environment',
+                answer: 'range',
+                options: [
+                  {
+                    label: '100%',
+                  },
+                  {
+                    label: 'From 80% to under 100%',
+                    tag: 'fix',
+                  },
+                  {
+                    label: 'Under 80%',
+                    tag: 'fix',
+                  },
+                  {
+                    label:
+                      'Not applicable - only domestic wastewater connected to the shared system',
+                    tag: 'na',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action:
+                  'Make sure all wastewater is treated to standard or connected to a centralized treatment system. The mandatory target is 100%.',
+              },
+              {
+                num: '1.22',
+                text: 'Has the company carried out any initiative to regenerate or restore water resources?',
+                kind: 'advanced',
+                evidence:
+                  'Plan and implementation minutes; photos; investment documents; local authority confirmation.',
+                code: 'I 35',
+                csiText:
+                  'Activities and initiatives implemented to regenerate and restore water sources (number; investment level; amount of water regenerated)',
+                answer: 'range',
+                options: [
+                  {
+                    label: 'Not yet',
+                    tag: 'missing',
+                  },
+                  {
+                    label: '1 initiative',
+                  },
+                  {
+                    label: '2 or more initiatives',
+                  },
+                  {
+                    label: 'No data yet',
+                    tag: 'missing',
+                  },
+                ],
+                action:
+                  'Examples: rainwater harvesting, planting trees at watersheds, taking part in restoring local ponds, lakes and canals.',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        no: 2,
+        title: 'Part 2 - Corporate governance',
+        subtitle: 'How the company plans, manages risks and listens to customers',
+        note: 'Answer "Yes" when the company is doing it AND has documents to prove it. Each question suggests which documents you need.',
+        groups: [
+          {
+            title: 'Sustainable development commitment',
+            questions: [
+              {
+                num: '2.1',
+                text: 'Does the annual business plan include at least one environmental target and one social target, with specific numbers?',
+                kind: 'core',
+                evidence:
+                  'Annual business plan with an approval signature, clearly showing the environmental and social targets.',
+                code: 'G 1',
+                csiText: "The enterprise's business plan includes environmental and social targets",
+                answer: 'yesno',
+                action:
+                  'Include at least one environmental target (e.g., cut electricity consumption by 10%) and one social target (e.g., 100% of workers receive safety training) in the annual business plan, approved by leadership.',
+              },
+            ],
+          },
+          {
+            title: 'Risk management',
+            questions: [
+              {
+                num: '2.2',
+                text: 'Does the company have a regulation (even a short one) on how to identify and handle risks in production and business, with clear assignment of who is responsible?',
+                kind: 'core',
+                evidence:
+                  'Risk management regulation; list of main risks; minutes of periodic risk reviews.',
+                code: 'G 5',
+                csiText:
+                  'Develop policies, procedures and an organisational structure for risk management in production/business activities',
+                answer: 'yesno',
+                action:
+                  'Write a 2 - 3 page regulation: who identifies risks, who decides how to handle them, how often they are reviewed. Draw up a list of 5 - 10 main risks, including natural disasters and loss of supply.',
+              },
+            ],
+          },
+          {
+            title: 'Customer satisfaction',
+            questions: [
+              {
+                num: '2.3',
+                text: 'Does the company have a channel for collecting customer feedback and run a satisfaction survey (at least once a year) to make improvements?',
+                kind: 'core',
+                evidence:
+                  'Survey questionnaire; results report; minutes of improvements made after the survey.',
+                code: 'G 12',
+                csiText:
+                  'Develop policies, procedures and information channels, and collect feedback, conduct surveys and evaluate customer satisfaction with products/services in order to make improvements',
+                answer: 'yesno',
+                action:
+                  'Create a short survey form (Google Forms is enough), send it to customers once a year, and record the results and the improvements made.',
+              },
+              {
+                num: '2.4',
+                text: 'Does the company have a process for receiving and handling complaints, suggestions and whistleblowing reports from customers and other stakeholders?',
+                kind: 'core',
+                evidence:
+                  'Complaint handling process; complaint log with handling results; proof that the reporting channels are publicly announced.',
+                code: 'G 13',
+                csiText:
+                  'Implement a procedure for handling complaints, feedback and whistleblowing reports of misconduct from customers and stakeholders',
+                answer: 'yesno',
+                action:
+                  'Issue a short process: intake channels, response deadlines, who handles cases, how whistleblowers are protected. Keep a log for each case.',
+              },
+            ],
+          },
+          {
+            title: 'Specific policies',
+            questions: [
+              {
+                num: '2.5',
+                text: 'Does the company have a regulation on preventing sexual harassment in the workplace (in the internal labor regulations or a separate policy)?',
+                kind: 'core',
+                evidence:
+                  'Clause in the internal labor regulations or a separate policy; training materials and attendance lists.',
+                code: 'G 17',
+                csiText:
+                  'Develop and implement a policy/provisions on preventing sexual harassment in the workplace',
+                answer: 'yesno',
+                action:
+                  'Add a clause on preventing sexual harassment to the internal labor regulations, with a confidential complaint channel, and communicate it to all staff.',
+              },
+              {
+                num: '2.6',
+                text: 'Does the company have a commitment not to trade in, consume or use wildlife and wildlife products (including when entertaining guests or giving gifts)?',
+                kind: 'core',
+                evidence: 'Commitment signed by leadership; proof of internal communication.',
+                code: 'G 19',
+                csiText:
+                  'Develop and implement a policy/commitment/code of conduct on preventing the trade, consumption and use of wildlife and products derived from wildlife',
+                answer: 'yesno',
+                action:
+                  'Issue a one-page commitment signed by leadership, covering both guest entertainment and corporate gifts, and communicate it to staff.',
+              },
+            ],
+          },
+          {
+            title: 'Communication',
+            questions: [
+              {
+                num: '2.7',
+                text: 'Does the company have channels to share information with partners and stakeholders, and channels for them to give feedback (website, fanpage, email, periodic meetings...)?',
+                kind: 'core',
+                evidence:
+                  'Screenshots or links to the channels; log recording and handling of feedback.',
+                code: 'G 20',
+                csiText:
+                  'Establish forms of communication with partners and stakeholders, and forms/channels for receiving feedback from stakeholders',
+                answer: 'yesno',
+                action:
+                  'Clearly identify the channels you use to share information externally and to receive feedback; record the feedback received and how it was handled.',
+              },
+            ],
+          },
+          {
+            title: 'Innovation',
+            questions: [
+              {
+                num: '2.8',
+                text: 'Has the company invested in research, improvement or technology to make its management or products more sustainable?',
+                kind: 'advanced',
+                evidence:
+                  'Investment plan or decision; supporting documents; results report; illustrative photos.',
+                code: 'G 22',
+                csiText:
+                  'Carry out research and development, innovation and science and technology application activities (organising, training, investment...) to improve corporate governance processes, innovate products... contributing to the sustainable development of the enterprise',
+                answer: 'yesno',
+                action:
+                  'Record the internal improvements already made (management software, process improvements, product designs with less packaging...) along with the amount invested and the results.',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        no: 3,
+        title: 'Part 3 - Environment',
+        subtitle: 'Permits, waste, energy saving and awareness raising',
+        note: 'Most items here are mandatory under the Law on Environmental Protection. If an item does not apply to your business, choose "Not applicable".',
+        groups: [
+          {
+            title: 'Compliance with environmental protection law',
+            questions: [
+              {
+                num: '3.1',
+                text: 'Does the company have a valid environmental permit or environmental registration (and a water extraction permit if it extracts water itself)?',
+                kind: 'core',
+                evidence:
+                  'Valid environmental permit or environmental registration certificate; water extraction permit.',
+                code: 'E 1',
+                csiText:
+                  'Holds a valid environmental permit; environmental registration; and registration for surface water and groundwater extraction and use, as required by regulations',
+                answer: 'yesno',
+                action:
+                  'Check which category your company falls under in the Law on Environmental Protection 2020 to know whether you need a permit or only a registration. Review the expiry date and start the renewal process 6 months ahead.',
+              },
+              {
+                num: '3.2',
+                text: 'Has the company paid all environmental taxes and fees (wastewater, emissions, water extraction, etc.) in full and on time?',
+                kind: 'core',
+                evidence: 'Proof of payment of environmental taxes and fees; fee declarations.',
+                code: 'E 2',
+                csiText:
+                  'Pays in full and on time all environmental protection taxes and fees for wastewater; emissions; surface water and groundwater use; environmental protection deposits; and payments for natural ecosystem services',
+                answer: 'yesno',
+                action:
+                  'Review the environmental financial obligations the company must pay and keep complete payment records for 3 years.',
+              },
+              {
+                num: '3.3',
+                text: 'Has the company submitted its annual environmental protection report in full and on time (and reports on water, chemicals and packaging recycling if applicable)?',
+                kind: 'core',
+                evidence:
+                  'Submitted reports with receipts from the receiving authority for all 3 years.',
+                code: 'E 3',
+                csiText:
+                  'Submits environmental protection reports, reports on surface water and groundwater extraction, chemical activities, and packaging and product recycling results fully and on time',
+                answer: 'yesno',
+                action:
+                  'Set a reminder for the environmental protection report deadline (before January 15 each year) and for other reports if they apply.',
+              },
+              {
+                num: '3.4',
+                text: 'Are household waste and ordinary industrial solid waste sorted, stored and handed over to a licensed provider as required?',
+                kind: 'core',
+                evidence:
+                  'Waste collection and treatment contracts; handover records; photos of the storage area with signage.',
+                code: 'E 4',
+                csiText:
+                  'Complies with regulations on the sorting, collection, transport, storage and treatment of ordinary industrial solid waste and domestic solid waste',
+                answer: 'yesno',
+                action:
+                  'Set up a waste sorting area at the source, sign a contract with a licensed collector and keep complete handover records.',
+              },
+              {
+                num: '3.5',
+                text: 'Is hazardous waste (waste oil, oily rags, light bulbs, chemicals, etc.) stored separately, tracked in a logbook and handed over to a licensed provider?',
+                kind: 'core',
+                evidence:
+                  'Hazardous waste source owner registration book; handover records; contract with a licensed provider.',
+                code: 'E 5',
+                csiText:
+                  'Complies with regulations on the sorting, collection, transport, storage and treatment of hazardous solid waste',
+                answer: 'yesno',
+                action:
+                  'Set up a separate storage area with warning signs, keep a waste source owner logbook and hand the waste over to a licensed hazardous waste treatment provider.',
+              },
+              {
+                num: '3.6',
+                text: 'If the company imports or exports used machinery, equipment, materials or scrap: does it comply with environmental protection regulations?',
+                kind: 'core',
+                evidence: 'Customs records; scrap import permit; inspection results.',
+                code: 'E 6',
+                csiText:
+                  'Complies with environmental protection regulations on the export, import and transit of used goods, machinery, equipment, vehicles, raw materials and scrap',
+                answer: 'yesno',
+                action:
+                  'Review the import conditions and customs records. If the company does not import or export these items, choose "Not applicable".',
+              },
+              {
+                num: '3.7',
+                text: 'If the company produces or imports products or packaging that carry recycling responsibility under EPR (extended producer responsibility): has it recycled or made the financial contribution as required?',
+                kind: 'core',
+                evidence:
+                  'Registered recycling plan or proof of financial contribution; recycling results report.',
+                code: 'E 7',
+                csiText:
+                  'Complies with regulations on product and packaging recycling responsibility (EPR) and waste treatment responsibility',
+                answer: 'yesno',
+                action:
+                  "Check whether the company's products and packaging are on the list that must be recycled. If so, register a recycling plan or make the financial contribution on time.",
+              },
+              {
+                num: '3.8',
+                text: 'Are chemicals, equipment and tools used economically and safely, with an inventory list and safety instructions?',
+                kind: 'core',
+                evidence:
+                  'Chemical inventory list; safety data sheets (MSDS); chemical safety training records.',
+                code: 'E 8',
+                csiText: 'Uses chemicals, equipment and tools economically and safely',
+                answer: 'yesno',
+                action:
+                  'Prepare an inventory of the chemicals in use, keep a safety data sheet for each one, store them as required and train the people who handle them.',
+              },
+              {
+                num: '3.9',
+                text: 'Has the company equipped itself with enough equipment and tools to prevent and respond to environmental incidents (oil spills, chemical leaks, fires, etc.)?',
+                kind: 'core',
+                evidence:
+                  'List of incident response equipment; periodic inspection records; photos.',
+                code: 'E 9',
+                csiText:
+                  'Is fully equipped with equipment and tools for risk prevention and environmental incident response',
+                answer: 'yesno',
+                action:
+                  'Provide and regularly inspect absorbent materials, spill containment barriers, fire extinguishers and protective gear; prepare a short incident response plan.',
+              },
+              {
+                num: '3.10',
+                text: 'Does the company monitor and control wastewater and emissions periodically as required (under its environmental permit)?',
+                kind: 'core',
+                evidence:
+                  'Monitoring results for each period; contract with a qualified monitoring provider.',
+                code: 'E 10',
+                csiText:
+                  'Controls, monitors and supervises wastewater and emissions in accordance with current regulations',
+                answer: 'yesno',
+                action:
+                  'Carry out monitoring at the frequency stated in the environmental permit, performed by a licensed provider.',
+              },
+            ],
+          },
+          {
+            title: 'Environmental protection activities and climate change response',
+            questions: [
+              {
+                num: '3.11',
+                text: 'Does the company have a policy encouraging employees to commute by low-emission transport (bus, bicycle, electric vehicle, carpooling, etc.)?',
+                kind: 'advanced',
+                evidence: 'Support policy; list of beneficiaries; payment records.',
+                code: 'E 12',
+                csiText:
+                  'Implements policies that encourage and support employees in using low-emission transport',
+                answer: 'yesno',
+                action:
+                  'Issue a policy that supports the cost of bus, bicycle or electric vehicle commuting, or organize carpooling or shuttle services.',
+              },
+              {
+                num: '3.12',
+                text: 'Has the company issued and regularly enforced rules on saving electricity and energy?',
+                kind: 'core',
+                evidence:
+                  'Issued energy saving rules; inspection records; monthly electricity consumption data.',
+                code: 'E 17',
+                csiText: 'Issues and regularly implements energy-saving practice rules',
+                answer: 'yesno',
+                action:
+                  'Issue short rules: turn off equipment when not in use, air conditioner temperature settings, periodic maintenance - and check that they are followed.',
+              },
+              {
+                num: '3.13',
+                text: 'Has the company made a commitment to protect biodiversity and not to trade, transport or use wild animals and wildlife products (including for hosting guests or as gifts)?',
+                kind: 'core',
+                evidence: 'Issued commitment or policy; internal communication materials.',
+                code: 'E 24',
+                csiText:
+                  'Protects biodiversity and prevents and combats the trade, transport and use of wildlife',
+                answer: 'yesno',
+                action:
+                  'You can combine this with the commitment in question G 19 into one document and share it with all staff.',
+              },
+            ],
+          },
+          {
+            title: 'Environmental management and awareness raising',
+            questions: [
+              {
+                num: '3.14',
+                text: 'Has the company trained and communicated with employees about environmental protection and climate change, and tracked how their awareness changed after the training?',
+                kind: 'core',
+                evidence:
+                  'Training materials; attendance lists; results of awareness surveys before and after.',
+                code: 'E 26',
+                csiText:
+                  'Organises training and tracks changes in awareness and behaviour after training, and communicates to raise employee awareness of environmental protection and climate change response',
+                answer: 'yesno',
+                action:
+                  'Hold at least 1 training session per year and use a short questionnaire before and after the session to see how awareness has changed.',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        no: 4,
+        title: 'Part 4 - Employees and society',
+        subtitle: 'Contracts, pay, workplace safety, dialogue and customer relations',
+        note: 'This is the longest part. It is best done together with the person in charge of HR or accounting.',
+        groups: [
+          {
+            title: 'Personnel management',
+            questions: [
+              {
+                num: '4.1',
+                text: 'Has the company signed written labor contracts of the correct type and with full content with everyone who works for 1 month or longer?',
+                kind: 'core',
+                evidence: 'Set of labor contracts; list of employees with contract types.',
+                code: 'L 1',
+                csiText:
+                  'Fully complies with regulations on concluding labour contracts: in writing for contracts of one (01) month or longer; using the correct contract type; with all contents required by regulations',
+                answer: 'yesno',
+                action:
+                  'Review all contracts: they must contain the content required by Article 21 of the Labor Code 2019, be of the correct type, and be in writing for every contract of 1 month or longer.',
+              },
+              {
+                num: '4.2',
+                text: 'When temporarily reassigning an employee to other work or another workplace, does the company follow the regulations and the terms agreed in the contract?',
+                kind: 'core',
+                evidence: 'Reassignment decision; advance notice; contract stating the workplace.',
+                code: 'L 2',
+                csiText:
+                  'Complies with regulations on performing labour contracts, including temporarily transferring employees to work other than that in their contract in accordance with regulations, and assigning the workplace as agreed',
+                answer: 'yesno',
+                action:
+                  "Reassign only as permitted (no more than 60 cumulative days per year, with 3 working days' advance notice) and place employees at the agreed location.",
+              },
+              {
+                num: '4.3',
+                text: 'Are amendments to and termination of labor contracts done as required (in writing, with sufficient advance notice, with full payment)?',
+                kind: 'core',
+                evidence:
+                  'Contract addenda; termination decisions; settlement records; payment records.',
+                code: 'L 3',
+                csiText:
+                  'Complies with regulations on amending, supplementing and terminating labour contracts',
+                answer: 'yesno',
+                action:
+                  'Review the process: valid grounds, correct notice periods, and full payment within 14 working days when a contract ends.',
+              },
+              {
+                num: '4.4',
+                text: 'Has the company signed electronic labor contracts?',
+                kind: 'advanced',
+                evidence:
+                  'Signed electronic labor contracts; description of the digital signature platform in use.',
+                code: 'L 4',
+                csiText:
+                  'Proactively develops and implements the signing of electronic labour contracts',
+                answer: 'yesno',
+                action:
+                  'Roll out electronic labor contracts through a valid digital signature platform - it saves time and storage.',
+              },
+              {
+                num: '4.5',
+                text: 'Has the company set up an employee management register (paper or electronic) and does it update it as soon as someone new joins?',
+                kind: 'core',
+                evidence:
+                  'Updated employee management register (paper copy or export from software).',
+                code: 'L 5',
+                csiText:
+                  'Maintains a labour management register and fully records employee information in it from the time employees start work, as required by regulations',
+                answer: 'yesno',
+                action:
+                  'Set up an employee management register and update it as soon as someone new joins, with all the information required.',
+              },
+              {
+                num: '4.6',
+                text: 'Does the company report changes in its workforce periodically to the local labor authority?',
+                kind: 'core',
+                evidence: 'Submitted workforce reports with receipts.',
+                code: 'L 6',
+                csiText:
+                  'Reports changes in the workforce to the state labour authority as required by regulations',
+                answer: 'yesno',
+                action:
+                  'Submit the workforce change report to the local labor authority every 6 months.',
+              },
+              {
+                num: '4.7',
+                text: 'Does the company have written internal labor regulations registered with the labor authority? (mandatory for companies with 10 or more employees)',
+                kind: 'core',
+                evidence:
+                  'Internal labor regulations; registration confirmation; photo of the posting at the workplace.',
+                code: 'L 7',
+                csiText:
+                  'Develops and registers internal labour regulations with the state labour authority',
+                answer: 'yesno',
+                action:
+                  'Draft the internal labor regulations, register them with the provincial labor authority and post them at the workplace. With fewer than 10 employees, registration is not required but it is still advisable to have regulations.',
+              },
+              {
+                num: '4.8',
+                text: 'When handling labor discipline, does the company follow the proper principles and procedure (a meeting, minutes, and an employee representative)?',
+                kind: 'core',
+                evidence:
+                  'Disciplinary procedure; meeting minutes; disciplinary decisions (if any).',
+                code: 'L 8',
+                csiText:
+                  'Ensures the principles, order and procedures for handling labour discipline',
+                answer: 'yesno',
+                action:
+                  'Discipline must be based on the internal labor regulations; hold a meeting attended by the employee representative organization and the person concerned, and keep minutes.',
+              },
+              {
+                num: '4.9',
+                text: 'Are employees informed about internal job openings and promotion opportunities?',
+                kind: 'core',
+                evidence: 'Internal job announcements; promotion rules; list of people promoted.',
+                code: 'L 9',
+                csiText:
+                  'Enables employees to access employment opportunities and career advancement',
+                answer: 'yesno',
+                action:
+                  'Make internal job openings and promotion criteria public so employees know about development opportunities.',
+              },
+            ],
+          },
+          {
+            title: 'Pay, bonuses and compulsory insurance',
+            questions: [
+              {
+                num: '4.10',
+                text: 'Has the company developed and publicly posted its salary scale, pay table and labor norms at the workplace?',
+                kind: 'core',
+                evidence:
+                  'Salary scale and pay table; minutes of consultation with the employee representative organization; photo of the posting.',
+                code: 'L 11',
+                csiText:
+                  'Develops and publicly discloses the wage scales, payrolls and labour norms at the workplace',
+                answer: 'yesno',
+                action:
+                  'Develop the salary scale, pay table and labor norms, consult the employee representative organization (if any) and post them publicly.',
+              },
+              {
+                num: '4.11',
+                text: 'Does the company have a written pay policy?',
+                kind: 'advanced',
+                evidence: 'Issued pay policy; proof it was shared with employees.',
+                code: 'L 12',
+                csiText: 'Develops wage payment regulations for employees',
+                answer: 'yesno',
+                action:
+                  'Issue a pay policy that clearly states the pay structure, criteria for raises and how overtime pay is calculated.',
+              },
+              {
+                num: '4.12',
+                text: 'Does the company pay salaries and overtime on time and in full, and send a pay statement to each employee?',
+                kind: 'core',
+                evidence: 'Payroll; bank transfer records; sample pay slip sent to employees.',
+                code: 'L 13',
+                csiText:
+                  "Pays employees' wages and overtime pay on time and in full, and provides them with wage statements",
+                answer: 'yesno',
+                action:
+                  'Pay on the committed date and send each employee a detailed pay slip every pay period.',
+              },
+              {
+                num: '4.13',
+                text: 'Does the company have a written bonus policy and follow it?',
+                kind: 'advanced',
+                evidence: 'Bonus policy; bonus decisions; bonus payment records.',
+                code: 'L 14',
+                csiText: 'Develops and implements bonus regulations for employees',
+                answer: 'yesno',
+                action:
+                  'Issue a transparent bonus policy that clearly states the basis and timing for bonus decisions.',
+              },
+              {
+                num: '4.14',
+                text: 'Does the company pay social insurance, health insurance, unemployment insurance and occupational accident and disease insurance in full and on time for all employees required to be covered?',
+                kind: 'core',
+                evidence:
+                  'Social insurance payment notice (form C12-TS); confirmation of no social insurance arrears; payment records.',
+                code: 'L 15',
+                csiText:
+                  'Pays social insurance, health insurance, unemployment insurance and occupational accident and disease insurance on time and for all employees subject to mandatory contributions',
+                answer: 'yesno',
+                action:
+                  'Pay in full and on time for 100% of the employees who must be covered. Check whether there are any outstanding arrears.',
+              },
+            ],
+          },
+          {
+            title: 'Allowances and benefits',
+            questions: [
+              {
+                num: '4.15',
+                text: 'Does the company support employees with meal allowances for shifts or lunch?',
+                kind: 'advanced',
+                evidence: 'Support policy; payroll showing the allowance; meal supply contract.',
+                code: 'L 19',
+                csiText: 'Provides shift meal and lunch allowances for employees',
+                answer: 'yesno',
+                action: 'Provide a shift or lunch meal allowance, or organize meals for employees.',
+              },
+              {
+                num: '4.16',
+                text: "Does the company have a policy supporting employees' childcare (daycare, gifts on June 1, rewards for children with good grades, etc.)?",
+                kind: 'advanced',
+                evidence: 'Support policy; list of beneficiaries; payment records.',
+                code: 'L 20',
+                csiText:
+                  "Implements policies supporting employees' childcare: daycare/raising young children/high academic achievement...",
+                answer: 'yesno',
+                action:
+                  'Issue a childcare support policy: daycare allowance, gifts on June 1, and rewards for children with good academic results.',
+              },
+              {
+                num: '4.17',
+                text: 'Does the company organize cultural, sports, sightseeing or travel activities for employees?',
+                kind: 'advanced',
+                evidence: 'Activity plan; participant lists; photos; payment records.',
+                code: 'L 21',
+                csiText:
+                  'Organises cultural, artistic and sports activities, and excursions and trips for employees',
+                answer: 'yesno',
+                action:
+                  'Organize at least one cultural, sports or sightseeing activity each year to build team spirit.',
+              },
+              {
+                num: '4.18',
+                text: 'Does the company support employees with a phone allowance?',
+                kind: 'advanced',
+                evidence: 'Support policy; payroll showing the allowance.',
+                code: 'L 23',
+                csiText: 'Provides a phone allowance',
+                answer: 'yesno',
+                action: 'Support phone costs for roles that need to stay in regular contact.',
+              },
+              {
+                num: '4.19',
+                text: 'Does the company have a practice of sending greetings or gifts to employees for birthdays, weddings and bereavements?',
+                kind: 'advanced',
+                evidence: 'Welfare policy; visit tracking log; payment records.',
+                code: 'L 24',
+                csiText: 'Provides support for birthdays, weddings, bereavement of relatives...',
+                answer: 'yesno',
+                action:
+                  'Maintain the practice of greetings or gifts for birthdays, weddings and bereavements, and write it into the welfare policy.',
+              },
+              {
+                num: '4.20',
+                text: 'Does the company provide assistance to employees facing hardship due to accidents?',
+                kind: 'advanced',
+                evidence: 'Assistance policy; list of those supported; payment records.',
+                code: 'L 25',
+                csiText: 'Provides allowances for employees in hardship due to accidents',
+                answer: 'yesno',
+                action:
+                  'Have a fund or mechanism to assist employees facing hardship due to accidents.',
+              },
+            ],
+          },
+          {
+            title: 'Working hours and rest',
+            questions: [
+              {
+                num: '4.21',
+                text: 'Are normal working hours kept to no more than 8 hours a day or 48 hours a week?',
+                kind: 'core',
+                evidence: 'Timesheets; internal labor regulations stating working hours.',
+                code: 'L 26',
+                csiText:
+                  'Applies normal working hours of no more than 08 hours per 01 day or no more than 48 hours per 01 week',
+                answer: 'yesno',
+                action: 'Check the timesheets and adjust work schedules if they exceed the limit.',
+              },
+              {
+                num: '4.22',
+                text: 'Do employees get weekly rest, breaks during the day, rest between shifts and mid-shift breaks as required?',
+                kind: 'core',
+                evidence: 'Timesheets; shift schedules; internal labor regulations.',
+                code: 'L 27',
+                csiText:
+                  'Ensures weekly rest, breaks during working hours, rest between shifts and mid-shift breaks for employees',
+                answer: 'yesno',
+                action:
+                  'Ensure at least 24 consecutive hours of weekly rest, a 30-minute mid-shift break (45 minutes for night shifts), and at least 12 hours of rest between shifts.',
+              },
+              {
+                num: '4.23',
+                text: 'Are overtime, night shifts, and work on days off and public holidays done as required (with agreement, within the limits, paid at the correct rates)?',
+                kind: 'core',
+                evidence: 'Written consent to overtime; overtime timesheets; payroll.',
+                code: 'L 28',
+                csiText:
+                  'Strictly complies with regulations on employing employees for overtime, night shifts, and work on rest days and public holidays',
+                answer: 'yesno',
+                action:
+                  "Keep overtime to no more than 40 hours/month and 200 hours/year (300 hours for permitted industries), with the employee's consent and at the correct pay rates.",
+              },
+              {
+                num: '4.24',
+                text: 'Do employees get paid personal leave or unpaid leave as required?',
+                kind: 'core',
+                evidence: 'Internal labor regulations; leave requests and approvals; timesheets.',
+                code: 'L 29',
+                csiText:
+                  'Ensures employees can take personal leave or unpaid leave as required by regulations',
+                answer: 'yesno',
+                action:
+                  "Ensure the leave entitlements for the employee's own marriage, a child's marriage, bereavement, and unpaid leave as required.",
+              },
+            ],
+          },
+          {
+            title: 'Occupational health and safety',
+            questions: [
+              {
+                num: '4.25',
+                text: 'Does the company organize periodic health checks for employees as required?',
+                kind: 'core',
+                evidence: 'Contract with a medical facility; health check results.',
+                code: 'L 30',
+                csiText:
+                  'Provide periodic health check-ups for employees as required by regulations',
+                answer: 'yesno',
+                action:
+                  'Hold health checks at least once a year; every 6 months for employees in heavy, hazardous work, employees with disabilities, minors and older employees.',
+              },
+              {
+                num: '4.26',
+                text: 'Does the company have a medical unit or hire medical services as required?',
+                kind: 'core',
+                evidence: 'Decision establishing a medical unit or medical service contract.',
+                code: 'L 31',
+                csiText:
+                  'Establish an in-house healthcare unit or engage a healthcare service provider as required by regulations',
+                answer: 'yesno',
+                action:
+                  'Small enterprises usually only need to sign a contract with a qualified medical facility.',
+              },
+              {
+                num: '4.27',
+                text: 'Has the company assigned people to provide first aid and emergency care and provided first aid kits at the workplace?',
+                kind: 'core',
+                evidence:
+                  'Assignment decision; first aid training certificates; first aid kit inventory.',
+                code: 'L 32',
+                csiText:
+                  'Arrange first-aid and emergency response personnel at the workplace as required by regulations',
+                answer: 'yesno',
+                action:
+                  'Assign and send first aid providers for training; provide first aid kits for each work area.',
+              },
+              {
+                num: '4.28',
+                text: 'If the company has a canteen: does it control food quality and food safety and hygiene?',
+                kind: 'advanced',
+                evidence: 'Food safety eligibility certificate; food sample retention log.',
+                code: 'L 33',
+                csiText: 'Control the quality and food safety and hygiene of the employee canteen',
+                answer: 'yesno',
+                action:
+                  'Keep food samples for 24 hours, keep records of food origin and arrange health checks for kitchen staff. If there is no canteen, choose "Not applicable".',
+              },
+              {
+                num: '4.29',
+                text: 'Has the company issued occupational safety and health rules, procedures and plans?',
+                kind: 'core',
+                evidence:
+                  'Annual occupational safety and health plan; safety rules and procedures.',
+                code: 'L 34',
+                csiText:
+                  'Issue rules, procedures and plans to ensure occupational safety and health at the workplace',
+                answer: 'yesno',
+                action:
+                  'Prepare an annual occupational safety and health plan with a budget, together with safety rules for each role.',
+              },
+              {
+                num: '4.30',
+                text: 'Does the company have a unit or a qualified person in charge of occupational safety and health?',
+                kind: 'core',
+                evidence: 'Assignment decision; training certificate of the person in charge.',
+                code: 'L 35',
+                csiText:
+                  'Arrange a unit or personnel in charge of occupational safety and health who meet the qualification requirements under regulations',
+                answer: 'yesno',
+                action:
+                  'Assign a person in charge of occupational safety and health and send them for training to obtain the appropriate certificate.',
+              },
+              {
+                num: '4.31',
+                text: 'Are machines and equipment with strict safety requirements (boilers, lifting equipment, pressure vessels, etc.) inspected on time?',
+                kind: 'core',
+                evidence: 'Equipment inventory; valid inspection certificates.',
+                code: 'L 36',
+                csiText:
+                  'Machinery and equipment in use that are subject to strict occupational safety requirements are inspected as required by regulations',
+                answer: 'yesno',
+                action:
+                  'Make an inventory of this equipment and have it inspected at the correct intervals. If you have no equipment of this type, choose "Not applicable".',
+              },
+              {
+                num: '4.32',
+                text: 'Has the company assessed health risks at the workplace?',
+                kind: 'advanced',
+                evidence: 'Risk assessment report; control measures applied.',
+                code: 'L 37',
+                csiText: "Assess workplace risks related to employees' health",
+                answer: 'yesno',
+                action:
+                  'Assess health risks at least once a year for roles with dangerous or harmful factors.',
+              },
+              {
+                num: '4.33',
+                text: 'Does the company have a plan for handling incidents and emergency response at the workplace?',
+                kind: 'core',
+                evidence: 'Emergency response plan; drill records; evacuation map.',
+                code: 'L 38',
+                csiText: 'Issue an incident response and emergency response plan for the workplace',
+                answer: 'yesno',
+                action:
+                  'Develop an emergency response plan (fire or explosion, accidents, leaks) and hold drills regularly.',
+              },
+              {
+                num: '4.34',
+                text: 'When a workplace accident occurs, does the company investigate and report to the authorities as required?',
+                kind: 'core',
+                evidence:
+                  'Accident investigation report; notification documents; benefit settlement records.',
+                code: 'L 39',
+                csiText:
+                  'Investigate and report occupational accidents at the workplace to the competent authorities',
+                answer: 'yesno',
+                action:
+                  'Set up an investigation team, prepare the report and notify within the deadline. If no accident has ever occurred, choose "Not applicable".',
+              },
+              {
+                num: '4.35',
+                text: 'Are workers provided with enough personal protective equipment suited to their work?',
+                kind: 'core',
+                evidence:
+                  'Issuance list; signed receipt book; photos of workers using the equipment.',
+                code: 'L 40',
+                csiText: 'Provide sufficient personal protective equipment to employees',
+                answer: 'yesno',
+                action:
+                  'Issue enough protective gear for each role, have workers sign for it and check that it is used.',
+              },
+              {
+                num: '4.36',
+                text: 'Has the company made a list of workers doing heavy, hazardous or dangerous work?',
+                kind: 'core',
+                evidence:
+                  'Worker classification list; comparison with the list of heavy and hazardous occupations.',
+                code: 'L 41',
+                csiText:
+                  'Record and classify workers performing arduous, hazardous or dangerous work and workers performing especially arduous, hazardous or dangerous work',
+                answer: 'yesno',
+                action:
+                  'Compare job positions with the State\'s list of heavy and hazardous occupations so the correct entitlements apply. If you have no such positions, choose "Not applicable".',
+              },
+              {
+                num: '4.37',
+                text: 'Does the company provide occupational safety and health training for workers as required?',
+                kind: 'core',
+                evidence: 'Training plan; attendance lists; certificates or safety cards.',
+                code: 'L 42',
+                csiText:
+                  'Provide occupational safety and health training for employees as required by regulations',
+                answer: 'yesno',
+                action:
+                  'Train the right groups at the right intervals (every 2 years for group 3, every year for group 4).',
+              },
+              {
+                num: '4.38',
+                text: 'Does the company carry out workplace environment monitoring every year (dust, noise, heat, lighting, toxic fumes, etc.)?',
+                kind: 'core',
+                evidence:
+                  'Workplace environment monitoring results; contract with a qualified provider.',
+                code: 'L 43',
+                csiText: 'Conduct annual monitoring of the working environment',
+                answer: 'yesno',
+                action:
+                  'Hire a qualified provider to monitor at least once a year and fix any factor that exceeds the threshold.',
+              },
+              {
+                num: '4.39',
+                text: 'Does the company submit periodic reports on workplace accidents and occupational safety and health to the authorities?',
+                kind: 'core',
+                evidence: 'Submitted reports with receipts.',
+                code: 'L 44',
+                csiText:
+                  'Periodically report to the competent authorities on occupational accidents and occupational safety and health',
+                answer: 'yesno',
+                action:
+                  'Submit the annual occupational safety and health and workplace accident reports, usually before January 10.',
+              },
+            ],
+          },
+          {
+            title: 'Education and training',
+            questions: [
+              {
+                num: '4.40',
+                text: 'Are employees trained before being moved to heavy, hazardous or dangerous work?',
+                kind: 'core',
+                evidence: 'Transfer decision; training program and results.',
+                code: 'L 45',
+                csiText:
+                  'Train employees before transferring them to positions or fields of work involving arduous or hazardous work',
+                answer: 'yesno',
+                action:
+                  'Retrain employees before moving them to positions with heavy, hazardous or dangerous factors. If there are no such positions, choose "Not applicable".',
+              },
+              {
+                num: '4.41',
+                text: 'Does the company have an annual training plan and a budget for training?',
+                kind: 'core',
+                evidence: 'Annual training plan with budget estimate; results report.',
+                code: 'L 46',
+                csiText:
+                  "Develop an annual plan and allocate funding for training, capacity building and upgrading of employees' qualifications and vocational skills; company policies and regulations; and laws and legal policies",
+                answer: 'yesno',
+                action:
+                  'Prepare an annual training plan with a separate budget line, including training on internal regulations and labor law.',
+              },
+            ],
+          },
+          {
+            title: 'Trade union and collective labor agreement',
+            questions: [
+              {
+                num: '4.42',
+                text: 'Does the company have a grassroots trade union established through the proper procedure?',
+                kind: 'core',
+                evidence:
+                  'Decision recognizing the grassroots trade union; list of the executive committee.',
+                code: 'L 47',
+                csiText:
+                  'Establish a grassroots trade union in accordance with the proper process and procedures',
+                answer: 'yesno',
+                action:
+                  'Work with the higher-level trade union to establish one. If the company does not yet qualify, record that you have made contact and enable employees to join the higher-level trade union.',
+              },
+              {
+                num: '4.43',
+                text: 'Does the company provide conditions (time, venue, funding) for the trade union to operate?',
+                kind: 'core',
+                evidence: 'Proof of trade union fee payments; records of activities.',
+                code: 'L 48',
+                csiText:
+                  "Enable trade union members and officers to carry out trade union activities effectively in line with the trade union's functions and duties",
+                answer: 'yesno',
+                action:
+                  'Arrange time and venue for trade union activities and pay trade union fees as required.',
+              },
+              {
+                num: '4.44',
+                text: 'Does the company consult the trade union when developing salary scale and payroll, labor norms and bonus regulations?',
+                kind: 'core',
+                evidence: "Consultation documents and the trade union's written responses.",
+                code: 'L 49',
+                csiText:
+                  'Consult the executive committee of the grassroots trade union when developing wage scales, payrolls, labour norms and bonus regulations',
+                answer: 'yesno',
+                action:
+                  "Send a written request for the trade union's opinion before issuing these documents and keep its written reply.",
+              },
+              {
+                num: '4.45',
+                text: 'Does the company consult the trade union when developing occupational safety and health plans, regulations and procedures?',
+                kind: 'core',
+                evidence:
+                  'Consultation documents; meeting minutes signed by a trade union representative.',
+                code: 'L 50',
+                csiText:
+                  'Consult the executive committee of the grassroots trade union (where a trade union exists) when developing and issuing plans, rules and procedures to ensure occupational safety and health at the workplace',
+                answer: 'yesno',
+                action:
+                  "Obtain the trade union's opinion in writing before issuing occupational safety and health documents.",
+              },
+              {
+                num: '4.46',
+                text: 'When a written proposal for collective bargaining is made, does the company hold the negotiation as required?',
+                kind: 'core',
+                evidence: 'Written bargaining proposal; minutes of negotiation sessions.',
+                code: 'L 51',
+                csiText:
+                  'Written request for negotiation by either party, the grassroots trade union or the employer, on the content of the collective bargaining request',
+                answer: 'yesno',
+                action:
+                  'Respond and hold negotiations within the required time limit when one side makes a written request.',
+              },
+              {
+                num: '4.47',
+                text: 'Does the collective labor agreement (if any) comply with the law and give employees more favorable terms?',
+                kind: 'core',
+                evidence: 'Signed agreement; document sent to the labor management authority.',
+                code: 'L 52',
+                csiText:
+                  'The content of the collective labour agreement does not contravene the law and is more favourable to employees',
+                answer: 'yesno',
+                action:
+                  'The agreement must contain at least one term more favorable to employees than the law. If there is no agreement, choose "Not yet".',
+              },
+            ],
+          },
+          {
+            title: 'Workplace democracy and dialogue',
+            questions: [
+              {
+                num: '4.48',
+                text: 'Has the company developed and publicly shared a workplace democracy regulation?',
+                kind: 'core',
+                evidence: 'Issued democracy regulation; photo of it posted.',
+                code: 'L 53',
+                csiText: 'Develop and publicly disclose workplace democracy regulations',
+                answer: 'yesno',
+                action:
+                  'Issue and post the democracy regulation, clearly stating what employees are entitled to know, discuss, decide and check.',
+              },
+              {
+                num: '4.49',
+                text: 'Does the company have two-way channels for exchanging and handling internal information (suggestion box, coordination meetings, internal group...)?',
+                kind: 'core',
+                evidence:
+                  'Information exchange regulation; log of feedback and how it was handled.',
+                code: 'L 54',
+                csiText:
+                  'Develop and implement a mechanism for exchanging and handling information within the enterprise',
+                answer: 'yesno',
+                action:
+                  'Set up an internal feedback channel and record the feedback received and how it was handled.',
+              },
+              {
+                num: '4.50',
+                text: 'Does the company hold workplace dialogue periodically or whenever an issue arises?',
+                kind: 'core',
+                evidence: 'Dialogue minutes; attendance list.',
+                code: 'L 55',
+                csiText: 'Hold periodic or ad hoc dialogues at the workplace',
+                answer: 'yesno',
+                action:
+                  'Hold dialogue at least once a year as required, or immediately when an issue arises.',
+              },
+              {
+                num: '4.51',
+                text: 'Does the company hold an annual employee conference?',
+                kind: 'core',
+                evidence: 'Minutes or resolution of the employee conference.',
+                code: 'L 56',
+                csiText: 'Hold an annual employee conference',
+                answer: 'yesno',
+                action:
+                  'Hold an employee conference every year with the participation of the employee representative organization.',
+              },
+              {
+                num: '4.52',
+                text: 'When a labor dispute arises, does the company resolve it following the procedure set by law?',
+                kind: 'core',
+                evidence: 'Case file; mediation minutes; resolution decision.',
+                code: 'L 58',
+                csiText:
+                  'Resolve labour disputes in accordance with the procedures prescribed by law',
+                answer: 'yesno',
+                action:
+                  'Resolve in this order: negotiation, labor mediator, arbitration council or court. If there has never been a dispute, choose "Not applicable".',
+              },
+            ],
+          },
+          {
+            title: 'Female employees, special categories of workers and non-discrimination',
+            questions: [
+              {
+                num: '4.53',
+                text: 'Does the workplace have enough suitable shower rooms and toilets (separate for men and women)?',
+                kind: 'core',
+                evidence: 'Floor plan; photos of the sanitation areas.',
+                code: 'L 60',
+                csiText: 'Ensure sufficient and suitable shower rooms and toilets at the workplace',
+                answer: 'yesno',
+                action:
+                  'Check the number and condition of sanitation facilities, making sure they are separate for men and women and sufficient for the number of employees.',
+              },
+              {
+                num: '4.54',
+                text: 'If the company employs minors: does it follow the proper rules for employing them?',
+                kind: 'core',
+                evidence:
+                  'List of minor employees; written consent of their representatives; health check records.',
+                code: 'L 62',
+                csiText: 'Ensure compliance with the principles for employing minors',
+                answer: 'yesno',
+                action:
+                  'Obtain consent from the representative, do not assign prohibited work, and limit working hours. If the company does not employ minors, choose "Not applicable".',
+              },
+              {
+                num: '4.55',
+                text: 'Does the company ensure there is no forced labor in any form (no holding of documents, no forced overtime, no deposits...)?',
+                kind: 'core',
+                evidence:
+                  'Commitment in the internal labor regulations; self-check results; dialogue minutes.',
+                code: 'L 63',
+                csiText: 'No forced labour in any form',
+                answer: 'yesno',
+                action:
+                  'Review to confirm: no holding of identity documents, no required deposits, no forced overtime, and employees are allowed to resign as regulated.',
+              },
+              {
+                num: '4.56',
+                text: 'Does the company ensure non-discrimination (gender, ethnicity, religion, marital status...) in recruitment, pay and promotion?',
+                kind: 'core',
+                evidence: 'Internal labor regulations; recruitment procedure; complaint log.',
+                code: 'L 64',
+                csiText: 'No discrimination in the management, employment and direction of workers',
+                answer: 'yesno',
+                action:
+                  'Review the regulations and actual practice in recruitment, pay and promotion to eliminate all discrimination.',
+              },
+              {
+                num: '4.57',
+                text: 'If the company employs workers with disabilities: does it ensure suitable working conditions and follow the proper rules?',
+                kind: 'advanced',
+                evidence:
+                  'List of employees with disabilities; records of suitable working conditions.',
+                code: 'L 66',
+                csiText:
+                  'Ensure compliance with the principles for employing workers with disabilities',
+                answer: 'yesno',
+                action:
+                  'Ensure suitable working conditions, do not assign heavy, hazardous or dangerous work, and consult them before deciding on related matters.',
+              },
+            ],
+          },
+          {
+            title: 'Relations with customers and community',
+            questions: [
+              {
+                num: '4.58',
+                text: 'Is all advertising, labeling and "green" claims about products and services truthful and backed by evidence (no "greenwashing")?',
+                kind: 'core',
+                evidence:
+                  'Label samples; advertising content; certificates or test results supporting the claims.',
+                code: 'S 1',
+                csiText:
+                  'Comply with requirements on marketing and labelling of products/services, and combat "greenwashing"',
+                answer: 'yesno',
+                action:
+                  'Review every "green", "eco" or "environmentally friendly" claim: remove or correct any claim that has no evidence.',
+              },
+              {
+                num: '4.59',
+                text: 'Does the company check the quality of products and services to ensure safety and health for consumers, especially children?',
+                kind: 'core',
+                evidence: 'Quality control procedure; test results or conformity certificates.',
+                code: 'S 2',
+                csiText:
+                  'Inspect and assess the quality of products/services to ensure consumer safety and health, especially for children',
+                answer: 'yesno',
+                action:
+                  'Set up a quality and safety check step before products are placed on the market.',
+              },
+              {
+                num: '4.60',
+                text: "Does the company protect customers' personal information when collecting, storing and using it?",
+                kind: 'core',
+                evidence: 'Data privacy policy; access authorization regulations.',
+                code: 'S 3',
+                csiText:
+                  "Uphold customers' right to information confidentiality in the collection, storage, processing and use of their information",
+                answer: 'yesno',
+                action:
+                  'Issue a customer data privacy policy in line with Decree 13/2023/ND-CP, and assign who may view which data.',
+              },
+              {
+                num: '4.61',
+                text: 'Does the company host student interns or student workers?',
+                kind: 'advanced',
+                evidence:
+                  'Agreement with the educational institution; list of students; internship confirmation letters.',
+                code: 'S 5',
+                csiText: 'Enable students to intern and work at the enterprise',
+                answer: 'yesno',
+                action:
+                  'Sign a cooperation agreement with a university, college or vocational school to host student interns, with an assigned supervisor.',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    areaTitles: [
+      'Business and operational data',
+      'Corporate governance',
+      'Environment',
+      'Employees and society',
+    ],
+    results: {
+      title: 'ESG Readiness Results',
+      subtitle: 'Where does your business stand, and what is still missing?',
+      note: 'This page updates automatically from your answers. You don\'t need to fill in anything here, except the "Almost ready" threshold if you want to adjust it.',
+      overallLabel: 'Overall readiness level of the business',
+      overallNote: 'Equal to the lowest level among the four areas below.',
+      areasTitle: 'Readiness level by area',
+      areasHeaders: [
+        'Area',
+        'Mandatory items in place',
+        'Mandatory items missing',
+        'Of which need fixing now',
+        'Mandatory item progress',
+        'Readiness level',
+        'Advanced items done',
+        'Unanswered questions',
+      ],
+      howTitle: 'How the readiness level is determined',
+      how: [
+        {
+          label: 'READY',
+          text: 'All applicable mandatory items in the area are in place.',
+        },
+        {
+          label: 'ALMOST READY',
+          text: 'At or above the threshold in the box below, but not all items are in place yet.',
+        },
+        {
+          label: 'NOT READY',
+          text: 'Below the threshold in the box below.',
+        },
+      ],
+      thresholdLabel: '"Almost ready" threshold (editable):',
+      thresholdNote:
+        'Default is 80% of mandatory items. Questions marked "Not applicable" are not counted. Advanced items are added value and do not affect the readiness level.',
+      thresholdDefault: 0.8,
+      groupsTitle: 'Where the gaps are - By task group',
+      groupsHeaders: [
+        'Task group',
+        'Area',
+        'Mandatory items in place',
+        'Mandatory items missing',
+        'Mandatory item progress',
+        'Advanced items done',
+        'Unanswered questions',
+      ],
+      firstTitle: 'Mandatory items to do first',
+      firstNote: 'The first 10 items - see the full list on the "Gaps to close" page',
+      firstHeaders: ['Question no.', 'Missing item', 'Priority'],
+    },
+    gap: {
+      title: 'Gaps to close and action plan',
+      subtitle:
+        'Filter by "Priority" level to see what to do first. Assign an owner and a due date for each item.',
+      note: 'The contents from "Question" to "Documents you need" update automatically from your answers.',
+      headers: [
+        'No.',
+        'Area',
+        'Task group',
+        'Question',
+        'Item type',
+        'Answer',
+        'Status',
+        'Priority',
+        'Action needed',
+        'Documents you need',
+        'Owner',
+        'Due date',
+        'Progress',
+      ],
+    },
+    documents: {
+      title: 'Checklist of documents you need',
+      subtitle: 'Documents that help the business answer "Yes" with confidence',
+      note: 'Mark the status of each document. Keep records for at least the last 3 years and name folders by question number so they are easy to find.',
+      headers: [
+        'Record, document',
+        'Related to questions',
+        'Notes',
+        'In place?',
+        'Stored where',
+        'Held by',
+      ],
+      groups: [
+        {
+          title: 'Group 1 - Governance and commitments',
+          items: [
             {
-              kind: 'paragraph',
-              text: 'The content below sits in the footnotes of the original document and is very easy to overlook, yet it determines how many indicators are understood and answered.',
+              id: 'd7',
+              title: 'Annual business plan with environmental and social targets',
+              refs: '2.1',
+              note: 'At least one environmental target and one social target with specific numbers, approved by management.',
             },
             {
-              kind: 'pairs',
-              rows: [
-                {
-                  label:
-                    'Classification of enterprises by environmental criteria (Article 28 of the Law on Environmental Protection 2020)',
-                  text: 'Group 1: Enterprises of large scale and capacity with a high risk of adverse environmental impact, and medium-scale enterprises with environmentally sensitive factors. Group 2: Enterprises of medium scale and capacity with a risk of adverse environmental impact, and small-scale enterprises with environmentally sensitive factors. Group 3: Enterprises of small scale and capacity with a risk of causing environmental pollution that must be managed and treated as prescribed. Group 4: Enterprises with no risk of adverse environmental impact.',
-                },
-                {
-                  label:
-                    'Part II - Organisational structure, model and key personnel: what does the Evaluation Council want to see?',
-                  text: "Part II provides the CSI 2026 Programme's Evaluation Council with information on the organisational structure, operational arrangements and the assignment of duties to departments/divisions, especially the unit/personnel in charge of sustainable development, and the decision-making process of the entire enterprise within the scope of participation in the Programme. Enterprises are required to provide an organisational chart and documents assigning duties.",
-                },
-                {
-                  label: 'Energy use reporting: sector-specific rules',
-                  text: 'Producers of steel, beer, soft drinks, cane sugar, paper, processed seafood and plastics report energy use results using the methods prescribed in the relevant Circulars of the Ministry of Industry and Trade. Other units report the energy consumption for 01 main product or service.',
-                },
-                {
-                  label: 'Research - development - innovation: distinguishing two indicators',
-                  text: 'Process and product improvement from research - development - innovation - application of science and technology is an INTERNAL activity of the enterprise aimed at optimising management processes, improving productivity and operational quality, protecting the environment and enhancing competitiveness. Application and commercialisation of products from research - development - innovation is an activity directed OUTSIDE the enterprise, aimed at introducing new products and new production and business processes serving production, business and daily life. This is the basis for distinguishing indicators G 22 and G 23.',
-                },
-                {
-                  label: 'What is IFRS and why does CSI 2026 mention it',
-                  text: "IFRS (International Financial Reporting Standards) is a set of standards and rules issued by the International Accounting Standards Board (IASB) to create a global accounting framework, helping accountants, auditors and investors better understand an enterprise's financial position, while enhancing transparency and accountability. The Ministry of Finance has issued a roadmap for applying IFRS in Vietnam. IFRS S1 sets out general requirements for sustainability-related information, and IFRS S2 sets out climate-related disclosures.",
-                },
-                {
-                  label: 'Four steps to build a materiality matrix (per the notes of the Index)',
-                  text: 'Building a materiality analysis matrix should follow these steps: (1) Define the scope and stakeholders; (2) Identify material issues; (3) Assess their level of importance; (4) Build and validate the matrix. This matrix helps the enterprise focus time and resources on core issues, improving operational efficiency and risk management.',
-                },
-                {
-                  label: "Sustainable development orientation in the enterprise's commitments",
-                  text: 'A corporate sustainable development orientation requires commitments on environment, labour - social and governance together with economic performance, with specific targets for each period, to ensure long-term growth without compromising the future. These targets need to be thoroughly communicated within the leadership and down to every department and employee so that they are achieved.',
-                },
-              ],
+              id: 'd8',
+              title: 'Risk management regulation and list of key risks',
+              refs: '2.2',
+              note: 'A small business can keep it to 2 - 3 pages.',
+            },
+            {
+              id: 'd9',
+              title: 'Customer satisfaction survey questionnaire and results',
+              refs: '2.3',
+              note: 'A short online form is enough.',
+            },
+            {
+              id: 'd10',
+              title: 'Complaint handling procedure and complaint log',
+              refs: '2.4',
+              note: 'State the response deadline and how whistleblowers are protected.',
+            },
+            {
+              id: 'd11',
+              title: 'Workplace sexual harassment prevention regulation',
+              refs: '2.5',
+              note: 'Best included in the internal labor regulations.',
+            },
+            {
+              id: 'd12',
+              title: 'Commitment not to use wildlife and to protect biodiversity',
+              refs: '2.6, 3.13',
+              note: 'One document can cover both questions.',
+            },
+          ],
+        },
+        {
+          title: 'Group 2 - Environmental records',
+          items: [
+            {
+              id: 'd14',
+              title: 'Environmental permit or environmental registration certificate',
+              refs: '3.1',
+              note: 'Check the expiry date and renew 6 months in advance.',
+            },
+            {
+              id: 'd15',
+              title: 'Proof of payment of environmental protection tax and fees',
+              refs: '3.2',
+              note: 'Keep a full 3 years.',
+            },
+            {
+              id: 'd16',
+              title: 'Annual environmental protection report',
+              refs: '3.3',
+              note: 'Usually submitted before 15 January each year - keep the receipt.',
+            },
+            {
+              id: 'd17',
+              title: 'Contracts and waste transfer records with a licensed handler',
+              refs: '3.4, 3.5, 1.16',
+              note: "Check that the handler's license is still valid.",
+            },
+            {
+              id: 'd18',
+              title: 'Hazardous waste generator registration book',
+              refs: '3.5',
+              note: 'Mandatory if the business generates hazardous waste.',
+            },
+            {
+              id: 'd19',
+              title: 'Chemical inventory and chemical safety data sheets',
+              refs: '3.8',
+              note: 'Include safety instructions for people who handle them.',
+            },
+            {
+              id: 'd20',
+              title: 'Periodic wastewater and emissions monitoring results',
+              refs: '3.10, 1.21',
+              note: 'Follow the frequency stated in the environmental permit.',
+            },
+            {
+              id: 'd21',
+              title: 'Energy saving regulation',
+              refs: '3.12',
+              note: 'Include inspection records of how it is carried out.',
+            },
+          ],
+        },
+        {
+          title: 'Group 3 - Labor and safety records',
+          items: [
+            {
+              id: 'd23',
+              title: 'Set of labor contracts and employee list',
+              refs: '4.1, 4.2, 4.3',
+              note: 'Contain all mandatory content under Article 21 of the Labor Code 2019.',
+            },
+            {
+              id: 'd24',
+              title: 'Employee management book',
+              refs: '4.5',
+              note: 'Paper or electronic both work.',
+            },
+            {
+              id: 'd25',
+              title: 'Registered internal labor regulations',
+              refs: '4.7, 2.5',
+              note: 'Registration is mandatory for businesses with 10 or more employees.',
+            },
+            {
+              id: 'd26',
+              title: 'Posted salary scale and payroll',
+              refs: '4.10, 4.44',
+              note: 'Include the opinion of the employee representative organization (if any).',
+            },
+            {
+              id: 'd27',
+              title: 'Social insurance contribution result notice (form C12-TS)',
+              refs: '4.14, 1.12',
+              note: 'The strongest evidence of insurance contributions.',
+            },
+            {
+              id: 'd28',
+              title: 'Timesheets and overtime records',
+              refs: '4.21, 4.22, 4.23',
+              note: "Include the employee's written consent to overtime.",
+            },
+            {
+              id: 'd29',
+              title: 'Periodic health check records',
+              refs: '4.25',
+              note: 'At least once a year.',
+            },
+            {
+              id: 'd30',
+              title: 'Annual occupational safety and health plan',
+              refs: '4.29',
+              note: 'With a budget and assigned responsibilities.',
+            },
+            {
+              id: 'd31',
+              title: 'Occupational safety and health training records',
+              refs: '4.37',
+              note: 'Include safety cards or certificates.',
+            },
+            {
+              id: 'd32',
+              title: 'Workplace environment monitoring results',
+              refs: '4.38',
+              note: 'Every year.',
+            },
+            {
+              id: 'd33',
+              title: 'Annual training plan with a budget',
+              refs: '4.41, 1.13',
+              note: 'Include a summary table of training hours.',
+            },
+            {
+              id: 'd34',
+              title:
+                'Grassroots democracy regulation and minutes of dialogues and employee conferences',
+              refs: '4.48, 4.50, 4.51',
+              note: 'Include a photo of the posted regulation.',
+            },
+          ],
+        },
+        {
+          title: 'Group 4 - Customers and products',
+          items: [
+            {
+              id: 'd36',
+              title: 'Evidence for every "green" claim on labels and advertising',
+              refs: '4.58',
+              note: 'To avoid being seen as "greenwashing".',
+            },
+            {
+              id: 'd37',
+              title: 'Product quality control procedure',
+              refs: '4.59',
+              note: "Especially for children's products.",
+            },
+            {
+              id: 'd38',
+              title: 'Customer personal data protection policy',
+              refs: '4.60',
+              note: 'In line with Decree 13/2023/ND-CP.',
+            },
+          ],
+        },
+        {
+          title: 'Group 5 - Data logs to record every month',
+          items: [
+            {
+              id: 'd40',
+              title: 'Electricity and fuel consumption log',
+              refs: '1.18, 3.12',
+              note: 'The basis for showing energy saving results.',
+            },
+            {
+              id: 'd41',
+              title: 'Water consumption log',
+              refs: '1.19, 1.20',
+              note: 'Divide by output to get water use per product.',
+            },
+            {
+              id: 'd42',
+              title: 'Waste volume log by type',
+              refs: '1.16, 1.17',
+              note: 'Match it with the transfer records.',
+            },
+            {
+              id: 'd43',
+              title: 'Employee data table by gender and management level',
+              refs: '1.8, 1.9, 1.11',
+              note: 'Update at the end of each year.',
             },
           ],
         },
       ],
     },
     glossary: {
-      id: 'glossary',
-      header: [
-        'GLOSSARY AND LEGAL REFERENCES',
-        'For quick reference during self-assessment',
-        'This list of legal documents is for reference only. Enterprises should check the consolidated versions in force at the time of application and seek legal advice when needed.',
+      title: 'Glossary',
+      entries: [
+        {
+          term: 'Ready',
+          definition: 'The business has all (applicable) mandatory items in place in an area.',
+        },
+        {
+          term: 'Almost ready',
+          definition:
+            'The business has 80% or more of the mandatory items in an area, but not all of them. The 80% threshold can be adjusted on the Readiness results page.',
+        },
+        {
+          term: 'Not ready',
+          definition: 'The business has less than 80% of the mandatory items in an area.',
+        },
+        {
+          term: 'Mandatory',
+          definition:
+            'Items tied to Vietnamese legal requirements. They correspond to the core indicators (C - Core) in the CSI index.',
+        },
+        {
+          term: 'Advanced',
+          definition:
+            'Extra items the business does to reduce risk and gain an edge. They correspond to the advanced indicators (A - Advance) in the CSI index.',
+        },
+        {
+          term: 'Needs fixing',
+          definition:
+            'An answer showing a compliance problem that must be dealt with right away - for example, not paying insurance for 100% of the employees who are required to be covered.',
+        },
+        {
+          term: 'Worth a look',
+          definition:
+            'The business has the data, but the figure deserves a closer look - for example, there were workplace accidents, or the business is making a loss. It does not lower the readiness level.',
+        },
+        {
+          term: 'ESG',
+          definition:
+            'Environmental - Social - Governance: three groups of factors used to assess how sustainable a business is.',
+        },
+        {
+          term: 'CSI',
+          definition:
+            'The Corporate Sustainability Index issued by VCCI and VBCSD, used to assess and recognize sustainable businesses in Vietnam. This tool is built on CSI 2026.',
+        },
+        {
+          term: 'ROE, ROA, ROS',
+          definition:
+            "Three profitability ratios: profit after tax divided by owner's equity (ROE), by total assets (ROA), and by revenue (ROS). The business's accountant can quickly calculate them from the financial statements.",
+        },
+        {
+          term: 'Environmental permit, environmental registration',
+          definition:
+            'Two types of environmental procedures under the Law on Environmental Protection 2020. Which one the business needs depends on its business group by environmental criteria.',
+        },
+        {
+          term: 'Hazardous waste',
+          definition:
+            'Waste that can harm health and the environment: used oil, oily rags, fluorescent bulbs, batteries, chemicals, chemical containers... It must be stored separately and handed over to a licensed handler.',
+        },
+        {
+          term: 'EPR',
+          definition:
+            'Extended producer responsibility: producers and importers of certain products and packaging must recycle them or contribute financially to their recycling.',
+        },
+        {
+          term: 'Workplace environment monitoring',
+          definition:
+            'Measuring harmful factors at the workplace such as dust, noise, vibration, light, temperature and toxic gases.',
+        },
+        {
+          term: 'Internal labor regulations',
+          definition:
+            'The document setting out labor discipline at the business. Businesses with 10 or more employees must have written regulations and register them with the labor management authority.',
+        },
+        {
+          term: 'Grassroots democracy regulation',
+          definition:
+            'The document setting out what employees have the right to know, discuss, decide and check at the workplace.',
+        },
+        {
+          term: 'Collective labor agreement',
+          definition:
+            'A written agreement between the collective of employees and the business, with terms more favorable to employees than those required by law.',
+        },
+        {
+          term: 'Greenwashing',
+          definition:
+            'Making claims about the environmental benefits of a product or business without evidence, misleading customers.',
+        },
       ],
+    },
+    about: {
+      title: 'About this tool',
       sections: [
         {
-          id: 'glossary-s1',
-          title: 'A. GLOSSARY',
+          title: 'How the tool is built',
           blocks: [
             {
               kind: 'pairs',
               rows: [
                 {
-                  label: 'CSI',
-                  text: 'Corporate Sustainability Index - the sustainable enterprise index issued by VCCI/VBCSD, used as the scoring basis for the Programme for Assessing and Announcing Sustainable Enterprises in Vietnam.',
+                  label: 'Foundation',
+                  text: 'The CSI 2026 Corporate Sustainability Index, the version for small and micro enterprises, issued by the Vietnam Chamber of Commerce and Industry (VCCI) and the Vietnam Business Council for Sustainable Development (VBCSD). The index has 105 indicators: 86 core indicators and 19 advanced indicators.',
                 },
                 {
-                  label: 'VCCI',
-                  text: 'Vietnam Chamber of Commerce and Industry - the lead organisation of the CSI Programme.',
+                  label: 'Coverage',
+                  text: 'All 105 CSI indicators are in the tool, each as one question. The indicator code and the original CSI wording are in the two collapsed columns at the end of each question page - click the "+" sign above the column to open them.',
                 },
                 {
-                  label: 'VBCSD',
-                  text: 'Vietnam Business Council for Sustainable Development - the implementing organisation of the CSI Programme.',
+                  label: 'How it differs from the CSI index',
+                  text: 'CSI is a set of criteria for scoring and ranking businesses. This tool uses the same content for a different purpose: helping businesses self-assess their readiness and see their gaps. That is why the tool has no scoring scale, the questions are rewritten in everyday language, and quantitative indicators are turned into range choices.',
                 },
                 {
-                  label: 'ESG',
-                  text: "Environmental - Social - Governance: the three groups of Environmental, Social and Governance factors used to assess an enterprise's level of sustainability.",
-                },
-                {
-                  label: 'C (Core) indicator',
-                  text: "CSI's core indicators, tied to legal compliance. Enterprises need to complete all C indicators relevant to their specific characteristics.",
-                },
-                {
-                  label: 'A (Advance) indicator',
-                  text: "CSI's advanced indicators, tied to programmes and actions that reduce environmental - social risks and build a sustainable business ecosystem.",
-                },
-                {
-                  label: 'I (Indicator) indicators',
-                  text: 'Group of results indicators, requiring performance data for the 3 years of the assessment period.',
-                },
-                {
-                  label: 'G (Governance) indicators',
-                  text: 'Group of corporate governance indicators.',
-                },
-                {
-                  label: 'E (Environment) indicators',
-                  text: 'Group of environmental indicators.',
-                },
-                {
-                  label: 'L&S (Labor and Social) indicators',
-                  text: 'Group of labour and social indicators.',
-                },
-                {
-                  label: 'Material issues (materiality)',
-                  text: 'The economic, environmental, social and governance issues with the greatest impact on the enterprise and its stakeholders, identified through a materiality matrix.',
-                },
-                {
-                  label: 'Stakeholder',
-                  text: "Groups affected by or influencing the enterprise's operations: employees, customers, suppliers, communities, regulators, investors.",
-                },
-                {
-                  label: 'Greenhouse gas inventory',
-                  text: "Identifying and calculating the enterprise's greenhouse gas emissions using prescribed methods and emission factors.",
-                },
-                {
-                  label: 'Scope 1 emissions',
-                  text: 'Direct greenhouse gas emissions from sources owned or controlled by the enterprise, for example on-site fuel combustion.',
-                },
-                {
-                  label: 'Scope 2 emissions',
-                  text: 'Indirect emissions from electricity, heat and steam purchased and used by the enterprise.',
-                },
-                {
-                  label: 'Emission intensity',
-                  text: 'Total greenhouse gas emissions divided by a unit of output, usually revenue or production volume.',
-                },
-                {
-                  label: 'EPR',
-                  text: 'Extended Producer Responsibility - the extended responsibility of producers and importers for recycling products and packaging and for waste treatment.',
-                },
-                {
-                  label: 'Circular economy',
-                  text: 'An economic model in which materials are kept in use for as long as possible through durable design, repair, reuse and recycling, instead of extract - use - dispose.',
-                },
-                {
-                  label: 'Greenwashing',
-                  text: 'Making claims about the environmental benefits of a product, service or enterprise without verifiable evidence, misleading consumers.',
-                },
-                {
-                  label: 'DEI',
-                  text: 'Diversity, Equity and Inclusion - diversity, equity and inclusion in the workplace.',
-                },
-                {
-                  label: 'ISSB / IFRS S1, S2',
-                  text: 'The International Sustainability Standards Board and its two disclosure standards: S1 on general requirements for sustainability-related information, S2 on climate-related information.',
-                },
-                {
-                  label: 'TCFD',
-                  text: 'Task Force on Climate-related Financial Disclosures - a framework for climate-related financial disclosures.',
-                },
-                {
-                  label: 'SDGs',
-                  text: 'The 17 United Nations Sustainable Development Goals to 2030.',
-                },
-                {
-                  label: 'Business continuity plan (BCP)',
-                  text: "A plan to ensure the enterprise's operations are not interrupted in the event of natural disasters, epidemics, incidents or supply chain disruptions.",
-                },
-                {
-                  label: 'IFRS S1, S2',
-                  text: 'The two sustainability disclosure standards of the International Sustainability Standards Board (ISSB): S1 sets out general requirements for sustainability-related information, S2 sets out climate-related disclosures. CSI 2026 encourages enterprises in international supply chains to additionally prepare certain metrics under these two standards.',
-                },
-                {
-                  label: 'Grouping of enterprises by environmental criteria',
-                  text: 'The classification under Article 28 of the Law on Environmental Protection 2020 into 4 groups, based on scale, capacity and the level of risk of adverse environmental impact. The enterprise\'s group determines whether it needs an environmental permit or only an environmental registration. See details on the "CSI 2026 Introduction" page.',
-                },
-                {
-                  label: 'Key energy-using facility',
-                  text: 'A facility whose energy consumption reaches the threshold prescribed by the law on economical and efficient use of energy, and which must carry out periodic energy audits and report on its energy use.',
-                },
-                {
-                  label: 'Occupational environment monitoring',
-                  text: 'Measuring and analysing harmful factors in the workplace such as dust, noise, vibration, lighting, temperature and toxic gases.',
+                  label: 'This is not a CSI submission',
+                  text: "The tool's result is an internal self-assessment, not an application file and not an assessment result of the CSI Program. The official submission is made online at vbcsd.vn using the Organizing Committee's forms and deadlines.",
                 },
               ],
             },
           ],
         },
         {
-          id: 'glossary-s2',
-          title: 'B. COMMONLY REFERENCED LEGAL BASES',
+          title: 'How the readiness level is determined',
           blocks: [
             {
-              kind: 'table',
-              headers: ['Document', 'Relevant content', 'Related CSI indicators'],
+              kind: 'pairs',
               rows: [
-                [
-                  'Law on Environmental Protection 2020 (Law No. 72/2020/QH14)',
-                  'Environmental permits, environmental registration, grouping of enterprises by environmental criteria (Article 28), EPR, waste management',
-                  'E 1 - E 10, E 23, E 24',
-                ],
-                [
-                  'Decree 08/2022/ND-CP detailing a number of articles of the Law on Environmental Protection',
-                  'Guidance on environmental permits, waste management, recycling responsibility',
-                  'E 1, E 4, E 5, E 7',
-                ],
-                [
-                  'Decree 06/2022/ND-CP on greenhouse gas emission mitigation and ozone layer protection',
-                  'Greenhouse gas inventory, emission mitigation plan',
-                  'E 21, I 29, I 30',
-                ],
-                [
-                  'Decision of the Prime Minister promulgating the list of sectors and greenhouse gas emitting facilities required to conduct an inventory (Decision 13/2024/QD-TTg and updating documents)',
-                  'Determining whether the enterprise is subject to mandatory greenhouse gas inventory',
-                  'E 21',
-                ],
-                [
-                  'Law on Economical and Efficient Use of Energy 2010',
-                  'Key energy-using facilities, energy audits, energy use reporting',
-                  'E 17, E 18',
-                ],
-                [
-                  'Labour Code 2019 (Law No. 45/2019/QH14)',
-                  'Labour contracts, internal labour regulations, working hours, labour discipline, workplace dialogue',
-                  'L 1 - L 14, L 26 - L 29, L 53 - L 58',
-                ],
-                [
-                  'Decree 145/2020/ND-CP guiding the Labour Code',
-                  'Grassroots democracy regulations, employee conferences, female workers, working conditions',
-                  'L 53 - L 61',
-                ],
-                [
-                  'Law on Occupational Safety and Health 2015 (Law No. 84/2015/QH13)',
-                  'OSH plan, safety training, equipment inspection, occupational environment monitoring, occupational accident reporting',
-                  'L 30 - L 45, I 19',
-                ],
-                [
-                  'Law on Social Insurance 2024 (Law No. 41/2024/QH15, effective from 01/7/2025)',
-                  'Subjects and contribution rates of compulsory social insurance',
-                  'L 15, I 16',
-                ],
-                [
-                  'Law on Trade Unions and current guiding documents',
-                  'Establishing grassroots trade unions, trade union fees, collective bargaining, collective labour agreements',
-                  'L 47 - L 52',
-                ],
-                [
-                  'Decree 13/2023/ND-CP on personal data protection',
-                  'Collection, storage, processing and use of personal data of customers and employees',
-                  'S 3',
-                ],
-                [
-                  'Law on Consumer Rights Protection 2023',
-                  'Responsibility for product quality and safety, truthful information to consumers',
-                  'S 1, S 2',
-                ],
-                [
-                  'Decree 80/2021/ND-CP',
-                  'Criteria for determining micro, small and medium enterprises (Article 5) - the basis for choosing the appropriate CSI edition',
-                  'All',
-                ],
+                {
+                  label: 'For each area',
+                  text: 'Only applicable mandatory items are counted (questions marked "Not applicable" are skipped). READY when all are in place. ALMOST READY when 80% or more are in place. NOT READY when below 80%. The 80% threshold is proposed by Dear Our Community and can be adjusted on the Readiness results page.',
+                },
+                {
+                  label: 'For the whole business',
+                  text: 'Take the lowest level among the four areas. A business is only truly ready when every area is ready - one weak area is enough to create risk with customers, banks or regulators.',
+                },
+                {
+                  label: 'Advanced items',
+                  text: 'Counted and shown separately as added value, and do not affect the readiness level.',
+                },
+                {
+                  label: 'Why it relies on mandatory items',
+                  text: 'The CSI index requires businesses to complete all core indicators that fit their circumstances. This is the clearest and most objective standard for deciding whether a business is ready.',
+                },
               ],
             },
           ],
         },
-      ],
-    },
-    profile: {
-      title: 'COMPANY PROFILE',
-      subtitle:
-        'Section A - Part I: Company information | Part II: Organisational structure and key personnel',
-      note: 'Yellow cells are cells the enterprise needs to fill in. Data must cover all 3 years 2023 - 2025 of the assessment period.',
-      generalTitle: 'GENERAL INFORMATION',
-      generalFields: [
         {
-          id: 'general-1',
-          label: 'Full name of the enterprise (as per business registration)',
-        },
-        {
-          id: 'general-2',
-          label: 'Abbreviated name of the enterprise',
-        },
-        {
-          id: 'general-3',
-          label: 'Company website',
-        },
-        {
-          id: 'general-4',
-          label: 'Year of establishment',
-        },
-        {
-          id: 'general-5',
-          label: 'Tax code',
-        },
-        {
-          id: 'general-6',
-          label: 'Registered business address',
-        },
-        {
-          id: 'general-7',
-          label: 'Operating address',
-        },
-        {
-          id: 'general-8',
-          label: 'Phone number',
-        },
-        {
-          id: 'general-9',
-          label: 'Business email',
-        },
-        {
-          id: 'general-10',
-          label:
-            'Type of enterprise by main ownership capital (Non-state enterprise / FDI / Other type)',
-          options: [
+          title: 'Figure questions',
+          blocks: [
             {
-              value: 'o1',
-              label: 'Non-state enterprise',
-            },
-            {
-              value: 'o2',
-              label: 'FDI',
-            },
-            {
-              value: 'o3',
-              label: 'Other type',
+              kind: 'pairs',
+              rows: [
+                {
+                  label: 'Choose by range',
+                  text: 'For the 22 figure questions, the business picks a range instead of entering a number. Choosing "No data yet" counts as missing.',
+                },
+                {
+                  label: 'Needs fixing',
+                  text: 'Some ranges show a compliance problem: a compulsory insurance contribution rate below 100%, solid waste not fully handed over to a licensed handler, wastewater not fully treated to standard. These choices count as missing and are moved to the top of the priority list.',
+                },
+                {
+                  label: 'Worth a look',
+                  text: 'Some ranges show the business has the data but the figure deserves a closer look: operating at a loss, a negative profit margin, average income below VND 5 million, a male - female income gap above 20%, workplace accidents having occurred. These choices do not lower the readiness level.',
+                },
+                {
+                  label: 'Revenue ranges',
+                  text: 'The thresholds of VND 3, 10, 50 and 100 billion are chosen according to the enterprise classification criteria in Decree 80/2021/ND-CP.',
+                },
+              ],
             },
           ],
         },
         {
-          id: 'general-11',
-          label: 'Enterprise size under Article 5 of Decree 80/2021/ND-CP (Small / Micro)',
-          options: [
+          title: 'Authorship and scope of responsibility',
+          blocks: [
             {
-              value: 'o1',
-              label: 'Small',
-            },
-            {
-              value: 'o2',
-              label: 'Micro',
-            },
-          ],
-        },
-        {
-          id: 'general-12',
-          label:
-            'Classification by environmental criteria - Article 28 of the Law on Environmental Protection 2020 (Group 2 / Group 3 / Group 4)',
-          options: [
-            {
-              value: 'o1',
-              label: 'Group 2',
-            },
-            {
-              value: 'o2',
-              label: 'Group 3',
-            },
-            {
-              value: 'o3',
-              label: 'Group 4',
+              kind: 'pairs',
+              rows: [
+                {
+                  label: 'Authorship',
+                  text: 'Dear Our Community - ESG Knowledge Hub and ESG Practice Community.',
+                },
+                {
+                  label: 'Scope of responsibility',
+                  text: 'The tool supports businesses in self-assessment and planning and is not legal advice. Businesses should check against current legal documents and consult experts when needed.',
+                },
+                {
+                  label: 'Updates',
+                  text: 'The CSI index is updated by VCCI every year. The tool will be reviewed when a new CSI version is released.',
+                },
+              ],
             },
           ],
         },
-        {
-          id: 'general-13',
-          label:
-            'Field of activity (Specialising in manufacturing, processing / Specialising in construction, trade - services)',
-          options: [
-            {
-              value: 'o1',
-              label: 'Specialising in manufacturing, processing',
-            },
-            {
-              value: 'o2',
-              label: 'Specialising in construction, trade - services',
-            },
-          ],
-        },
-        {
-          id: 'general-14',
-          label: 'Main business lines currently in actual operation',
-        },
-        {
-          id: 'general-15',
-          label: 'Legal representative - full name, title, phone, email',
-        },
-        {
-          id: 'general-16',
-          label: 'CSI contact person - full name, title, phone, email, mailing address',
-        },
-      ],
-      infoBlocks: [
-        {
-          id: 'env-group',
-          title:
-            'Classification of enterprises by environmental criteria (Article 28 of the Law on Environmental Protection 2020)',
-          text: 'Group 1: Enterprises of large scale and capacity with a high risk of adverse environmental impact, and medium-scale enterprises with environmentally sensitive factors. Group 2: Enterprises of medium scale and capacity with a risk of adverse environmental impact, and small-scale enterprises with environmentally sensitive factors. Group 3: Enterprises of small scale and capacity with a risk of causing environmental pollution that must be managed and treated as prescribed. Group 4: Enterprises with no risk of adverse environmental impact.',
-        },
-        {
-          id: 'structure',
-          title:
-            'Part II - Organisational structure, model and key personnel: what does the Evaluation Council want to see?',
-          text: "Part II provides the CSI 2026 Programme's Evaluation Council with information on the organisational structure, operational arrangements and the assignment of duties to departments/divisions, especially the unit/personnel in charge of sustainable development, and the decision-making process of the entire enterprise within the scope of participation in the Programme. Enterprises are required to provide an organisational chart and documents assigning duties.",
-        },
-      ],
-      yearTables: [
-        {
-          id: 'economy',
-          title: 'ECONOMIC INFORMATION',
-          headers: ['Description', '2023', '2024', '2025', 'Notes / attached documents'],
-          rows: [
-            {
-              id: 'economy-1',
-              label: 'Registered business capital (million VND)',
-            },
-            {
-              id: 'economy-2',
-              label: 'Total capital invested in production - business (million VND)',
-            },
-            {
-              id: 'economy-3',
-              label: 'Financial statements (audited preferred) - specify the attached file name',
-            },
-          ],
-        },
-        {
-          id: 'materials',
-          title: 'INPUT MATERIAL CONSUMPTION (main materials)',
-          headers: ['Description', '2023', '2024', '2025', 'Notes / attached documents'],
-          rows: [
-            {
-              id: 'materials-1',
-              label: 'Material 1 - specify name and unit of measure',
-            },
-            {
-              id: 'materials-2',
-              label: 'Material 2',
-            },
-            {
-              id: 'materials-3',
-              label: 'Material 3',
-            },
-            {
-              id: 'materials-4',
-              label: 'Material 4',
-            },
-          ],
-        },
-        {
-          id: 'energy',
-          title: 'ANNUAL ENERGY CONSUMPTION',
-          headers: ['Description', '2023', '2024', '2025', 'Notes / attached documents'],
-          rows: [
-            {
-              id: 'energy-1',
-              label: 'Electricity (kWh)',
-            },
-            {
-              id: 'energy-2',
-              label: 'Oil (litres)',
-            },
-            {
-              id: 'energy-3',
-              label: 'Petrol (litres)',
-            },
-            {
-              id: 'energy-4',
-              label: 'Coal (tonnes)',
-            },
-            {
-              id: 'energy-5',
-              label: 'Biomass (MJ)',
-            },
-            {
-              id: 'energy-6',
-              label: 'Other energy - specify',
-            },
-          ],
-        },
-        {
-          id: 'water',
-          title: 'ANNUAL WATER CONSUMPTION',
-          headers: ['Description', '2023', '2024', '2025', 'Notes / attached documents'],
-          rows: [
-            {
-              id: 'water-1',
-              label: 'Surface water (m3)',
-            },
-            {
-              id: 'water-2',
-              label: 'Groundwater (m3)',
-            },
-            {
-              id: 'water-3',
-              label: 'Rainwater (m3)',
-            },
-            {
-              id: 'water-4',
-              label: 'Domestic water (m3)',
-            },
-            {
-              id: 'water-5',
-              label: 'Other water sources (m3)',
-            },
-          ],
-        },
-        {
-          id: 'waste',
-          title: 'WASTE AND EMISSIONS GENERATED',
-          headers: ['Description', '2023', '2024', '2025', 'Notes / attached documents'],
-          rows: [
-            {
-              id: 'waste-1',
-              label: 'Wastewater (m3)',
-            },
-            {
-              id: 'waste-2',
-              label: 'Domestic solid waste (tonnes)',
-            },
-            {
-              id: 'waste-3',
-              label: 'Ordinary industrial solid waste (tonnes)',
-            },
-            {
-              id: 'waste-4',
-              label: 'Hazardous industrial solid waste (tonnes)',
-            },
-            {
-              id: 'waste-5',
-              label: 'Product packaging (tonnes)',
-            },
-            {
-              id: 'waste-6',
-              label: 'Plastic waste (tonnes)',
-            },
-            {
-              id: 'waste-7',
-              label: 'Air-polluting emissions - specify type and unit (excluding greenhouse gases)',
-            },
-          ],
-        },
-        {
-          id: 'labor',
-          title: 'LABOUR INFORMATION',
-          headers: ['Description', '2023', '2024', '2025', 'Notes / attached documents'],
-          rows: [
-            {
-              id: 'labor-1',
-              label: 'Total number of official employees (persons)',
-            },
-            {
-              id: 'labor-2',
-              label: 'Number of female employees (persons)',
-            },
-            {
-              id: 'labor-3',
-              label: 'Number of employees who left, including retirement (persons)',
-            },
-            {
-              id: 'labor-4',
-              label: 'Number of newly recruited employees (persons)',
-            },
-            {
-              id: 'labor-5',
-              label: 'Number of minor employees, if any (persons)',
-            },
-            {
-              id: 'labor-6',
-              label: 'Number of employees with disabilities, if any (persons)',
-            },
-            {
-              id: 'labor-7',
-              label:
-                'Number of female managers at middle level, deputy head of department and above (persons)',
-            },
-            {
-              id: 'labor-8',
-              label:
-                'Number of female leaders on the board of directors, board of management (persons)',
-            },
-            {
-              id: 'labor-9',
-              label: 'Number of labour disputes occurring at the workplace (cases)',
-            },
-          ],
-        },
-      ],
-      standards: {
-        title:
-          'STANDARDS AND CERTIFICATIONS CURRENTLY APPLIED (valid as of the time of participation in the CSI Programme)',
-        rows: [
-          {
-            id: 'standard-1',
-            label: 'Quality standards',
-          },
-          {
-            id: 'standard-2',
-            label: 'Environmental standards',
-          },
-          {
-            id: 'standard-3',
-            label: 'Labour - social standards',
-          },
-        ],
-      },
-      violations: {
-        title:
-          'ADMINISTRATIVE VIOLATIONS DURING THE ASSESSMENT PERIOD (from 01/01/2023 to the time of submission)',
-        headers: [
-          'Content',
-          'Any violation? (Yes/No)',
-          'Fully remedied?',
-          'Certifying authority',
-          'Supporting documents',
-        ],
-        rows: [
-          {
-            id: 'violation-1',
-            label: 'Administrative violations on environmental protection',
-          },
-          {
-            id: 'violation-2',
-            label: 'Administrative violations in labour, social insurance, trade unions',
-          },
-          {
-            id: 'violation-3',
-            label: 'Administrative violations in taxes, fees',
-          },
-          {
-            id: 'violation-4',
-            label: 'Other administrative violations (please specify)',
-          },
-        ],
-      },
-      sectionA: {
-        title: 'SELF-ASSESSMENT OF SECTION A COMPLETENESS',
-        headers: ['Content', 'Maximum points', 'Fully completed? (Yes/No)', 'Self-assessed points'],
-        rows: [
-          {
-            id: 'part-1',
-            label: 'Part I - Company information',
-            maxScore: 14,
-          },
-          {
-            id: 'part-2',
-            label: 'Part II - Organisational structure, model and key personnel',
-            maxScore: 4,
-          },
-        ],
-      },
-    },
-    sections: [
-      {
-        id: 'I',
-        title: 'RESULTS INDICATORS FOR THE 3 YEARS 2023 - 2025 (I INDICATORS)',
-        subtitle:
-          'Part III of the CSI 2026 Indicator Set | 22 indicators (18 C indicators, 4 A indicators) | Published maximum: 178 points',
-        note: 'Enter the actual figures for each year, then select the level of data and evidence currently available.',
-        shortLabel: 'I indicators',
-        dashboardLabel: '3-year results indicators (I)',
-        publishedMax: 178,
-        headers: {
-          code: 'Indicator code',
-          level: 'Level',
-          text: 'Indicator',
-          unit: 'Unit',
-          y2023: '2023',
-          y2024: '2024',
-          y2025: '2025',
-          maxScore: 'Maximum points',
-          answer: 'Complete data for all 3 years available? (Yes/No)',
-          selfScore: 'Self-assessed points',
-          available: 'Applicable points',
-          priority: 'Priority',
-          hint: 'Suggested action',
-          evidence: 'Supporting evidence to prepare',
-          note: 'Notes / existing records',
-          owner: 'Owner',
-          deadline: 'Due date',
-          group: 'Group',
-        },
-        groups: [
-          {
-            id: 'i-g1',
-            title: 'ECONOMIC',
-            declaredMax: 87,
-            blocks: [
-              {
-                id: 'i-g1-b1',
-                title: '',
-                declaredMax: 0,
-                indicators: [
-                  {
-                    id: 'I 1',
-                    level: 'C',
-                    text: 'Total revenue',
-                    unit: 'Million VND',
-                    maxScore: 20,
-                    hint: 'Extract revenue figures for the 3 years 2023-2025 from the financial statements. If revenue declined, prepare an explanation of the causes and remedial measures.',
-                    evidence:
-                      'Financial statements for 3 years (audited preferred); corporate income tax finalisation returns.',
-                  },
-                  {
-                    id: 'I 3',
-                    level: 'C',
-                    text: 'Profit before tax',
-                    unit: 'Million VND',
-                    maxScore: 20,
-                    hint: 'Extract profit before tax for the 3 years. Ensure the figures match the financial statements and tax returns.',
-                    evidence:
-                      'Income statements for 3 years; corporate income tax finalisation returns.',
-                  },
-                  {
-                    id: 'I 4',
-                    level: 'C',
-                    text: 'Return on equity (ROE)',
-                    unit: '%',
-                    maxScore: 9,
-                    hint: "Calculate ROE = Profit after tax / Average owners' equity. Present the formula used so that the Evaluation Council can cross-check it.",
-                    evidence: 'ROE calculation sheet with formula; balance sheets for 3 years.',
-                  },
-                  {
-                    id: 'I 5',
-                    level: 'C',
-                    text: 'Return on assets (ROA)',
-                    unit: '%',
-                    maxScore: 9,
-                    hint: 'Calculate ROA = Profit after tax / Average total assets.',
-                    evidence: 'ROA calculation sheet with formula; balance sheets for 3 years.',
-                  },
-                  {
-                    id: 'I 6',
-                    level: 'C',
-                    text: 'Return on sales (ROS)',
-                    unit: '%',
-                    maxScore: 9,
-                    hint: 'Calculate ROS = Profit after tax / Net revenue.',
-                    evidence: 'ROS calculation sheet with formula; income statements for 3 years.',
-                  },
-                  {
-                    id: 'I 7',
-                    level: 'C',
-                    text: 'Total contributions to the State budget',
-                    unit: 'Million VND',
-                    maxScore: 14,
-                    hint: 'Aggregate all amounts paid to the State budget: corporate income tax, VAT, foreign contractor tax, fees, charges, land rent...',
-                    evidence:
-                      'Tax authority confirmation of tax obligations; State budget payment vouchers for 3 years.',
-                  },
-                  {
-                    id: 'I 8',
-                    level: 'A',
-                    text: 'Budget for community and social support through programmes/initiatives',
-                    unit: 'Million VND',
-                    maxScore: 6,
-                    hint: 'Compile the total budget spent on the community and society by year and by programme. State the number of beneficiaries clearly to make the case more convincing.',
-                    evidence:
-                      'List of community programmes with budgets; expenditure vouchers; thank-you letters/confirmations from recipient partners.',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 'i-g2',
-            title: 'SOCIAL',
-            declaredMax: 50,
-            blocks: [
-              {
-                id: 'i-g2-b1',
-                title: '',
-                declaredMax: 0,
-                indicators: [
-                  {
-                    id: 'I 12',
-                    level: 'C',
-                    text: 'Percentage of women in middle management (deputy head of department and above)',
-                    unit: '%',
-                    maxScore: 4,
-                    hint: 'Calculate the percentage of women holding management positions at deputy head of department level and above. If the percentage is low, state a clear improvement plan in the commitments section.',
-                    evidence:
-                      'Organisational chart; list of managers by gender; appointment decisions.',
-                  },
-                  {
-                    id: 'I 13',
-                    level: 'C',
-                    text: 'Percentage of women leaders on the Executive Board and Board of Directors',
-                    unit: '%',
-                    maxScore: 4,
-                    hint: "Calculate the percentage of women on the Executive Board/Board of Directors/Members' Council.",
-                    evidence:
-                      'Charter; list of Board of Directors / Executive Board members; appointment decisions.',
-                  },
-                  {
-                    id: 'I 14',
-                    level: 'C',
-                    text: 'Average monthly income of employees',
-                    unit: 'Million VND',
-                    maxScore: 13,
-                    hint: 'Calculate the average monthly income of all employees (including salary, allowances and bonuses). Compare it with the applicable regional minimum wage.',
-                    evidence:
-                      'Payrolls for 3 years; total payroll fund reports; personal income tax returns.',
-                  },
-                  {
-                    id: 'I 15',
-                    level: 'C',
-                    text: 'Average monthly income of employees by gender (male/female)',
-                    unit: 'Million VND',
-                    maxScore: 8,
-                    hint: 'Break down average income by gender (male/female). Large gaps need to be explained based on the job position structure.',
-                    evidence: 'Payroll analysed by gender; remuneration regulations.',
-                  },
-                  {
-                    id: 'I 16',
-                    level: 'C',
-                    text: 'Percentage of employees covered by all types of compulsory insurance out of total employees subject to compulsory contributions',
-                    unit: '%',
-                    maxScore: 13,
-                    hint: 'Calculate the percentage of employees for whom compulsory social insurance is paid out of the total employees subject to contributions. The target is 100%.',
-                    evidence:
-                      'Notice of social insurance contribution results (form C12-TS); confirmation of no social insurance arrears from the social insurance agency.',
-                  },
-                  {
-                    id: 'I 17',
-                    level: 'C',
-                    text: 'Annual training hours per employee among those requiring training (orientation and onboarding; compliance; soft skills; professional skills; other training)',
-                    unit: 'Hours/employee',
-                    maxScore: 6,
-                    hint: 'Compile the average training hours per employee across 5 groups: orientation and onboarding, compliance, soft skills, professional skills, other.',
-                    evidence:
-                      'Annual training plan; attendance lists and training certificates; training hours summary sheet.',
-                  },
-                  {
-                    id: 'I 19',
-                    level: 'C',
-                    text: 'Number of occupational accidents and incidents occurring during the reporting period (2023-2025)',
-                    unit: 'Cases',
-                    maxScore: 8,
-                    hint: 'Record the number of occupational accidents and incidents over the whole 2023-2025 period. If none occurred, state 0 clearly and attach periodic occupational safety and health reports as proof.',
-                    evidence:
-                      'Occupational accident log; accident investigation reports (if any); periodic occupational safety and health reports.',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 'i-g3',
-            title: 'ENVIRONMENT - CLIMATE CHANGE',
-            declaredMax: 41,
-            blocks: [
-              {
-                id: 'i-g3-b1',
-                title: '» Materials and solid waste management',
-                declaredMax: 17,
-                indicators: [
-                  {
-                    id: 'I 22',
-                    level: 'A',
-                    text: 'Activities and initiatives implemented to reduce plastic waste (number of activities; investment level; amount of plastic waste recycled or reused)',
-                    unit: 'Number/Million VND/Tonnes',
-                    maxScore: 3,
-                    hint: 'List each plastic reduction initiative (replacing packaging, eliminating single-use plastic bottles, packaging take-back...), together with the investment level and the volume of plastic recycled.',
-                    evidence:
-                      'Initiative implementation plans/minutes; photos; investment vouchers; volume tracking logs.',
-                  },
-                  {
-                    id: 'I 23',
-                    level: 'C',
-                    text: 'Amount of solid waste sorted, collected, stored, transported and treated (domestic; ordinary industrial; hazardous industrial)',
-                    unit: 'Tonnes',
-                    maxScore: 8,
-                    hint: 'Record the volume of solid waste sorted, collected and treated in 3 groups: domestic, ordinary industrial and hazardous industrial. Separate figures are needed for each group and each year, reconcilable with the waste handover documents.',
-                    evidence:
-                      'Waste handover documents; contracts with licensed treatment providers; waste generator register.',
-                  },
-                  {
-                    id: 'I 24',
-                    level: 'C',
-                    text: 'Direct costs related to solid waste management',
-                    unit: 'Million VND',
-                    maxScore: 6,
-                    hint: 'Aggregate the direct costs of solid waste management: collection and treatment fees, hiring of transport providers, depreciation of storage areas.',
-                    evidence: 'Waste treatment service contracts; invoices and payment vouchers.',
-                  },
-                ],
-              },
-              {
-                id: 'i-g3-b2',
-                title: '» Energy and fuel consumption',
-                declaredMax: 6,
-                indicators: [
-                  {
-                    id: 'I 27',
-                    level: 'A',
-                    text: 'Percentage of energy saved through the application of energy saving and efficiency measures',
-                    unit: '%',
-                    maxScore: 6,
-                    hint: 'Calculate the amount of energy saved through improvement measures, divided by total energy used. State clearly which measures produced those savings.',
-                    evidence:
-                      'Energy audit report; before-and-after consumption comparison table; electricity bills.',
-                  },
-                ],
-              },
-              {
-                id: 'i-g3-b3',
-                title: '» Water management and use',
-                declaredMax: 18,
-                indicators: [
-                  {
-                    id: 'I 31',
-                    level: 'C',
-                    text: 'Typical water consumption per unit of product/service',
-                    unit: 'm3/product',
-                    maxScore: 8,
-                    hint: 'Calculate water consumption per unit of product/service. Installing water meters by area will make the data more accurate.',
-                    evidence:
-                      'Water bills/water abstraction licence; meter logs; production output.',
-                  },
-                  {
-                    id: 'I 32',
-                    level: 'C',
-                    text: 'Percentage of water consumption saved through the application of measures to enhance water saving and efficiency',
-                    unit: '%',
-                    maxScore: 4,
-                    hint: 'Calculate the percentage of water saved through improvement measures out of total water used.',
-                    evidence:
-                      'Before-and-after water consumption comparison table; description of water saving measures.',
-                  },
-                  {
-                    id: 'I 33',
-                    level: 'C',
-                    text: 'Percentage of wastewater collected and treated to meet technical standards and regulations before discharge into the environment',
-                    unit: '%',
-                    maxScore: 4,
-                    hint: 'Calculate the percentage of wastewater collected and treated to meet technical regulations before discharge. The target is 100%.',
-                    evidence:
-                      'Periodic wastewater monitoring results; environmental permit; wastewater connection/treatment contract.',
-                  },
-                  {
-                    id: 'I 35',
-                    level: 'A',
-                    text: 'Activities and initiatives implemented to regenerate and restore water sources (number; investment level; amount of water regenerated)',
-                    unit: 'Number/Million VND/m3',
-                    maxScore: 2,
-                    hint: 'List initiatives to regenerate and restore water sources (upstream reforestation, rainwater harvesting, restoration of ponds and lakes...) together with the investment level and water volume.',
-                    evidence:
-                      'Implementation plans and minutes; photos; investment vouchers; confirmation from local authorities.',
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-        total: {
-          label: 'TOTAL',
-          maxScore: 184,
-        },
-      },
-      {
-        id: 'G',
-        title: 'CORPORATE GOVERNANCE INDICATORS (G INDICATORS)',
-        subtitle:
-          'Part IV of the CSI 2026 Indicator Set | 8 indicators (7 C indicators, 1 A indicator) | Published maximum: 70 points',
-        note: 'Select the implementation level for each indicator. Only select "Fully implemented, with records" when supporting documents actually exist.',
-        shortLabel: 'G indicators',
-        dashboardLabel: 'Governance indicators (G)',
-        publishedMax: 70,
-        headers: {
-          code: 'Indicator code',
-          level: 'Level',
-          text: 'Indicator',
-          maxScore: 'Maximum points',
-          answer: 'Implemented at the enterprise (Yes/No)',
-          selfScore: 'Self-assessed points',
-          available: 'Applicable points',
-          priority: 'Priority',
-          hint: 'Suggested action',
-          evidence: 'Supporting evidence to prepare',
-          note: 'Notes / existing records',
-          owner: 'Owner',
-          deadline: 'Due date',
-          group: 'Group',
-        },
-        groups: [
-          {
-            id: 'g-g1',
-            title: 'SUSTAINABLE DEVELOPMENT COMMITMENT',
-            declaredMax: 10,
-            blocks: [
-              {
-                id: 'g-g1-b1',
-                title: '',
-                declaredMax: 0,
-                indicators: [
-                  {
-                    id: 'G 1',
-                    level: 'C',
-                    text: "The enterprise's business plan includes environmental and social targets",
-                    maxScore: 10,
-                    hint: 'Include at least one environmental target and one social target with specific figures in the annual business plan, approved by leadership. For medium and large enterprises, also link them to the Sustainable Development Goals (SDGs) on which the enterprise has the clearest impact.',
-                    evidence:
-                      'Signed and approved annual business plan clearly showing E and S targets; minutes of the meeting adopting the plan.',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 'g-g2',
-            title: 'RISK MANAGEMENT',
-            declaredMax: 6,
-            blocks: [
-              {
-                id: 'g-g2-b1',
-                title: '',
-                declaredMax: 0,
-                indicators: [
-                  {
-                    id: 'G 5',
-                    level: 'C',
-                    text: 'Develop policies, procedures and an organisational structure for risk management in production/business activities',
-                    maxScore: 6,
-                    hint: 'Issue a risk management policy and procedure, clearly assigning who identifies, who assesses and who approves mitigation measures. Small enterprises can keep this to 2-3 pages.',
-                    evidence:
-                      'Risk management policy/regulations; responsibility assignment chart; minutes of periodic risk reviews.',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 'g-g3',
-            title: 'ENSURING CUSTOMER SATISFACTION',
-            declaredMax: 28,
-            blocks: [
-              {
-                id: 'g-g3-b1',
-                title: '',
-                declaredMax: 0,
-                indicators: [
-                  {
-                    id: 'G 12',
-                    level: 'C',
-                    text: 'Develop policies, procedures and information channels, and collect feedback, conduct surveys and evaluate customer satisfaction with products/services in order to make improvements',
-                    maxScore: 14,
-                    hint: 'Set up channels for collecting customer feedback (surveys, hotline, online forms) and conduct a satisfaction survey at least once a year, with a results report and improvement actions.',
-                    evidence:
-                      'Survey policy/procedure; questionnaire; survey results report; post-survey improvement minutes.',
-                  },
-                  {
-                    id: 'G 13',
-                    level: 'C',
-                    text: 'Implement a procedure for handling complaints, feedback and whistleblowing reports of misconduct from customers and stakeholders',
-                    maxScore: 14,
-                    hint: 'Issue a procedure for handling complaints and whistleblowing reports, specifying response deadlines and whistleblower protection mechanisms. Keep a log tracking each case.',
-                    evidence:
-                      'Complaint handling procedure; complaint log and handling results; evidence of publication of the intake channels.',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 'g-g4',
-            title: 'SPECIFIC POLICIES',
-            declaredMax: 12,
-            blocks: [
-              {
-                id: 'g-g4-b1',
-                title: '',
-                declaredMax: 0,
-                indicators: [
-                  {
-                    id: 'G 17',
-                    level: 'C',
-                    text: 'Develop and implement a policy/provisions on preventing sexual harassment in the workplace',
-                    maxScore: 6,
-                    hint: 'Issue a policy on preventing sexual harassment in the workplace and incorporate it into the labour regulations, together with a confidential complaint procedure and training for employees.',
-                    evidence:
-                      'Policy/provisions in the labour regulations; training materials and attendance lists; complaint intake procedure.',
-                  },
-                  {
-                    id: 'G 19',
-                    level: 'C',
-                    text: 'Develop and implement a policy/commitment/code of conduct on preventing the trade, consumption and use of wildlife and products derived from wildlife',
-                    maxScore: 6,
-                    hint: 'Issue a commitment not to trade, consume or use wildlife and wildlife products; apply it also to client entertainment and corporate gifts.',
-                    evidence:
-                      'Signed policy/commitment; evidence of internal dissemination; content integrated into the code of conduct.',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 'g-g5',
-            title: 'COMMUNICATIONS',
-            declaredMax: 8,
-            blocks: [
-              {
-                id: 'g-g5-b1',
-                title: '',
-                declaredMax: 0,
-                indicators: [
-                  {
-                    id: 'G 20',
-                    level: 'C',
-                    text: 'Establish forms of communication with partners and stakeholders, and forms/channels for receiving feedback from stakeholders',
-                    maxScore: 8,
-                    hint: 'Clearly define communication channels to partners and stakeholders (website, newsletter, fanpage, partner meetings) and two-way feedback channels.',
-                    evidence:
-                      'Communications plan; screenshots/links of the channels; feedback recording and handling log.',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 'g-g6',
-            title: 'RESEARCH & DEVELOPMENT - INNOVATION - APPLICATION OF SCIENCE AND TECHNOLOGY',
-            declaredMax: 6,
-            blocks: [
-              {
-                id: 'g-g6-b1',
-                title: '',
-                declaredMax: 0,
-                indicators: [
-                  {
-                    id: 'G 22',
-                    level: 'A',
-                    text: 'Carry out research and development, innovation and science and technology application activities (organising, training, investment...) to improve corporate governance processes, innovate products... contributing to the sustainable development of the enterprise',
-                    maxScore: 6,
-                    hint: 'This indicator concerns INTERNAL activities: process improvement and product improvement aimed at optimising governance processes, improving productivity and operational quality, protecting the environment and enhancing competitiveness. Record each activity together with its investment level. Do not confuse this with G 23 (externally oriented).',
-                    evidence:
-                      'R&D decisions/plans; investment vouchers; research results reports; illustrative photos.',
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-        total: {
-          label: 'TOTAL',
-          maxScore: 70,
-        },
-      },
-      {
-        id: 'E',
-        title: 'ENVIRONMENTAL INDICATORS (E INDICATORS)',
-        subtitle:
-          'Part V of the CSI 2026 Indicator Set | 14 indicators (13 C indicators, 1 A indicator) | Published maximum points: 138 points',
-        note: 'Most E indicators are legal compliance indicators. Address all C indicators first.',
-        shortLabel: 'E indicators',
-        dashboardLabel: 'Environmental indicators (E)',
-        publishedMax: 138,
-        headers: {
-          code: 'Indicator code',
-          level: 'Level',
-          text: 'Indicator',
-          maxScore: 'Maximum points',
-          answer: 'Implemented at the enterprise (Yes/No)',
-          selfScore: 'Self-assessed points',
-          available: 'Applicable points',
-          priority: 'Priority',
-          hint: 'Suggested action',
-          evidence: 'Supporting evidence to prepare',
-          note: 'Notes / existing records',
-          owner: 'Owner',
-          deadline: 'Due date',
-          group: 'Group',
-        },
-        groups: [
-          {
-            id: 'e-g1',
-            title: 'COMPLIANCE WITH ENVIRONMENTAL PROTECTION LAWS',
-            declaredMax: 112,
-            blocks: [
-              {
-                id: 'e-g1-b1',
-                title:
-                  '» Environmental permits; environmental taxes and fees, and environmental reporting',
-                declaredMax: 42,
-                indicators: [
-                  {
-                    id: 'E 1',
-                    level: 'C',
-                    text: 'Holds a valid environmental permit; environmental registration; and registration for surface water and groundwater extraction and use, as required by regulations',
-                    maxScore: 14,
-                    hint: 'Check which category the company falls into under Article 28 of the Law on Environmental Protection 2020 to determine whether an environmental permit or only an environmental registration is required. Review expiry dates and file for renewal 6 months in advance.',
-                    evidence:
-                      'Valid environmental permit/environmental registration certificate; surface water and groundwater extraction permits.',
-                  },
-                  {
-                    id: 'E 2',
-                    level: 'C',
-                    text: 'Pays in full and on time all environmental protection taxes and fees for wastewater; emissions; surface water and groundwater use; environmental protection deposits; and payments for natural ecosystem services',
-                    maxScore: 14,
-                    hint: 'Review the environmental financial obligations applicable to the company: environmental protection fees for wastewater and emissions; water extraction right fees; deposits.',
-                    evidence:
-                      'Payment receipts for environmental protection fees and taxes; fee declarations; confirmation from the tax authority.',
-                  },
-                  {
-                    id: 'E 3',
-                    level: 'C',
-                    text: 'Submits environmental protection reports, reports on surface water and groundwater extraction, chemical activities, and packaging and product recycling results fully and on time',
-                    maxScore: 14,
-                    hint: 'Set up reminders for the environmental protection report deadline (before 15 January each year) and for reports on water, chemicals and EPR.',
-                    evidence:
-                      'Submitted reports with receipts/acknowledgement stamps from the regulatory authority for all 3 years.',
-                  },
-                ],
-              },
-              {
-                id: 'e-g1-b2',
-                title:
-                  '» Waste management, pollution prevention and control, and environmental incident response',
-                declaredMax: 70,
-                indicators: [
-                  {
-                    id: 'E 4',
-                    level: 'C',
-                    text: 'Complies with regulations on the sorting, collection, transport, storage and treatment of ordinary industrial solid waste and domestic solid waste',
-                    maxScore: 14,
-                    hint: 'Set up an area for waste sorting at source, contract a licensed collection provider and keep all waste handover records.',
-                    evidence:
-                      'Collection and treatment contracts; waste handover records; photos of the storage area with signage.',
-                  },
-                  {
-                    id: 'E 5',
-                    level: 'C',
-                    text: 'Complies with regulations on the sorting, collection, transport, storage and treatment of hazardous solid waste',
-                    maxScore: 14,
-                    hint: 'Hazardous waste must be stored separately, with warning signs and a waste generator logbook, and handed over to a provider licensed to treat hazardous waste.',
-                    evidence:
-                      'Hazardous waste generator registration book; hazardous waste handover documents; contract with a licensed provider; photos of the storage facility.',
-                  },
-                  {
-                    id: 'E 6',
-                    level: 'C',
-                    text: 'Complies with environmental protection regulations on the export, import and transit of used goods, machinery, equipment, vehicles, raw materials and scrap',
-                    maxScore: 6,
-                    hint: 'If the company exports or imports used machinery, equipment, raw materials or scrap, review import conditions and customs records. If this does not apply, select "Not applicable".',
-                    evidence: 'Customs records; scrap import permits; inspection results.',
-                  },
-                  {
-                    id: 'E 7',
-                    level: 'C',
-                    text: 'Complies with regulations on product and packaging recycling responsibility (EPR) and waste treatment responsibility',
-                    maxScore: 6,
-                    hint: 'Check whether the company is subject to extended producer responsibility (EPR). If so, register a recycling plan or make a financial contribution to the Vietnam Environmental Protection Fund on time.',
-                    evidence:
-                      'Recycling plan registration; financial contribution receipts; recycling results report.',
-                  },
-                  {
-                    id: 'E 8',
-                    level: 'C',
-                    text: 'Uses chemicals, equipment and tools economically and safely',
-                    maxScore: 6,
-                    hint: 'Compile a list of chemicals in use, maintain safety data sheets (MSDS), store them in compliant storage and provide chemical safety training to those exposed.',
-                    evidence:
-                      'Chemical inventory; MSDS sheets; chemical incident prevention measures; training records.',
-                  },
-                  {
-                    id: 'E 9',
-                    level: 'C',
-                    text: 'Is fully equipped with equipment and tools for risk prevention and environmental incident response',
-                    maxScore: 12,
-                    hint: 'Provide and periodically inspect incident response equipment: absorbent materials, spill containment bunds, fire extinguishers, protective equipment.',
-                    evidence:
-                      'List of incident response equipment; periodic inspection reports; photos; environmental incident response plan.',
-                  },
-                  {
-                    id: 'E 10',
-                    level: 'C',
-                    text: 'Controls, monitors and supervises wastewater and emissions in accordance with current regulations',
-                    maxScore: 12,
-                    hint: 'Conduct periodic environmental monitoring at the frequency stated in the environmental permit, carried out by a licensed provider.',
-                    evidence:
-                      'Wastewater and emissions monitoring results for each period; contract with a qualified monitoring provider.',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 'e-g2',
-            title:
-              'ENVIRONMENTAL PROTECTION, CLIMATE CHANGE RESPONSE AND CIRCULAR ECONOMY ACTIVITIES',
-            declaredMax: 16,
-            blocks: [
-              {
-                id: 'e-g2-b1',
-                title: '» Use of recycled and renewable raw materials, fuels and energy',
-                declaredMax: 4,
-                indicators: [
-                  {
-                    id: 'E 12',
-                    level: 'A',
-                    text: 'Implements policies that encourage and support employees in using low-emission transport',
-                    maxScore: 4,
-                    hint: 'Issue a policy encouraging employees to travel by bus, bicycle or electric vehicle, or to carpool; the company may subsidise costs or provide shuttle transport.',
-                    evidence:
-                      'Support policy; list of employees benefiting from the policy; payment records.',
-                  },
-                ],
-              },
-              {
-                id: 'e-g2-b2',
-                title: '» Economical and efficient use of energy',
-                declaredMax: 6,
-                indicators: [
-                  {
-                    id: 'E 17',
-                    level: 'C',
-                    text: 'Issues and regularly implements energy-saving practice rules',
-                    maxScore: 6,
-                    hint: 'Issue energy-saving practice rules (switching off equipment when not in use, air-conditioning temperature settings, periodic maintenance) and check compliance.',
-                    evidence:
-                      'Issued energy-saving rules; inspection reports; monthly electricity consumption data.',
-                  },
-                ],
-              },
-              {
-                id: 'e-g2-b3',
-                title: '» Sustainable extraction and use of raw materials and natural resources',
-                declaredMax: 6,
-                indicators: [
-                  {
-                    id: 'E 24',
-                    level: 'C',
-                    text: 'Protects biodiversity and prevents and combats the trade, transport and use of wildlife',
-                    maxScore: 6,
-                    hint: 'Issue a commitment to protect biodiversity and not consume wildlife; communicate it to all employees and apply it to client hospitality activities.',
-                    evidence:
-                      'Issued commitment/policy; internal communication materials; conservation activities participated in.',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 'e-g3',
-            title: 'ENVIRONMENTAL MANAGEMENT, AWARENESS-RAISING AND COMMUNICATION FOR EMPLOYEES',
-            declaredMax: 10,
-            blocks: [
-              {
-                id: 'e-g3-b1',
-                title: '',
-                declaredMax: 0,
-                indicators: [
-                  {
-                    id: 'E 26',
-                    level: 'C',
-                    text: 'Organises training and tracks changes in awareness and behaviour after training, and communicates to raise employee awareness of environmental protection and climate change response',
-                    maxScore: 10,
-                    hint: 'Organise environmental and climate change training for employees at least once a year, with pre- and post-training awareness surveys to demonstrate effectiveness.',
-                    evidence:
-                      'Training materials; attendance list; pre- and post-training survey results; photos.',
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-        total: {
-          label: 'TOTAL',
-          maxScore: 138,
-        },
-      },
-      {
-        id: 'LS',
-        title: 'LABOUR AND SOCIAL INDICATORS (L AND S INDICATORS)',
-        subtitle:
-          'Part VI of the CSI 2026 Indicator Set | 61 indicators (48 C indicators, 13 A indicators) | Published maximum points: 141 points',
-        note: 'This is the part with the most indicators. It is best completed together with the HR department and trade union representatives.',
-        shortLabel: 'L&S indicators',
-        dashboardLabel: 'Labour and social indicators (L&S)',
-        publishedMax: 141,
-        headers: {
-          code: 'Indicator code',
-          level: 'Level',
-          text: 'Indicator',
-          maxScore: 'Maximum points',
-          answer: 'Implemented at the enterprise (Yes/No)',
-          selfScore: 'Self-assessed points',
-          available: 'Applicable points',
-          priority: 'Priority',
-          hint: 'Suggested action',
-          evidence: 'Supporting evidence to prepare',
-          note: 'Notes / existing records',
-          owner: 'Owner',
-          deadline: 'Due date',
-          group: 'Group',
-        },
-        groups: [
-          {
-            id: 'ls-g1',
-            title: 'HUMAN RESOURCES MANAGEMENT',
-            declaredMax: 23,
-            blocks: [
-              {
-                id: 'ls-g1-b1',
-                title: '',
-                declaredMax: 0,
-                indicators: [
-                  {
-                    id: 'L 1',
-                    level: 'C',
-                    text: 'Fully complies with regulations on concluding labour contracts: in writing for contracts of one (01) month or longer; using the correct contract type; with all contents required by regulations',
-                    maxScore: 4,
-                    hint: 'Review all labour contracts: they must contain all mandatory contents under Article 21 of the Labour Code 2019, be of the correct type, and be in writing for contracts of 1 month or longer.',
-                    evidence:
-                      'Set of template labour contracts; list of employees with contract types; representative signed contracts.',
-                  },
-                  {
-                    id: 'L 2',
-                    level: 'C',
-                    text: 'Complies with regulations on performing labour contracts, including temporarily transferring employees to work other than that in their contract in accordance with regulations, and assigning the workplace as agreed',
-                    maxScore: 2,
-                    hint: "Ensure employees are transferred to other work only in accordance with regulations (no more than 60 cumulative days per year, with 3 days' notice) and assigned to the agreed workplace.",
-                    evidence:
-                      'Transfer decisions; advance notices; labour contracts stating the workplace.',
-                  },
-                  {
-                    id: 'L 3',
-                    level: 'C',
-                    text: 'Complies with regulations on amending, supplementing and terminating labour contracts',
-                    maxScore: 4,
-                    hint: 'Review the process for amending, supplementing and terminating contracts: valid grounds, correct notice periods, full payment within 14 working days.',
-                    evidence:
-                      'Contract annexes; termination decisions; contract settlement records; severance allowance payment records.',
-                  },
-                  {
-                    id: 'L 4',
-                    level: 'A',
-                    text: 'Proactively develops and implements the signing of electronic labour contracts',
-                    maxScore: 1,
-                    hint: 'Introduce electronic signing of labour contracts, which have the same legal validity as written contracts. This is an advanced indicator that helps save time and storage.',
-                    evidence:
-                      'Signed electronic labour contracts; description of the digital signing platform in use.',
-                  },
-                  {
-                    id: 'L 5',
-                    level: 'C',
-                    text: 'Maintains a labour management register and fully records employee information in it from the time employees start work, as required by regulations',
-                    maxScore: 2,
-                    hint: 'Set up a labour management register (paper or electronic) and update it as soon as a new employee joins, with all information fields required by regulations.',
-                    evidence:
-                      'Updated labour management register; screenshots/exports from the software.',
-                  },
-                  {
-                    id: 'L 6',
-                    level: 'C',
-                    text: 'Reports changes in the workforce to the state labour authority as required by regulations',
-                    maxScore: 3,
-                    hint: 'Submit workforce change reports every 6 months to the local labour authority.',
-                    evidence: 'Submitted labour usage reports with receipts for all 3 years.',
-                  },
-                  {
-                    id: 'L 7',
-                    level: 'C',
-                    text: 'Develops and registers internal labour regulations with the state labour authority',
-                    maxScore: 2,
-                    hint: 'Companies with 10 or more employees must have written internal labour regulations and register them with the provincial labour authority.',
-                    evidence:
-                      'Internal labour regulations; registration confirmation of the regulations; evidence of posting at the workplace.',
-                  },
-                  {
-                    id: 'L 8',
-                    level: 'C',
-                    text: 'Ensures the principles, order and procedures for handling labour discipline',
-                    maxScore: 3,
-                    hint: 'Labour discipline must follow the correct procedure: grounds in the internal labour regulations, a meeting with the participation of the trade union and the employee, and written minutes.',
-                    evidence:
-                      'Disciplinary procedure; minutes of disciplinary meetings; disciplinary decisions (if any).',
-                  },
-                  {
-                    id: 'L 9',
-                    level: 'C',
-                    text: 'Enables employees to access employment opportunities and career advancement',
-                    maxScore: 2,
-                    hint: 'Publish internal job vacancies and promotion criteria so employees know their development opportunities.',
-                    evidence: 'Internal job postings; promotion rules; list of promoted employees.',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 'ls-g2',
-            title: 'WAGES, BONUSES AND MANDATORY INSURANCE',
-            declaredMax: 26,
-            blocks: [
-              {
-                id: 'ls-g2-b1',
-                title: '',
-                declaredMax: 0,
-                indicators: [
-                  {
-                    id: 'L 11',
-                    level: 'C',
-                    text: 'Develops and publicly discloses the wage scales, payrolls and labour norms at the workplace',
-                    maxScore: 6,
-                    hint: 'Develop wage scales, payrolls and labour norms, consult the trade union and post them publicly at the workplace.',
-                    evidence:
-                      'Wage scales and payrolls; minutes of trade union consultation; photos of posting.',
-                  },
-                  {
-                    id: 'L 12',
-                    level: 'A',
-                    text: 'Develops wage payment regulations for employees',
-                    maxScore: 4,
-                    hint: 'Issue wage payment regulations that clearly set out the wage structure, pay rise criteria and overtime pay calculation.',
-                    evidence:
-                      'Issued wage payment regulations; evidence of communication to employees.',
-                  },
-                  {
-                    id: 'L 13',
-                    level: 'C',
-                    text: "Pays employees' wages and overtime pay on time and in full, and provides them with wage statements",
-                    maxScore: 6,
-                    hint: 'Pay wages on the committed pay dates and send each employee a detailed statement of wages and overtime.',
-                    evidence: 'Payroll; bank transfer records; sample payslip sent to employees.',
-                  },
-                  {
-                    id: 'L 14',
-                    level: 'A',
-                    text: 'Develops and implements bonus regulations for employees',
-                    maxScore: 4,
-                    hint: 'Issue transparent bonus regulations that clearly state the basis and timing of bonus reviews.',
-                    evidence: 'Bonus regulations; bonus decisions; bonus payment records.',
-                  },
-                  {
-                    id: 'L 15',
-                    level: 'C',
-                    text: 'Pays social insurance, health insurance, unemployment insurance and occupational accident and disease insurance on time and for all employees subject to mandatory contributions',
-                    maxScore: 6,
-                    hint: 'Pay social insurance, health insurance, unemployment insurance and occupational accident and disease insurance in full and on time for 100% of employees subject to mandatory contributions. Check for any outstanding arrears.',
-                    evidence:
-                      'Social insurance contribution statement (C12-TS); confirmation of no social insurance arrears; payment records.',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 'ls-g3',
-            title: 'ALLOWANCES AND WELFARE BENEFITS',
-            declaredMax: 9,
-            blocks: [
-              {
-                id: 'ls-g3-b1',
-                title: '',
-                declaredMax: 0,
-                indicators: [
-                  {
-                    id: 'L 19',
-                    level: 'A',
-                    text: 'Provides shift meal and lunch allowances for employees',
-                    maxScore: 2,
-                    hint: 'Provide shift meal/lunch allowances or operate a canteen for employees.',
-                    evidence:
-                      'Shift meal allowance policy; payroll showing the allowance; meal supply contract.',
-                  },
-                  {
-                    id: 'L 20',
-                    level: 'A',
-                    text: "Implements policies supporting employees' childcare: daycare/raising young children/high academic achievement...",
-                    maxScore: 2,
-                    hint: "Issue policies supporting employees' childcare: daycare allowances, gifts on 1 June (Children's Day), rewards for children with academic achievements.",
-                    evidence:
-                      'Support policy; list of beneficiaries; payment records; photos of activities.',
-                  },
-                  {
-                    id: 'L 21',
-                    level: 'A',
-                    text: 'Organises cultural, artistic and sports activities, and excursions and trips for employees',
-                    maxScore: 2,
-                    hint: 'Organise annual cultural, sports and excursion activities to build employee engagement.',
-                    evidence: 'Activity plan; participant list; photos; payment records.',
-                  },
-                  {
-                    id: 'L 23',
-                    level: 'A',
-                    text: 'Provides a phone allowance',
-                    maxScore: 1,
-                    hint: 'Cover phone costs for positions that require frequent communication.',
-                    evidence: 'Support policy; payroll showing the phone allowance.',
-                  },
-                  {
-                    id: 'L 24',
-                    level: 'A',
-                    text: 'Provides support for birthdays, weddings, bereavement of relatives...',
-                    maxScore: 1,
-                    hint: "Maintain a practice of gifts and visits for employees' birthdays, weddings, and family celebrations and bereavements.",
-                    evidence: 'Welfare regulations; log of visits and gifts; payment records.',
-                  },
-                  {
-                    id: 'L 25',
-                    level: 'A',
-                    text: 'Provides allowances for employees in hardship due to accidents',
-                    maxScore: 1,
-                    hint: 'Have a fund or mechanism to support employees facing hardship due to accidents or serious illnesses.',
-                    evidence:
-                      'Hardship allowance regulations; list of those supported; payment records.',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 'ls-g4',
-            title: 'WORKING HOURS AND REST PERIODS',
-            declaredMax: 13,
-            blocks: [
-              {
-                id: 'ls-g4-b1',
-                title: '',
-                declaredMax: 0,
-                indicators: [
-                  {
-                    id: 'L 26',
-                    level: 'C',
-                    text: 'Applies normal working hours of no more than 08 hours per 01 day or no more than 48 hours per 01 week',
-                    maxScore: 5,
-                    hint: 'Check timesheets: normal working hours do not exceed 8 hours/day or 48 hours/week.',
-                    evidence: 'Timesheets; internal labour regulations specifying working hours.',
-                  },
-                  {
-                    id: 'L 27',
-                    level: 'C',
-                    text: 'Ensures weekly rest, breaks during working hours, rest between shifts and mid-shift breaks for employees',
-                    maxScore: 3,
-                    hint: 'Ensure weekly rest of at least 24 consecutive hours, a 30-minute mid-shift break (45 minutes for night shifts), and at least 12 hours of rest between shifts.',
-                    evidence:
-                      'Timesheets showing shifts; internal labour regulations; shift rosters.',
-                  },
-                  {
-                    id: 'L 28',
-                    level: 'C',
-                    text: 'Strictly complies with regulations on employing employees for overtime, night shifts, and work on rest days and public holidays',
-                    maxScore: 3,
-                    hint: 'Overtime must not exceed 40 hours/month and 200 hours/year (300 hours for permitted sectors), with written agreement and payment at the correct rate.',
-                    evidence:
-                      'Written overtime consents; overtime timesheets; payroll showing overtime pay.',
-                  },
-                  {
-                    id: 'L 29',
-                    level: 'C',
-                    text: 'Ensures employees can take personal leave or unpaid leave as required by regulations',
-                    maxScore: 2,
-                    hint: "Ensure paid personal leave (own marriage, child's marriage, bereavement) and unpaid leave as required by regulations.",
-                    evidence:
-                      'Internal labour regulations; leave requests and approvals; timesheets.',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 'ls-g5',
-            title: 'HEALTH, OCCUPATIONAL SAFETY AND HEALTH, AND FOOD SAFETY AND HYGIENE',
-            declaredMax: 30,
-            blocks: [
-              {
-                id: 'ls-g5-b1',
-                title: '',
-                declaredMax: 0,
-                indicators: [
-                  {
-                    id: 'L 30',
-                    level: 'C',
-                    text: 'Provide periodic health check-ups for employees as required by regulations',
-                    maxScore: 4,
-                    hint: 'Organise periodic health check-ups at least once a year (every 6 months for workers in arduous or hazardous jobs, workers with disabilities, minors and elderly workers).',
-                    evidence:
-                      'Contract with a healthcare facility; health check-up results; employee health management records.',
-                  },
-                  {
-                    id: 'L 31',
-                    level: 'C',
-                    text: 'Establish an in-house healthcare unit or engage a healthcare service provider as required by regulations',
-                    maxScore: 1,
-                    hint: 'Set up a healthcare unit or sign a contract with a qualified healthcare facility appropriate to the size of the workforce.',
-                    evidence:
-                      'Decision establishing the healthcare unit or healthcare service contract; certificates of healthcare staff.',
-                  },
-                  {
-                    id: 'L 32',
-                    level: 'C',
-                    text: 'Arrange first-aid and emergency response personnel at the workplace as required by regulations',
-                    maxScore: 1,
-                    hint: 'Assign and train first-aid and emergency response personnel; provide first-aid kits in the prescribed quantities for each work area.',
-                    evidence:
-                      'Decision assigning first-aid personnel; first-aid training certificates; first-aid kit inventory.',
-                  },
-                  {
-                    id: 'L 33',
-                    level: 'A',
-                    text: 'Control the quality and food safety and hygiene of the employee canteen',
-                    maxScore: 1,
-                    hint: 'If there is a collective canteen, ensure a food safety certificate is in place, retain food samples for 24 hours and provide health check-ups for kitchen staff.',
-                    evidence:
-                      'Certificate of eligibility for food safety; food sample log; food origin records.',
-                  },
-                  {
-                    id: 'L 34',
-                    level: 'C',
-                    text: 'Issue rules, procedures and plans to ensure occupational safety and health at the workplace',
-                    maxScore: 3,
-                    hint: 'Issue OSH (occupational safety and health) rules, procedures and an annual OSH plan with an allocated budget.',
-                    evidence:
-                      'Approved annual OSH plan; safety rules and procedures for each position.',
-                  },
-                  {
-                    id: 'L 35',
-                    level: 'C',
-                    text: 'Arrange a unit or personnel in charge of occupational safety and health who meet the qualification requirements under regulations',
-                    maxScore: 2,
-                    hint: 'Assign a unit or person in charge of OSH holding certificates appropriate to the size and risk level of the enterprise.',
-                    evidence:
-                      'Assignment decision; OSH training certificate of the person in charge.',
-                  },
-                  {
-                    id: 'L 36',
-                    level: 'C',
-                    text: 'Machinery and equipment in use that are subject to strict occupational safety requirements are inspected as required by regulations',
-                    maxScore: 3,
-                    hint: 'Compile a list of machinery and equipment subject to strict safety requirements (boilers, elevators, lifting equipment...) and have them inspected at the prescribed intervals.',
-                    evidence: 'Equipment list; valid inspection certificates; inspection stamps.',
-                  },
-                  {
-                    id: 'L 37',
-                    level: 'A',
-                    text: "Assess workplace risks related to employees' health",
-                    maxScore: 1,
-                    hint: 'Conduct a workplace health risk assessment at least once a year and for every position with dangerous or harmful factors.',
-                    evidence: 'Risk assessment report; control measures applied.',
-                  },
-                  {
-                    id: 'L 38',
-                    level: 'C',
-                    text: 'Issue an incident response and emergency response plan for the workplace',
-                    maxScore: 2,
-                    hint: 'Develop an emergency response plan (fire and explosion, chemical leaks, accidents) and conduct periodic drills.',
-                    evidence: 'Emergency response plan; drill records; evacuation maps.',
-                  },
-                  {
-                    id: 'L 39',
-                    level: 'C',
-                    text: 'Investigate and report occupational accidents at the workplace to the competent authorities',
-                    maxScore: 1,
-                    hint: 'When an occupational accident occurs, set up an investigation team, prepare a report and notify the competent authorities within the prescribed time limit.',
-                    evidence:
-                      'Accident investigation report; notification documents; records of benefits settled for the employees.',
-                  },
-                  {
-                    id: 'L 40',
-                    level: 'C',
-                    text: 'Provide sufficient personal protective equipment to employees',
-                    maxScore: 3,
-                    hint: 'Issue full personal protective equipment for each job position, with signed acknowledgement of receipt and checks on its use.',
-                    evidence:
-                      'PPE issuance list; acknowledgement-of-receipt log; photos of employees using PPE.',
-                  },
-                  {
-                    id: 'L 41',
-                    level: 'C',
-                    text: 'Record and classify workers performing arduous, hazardous or dangerous work and workers performing especially arduous, hazardous or dangerous work',
-                    maxScore: 2,
-                    hint: 'Compile a list of workers performing arduous, hazardous or dangerous work according to the list issued by the Ministry of Labour, Invalids and Social Affairs so that the correct benefits are applied.',
-                    evidence:
-                      'Worker classification list; comparison table against the list of arduous and hazardous occupations.',
-                  },
-                  {
-                    id: 'L 42',
-                    level: 'C',
-                    text: 'Provide occupational safety and health training for employees as required by regulations',
-                    maxScore: 3,
-                    hint: 'Provide OSH training for all 6 target groups at the correct intervals (every 2 years for group 3, annually for group 4).',
-                    evidence: 'Training plan; attendance lists; safety certificates/cards.',
-                  },
-                  {
-                    id: 'L 43',
-                    level: 'C',
-                    text: 'Conduct annual monitoring of the working environment',
-                    maxScore: 1,
-                    hint: 'Conduct working environment monitoring at least once a year for harmful factors (dust, noise, lighting, heat, toxic gases and vapours).',
-                    evidence:
-                      'Working environment monitoring results; contract with a qualified organisation; corrective measures.',
-                  },
-                  {
-                    id: 'L 44',
-                    level: 'C',
-                    text: 'Periodically report to the competent authorities on occupational accidents and occupational safety and health',
-                    maxScore: 2,
-                    hint: 'Submit periodic OSH reports and occupational accident reports before 10 January each year.',
-                    evidence: 'Submitted reports with receipts for all 3 years.',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 'ls-g6',
-            title: 'EDUCATION AND TRAINING',
-            declaredMax: 4,
-            blocks: [
-              {
-                id: 'ls-g6-b1',
-                title: '',
-                declaredMax: 0,
-                indicators: [
-                  {
-                    id: 'L 45',
-                    level: 'C',
-                    text: 'Train employees before transferring them to positions or fields of work involving arduous or hazardous work',
-                    maxScore: 1,
-                    hint: 'Retrain employees before transferring them to positions involving arduous or hazardous factors.',
-                    evidence: 'Transfer decision; training programme; training list and results.',
-                  },
-                  {
-                    id: 'L 46',
-                    level: 'C',
-                    text: "Develop an annual plan and allocate funding for training, capacity building and upgrading of employees' qualifications and vocational skills; company policies and regulations; and laws and legal policies",
-                    maxScore: 3,
-                    hint: 'Prepare an annual training plan with a dedicated budget line, including training on laws and legal policies and internal regulations.',
-                    evidence:
-                      'Approved annual training plan with budget estimate; implementation results report.',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 'ls-g7',
-            title: 'TRADE UNION, COLLECTIVE LABOUR AGREEMENTS',
-            declaredMax: 12,
-            blocks: [
-              {
-                id: 'ls-g7-b1',
-                title: '',
-                declaredMax: 0,
-                indicators: [
-                  {
-                    id: 'L 47',
-                    level: 'C',
-                    text: 'Establish a grassroots trade union in accordance with the proper process and procedures',
-                    maxScore: 2,
-                    hint: 'Coordinate with the higher-level trade union to establish a grassroots trade union. If the conditions are not yet met, record the contacts made and enable employees to join the higher-level trade union.',
-                    evidence:
-                      'Decision recognising the grassroots trade union; list of the executive committee; congress minutes.',
-                  },
-                  {
-                    id: 'L 48',
-                    level: 'C',
-                    text: "Enable trade union members and officers to carry out trade union activities effectively in line with the trade union's functions and duties",
-                    maxScore: 2,
-                    hint: 'Provide time, venues and funding for trade union activities; pay trade union dues as required by regulations.',
-                    evidence:
-                      'Coordination regulations with the trade union; payment vouchers for trade union dues; activity minutes.',
-                  },
-                  {
-                    id: 'L 49',
-                    level: 'C',
-                    text: 'Consult the executive committee of the grassroots trade union when developing wage scales, payrolls, labour norms and bonus regulations',
-                    maxScore: 2,
-                    hint: 'Consult the trade union executive committee in writing before issuing wage scales and payrolls, labour norms and bonus regulations.',
-                    evidence: "Consultation letter and the trade union's written reply.",
-                  },
-                  {
-                    id: 'L 50',
-                    level: 'C',
-                    text: 'Consult the executive committee of the grassroots trade union (where a trade union exists) when developing and issuing plans, rules and procedures to ensure occupational safety and health at the workplace',
-                    maxScore: 2,
-                    hint: 'Consult the trade union when issuing OSH plans, rules and procedures.',
-                    evidence:
-                      'Consultation letter; meeting minutes signed by the trade union representative.',
-                  },
-                  {
-                    id: 'L 51',
-                    level: 'C',
-                    text: 'Written request for negotiation by either party, the grassroots trade union or the employer, on the content of the collective bargaining request',
-                    maxScore: 2,
-                    hint: 'Conduct collective bargaining when either party makes a written request, and respond within the prescribed time limit.',
-                    evidence:
-                      'Written request for negotiation; minutes of the negotiation sessions.',
-                  },
-                  {
-                    id: 'L 52',
-                    level: 'C',
-                    text: 'The content of the collective labour agreement does not contravene the law and is more favourable to employees',
-                    maxScore: 2,
-                    hint: 'Sign a collective labour agreement containing at least one provision more favourable to employees than the law, and submit it to the labour management authority.',
-                    evidence:
-                      'Signed collective labour agreement; submission letter to the management authority; comparison table against legal requirements.',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 'ls-g8',
-            title:
-              'IMPLEMENTATION OF WORKPLACE DEMOCRACY REGULATIONS, INFORMATION EXCHANGE AND HANDLING, AND LABOUR DISPUTE RESOLUTION',
-            declaredMax: 7,
-            blocks: [
-              {
-                id: 'ls-g8-b1',
-                title: '',
-                declaredMax: 0,
-                indicators: [
-                  {
-                    id: 'L 53',
-                    level: 'C',
-                    text: 'Develop and publicly disclose workplace democracy regulations',
-                    maxScore: 2,
-                    hint: 'Issue and post the grassroots workplace democracy regulations at the workplace, clearly stating the matters employees are entitled to know, discuss, decide and inspect.',
-                    evidence:
-                      'Issued workplace democracy regulations; photos of the posting; minutes of employee consultation.',
-                  },
-                  {
-                    id: 'L 54',
-                    level: 'C',
-                    text: 'Develop and implement a mechanism for exchanging and handling information within the enterprise',
-                    maxScore: 2,
-                    hint: 'Set up two-way internal communication channels (suggestion box, internal groups, briefing meetings) and record how feedback is handled.',
-                    evidence:
-                      'Regulations on information exchange; log of feedback received and handling results.',
-                  },
-                  {
-                    id: 'L 55',
-                    level: 'C',
-                    text: 'Hold periodic or ad hoc dialogues at the workplace',
-                    maxScore: 1,
-                    hint: 'Hold workplace dialogues at least once a year as required by regulations, or whenever an issue arises.',
-                    evidence: 'Dialogue minutes; attendance list; feedback taken on board.',
-                  },
-                  {
-                    id: 'L 56',
-                    level: 'C',
-                    text: 'Hold an annual employee conference',
-                    maxScore: 1,
-                    hint: 'Hold an employee conference every year with the participation of representatives of the workforce.',
-                    evidence: 'Plan and minutes of the employee conference; conference resolution.',
-                  },
-                  {
-                    id: 'L 58',
-                    level: 'C',
-                    text: 'Resolve labour disputes in accordance with the procedures prescribed by law',
-                    maxScore: 1,
-                    hint: 'Resolve labour disputes following the correct sequence: negotiation, labour mediator, arbitration council or court.',
-                    evidence:
-                      'Case files; mediation minutes; resolution decisions. If none arose, select "Did not occur during the assessment period".',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 'ls-g9',
-            title:
-              'FEMALE WORKERS, SPECIAL CATEGORIES OF WORKERS, NON-DISCRIMINATION AND NO FORCED LABOUR',
-            declaredMax: 5,
-            blocks: [
-              {
-                id: 'ls-g9-b1',
-                title: '',
-                declaredMax: 0,
-                indicators: [
-                  {
-                    id: 'L 60',
-                    level: 'C',
-                    text: 'Ensure sufficient and suitable shower rooms and toilets at the workplace',
-                    maxScore: 1,
-                    hint: 'Check the number and condition of shower rooms and toilets, ensuring separate facilities for men and women and sufficient capacity for the number of workers.',
-                    evidence:
-                      'Floor plan; photos of sanitary facilities; working conditions inspection report.',
-                  },
-                  {
-                    id: 'L 62',
-                    level: 'C',
-                    text: 'Ensure compliance with the principles for employing minors',
-                    maxScore: 1,
-                    hint: 'If minors are employed, obtain the consent of their legal representative, do not assign prohibited work, and limit working hours. If minors are not employed, state this clearly.',
-                    evidence:
-                      'List of minor workers (if any); written consent of the legal representative; health check-up records.',
-                  },
-                  {
-                    id: 'L 63',
-                    level: 'C',
-                    text: 'No forced labour in any form',
-                    maxScore: 1,
-                    hint: 'Verify that identity documents are not retained, no deposits are required, overtime is not forced, and contract termination is permitted as required by regulations.',
-                    evidence:
-                      'No-forced-labour commitment in the labour rules; self-inspection results; minutes of dialogue with employees.',
-                  },
-                  {
-                    id: 'L 64',
-                    level: 'C',
-                    text: 'No discrimination in the management, employment and direction of workers',
-                    maxScore: 1,
-                    hint: 'Review regulations and practices on recruitment, pay and promotion to eliminate all discrimination based on gender, ethnicity, religion or marital status.',
-                    evidence:
-                      'Labour rules; recruitment procedure; log of discrimination complaints.',
-                  },
-                  {
-                    id: 'L 66',
-                    level: 'A',
-                    text: 'Ensure compliance with the principles for employing workers with disabilities',
-                    maxScore: 1,
-                    hint: 'If workers with disabilities are employed, ensure suitable working conditions, do not assign arduous or hazardous work, and consult them before deciding on related matters.',
-                    evidence:
-                      'List of workers with disabilities; records of suitable working conditions; consultation minutes.',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 'ls-g10',
-            title: 'RELATIONS WITH CUSTOMERS, THE COMMUNITY AND SOCIETY',
-            declaredMax: 12,
-            blocks: [
-              {
-                id: 'ls-g10-b1',
-                title: '',
-                declaredMax: 0,
-                indicators: [
-                  {
-                    id: 'S 1',
-                    level: 'C',
-                    text: 'Comply with requirements on marketing and labelling of products/services, and combat "greenwashing"',
-                    maxScore: 4,
-                    hint: 'Review all advertising content, labels and environmental claims. All "green", "eco" and "environmentally friendly" claims must be backed by verifiable evidence to avoid "greenwashing".',
-                    evidence:
-                      'Product label samples; advertising content; certificates/test results substantiating the claims.',
-                  },
-                  {
-                    id: 'S 2',
-                    level: 'C',
-                    text: 'Inspect and assess the quality of products/services to ensure consumer safety and health, especially for children',
-                    maxScore: 4,
-                    hint: 'Establish a quality and safety inspection procedure for products before placing them on the market, especially for products intended for children.',
-                    evidence:
-                      'Quality control procedure; test results/certificates of conformity; product recall records (if any).',
-                  },
-                  {
-                    id: 'S 3',
-                    level: 'C',
-                    text: "Uphold customers' right to information confidentiality in the collection, storage, processing and use of their information",
-                    maxScore: 3,
-                    hint: 'Issue a customer data privacy policy in line with Decree 13/2023/ND-CP on personal data protection; assign access rights and have a mechanism for handling data breaches.',
-                    evidence:
-                      'Data privacy policy; access authorisation procedure; personal data processing impact assessment records.',
-                  },
-                  {
-                    id: 'S 5',
-                    level: 'A',
-                    text: 'Enable students to intern and work at the enterprise',
-                    maxScore: 1,
-                    hint: 'Sign cooperation agreements with universities, colleges and vocational schools to host student interns, with assigned mentors.',
-                    evidence:
-                      'Cooperation agreements with training institutions; list of student interns; internship confirmation letters.',
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-        total: {
-          label: 'TOTAL',
-          maxScore: 141,
-        },
-      },
-    ],
-    dashboard: {
-      title: 'SCORECARD AND READINESS LEVEL',
-      subtitle: 'EDITION FOR SMALL AND MICRO ENTERPRISES',
-      note: 'All figures on this page are calculated automatically from the self-assessment pages. Do not enter data manually here.',
-      partsTitle: 'READINESS LEVEL BY PART OF THE CSI 2026 INDEX',
-      partsHeaders: [
-        'Part of the CSI 2026 Index',
-        'Maximum points published by CSI',
-        'Total points of component indicators',
-        'Applicable points (after excluding non-applicable indicators)',
-        'Self-assessed points',
-        'Readiness rate',
-        'Converted points on CSI scale',
-      ],
-      partARows: [
-        'Part I - Company information',
-        'Part II - Organisational structure, model and key personnel',
-      ],
-      totalLabel: 'TOTAL',
-      partsNote:
-        'Bonus points for each part are determined by the CSI Programme\'s Evaluation Council and are not included in this self-assessment table. "Converted points on CSI scale" are estimated points based on the readiness rate, used only for tracking internal progress.',
-      complianceTitle: 'COMPLIANCE STATUS - CORE INDICATORS (C)',
-      complianceHeaders: ['Tracked metric', 'Count'],
-      complianceRows: [
-        'Total number of C indicators (core, tied to legal compliance)',
-        'Number of C indicators achieved',
-        'Number of C indicators REQUIRING IMMEDIATE ACTION (HIGH priority)',
-        'Number of C indicators marked as not applicable',
-        'Total number of A indicators (advanced)',
-        'Number of A indicators achieved',
-        'Number of indicators NOT YET ASSESSED',
-      ],
-      groupsTitle: 'READINESS LEVEL BY INDICATOR GROUP',
-      groupsHeaders: [
-        'Indicator group',
-        'Part',
-        'Applicable points',
-        'Self-assessed points',
-        'Readiness rate',
-      ],
-    },
-    plan: {
-      title: 'ACTION PLAN BY PRIORITY',
-      notes: [
-        'Use the filter in the header row: filter the "Priority" column = HIGH - Compliance to address first',
-        'The columns from "Current answer" to "Due date" are pulled automatically from the self-assessment pages. Only enter data manually in the last two columns.',
-      ],
-      headers: [
-        'Indicator code',
-        'Level',
-        'Part',
-        'Indicator group',
-        'Indicator content',
-        'Maximum points',
-        'Current status',
-        'Priority',
-        'Missing points',
-        'Actions required',
-        'Owner',
-        'Due date',
-        'Task status',
-        'Progress notes',
       ],
     },
   },

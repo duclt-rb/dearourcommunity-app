@@ -7,90 +7,68 @@ import {
   withMethods,
   withState,
 } from '@ngrx/signals';
+import { computeReadiness } from './csi.logic';
 import { getCsiToolkit } from './csi.data';
-import {
-  CsiAnswer,
-  CsiIndicator,
-  CsiLevel,
-  CsiPriority,
-  CsiSectionId,
-  CsiToolkitConfig,
-  priorityFor,
-} from './csi.types';
-import { TOOLKIT_PERSIST_VERSION } from '../shared/persist-migration';
+import { CsiToolkitConfig } from './csi.types';
 
 const STORAGE_PREFIX = 'doc:csi-toolkit:';
+/**
+ * v3 = thiết kế "mức độ sẵn sàng" (CR-023). Payload cũ (v2: chấm điểm 545/551, khoá theo mã chỉ số)
+ * khác hẳn về cấu trúc nên KHÔNG migrate — bị bỏ qua và ghi đè ở lần lưu đầu tiên.
+ */
+const PERSIST_VERSION = 3;
 /** Fallback config used before the component calls `init()`. */
 const DEFAULT_CONFIG = getCsiToolkit('csi-2026-sme') as CsiToolkitConfig;
 
-/** Ô nhập của bảng số liệu 3 năm (hồ sơ DN + chỉ số I). */
-export interface YearRow {
-  y2023: string;
-  y2024: string;
-  y2025: string;
-  note: string;
-}
-export interface ViolationRow {
-  violated: string;
-  fixed: string;
-  agency: string;
-  evidence: string;
-}
-/** Cột nhập tay theo từng chỉ số (sheet 4–7). */
-export interface IndicatorMeta {
-  note: string;
-  owner: string;
-  deadline: string;
-}
-/** Hai cột nhập tay cuối của sheet Kế hoạch hành động. */
-export interface PlanRow {
+/** Ba cột nhập tay của danh mục hồ sơ. */
+export interface DocRow {
+  /** 'yes' | 'no' | 'na'. */
   status: string;
+  where: string;
+  owner: string;
+}
+/** Ba cột nhập tay của trang Khoảng cách cần lấp. */
+export interface PlanRow {
+  owner: string;
+  due: string;
+  /** 'todo' | 'doing' | 'done'. */
   progress: string;
 }
-const EMPTY_YEAR: YearRow = { y2023: '', y2024: '', y2025: '', note: '' };
-const EMPTY_VIOLATION: ViolationRow = { violated: '', fixed: '', agency: '', evidence: '' };
-const EMPTY_META: IndicatorMeta = { note: '', owner: '', deadline: '' };
-const EMPTY_PLAN: PlanRow = { status: '', progress: '' };
+const EMPTY_DOC: DocRow = { status: '', where: '', owner: '' };
+const EMPTY_PLAN: PlanRow = { owner: '', due: '', progress: '' };
 
 interface CsiState {
   /** Active toolkit config (set via init); not persisted. */
   config: CsiToolkitConfig;
   /** localStorage key for the active toolkit; null until init. Not persisted. */
   storageKey: string | null;
-  // ── Hồ sơ doanh nghiệp ──
-  general: Record<string, string>;
-  profileYears: Record<string, YearRow>;
-  standards: Record<string, string>;
-  violations: Record<string, ViolationRow>;
-  /** Tự đánh giá Mục A: rowId → 'yes' | 'no'. */
-  sectionA: Record<string, string>;
-  // ── Chỉ số I / G / E / L&S (khoá = mã chỉ số) ──
-  answers: Record<string, CsiAnswer>;
-  indicatorYears: Record<string, YearRow>;
-  meta: Record<string, IndicatorMeta>;
-  // ── Kế hoạch hành động ──
+  /** Thông tin doanh nghiệp: field id → giá trị (lựa chọn lưu theo chỉ số option). */
+  profile: Record<string, string>;
+  /** STT câu hỏi → 'yes' | 'no' | 'na' (câu có/không) hoặc chỉ số lựa chọn (câu khoảng). */
+  answers: Record<string, string>;
+  /** STT câu hỏi → ghi chú của doanh nghiệp. */
+  notes: Record<string, string>;
+  docs: Record<string, DocRow>;
   plan: Record<string, PlanRow>;
+  /** Ngưỡng "Gần sẵn sàng" 0–1. */
+  threshold: number;
   currentStep: number;
 }
 
 const initialState: CsiState = {
   config: DEFAULT_CONFIG,
   storageKey: null,
-  general: {},
-  profileYears: {},
-  standards: {},
-  violations: {},
-  sectionA: {},
+  profile: {},
   answers: {},
-  indicatorYears: {},
-  meta: {},
+  notes: {},
+  docs: {},
   plan: {},
+  threshold: DEFAULT_CONFIG.results.thresholdDefault,
   currentStep: 0,
 };
 
 /** Persisted slice of the toolkit, keyed per toolkit id in localStorage. */
 interface PersistedCsi extends Partial<Omit<CsiState, 'config' | 'storageKey'>> {
-  /** Toolkit mới ra đời sau i18n → khởi đầu ở V2, không có dữ liệu V1 cần migrate. */
   version?: number;
 }
 
@@ -98,7 +76,8 @@ function loadPersisted(config: CsiToolkitConfig): PersistedCsi | null {
   if (typeof localStorage === 'undefined') return null;
   try {
     const raw = localStorage.getItem(STORAGE_PREFIX + config.id);
-    return raw ? (JSON.parse(raw) as PersistedCsi) : null;
+    const saved = raw ? (JSON.parse(raw) as PersistedCsi) : null;
+    return saved && saved.version === PERSIST_VERSION ? saved : null;
   } catch {
     return null;
   }
@@ -106,246 +85,74 @@ function loadPersisted(config: CsiToolkitConfig): PersistedCsi | null {
 function savePersisted(key: string, state: PersistedCsi): void {
   if (typeof localStorage === 'undefined') return;
   try {
-    localStorage.setItem(key, JSON.stringify({ ...state, version: TOOLKIT_PERSIST_VERSION }));
+    localStorage.setItem(key, JSON.stringify({ ...state, version: PERSIST_VERSION }));
   } catch {
     // ignore
   }
 }
 
-/** Một dòng tổng hợp điểm: điểm khả dụng loại chỉ số N/A khỏi cả tử số và mẫu số. */
-export interface ScoreTotals {
-  /** Tổng điểm các chỉ số thành phần. */
-  component: number;
-  /** Điểm khả dụng (sau khi loại chỉ số không áp dụng). */
-  available: number;
-  /** Điểm tự đánh giá. */
-  self: number;
-  /** Tỷ lệ sẵn sàng 0–1. */
-  rate: number;
-}
-
-export interface GroupResult extends ScoreTotals {
-  id: string;
-  title: string;
-  sectionId: CsiSectionId;
-  shortLabel: string;
-}
-
-export interface PartResult extends ScoreTotals {
-  id: string;
-  label: string;
-  /** Điểm tối đa CSI công bố. */
-  published: number;
-  /** Điểm quy đổi thang CSI = tỷ lệ sẵn sàng × điểm công bố. */
-  converted: number;
-}
-
-export interface PlanItem {
-  indicator: CsiIndicator;
-  sectionId: CsiSectionId;
-  shortLabel: string;
-  groupTitle: string;
-  answer: CsiAnswer | '';
-  priority: CsiPriority;
-  /** Điểm còn thiếu = điểm khả dụng − điểm tự đánh giá. */
-  missing: number;
-}
-
-function scoreOf(indicator: CsiIndicator, answer: CsiAnswer | undefined) {
-  if (answer === 'na') return { available: 0, self: 0 };
-  return { available: indicator.maxScore, self: answer === 'yes' ? indicator.maxScore : 0 };
-}
-
-function totals(component: number, available: number, self: number): ScoreTotals {
-  return { component, available, self, rate: available > 0 ? self / available : 0 };
-}
-
 export const CsiStore = signalStore(
-  withState(initialState),
+  withState<CsiState>(initialState),
 
-  withComputed((store) => ({
-    groupResults: computed<GroupResult[]>(() => {
-      const answers = store.answers();
-      return store.config().sections.flatMap((section) =>
-        section.groups.map((group) => {
-          let component = 0,
-            available = 0,
-            self = 0;
-          for (const block of group.blocks) {
-            for (const ind of block.indicators) {
-              const s = scoreOf(ind, answers[ind.id]);
-              component += ind.maxScore;
-              available += s.available;
-              self += s.self;
-            }
-          }
-          return {
-            id: group.id,
-            title: group.title,
-            sectionId: section.id,
-            shortLabel: section.shortLabel,
-            ...totals(component, available, self),
-          };
-        }),
-      );
-    }),
-
-    planItems: computed<PlanItem[]>(() => {
-      const answers = store.answers();
-      return store.config().sections.flatMap((section) =>
-        section.groups.flatMap((group) =>
-          group.blocks.flatMap((block) =>
-            block.indicators.map((indicator) => {
-              const answer = answers[indicator.id] ?? '';
-              const s = scoreOf(indicator, answers[indicator.id]);
-              return {
-                indicator,
-                sectionId: section.id,
-                shortLabel: section.shortLabel,
-                groupTitle: group.title,
-                answer,
-                priority: priorityFor(indicator.level, answer),
-                missing: s.available - s.self,
-              };
-            }),
-          ),
-        ),
-      );
-    }),
-  })),
-
-  withComputed((store) => ({
-    /** Dòng Phần I–II (Mục A) + 4 phần chỉ số, theo thứ tự Bảng điểm tổng hợp. */
-    partResults: computed<PartResult[]>(() => {
-      const config = store.config();
-      const sectionA = store.sectionA();
-      const partA = config.profile.sectionA.rows.map((row, i) => {
-        const self = sectionA[row.id] === 'yes' ? row.maxScore : 0;
-        const t = totals(row.maxScore, row.maxScore, self);
-        return {
-          id: row.id,
-          label: config.dashboard.partARows[i],
-          published: row.maxScore,
-          ...t,
-          converted: t.rate * row.maxScore,
-        };
-      });
-      const groups = store.groupResults();
-      const sections = config.sections.map((section) => {
-        const own = groups.filter((g) => g.sectionId === section.id);
-        const t = totals(
-          own.reduce((a, g) => a + g.component, 0),
-          own.reduce((a, g) => a + g.available, 0),
-          own.reduce((a, g) => a + g.self, 0),
-        );
-        return {
-          id: section.id,
-          label: section.dashboardLabel,
-          published: section.publishedMax,
-          ...t,
-          converted: t.rate * section.publishedMax,
-        };
-      });
-      return [...partA, ...sections];
-    }),
-
-    /** Tình trạng tuân thủ — 7 chỉ tiêu theo đúng thứ tự file. */
-    compliance: computed<number[]>(() => {
-      const items = store.planItems();
-      const count = (level: CsiLevel, fn: (p: PlanItem) => boolean) =>
-        items.filter((p) => p.indicator.level === level && fn(p)).length;
-      return [
-        count('C', () => true),
-        count('C', (p) => p.answer === 'yes'),
-        count('C', (p) => p.priority === 'high'),
-        count('C', (p) => p.answer === 'na'),
-        count('A', () => true),
-        count('A', (p) => p.answer === 'yes'),
-        items.filter((p) => p.answer === '').length,
-      ];
-    }),
-  })),
-
-  withComputed((store) => ({
-    grandTotal: computed<PartResult>(() => {
-      const parts = store.partResults();
-      const sum = (fn: (p: PartResult) => number) => parts.reduce((a, p) => a + fn(p), 0);
-      return {
-        id: 'total',
-        label: store.config().dashboard.totalLabel,
-        published: sum((p) => p.published),
-        ...totals(
-          sum((p) => p.component),
-          sum((p) => p.available),
-          sum((p) => p.self),
-        ),
-        converted: sum((p) => p.converted),
-      };
-    }),
-  })),
+  withComputed((store) => {
+    const readiness = computed(() =>
+      computeReadiness(store.config(), store.answers(), store.threshold()),
+    );
+    return {
+      readiness,
+      /** Số câu đã trả lời / tổng số câu. */
+      answeredCount: computed(() => {
+        const r = readiness();
+        return r.gaps.length - r.unanswered;
+      }),
+      totalQuestions: computed(() => readiness().gaps.length),
+      /** Hồ sơ: số "Có" / (tổng − "Không áp dụng"). */
+      docsSummary: computed(() => {
+        const docs = store.docs();
+        const ids = store.config().documents.groups.flatMap((g) => g.items.map((i) => i.id));
+        const na = ids.filter((id) => docs[id]?.status === 'na').length;
+        const yes = ids.filter((id) => docs[id]?.status === 'yes').length;
+        return { yes, total: ids.length - na };
+      }),
+    };
+  }),
 
   withMethods((store) => ({
-    // ── Hồ sơ doanh nghiệp ──
-    setGeneral(id: string, value: string) {
-      patchState(store, (s) => ({ general: { ...s.general, [id]: value } }));
-    },
-    setProfileYear(id: string, field: keyof YearRow, value: string) {
-      patchState(store, (s) => ({
-        profileYears: {
-          ...s.profileYears,
-          [id]: { ...(s.profileYears[id] ?? EMPTY_YEAR), [field]: value },
-        },
-      }));
-    },
-    setStandard(id: string, value: string) {
-      patchState(store, (s) => ({ standards: { ...s.standards, [id]: value } }));
-    },
-    setViolation(id: string, field: keyof ViolationRow, value: string) {
-      patchState(store, (s) => ({
-        violations: {
-          ...s.violations,
-          [id]: { ...(s.violations[id] ?? EMPTY_VIOLATION), [field]: value },
-        },
-      }));
-    },
-    setSectionA(id: string, value: string) {
-      patchState(store, (s) => ({ sectionA: { ...s.sectionA, [id]: value } }));
+    // ── Thông tin doanh nghiệp ──
+    setProfile(id: string, value: string) {
+      patchState(store, (s) => ({ profile: { ...s.profile, [id]: value } }));
     },
 
-    // ── Chỉ số ──
-    setAnswer(id: string, value: string) {
-      patchState(store, (s) => ({ answers: { ...s.answers, [id]: value as CsiAnswer } }));
+    // ── Câu hỏi ──
+    setAnswer(num: string, value: string) {
+      patchState(store, (s) => ({ answers: { ...s.answers, [num]: value } }));
     },
-    setIndicatorYear(id: string, field: keyof YearRow, value: string) {
+    setNote(num: string, value: string) {
+      patchState(store, (s) => ({ notes: { ...s.notes, [num]: value } }));
+    },
+
+    // ── Hồ sơ cần có / Khoảng cách cần lấp ──
+    setDoc(id: string, field: keyof DocRow, value: string) {
       patchState(store, (s) => ({
-        indicatorYears: {
-          ...s.indicatorYears,
-          [id]: { ...(s.indicatorYears[id] ?? EMPTY_YEAR), [field]: value },
-        },
+        docs: { ...s.docs, [id]: { ...(s.docs[id] ?? EMPTY_DOC), [field]: value } },
       }));
     },
-    setMeta(id: string, field: keyof IndicatorMeta, value: string) {
+    setPlan(num: string, field: keyof PlanRow, value: string) {
       patchState(store, (s) => ({
-        meta: { ...s.meta, [id]: { ...(s.meta[id] ?? EMPTY_META), [field]: value } },
+        plan: { ...s.plan, [num]: { ...(s.plan[num] ?? EMPTY_PLAN), [field]: value } },
       }));
     },
-    setPlan(id: string, field: keyof PlanRow, value: string) {
-      patchState(store, (s) => ({
-        plan: { ...s.plan, [id]: { ...(s.plan[id] ?? EMPTY_PLAN), [field]: value } },
-      }));
+    setThreshold(value: number) {
+      if (!Number.isFinite(value)) return;
+      patchState(store, { threshold: Math.min(1, Math.max(0, value)) });
     },
 
     // ── getters ──
-    generalOf: (id: string) => store.general()[id] ?? '',
-    profileYearOf: (id: string, field: keyof YearRow) => store.profileYears()[id]?.[field] ?? '',
-    standardOf: (id: string) => store.standards()[id] ?? '',
-    violationOf: (id: string, field: keyof ViolationRow) => store.violations()[id]?.[field] ?? '',
-    sectionAOf: (id: string) => store.sectionA()[id] ?? '',
-    answerOf: (id: string) => store.answers()[id] ?? '',
-    indicatorYearOf: (id: string, field: keyof YearRow) =>
-      store.indicatorYears()[id]?.[field] ?? '',
-    metaOf: (id: string, field: keyof IndicatorMeta) => store.meta()[id]?.[field] ?? '',
-    planOf: (id: string, field: keyof PlanRow) => store.plan()[id]?.[field] ?? '',
+    profileOf: (id: string) => store.profile()[id] ?? '',
+    answerOf: (num: string) => store.answers()[num] ?? '',
+    noteOf: (num: string) => store.notes()[num] ?? '',
+    docOf: (id: string, field: keyof DocRow) => store.docs()[id]?.[field] ?? '',
+    planOf: (num: string, field: keyof PlanRow) => store.plan()[num]?.[field] ?? '',
 
     // ── stepper ──
     goToStep(index: number, total: number) {
@@ -363,15 +170,13 @@ export const CsiStore = signalStore(
       patchState(store, {
         config,
         storageKey: STORAGE_PREFIX + config.id,
-        general: saved?.general ?? {},
-        profileYears: saved?.profileYears ?? {},
-        standards: saved?.standards ?? {},
-        violations: saved?.violations ?? {},
-        sectionA: saved?.sectionA ?? {},
+        profile: saved?.profile ?? {},
         answers: saved?.answers ?? {},
-        indicatorYears: saved?.indicatorYears ?? {},
-        meta: saved?.meta ?? {},
+        notes: saved?.notes ?? {},
+        docs: saved?.docs ?? {},
         plan: saved?.plan ?? {},
+        threshold:
+          typeof saved?.threshold === 'number' ? saved.threshold : config.results.thresholdDefault,
         currentStep: saved?.currentStep ?? 0,
       });
     },
@@ -384,7 +189,12 @@ export const CsiStore = signalStore(
           // ignore
         }
       }
-      patchState(store, { ...initialState, config: store.config(), storageKey: key });
+      patchState(store, {
+        ...initialState,
+        config: store.config(),
+        storageKey: key,
+        threshold: store.config().results.thresholdDefault,
+      });
     },
   })),
 
@@ -394,15 +204,12 @@ export const CsiStore = signalStore(
         const key = store.storageKey();
         if (!key) return; // not initialised yet — nothing to persist
         savePersisted(key, {
-          general: store.general(),
-          profileYears: store.profileYears(),
-          standards: store.standards(),
-          violations: store.violations(),
-          sectionA: store.sectionA(),
+          profile: store.profile(),
           answers: store.answers(),
-          indicatorYears: store.indicatorYears(),
-          meta: store.meta(),
+          notes: store.notes(),
+          docs: store.docs(),
           plan: store.plan(),
+          threshold: store.threshold(),
           currentStep: store.currentStep(),
         });
       });

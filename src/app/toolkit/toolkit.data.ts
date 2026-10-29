@@ -82,11 +82,11 @@ export const TOOLKITS: Toolkit[] = localePick({
     },
     {
       id: 'csi-2026-sme',
-      name: 'Bộ công cụ ESG theo Bộ chỉ số CSI 2026',
+      name: 'Đánh giá mức độ sẵn sàng ESG',
       group: 'csi',
-      sector: 'Phiên bản dành cho doanh nghiệp nhỏ và siêu nhỏ',
+      sector: 'Dành cho doanh nghiệp nhỏ và siêu nhỏ',
       description:
-        'Bộ công cụ giúp doanh nghiệp trả lời ba câu hỏi: (1) Chúng ta đang ở đâu so với chuẩn CSI? (2) Khoảng cách lớn nhất nằm ở đâu? (3) Trong 12 tháng tới cần làm gì trước?',
+        'Dựa trên Bộ chỉ số CSI 2026. Giúp doanh nghiệp trả lời ba câu hỏi: (1) Doanh nghiệp mình đã sẵn sàng tới đâu? (2) Còn thiếu những gì? (3) Nên làm việc gì trước?',
     },
     {
       id: 'coming-soon-1',
@@ -162,11 +162,11 @@ export const TOOLKITS: Toolkit[] = localePick({
     },
     {
       id: 'csi-2026-sme',
-      name: 'ESG Toolkit based on the CSI 2026 Index',
+      name: 'ESG Readiness Assessment',
       group: 'csi',
-      sector: 'Edition for small and micro enterprises',
+      sector: 'For small and micro enterprises',
       description:
-        'The toolkit helps enterprises answer three questions: (1) Where do we stand against the CSI standard? (2) Where are the biggest gaps? (3) What should we do first in the next 12 months?',
+        'Based on the CSI 2026 Index. Helps your business answer three questions: (1) How ready are we? (2) What is still missing? (3) What should we do first?',
     },
     {
       id: 'coming-soon-1',

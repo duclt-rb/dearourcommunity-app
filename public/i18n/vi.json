@@ -558,18 +558,74 @@
     },
     "csi": {
       "steps": {
-        "guide": "Hướng dẫn sử dụng",
-        "intro": "Giới thiệu CSI 2026",
-        "glossary": "Thuật ngữ & pháp lý",
-        "profile": "Hồ sơ doanh nghiệp",
-        "I": "Chỉ số I",
-        "G": "Chỉ số G",
-        "E": "Chỉ số E",
-        "LS": "Chỉ số L&S",
-        "dashboard": "Bảng điểm tổng hợp",
-        "plan": "Kế hoạch hành động"
+        "guide": "Bắt đầu",
+        "profile": "Thông tin doanh nghiệp",
+        "part1": "Phần 1: Số liệu",
+        "part2": "Phần 2: Quản trị",
+        "part3": "Phần 3: Môi trường",
+        "part4": "Phần 4: Lao động, xã hội",
+        "results": "Kết quả sẵn sàng",
+        "gap": "Khoảng cách cần lấp",
+        "documents": "Hồ sơ cần có",
+        "glossary": "Thuật ngữ",
+        "about": "Về công cụ này"
       },
-      "planEmpty": "Không có chỉ số nào ở mức ưu tiên này."
+      "answer": {
+        "yes": "Có",
+        "no": "Chưa có",
+        "na": "Không áp dụng",
+        "label": "Trả lời",
+        "select": "Chọn khoảng phù hợp"
+      },
+      "kind": {
+        "core": "Bắt buộc",
+        "advanced": "Nâng cao"
+      },
+      "status": {
+        "unanswered": "Chưa trả lời",
+        "have": "Đã có",
+        "attention": "Cần lưu ý",
+        "fix": "Cần khắc phục",
+        "missing": "Còn thiếu",
+        "na": "Không áp dụng"
+      },
+      "priority": {
+        "all": "Tất cả",
+        "fix": "1 - Khắc phục ngay",
+        "missing": "2 - Bắt buộc còn thiếu",
+        "advanced": "3 - Nâng cao",
+        "attention": "Cần lưu ý",
+        "unanswered": "Chưa trả lời"
+      },
+      "level": {
+        "ready": "SẴN SÀNG",
+        "near": "GẦN SẴN SÀNG",
+        "not": "CHƯA SẴN SÀNG",
+        "nodata": "CHƯA CÓ DỮ LIỆU",
+        "partial": "CHƯA ĐỦ DỮ LIỆU"
+      },
+      "progress": {
+        "todo": "Chưa bắt đầu",
+        "doing": "Đang làm",
+        "done": "Đã xong"
+      },
+      "partCounts": "{{total}} câu hỏi: {{core}} việc bắt buộc, {{advanced}} việc nâng cao",
+      "answered": "Đã trả lời {{done}} / {{total}} câu",
+      "statusProvisional": "Kết quả tạm thời: còn {{count}} câu chưa trả lời. Trả lời hết để có kết quả chính xác.",
+      "statusComplete": "Đã trả lời đủ toàn bộ câu hỏi. Còn {{count}} việc bắt buộc cần bổ sung.",
+      "csiOriginal": "Mã CSI và nội dung gốc",
+      "csiCode": "Mã CSI",
+      "csiText": "Nội dung gốc trong Bộ chỉ số CSI 2026",
+      "evidenceLabel": "Cần có giấy tờ gì để chọn \"Có\"?",
+      "evidenceLabelData": "Cần có số liệu, giấy tờ gì?",
+      "noteLabel": "Ghi chú của doanh nghiệp",
+      "thresholdAria": "Ngưỡng Gần sẵn sàng (%)",
+      "docsSummary": "Số hồ sơ đã có: {{yes}} / {{total}}",
+      "notAnswered": "Chưa có dữ liệu",
+      "noValue": "—",
+      "planEmpty": "Không có việc nào ở mức ưu tiên này.",
+      "firstEmpty": "Chưa có việc bắt buộc nào còn thiếu.",
+      "overallLabelAria": "Mức sẵn sàng chung"
     }
   },
   "profile": {

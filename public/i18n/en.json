@@ -558,18 +558,74 @@
     },
     "csi": {
       "steps": {
-        "guide": "How to use",
-        "intro": "CSI 2026 Introduction",
-        "glossary": "Glossary & legal",
-        "profile": "Company profile",
-        "I": "Indicators I",
-        "G": "Indicators G",
-        "E": "Indicators E",
-        "LS": "Indicators L&S",
-        "dashboard": "Scorecard",
-        "plan": "Action plan"
+        "guide": "Get started",
+        "profile": "Company information",
+        "part1": "Part 1: Data",
+        "part2": "Part 2: Governance",
+        "part3": "Part 3: Environment",
+        "part4": "Part 4: Employees & society",
+        "results": "Readiness results",
+        "gap": "Gaps to close",
+        "documents": "Documents you need",
+        "glossary": "Glossary",
+        "about": "About this tool"
       },
-      "planEmpty": "No indicators at this priority level."
+      "answer": {
+        "yes": "Yes",
+        "no": "Not yet",
+        "na": "Not applicable",
+        "label": "Answer",
+        "select": "Select the matching range"
+      },
+      "kind": {
+        "core": "Mandatory",
+        "advanced": "Advanced"
+      },
+      "status": {
+        "unanswered": "Unanswered",
+        "have": "In place",
+        "attention": "Worth a look",
+        "fix": "Needs fixing",
+        "missing": "Missing",
+        "na": "Not applicable"
+      },
+      "priority": {
+        "all": "All",
+        "fix": "1 - Fix now",
+        "missing": "2 - Mandatory item missing",
+        "advanced": "3 - Advanced",
+        "attention": "Worth a look",
+        "unanswered": "Unanswered"
+      },
+      "level": {
+        "ready": "READY",
+        "near": "ALMOST READY",
+        "not": "NOT READY",
+        "nodata": "NO DATA YET",
+        "partial": "NOT ENOUGH DATA"
+      },
+      "progress": {
+        "todo": "Not started",
+        "doing": "In progress",
+        "done": "Done"
+      },
+      "partCounts": "{{total}} questions: {{core}} mandatory items, {{advanced}} advanced items",
+      "answered": "{{done}} / {{total}} questions answered",
+      "statusProvisional": "Provisional result: {{count}} questions still unanswered. Answer them all for an accurate result.",
+      "statusComplete": "All questions answered. {{count}} mandatory items still need to be added.",
+      "csiOriginal": "CSI code and original wording",
+      "csiCode": "CSI code",
+      "csiText": "Original wording in the CSI 2026 Index",
+      "evidenceLabel": "What documents do you need to answer \"Yes\"?",
+      "evidenceLabelData": "What data and documents do you need?",
+      "noteLabel": "Company notes",
+      "thresholdAria": "\"Almost ready\" threshold (%)",
+      "docsSummary": "Documents in place: {{yes}} / {{total}}",
+      "notAnswered": "No data yet",
+      "noValue": "—",
+      "planEmpty": "No items at this priority level.",
+      "firstEmpty": "No mandatory items are missing yet.",
+      "overallLabelAria": "Overall readiness level"
     }
   },
   "profile": {

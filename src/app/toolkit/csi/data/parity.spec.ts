@@ -4,17 +4,23 @@ import { CSI_TOOLKITS_VI } from './csi.data.vi';
 
 /**
  * Structure-parity guard giữa hai edition VI/EN: mọi thứ trừ text người đọc
- * (id, level, kind, value, điểm số, độ dài & thứ tự mảng) phải GIỐNG HỆT NHAU.
+ * (id, STT, loại việc, mã CSI, kiểu trả lời, tag, độ dài & thứ tự mảng) phải GIỐNG HỆT NHAU.
  * Mọi chuỗi khác là text người đọc → thay bằng placeholder (vẫn so sánh SỰ TỒN TẠI).
  */
-const STRUCTURAL_KEYS = new Set(['id', 'kind', 'value']);
-/** `level` chỉ là cấu trúc khi là cấp độ chỉ số C/A (tiêu đề cột "Cấp độ" cũng tên `level`). */
-const isStructural = (key: string, value: string) =>
-  STRUCTURAL_KEYS.has(key) || (key === 'level' && (value === 'C' || value === 'A'));
+const STRUCTURAL_KEYS = new Set([
+  'id',
+  'num',
+  'kind',
+  'code',
+  'answer',
+  'tag',
+  'refs',
+  'type',
+  'no',
+]);
 
-/** Ký tự có dấu tiếng Việt — bản EN không được còn (trừ tên riêng người liên hệ). */
+/** Ký tự có dấu tiếng Việt — bản EN không được còn. */
 const VIETNAMESE = /[ăâđêôơưạảấầẩẫậắằẳẵặẹẻẽếềểễệỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹàáèéìíòóùúý]/i;
-const PROPER_NAMES = /Nguyễn Thành Trung|Hoàng Lê Anh/g;
 
 function strings(value: unknown, key = '', out: [string, string][] = []): [string, string][] {
   if (Array.isArray(value)) value.forEach((v) => strings(v, key, out));
@@ -34,7 +40,7 @@ function structural(value: unknown, key = ''): unknown {
     }
     return out;
   }
-  if (typeof value === 'string' && !isStructural(key, value)) return value ? '<text>' : '';
+  if (typeof value === 'string' && !STRUCTURAL_KEYS.has(key)) return value ? '<text>' : '';
   return value;
 }
 
@@ -52,8 +58,8 @@ describe('csi data VI/EN structure parity', () => {
 
     it(`config '${id}' EN edition has no untranslated Vietnamese text`, () => {
       const leftovers = strings(CSI_TOOLKITS_EN[id])
-        .filter(([key, text]) => !isStructural(key, text))
-        .filter(([, text]) => VIETNAMESE.test(text.replace(PROPER_NAMES, '')));
+        .filter(([key]) => !STRUCTURAL_KEYS.has(key))
+        .filter(([, text]) => VIETNAMESE.test(text));
       expect(leftovers).toEqual([]);
     });
   }

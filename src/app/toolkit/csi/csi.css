@@ -1054,3 +1054,98 @@
     padding: 0 8px;
   }
 }
+
+/* ── CSI "mức độ sẵn sàng" (CR-023) ── */
+.csi__level-chip {
+  display: inline-block;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+.csi__level-chip.is-ready {
+  color: var(--color-success-700);
+  background: var(--color-success-50);
+}
+.csi__level-chip.is-near {
+  color: var(--color-warning-700);
+  background: var(--color-warning-50);
+}
+.csi__level-chip.is-not {
+  color: var(--color-error-700);
+  background: var(--color-error-50);
+}
+.csi__level-chip.is-nodata {
+  color: var(--color-gray-600);
+  background: var(--color-gray-100);
+}
+.csi__overall-score .csi__level-chip {
+  font-size: 1rem;
+  padding: 7px 16px;
+}
+
+.csi__list {
+  margin-top: 10px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-gray-700);
+}
+
+/* Mã CSI + nội dung gốc: thu gọn dưới mỗi câu hỏi. */
+.csi__orig {
+  margin-top: 10px;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--color-gray-600);
+}
+.csi__orig summary {
+  cursor: pointer;
+  width: fit-content;
+  font-weight: 600;
+  color: var(--color-gray-700);
+}
+.csi__orig p {
+  margin-top: 6px;
+}
+
+.csi__threshold {
+  margin-top: 16px;
+}
+.csi__threshold-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.csi__threshold-input .csi__cell {
+  width: 84px;
+}
+
+.csi__first {
+  margin-top: 12px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+.csi__first li {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-card);
+  background: var(--color-bg);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+.csi__first-text {
+  flex: 1 1 260px;
+  min-width: 0;
+}

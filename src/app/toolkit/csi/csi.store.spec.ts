@@ -2,92 +2,80 @@ import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { CSI_TOOLKITS_VI } from './data/csi.data.vi';
 import { CsiStore } from './csi.store';
-import { priorityFor } from './csi.types';
 
-// Chốt chặn: con số của bộ file gốc (105 chỉ số · 86 C · 19 A · 545 điểm công bố ·
-// 551 điểm thành phần) và cách chấm Có / Không / Không thuộc đối tượng áp dụng.
+const config = CSI_TOOLKITS_VI['csi-2026-sme'];
+const KEY = 'doc:csi-toolkit:csi-2026-sme';
+
 describe('CSI 2026 toolkit store', () => {
-  const config = CSI_TOOLKITS_VI['csi-2026-sme'];
-  const indicators = config.sections.flatMap((s) =>
-    s.groups.flatMap((g) => g.blocks.flatMap((b) => b.indicators)),
-  );
   let store: InstanceType<typeof CsiStore>;
+
+  function create(): InstanceType<typeof CsiStore> {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ providers: [CsiStore] });
+    const s = TestBed.inject(CsiStore);
+    s.init(config);
+    return s;
+  }
 
   beforeEach(() => {
     localStorage.clear();
-    TestBed.configureTestingModule({ providers: [CsiStore] });
-    store = TestBed.inject(CsiStore);
-    store.init(config);
+    store = create();
   });
 
-  it('matches the indicator counts of the source file', () => {
-    expect(indicators).toHaveLength(105);
-    expect(indicators.filter((i) => i.level === 'C')).toHaveLength(86);
-    expect(indicators.filter((i) => i.level === 'A')).toHaveLength(19);
-    expect(new Set(indicators.map((i) => i.id)).size).toBe(105);
-    // 22 nhóm chỉ số — đúng danh sách "Mức độ sẵn sàng theo từng nhóm" của Bảng điểm
-    expect(store.groupResults()).toHaveLength(22);
+  it('computes readiness from answers and keeps the default threshold', () => {
+    expect(store.threshold()).toBe(0.8);
+    expect(store.readiness().overall).toBe('nodata');
+    store.setAnswer('2.1', 'yes');
+    expect(store.readiness().areas[1].have).toBe(1);
+    expect(store.answeredCount()).toBe(1);
+    expect(store.totalQuestions()).toBe(105);
   });
 
-  it('starts at 0% with the published / component totals of the scorecard', () => {
-    const total = store.grandTotal();
-    expect(total.published).toBe(545);
-    expect(total.component).toBe(551);
-    expect(total.available).toBe(551);
-    expect(total.self).toBe(0);
-    expect(total.rate).toBe(0);
-    expect(store.partResults().map((p) => [p.published, p.component])).toEqual([
-      [14, 14],
-      [4, 4],
-      [178, 184],
-      [70, 70],
-      [138, 138],
-      [141, 141],
-    ]);
-    expect(store.compliance()).toEqual([86, 0, 0, 0, 19, 0, 105]);
+  it('clamps the threshold to 0–100%', () => {
+    store.setThreshold(1.5);
+    expect(store.threshold()).toBe(1);
+    store.setThreshold(-1);
+    expect(store.threshold()).toBe(0);
+    store.setThreshold(Number.NaN);
+    expect(store.threshold()).toBe(0);
   });
 
-  it('scores Có as full points and drops N/A from both numerator and denominator', () => {
-    store.setAnswer('I 1', 'yes'); // C, 20 điểm
-    store.setAnswer('E 6', 'na'); // C, 6 điểm
-    store.setAnswer('G 22', 'no'); // A, 6 điểm
-
-    const [, , partI, partG, partE] = store.partResults();
-    expect(partI.self).toBe(20);
-    expect(partI.available).toBe(184);
-    expect(partE.available).toBe(132);
-    expect(partG.self).toBe(0);
-    expect(store.compliance()).toEqual([86, 1, 0, 1, 19, 0, 102]);
-
-    const plan = new Map(store.planItems().map((p) => [p.indicator.id, p]));
-    expect(plan.get('I 1')?.priority).toBe('done');
-    expect(plan.get('I 1')?.missing).toBe(0);
-    expect(plan.get('E 6')?.priority).toBe('na');
-    expect(plan.get('E 6')?.missing).toBe(0);
-    expect(plan.get('G 22')?.priority).toBe('medium');
-    expect(plan.get('G 22')?.missing).toBe(6);
+  it('summarises documents as yes / (total − not applicable)', () => {
+    const ids = config.documents.groups.flatMap((g) => g.items.map((i) => i.id));
+    expect(ids).toHaveLength(33);
+    store.setDoc(ids[0], 'status', 'yes');
+    store.setDoc(ids[1], 'status', 'na');
+    expect(store.docsSummary()).toEqual({ yes: 1, total: 32 });
   });
 
-  it('converts readiness to the published CSI scale', () => {
-    for (const ind of config.sections[0].groups.flatMap((g) =>
-      g.blocks.flatMap((b) => b.indicators),
-    )) {
-      store.setAnswer(ind.id, 'yes');
-    }
-    store.setSectionA('part-1', 'yes');
+  it('persists to localStorage (v3) and rehydrates', async () => {
+    store.setAnswer('1.1', '2');
+    store.setNote('1.1', 'ghi chú');
+    store.setPlan('2.1', 'owner', 'Lan');
+    TestBed.tick();
+    const saved = JSON.parse(localStorage.getItem(KEY) ?? '{}');
+    expect(saved.version).toBe(3);
+    expect(saved.answers['1.1']).toBe('2');
 
-    const [part1, part2, partI] = store.partResults();
-    expect(part1.self).toBe(14);
-    expect(part2.self).toBe(0);
-    expect(partI.rate).toBe(1);
-    expect(partI.converted).toBe(178);
+    const again = create();
+    expect(again.answerOf('1.1')).toBe('2');
+    expect(again.noteOf('1.1')).toBe('ghi chú');
+    expect(again.planOf('2.1', 'owner')).toBe('Lan');
   });
 
-  it('maps answers to the agreed priority levels', () => {
-    expect(priorityFor('C', 'no')).toBe('high');
-    expect(priorityFor('A', 'no')).toBe('medium');
-    expect(priorityFor('C', 'yes')).toBe('done');
-    expect(priorityFor('A', 'na')).toBe('na');
-    expect(priorityFor('C', '')).toBe('unrated');
+  it('ignores a persisted payload from the retired scoring design (v2)', () => {
+    localStorage.setItem(KEY, JSON.stringify({ version: 2, answers: { 'I 1': 'yes' } }));
+    const fresh = create();
+    expect(fresh.answerOf('I 1')).toBe('');
+    expect(Object.keys(fresh.answers())).toHaveLength(0);
+  });
+
+  it('resets everything', () => {
+    store.setAnswer('1.1', '0');
+    store.setThreshold(0.5);
+    store.reset();
+    expect(store.answerOf('1.1')).toBe('');
+    expect(store.threshold()).toBe(0.8);
+    expect(localStorage.getItem(KEY)).toBeNull();
   });
 });

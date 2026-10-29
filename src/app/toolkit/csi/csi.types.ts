@@ -1,13 +1,11 @@
-// CSI 2026 toolkit type model — "Bộ công cụ ESG theo Bộ chỉ số CSI 2026, phiên bản DN nhỏ
-// và siêu nhỏ". Nội dung lấy NGUYÊN VĂN từ bộ file Excel gốc (10 sheet): mỗi sheet là một
-// bước của wizard, văn bản người đọc nằm trong `data/csi.data.{vi,en}.ts`.
-import { localePick } from '../../core/i18n/locale';
-import type { SegmentOptionLite } from '../waste/waste.types';
+// CSI 2026 toolkit type model — "Đánh giá mức độ sẵn sàng ESG, Doanh nghiệp nhỏ và siêu nhỏ" (CR-023).
+// Công cụ KHÔNG chấm điểm: mỗi việc là Có / Chưa có / Không áp dụng (hoặc chọn khoảng với câu số
+// liệu), kết quả là mức sẵn sàng theo 4 lĩnh vực. Nội dung sinh từ file Excel nguồn bằng
+// `tools/csi-readiness/build-data.py` → `data/csi.data.{vi,en}.ts` (cấu trúc khoá chặt bởi parity.spec).
 
 export type { SegmentOptionLite } from '../waste/waste.types';
-export { ACTION_STATUS_OPTIONS } from '../waste/waste.types';
 
-// ── Trang đọc (sheet 1 Hướng dẫn · 2 Giới thiệu CSI · 3 Thuật ngữ) ──
+// ── Trang đọc (Bắt đầu · Về công cụ này) ──
 
 export interface CsiPair {
   label: string;
@@ -16,243 +14,201 @@ export interface CsiPair {
 
 export type CsiDocBlock =
   | { kind: 'paragraph'; text: string }
-  | { kind: 'pairs'; rows: CsiPair[] }
-  | { kind: 'table'; headers: string[]; rows: string[][] };
+  | { kind: 'list'; items: string[] }
+  | { kind: 'pairs'; rows: CsiPair[] };
 
 export interface CsiDocSection {
-  id: string;
   title: string;
   blocks: CsiDocBlock[];
 }
 
-export interface CsiDocPage {
-  id: string;
-  /** Dòng tiêu đề đầu sheet (title / subtitle / ghi chú). */
-  header: string[];
+export interface CsiGuide {
+  title: string;
+  subtitle: string;
+  audience: string;
+  brand: string;
+  byline: string;
+  sections: CsiDocSection[];
+  footer: string;
+}
+
+export interface CsiAbout {
+  title: string;
   sections: CsiDocSection[];
 }
 
-// ── Sheet 3.1 — Hồ sơ doanh nghiệp ──
+export interface CsiGlossary {
+  title: string;
+  entries: { term: string; definition: string }[];
+}
+
+// ── Thông tin doanh nghiệp ──
 
 export interface CsiOption {
-  value: string;
   label: string;
 }
 
 export interface CsiProfileField {
   id: string;
   label: string;
-  /** Có khi nhãn gốc liệt kê lựa chọn trong ngoặc, vd "(Nhỏ / Siêu nhỏ)". */
+  type?: 'date';
   options?: CsiOption[];
-}
-
-export interface CsiProfileRow {
-  id: string;
-  label: string;
-}
-
-export interface CsiInfoBlock {
-  id: string;
-  title: string;
-  text: string;
-}
-
-/** Bảng số liệu 3 năm: Mô tả · 2023 · 2024 · 2025 · Ghi chú / tài liệu đính kèm. */
-export interface CsiYearTable {
-  id: string;
-  title: string;
-  headers: string[];
-  rows: CsiProfileRow[];
-}
-
-export interface CsiSectionARow {
-  id: string;
-  label: string;
-  maxScore: number;
 }
 
 export interface CsiProfile {
   title: string;
-  subtitle: string;
-  note: string;
-  generalTitle: string;
-  generalFields: CsiProfileField[];
-  infoBlocks: CsiInfoBlock[];
-  yearTables: CsiYearTable[];
-  standards: { title: string; rows: CsiProfileRow[] };
-  violations: { title: string; headers: string[]; rows: CsiProfileRow[] };
-  /** Tự đánh giá mức độ hoàn thiện Mục A (Phần I 14đ · Phần II 4đ). */
-  sectionA: { title: string; headers: string[]; rows: CsiSectionARow[] };
+  timeHint: string;
+  fields: CsiProfileField[];
+  infoBlocks: { title: string; text: string }[];
 }
 
-// ── Sheet 4–7 — Chỉ số I / G / E / L&S ──
+// ── Câu hỏi ──
 
-export type CsiLevel = 'C' | 'A';
-export type CsiSectionId = 'I' | 'G' | 'E' | 'LS';
+/** Bắt buộc (chỉ số cơ bản C — quyết định mức sẵn sàng) / Nâng cao (A — giá trị cộng thêm). */
+export type CsiKind = 'core' | 'advanced';
 
-export interface CsiIndicator {
-  /** Mã chỉ số nguyên văn (vd "I 1", "L 30") — cũng là khoá persist. */
-  id: string;
-  level: CsiLevel;
+/**
+ * Nhãn của lựa chọn khoảng trong câu số liệu (không gắn nhãn = "Đã có"):
+ * missing = còn thiếu · fix = cần khắc phục ngay (tính là còn thiếu) ·
+ * attention = cần lưu ý (tính là đã có) · na = không áp dụng (không tính).
+ */
+export type CsiTag = 'missing' | 'fix' | 'attention' | 'na';
+
+export interface CsiRangeOption {
+  label: string;
+  tag?: CsiTag;
+}
+
+export interface CsiQuestion {
+  /** STT hiển thị ("1.1"…"4.61") — cũng là khoá persist. */
+  num: string;
   text: string;
-  /** Chỉ số I: đơn vị tính của số liệu 3 năm. */
-  unit?: string;
-  maxScore: number;
-  /** Gợi ý hành động. */
-  hint: string;
-  /** Hồ sơ minh chứng cần chuẩn bị. */
+  kind: CsiKind;
+  /** Giấy tờ cần có để chọn "Có". */
   evidence: string;
+  /** Việc cần làm (sheet Khoảng cách cần lấp). */
+  action: string;
+  /** Mã chỉ số CSI nguyên văn (vd "I 1", "G 19", "S 3"). */
+  code: string;
+  /** Nội dung gốc trong Bộ chỉ số CSI 2026. */
+  csiText: string;
+  answer: 'yesno' | 'range';
+  /** Chỉ có với câu số liệu (answer = 'range'). */
+  options?: CsiRangeOption[];
 }
 
-/** Nhóm con "» …" (title rỗng = chỉ số nằm thẳng dưới nhóm). */
-export interface CsiBlock {
-  id: string;
+export interface CsiQuestionGroup {
   title: string;
-  declaredMax: number;
-  indicators: CsiIndicator[];
+  questions: CsiQuestion[];
 }
 
-export interface CsiGroup {
-  id: string;
-  title: string;
-  /** Điểm tối đa ghi ở dòng nhóm trong file (có thể khác tổng chỉ số thành phần). */
-  declaredMax: number;
-  blocks: CsiBlock[];
-}
-
-/** Tiêu đề cột nguyên văn của sheet; `unit`/`y2023…` chỉ có ở sheet chỉ số I. */
-export type CsiColumnKey =
-  | 'code'
-  | 'level'
-  | 'text'
-  | 'unit'
-  | 'y2023'
-  | 'y2024'
-  | 'y2025'
-  | 'maxScore'
-  | 'answer'
-  | 'selfScore'
-  | 'available'
-  | 'priority'
-  | 'hint'
-  | 'evidence'
-  | 'note'
-  | 'owner'
-  | 'deadline'
-  | 'group';
-
-export interface CsiSection {
-  id: CsiSectionId;
+export interface CsiPart {
+  /** 1 = Số liệu · 2 = Quản trị · 3 = Môi trường · 4 = Lao động, xã hội. */
+  no: 1 | 2 | 3 | 4;
   title: string;
   subtitle: string;
   note: string;
-  /** Cột "Phần" ở bảng điểm/kế hoạch, vd "Chỉ số I". */
-  shortLabel: string;
-  /** Tên dòng tương ứng ở Bảng điểm tổng hợp. */
-  dashboardLabel: string;
-  /** Điểm tối đa CSI công bố (dùng cho điểm quy đổi). */
-  publishedMax: number;
-  headers: Partial<Record<CsiColumnKey, string>>;
-  groups: CsiGroup[];
-  total: { label: string; maxScore: number };
+  groups: CsiQuestionGroup[];
 }
 
-// ── Sheet 8 — Bảng điểm · Sheet 9 — Kế hoạch hành động ──
+// ── Kết quả / Khoảng cách / Hồ sơ ──
 
-export interface CsiDashboardLabels {
+export interface CsiResultsText {
   title: string;
   subtitle: string;
   note: string;
-  partsTitle: string;
-  partsHeaders: string[];
-  partARows: string[];
-  totalLabel: string;
-  partsNote: string;
-  complianceTitle: string;
-  complianceHeaders: string[];
-  /** 7 dòng theo thứ tự file: tổng C · C đạt · C cần xử lý ngay · C N/A · tổng A · A đạt · chưa đánh giá. */
-  complianceRows: string[];
+  overallLabel: string;
+  overallNote: string;
+  areasTitle: string;
+  areasHeaders: string[];
+  howTitle: string;
+  how: CsiPair[];
+  thresholdLabel: string;
+  thresholdNote: string;
+  thresholdDefault: number;
   groupsTitle: string;
   groupsHeaders: string[];
+  firstTitle: string;
+  firstNote: string;
+  firstHeaders: string[];
 }
 
-export interface CsiPlanLabels {
+export interface CsiGapText {
   title: string;
-  notes: string[];
-  /** 14 cột nguyên văn của sheet Kế hoạch hành động. */
+  subtitle: string;
+  note: string;
   headers: string[];
+}
+
+export interface CsiDocItem {
+  id: string;
+  title: string;
+  /** STT câu hỏi liên quan (vd "2.6, 3.13"). */
+  refs: string;
+  note: string;
+}
+
+export interface CsiDocGroup {
+  title: string;
+  items: CsiDocItem[];
+}
+
+export interface CsiDocuments {
+  title: string;
+  subtitle: string;
+  note: string;
+  headers: string[];
+  groups: CsiDocGroup[];
 }
 
 export interface CsiToolkitConfig {
   id: string;
-  name: string;
-  sector: string;
-  brand: string;
-  guide: CsiDocPage;
-  intro: CsiDocPage;
-  glossary: CsiDocPage;
+  guide: CsiGuide;
   profile: CsiProfile;
-  sections: CsiSection[];
-  dashboard: CsiDashboardLabels;
-  plan: CsiPlanLabels;
+  parts: CsiPart[];
+  /** Tên 4 lĩnh vực (theo thứ tự Phần 1–4). */
+  areaTitles: string[];
+  results: CsiResultsText;
+  gap: CsiGapText;
+  documents: CsiDocuments;
+  glossary: CsiGlossary;
+  about: CsiAbout;
 }
 
-// ── Trả lời & mức ưu tiên ──
+// ── Trạng thái & mức sẵn sàng ──
 
-export type CsiAnswer = 'yes' | 'no' | 'na';
+export type CsiYesNo = 'yes' | 'no' | 'na';
 
-/** Có / Không / Không thuộc đối tượng áp dụng — đúng biểu mẫu CSI (không có "Một phần"). */
-export const CSI_ANSWER_OPTIONS: SegmentOptionLite[] = localePick({
-  vi: [
-    { value: 'yes', label: 'Có' },
-    { value: 'no', label: 'Không' },
-    { value: 'na', label: 'Không thuộc đối tượng áp dụng' },
-  ],
-  en: [
-    { value: 'yes', label: 'Yes' },
-    { value: 'no', label: 'No' },
-    { value: 'na', label: 'Not applicable' },
-  ],
-});
+/** Tình trạng một câu sau khi trả lời (giống cột "Tình trạng" của file). */
+export type CsiStatus = 'unanswered' | 'have' | 'attention' | 'fix' | 'missing' | 'na';
 
-/** Mục A chỉ có Có/Không (sheet Hồ sơ doanh nghiệp). */
-export const CSI_YES_NO_OPTIONS: SegmentOptionLite[] = CSI_ANSWER_OPTIONS.slice(0, 2);
+/** Mức ưu tiên ở trang Khoảng cách cần lấp ('' = đã có hoặc không áp dụng). */
+export type CsiPriority = 'fix' | 'missing' | 'advanced' | 'attention' | 'unanswered' | '';
 
-export type CsiPriority = 'unrated' | 'high' | 'medium' | 'done' | 'na';
+/** Mức sẵn sàng; 'nodata' = chưa có dữ liệu, 'partial' = chưa đủ dữ liệu (chỉ ở mức chung). */
+export type CsiLevel = 'ready' | 'near' | 'not' | 'nodata' | 'partial';
 
-/**
- * Mức ưu tiên (chốt 23/09): C + Không → CAO - Tuân thủ · A + Không → TRUNG BÌNH - Nâng cao ·
- * Có → Đã đạt · N/A → Không áp dụng · chưa trả lời → Chưa đánh giá.
- */
-export function priorityFor(level: CsiLevel, answer: string | undefined): CsiPriority {
-  if (answer === 'yes') return 'done';
-  if (answer === 'na') return 'na';
-  if (answer === 'no') return level === 'C' ? 'high' : 'medium';
-  return 'unrated';
+export const CSI_PROGRESS_VALUES = ['todo', 'doing', 'done'] as const;
+
+/** Câu trả lời đã lưu → tình trạng. Câu yes/no lưu 'yes'|'no'|'na'; câu khoảng lưu chỉ số lựa chọn. */
+export function statusOf(q: CsiQuestion, value: string | undefined): CsiStatus {
+  if (value === undefined || value === '') return 'unanswered';
+  if (q.answer === 'yesno') {
+    if (value === 'yes') return 'have';
+    if (value === 'na') return 'na';
+    return 'missing';
+  }
+  const tag = q.options?.[Number(value)]?.tag;
+  return tag ?? 'have';
 }
 
-export const CSI_PRIORITY_LABELS: Record<CsiPriority, string> = localePick({
-  vi: {
-    unrated: 'Chưa đánh giá',
-    high: 'CAO - Tuân thủ',
-    medium: 'TRUNG BÌNH - Nâng cao',
-    done: 'Đã đạt',
-    na: 'Không áp dụng',
-  },
-  en: {
-    unrated: 'Not assessed',
-    high: 'HIGH - Compliance',
-    medium: 'MEDIUM - Advanced',
-    done: 'Achieved',
-    na: 'Not applicable',
-  },
-});
+/** Tình trạng → mức ưu tiên (giống cột "Ưu tiên" của sheet Khoảng cách cần lấp). */
+export function priorityFor(kind: CsiKind, status: CsiStatus): CsiPriority {
+  if (status === 'fix') return 'fix';
+  if (status === 'missing') return kind === 'core' ? 'missing' : 'advanced';
+  if (status === 'attention') return 'attention';
+  if (status === 'unanswered') return 'unanswered';
+  return '';
+}
 
-/** Bộ lọc cột "Mức ưu tiên" ở Kế hoạch hành động ('' = tất cả). */
-export const CSI_PRIORITY_FILTERS: SegmentOptionLite[] = [
-  { value: '', label: localePick({ vi: 'Tất cả', en: 'All' }) },
-  ...(['high', 'medium', 'unrated', 'done', 'na'] as CsiPriority[]).map((p) => ({
-    value: p,
-    label: CSI_PRIORITY_LABELS[p],
-  })),
-];
+export const CSI_YES_NO_VALUES: CsiYesNo[] = ['yes', 'no', 'na'];
