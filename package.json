@@ -1,11 +1,12 @@
 {
   "name": "app",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "scripts": {
     "ng": "ng",
     "start": "node scripts/ng-build-info.mjs serve --configuration local",
     "start:dev": "node scripts/ng-build-info.mjs serve --configuration development",
     "build": "node scripts/ng-build-info.mjs build",
+    "build:staging": "node scripts/ng-build-info.mjs build --configuration staging",
     "watch": "ng build --watch --configuration local",
     "test": "ng test",
     "test:e2e": "playwright test",
