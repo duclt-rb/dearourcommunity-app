@@ -74,8 +74,8 @@ export default class BillingComponent implements OnInit {
   private readonly toolkitAccess = inject(ToolkitAccessService);
   private readonly router = inject(Router);
 
-  // MoMo tạm khoá trên production (đang phát triển — "Sắp ra mắt")
-  readonly momoDisabled = environment.production;
+  // MoMo khoá theo môi trường (environment.momoEnabled): production "Sắp ra mắt", staging mở để test
+  readonly momoDisabled = !environment.momoEnabled;
 
   ngOnInit() {
     this.profileStore.loadProfile();
